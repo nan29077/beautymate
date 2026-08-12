@@ -31,10 +31,20 @@ function getDashboardPath(role: string): string {
   }
 }
 
-// 개발 환경 전용 테스트 계정 (prisma/seed.ts 기준, 공통 비밀번호 password123)
+// 개발 환경 전용 테스트 계정 (scripts/create-test-accounts.ts 로 생성)
 const TEST_ACCOUNTS = [
-  { key: "admin", label: "관리자로 로그인", email: "admin@sajumate.com", password: "password123" },
-  { key: "consultant", label: "상담사로 로그인", email: "consultant1@sajumate.com", password: "password123" },
+  {
+    key: "admin",
+    label: "관리자로 로그인",
+    email: "test-admin@sajumate.com",
+    password: "TestAdmin123!",
+  },
+  {
+    key: "consultant",
+    label: "상담사로 로그인",
+    email: "test-consultant@sajumate.com",
+    password: "TestConsult123!",
+  },
 ] as const;
 
 // process.env.NODE_ENV 는 빌드 시 인라인되므로 프로덕션 번들에는 이 블록이 남지 않는다.
@@ -145,7 +155,7 @@ function LoginForm() {
       });
       if (result?.error) {
         setError(
-          `테스트 계정(${account.email}) 로그인에 실패했습니다. 시드 데이터가 투입되었는지 확인해주세요.`,
+          `테스트 계정(${account.email}) 로그인에 실패했습니다. scripts/create-test-accounts.ts 를 실행했는지 확인해주세요.`,
         );
       } else {
         await redirectAfterLogin();
@@ -437,7 +447,7 @@ function LoginForm() {
             </div>
 
             <p className="mt-2 text-center text-[10px] text-gray-400">
-              시드 계정(비밀번호 password123) 기준 · 개발 환경에서만 표시됩니다
+              scripts/create-test-accounts.ts 로 생성 · 개발 환경에서만 표시됩니다
             </p>
           </div>
         )}
