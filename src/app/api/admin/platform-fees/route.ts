@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const fees = await getPlatformFees();
-    const row = await (prisma as any).platformFeeSettings.findFirst({ orderBy: { id: "asc" } });
+    const row = await prisma.platformFeeSettings.findFirst({ orderBy: { id: "asc" } });
     return NextResponse.json({
       ...fees,
       mentorCommissionRate: Number(row?.mentorCommissionRate ?? 1),
@@ -36,23 +36,20 @@ export async function PUT(req: NextRequest) {
     };
 
     const sellerFeeRate = parseRate(body.sellerFeeRate);
-    const middleAdminFeeRate = parseRate(body.middleAdminFeeRate);
-    const brandFeeRate = parseRate(body.brandFeeRate);
-    const nodeFeeRate = parseRate(body.nodeFeeRate);
 
-    if (sellerFeeRate === null || middleAdminFeeRate === null || brandFeeRate === null || nodeFeeRate === null) {
+    if (sellerFeeRate === null) {
       return NextResponse.json({ error: "수수료율은 0~100 사이의 숫자여야 합니다" }, { status: 400 });
     }
 
-    const existing = await (prisma as any).platformFeeSettings.findFirst({ orderBy: { id: "asc" } });
+    const existing = await prisma.platformFeeSettings.findFirst({ orderBy: { id: "asc" } });
     if (existing) {
-      await (prisma as any).platformFeeSettings.update({
+      await prisma.platformFeeSettings.update({
         where: { id: existing.id },
-        data: { sellerFeeRate, middleAdminFeeRate, brandFeeRate, nodeFeeRate },
+        data: { sellerFeeRate },
       });
     } else {
-      await (prisma as any).platformFeeSettings.create({
-        data: { sellerFeeRate, middleAdminFeeRate, brandFeeRate, nodeFeeRate },
+      await prisma.platformFeeSettings.create({
+        data: { sellerFeeRate },
       });
     }
 

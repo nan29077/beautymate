@@ -45,47 +45,9 @@ export default async function AdminTaxPage() {
     else sellerNonBusiness.push(rec);
   }
 
-  // ── 브랜드 정산 (지급완료된 BrandSettlement) ──
-  let brands: TaxRecord[] = [];
-  try {
-    const rows = await (prisma as any).brandSettlement.findMany({
-      where: { isPaid: true },
-      include: {
-      },
-      orderBy: { paidAt: "desc" },
-    });
-    brands = rows.map((s: any) => ({
-      id: s.id,
-      name: s.brand?.brandName || "브랜드",
-      bizNumber: s.brand?.businessRegistrationNo || "",
-      repName: s.brand?.representativeName || "",
-      amount: Number(s.totalSupply),
-      date: (s.paidAt ?? s.updatedAt ?? s.createdAt).toISOString(),
-    }));
-  } catch {
-    // ignore
-  }
-
-  // ── 중간관리자 정산 (지급완료된 MiddleAdminSettlement) ──
-  let middleAdmins: TaxRecord[] = [];
-  try {
-    const rows = await (prisma as any).middleAdminSettlement.findMany({
-      where: { status: "PAID" },
-      include: {
-      },
-      orderBy: { paidAt: "desc" },
-    });
-    middleAdmins = rows.map((s: any) => ({
-      id: s.id,
-      name: s.middleAdmin?.companyName || s.middleAdmin?.name || "중간관리자",
-      bizNumber: s.middleAdmin?.bizNumber || "",
-      repName: s.middleAdmin?.name || "",
-      amount: Number(s.settlementAmount),
-      date: (s.paidAt ?? s.updatedAt ?? s.createdAt).toISOString(),
-    }));
-  } catch {
-    // ignore
-  }
+  // 브랜드·중간관리자 개념이 제거되어 해당 정산 집계는 더 이상 존재하지 않는다.
+  const brands: TaxRecord[] = [];
+  const middleAdmins: TaxRecord[] = [];
 
   return (
     <div className="animate-fade-in">
