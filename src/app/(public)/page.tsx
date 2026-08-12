@@ -14,7 +14,7 @@ import { DEFAULT_PRODUCT_IMAGE, pickSellerAvatar } from "@/lib/defaults";
 import { LIVE_RING_CLASS, OnAirBadge } from "@/components/shared/LiveBadge";
 import { getFeatureFlags } from "@/lib/settings";
 import { getHomeStats, getHomeStories, getHomeBenefits } from "@/lib/siteContent";
-import { Heart, Radio, Sparkles, ShieldCheck, Gift, Award, Quote, Instagram, Youtube, CreditCard, Smartphone, Landmark, Star, Moon, BookOpen, Briefcase, HeartHandshake, Calendar, X, Check, ArrowRight, LogIn } from 'lucide-react';
+import { Heart, Radio, Sparkles, ShieldCheck, Gift, Award, Quote, Instagram, Youtube, CreditCard, Smartphone, Landmark, Star, Moon, Calendar, ArrowRight, LogIn } from 'lucide-react';
 
 export const dynamic = "force-dynamic";
 
@@ -37,21 +37,6 @@ const DIFFERENTIATORS = [
 // 라이브 상담 진행 방법 (고객 / 상담사)
 const BUYER_STEPS = ["좋아하는 상담사를 PICK해요", "방송 시작 알림을 받아요", "라이브에 입장해 소통해요", "원하는 시간에 바로 예약·결제해요"];
 const SELLER_STEPS = ["상담 상품과 가능한 시간을 등록해요", "평소처럼 라이브 방송을 켜요", "예약 URL·QR을 설명란에 걸어둬요", "방송이 끝나면 예약이 쌓여 있어요"];
-
-// 상담 카테고리 (라인형 아이콘)
-const CATEGORIES = [
-  { icon: Star, name: "사주" }, { icon: Moon, name: "신점" }, { icon: Sparkles, name: "타로" },
-  { icon: Heart, name: "궁합" }, { icon: BookOpen, name: "작명" }, { icon: Briefcase, name: "사업운" },
-  { icon: HeartHandshake, name: "연애운" }, { icon: Calendar, name: "택일" },
-];
-
-// 상담사에게 생기는 변화 (Before → After)
-const BEFORE_AFTER = [
-  { before: "카톡 예약 문의", after: "자동 예약 접수" },
-  { before: "입금 확인", after: "결제 완료 즉시 확정" },
-  { before: "노쇼", after: "결제 완료 = 예약 확정" },
-  { before: "장부 정리", after: "정산 자동화" },
-];
 
 // 메인 페이지 = "사주메이트 브랜드 소개 + 상담사 진입(이름검색/PICK) + 상담사 신청 유도" 화면.
 // ※ 상담상품 판매/구매 리스트(인기상담상품·공구·상담상품 그리드 등)는 두지 않는다.
@@ -213,8 +198,6 @@ export default async function HomePage({
   // '상담사 탐색' 기능이 꺼져 있으면 /sellers 는 404다.
   // 이때는 페이지 안의 상담사 이름 검색(#find-seller)으로 대신 보낸다.
   const findSellerHref = FEATURE_SELLER ? "/sellers" : "#find-seller";
-  const categoryHref = (name: string) =>
-    FEATURE_SELLER ? `/sellers?category=${encodeURIComponent(name)}` : "#find-seller";
 
   // 관리자 "사이트 관리 > 메인페이지 관리"에서 수정 가능한 숫자/성공스토리/혜택
   const [homeStats, homeStories, homeBenefits] = await Promise.all([getHomeStats(), getHomeStories(), getHomeBenefits()]);
@@ -306,59 +289,6 @@ export default async function HomePage({
             <Sparkles size={13} strokeWidth={1.8} className="mt-0.5 flex-shrink-0" />
             라이브커머스에서 방송을 마치고 주문을 확인하듯, 방송이 끝나면 예약이 쌓여 있습니다.
           </p>
-        </div>
-      </section>
-
-      {/* ───── 상담사에게 이런 변화가 생깁니다 (Before → After) ───── */}
-      <section className="px-4 pt-8">
-        <div
-          className="relative overflow-hidden rounded-3xl px-5 py-6 text-white"
-          style={{ background: "linear-gradient(150deg, #12082b 0%, #221046 55%, #33206f 100%)" }}
-        >
-          <div className="pointer-events-none absolute -top-14 -right-10 w-40 h-40 rounded-full bg-purple-500/25 blur-3xl animate-aura" aria-hidden="true" />
-          <div className="relative">
-            <h2 className="text-[18px] font-extrabold leading-snug">상담사에게 이런 변화가 생깁니다</h2>
-            <p className="mt-1 text-[11.5px] text-purple-200/70">예약을 받는 방식이 바뀌면, 방송에만 집중할 수 있어요</p>
-
-            <div className="mt-4 space-y-2">
-              {BEFORE_AFTER.map((row) => (
-                <div key={row.before} className="flex items-center gap-2 rounded-2xl bg-white/[0.07] ring-1 ring-white/10 px-3 py-3">
-                  <span className="flex flex-1 items-center gap-1.5 min-w-0">
-                    <X size={13} strokeWidth={2.4} className="text-rose-300 flex-shrink-0" />
-                    <span className="truncate text-[12px] text-purple-100/55 line-through">{row.before}</span>
-                  </span>
-                  <ArrowRight size={13} strokeWidth={2} className="text-purple-300/50 flex-shrink-0" aria-hidden="true" />
-                  <span className="flex flex-1 items-center gap-1.5 min-w-0 justify-end">
-                    <Check size={13} strokeWidth={2.6} className="text-emerald-300 flex-shrink-0" />
-                    <span className="truncate text-[12px] font-bold text-white">{row.after}</span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ───── 상담 카테고리 ───── */}
-      <section className="px-5 pt-8">
-        <h2 className="text-[19px] font-extrabold text-gray-900">어떤 상담이 필요하세요?</h2>
-        <p className="mt-1 text-[12px] text-gray-500">분야별로 상담사를 찾아보세요</p>
-        <div className="mt-4 grid grid-cols-4 gap-2.5">
-          {CATEGORIES.map((c) => {
-            const CategoryIcon = c.icon;
-            return (
-              <Link
-                key={c.name}
-                href={categoryHref(c.name)}
-                className="rounded-2xl border border-gray-100 bg-white py-3.5 flex flex-col items-center gap-1.5 active:scale-[0.98] transition-transform"
-              >
-                <span className="w-9 h-9 rounded-full bg-[#f3f0fb] flex items-center justify-center">
-                  <CategoryIcon size={18} strokeWidth={1.6} className="text-[#2d1b69]" />
-                </span>
-                <span className="text-[11px] font-medium text-gray-700">{c.name}</span>
-              </Link>
-            );
-          })}
         </div>
       </section>
 
