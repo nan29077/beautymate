@@ -50,7 +50,8 @@ export default async function DashboardLayout({
       { href: "/admin/package-purchase-orders", iconName: "OrderManagement", label: "패키지 발주서", group: "상담상품 관리" },
       { href: "/admin/categories", iconName: "Category", label: "카테고리 관리", group: "상담상품 관리" },
       // 예약·정산
-      { href: "/admin/orders", iconName: "OrderManagement", label: "예약 관리", group: "예약·정산" },
+      { href: "/admin/orders", iconName: "OrderManagement", label: "예약 관리(구)", group: "예약·정산" },
+      { href: "/admin/reservations", iconName: "Calendar", label: "예약 조회", group: "예약·정산" },
       { href: "/admin/campaigns", iconName: "Event", label: "단체 상담 관리", group: "예약·정산" },
       { href: "/admin/settlements", iconName: "Settlement", label: "정산 관리", group: "예약·정산" },
       { href: "/admin/middle-settlements", iconName: "Settlement", label: "중간관리자 정산", group: "예약·정산" },
@@ -89,7 +90,9 @@ export default async function DashboardLayout({
       { href: "/seller/campaigns", iconName: "Event", label: "단체 상담 관리", group: "판매·라이브" },
       { href: "/seller/games", iconName: "Play", label: "게임관리", group: "판매·라이브" },
       // 예약·정산
-      { href: "/seller/orders", iconName: "OrderManagement_icon", label: "예약 관리", group: "예약·정산" },
+      { href: "/seller/timeslots", iconName: "Clock", label: "시간슬롯 관리", group: "예약·정산" },
+      { href: "/seller/reservations", iconName: "Calendar", label: "예약 관리", group: "예약·정산" },
+      { href: "/seller/orders", iconName: "OrderManagement_icon", label: "예약 관리(구)", group: "예약·정산" },
       { href: "/seller/package-purchase-orders", iconName: "Package", label: "패키지 발주서", group: "예약·정산" },
       { href: "/seller/settlements", iconName: "Settlement_icon", label: "정산·출금", group: "예약·정산" },
       // 알림톡
