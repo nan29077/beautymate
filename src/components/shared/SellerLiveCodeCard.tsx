@@ -1,14 +1,16 @@
 "use client";
 
 import { Icon } from '@/components/shared/Icon';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // 상담사 대시보드: 내 라이브 코드 + 내 라이브 링크 + 공유(카카오톡/링크).
 export default function SellerLiveCodeCard({ code, shopName }: { code: string; shopName: string }) {
   const [copied, setCopied] = useState<string | null>(null);
 
-  // 공유 링크: 방송 여부에 따라 라이브 시청 페이지/외부 라이브/점집으로 서버에서 분기 리다이렉트
-  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  // 공유 링크: 방송 여부에 따라 라이브 시청 페이지/외부 라이브/점집으로 서버에서 분기 리다이렉트.
+  // origin은 서버 렌더 시 알 수 없으므로 마운트 후 채운다 (SSR/CSR 렌더 결과를 일치시켜 hydration 오류 방지).
+  const [origin, setOrigin] = useState("");
+  useEffect(() => setOrigin(window.location.origin), []);
   const liveEntryUrl = `${origin}/live-code/${code}`;
   const message = `[${shopName}] 라이브 코드: ${code}\n아래 링크를 열면 방송 중일 때 라이브로, 방송 전이면 점집으로 바로 이동해요!\n${liveEntryUrl}`;
 

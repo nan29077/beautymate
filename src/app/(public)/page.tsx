@@ -1,3 +1,5 @@
+import { existsSync } from "fs";
+import path from "path";
 import { Icon } from '@/components/shared/Icon';
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -164,6 +166,16 @@ async function getHomeData(featureLive: boolean) {
 
 const SELLER_CTA_BG_DEFAULT = "/banners/sajumate/consultant-cta-v2.jpg";
 
+// DB 배너의 로컬 이미지가 실제로 존재하는지 서버에서 검증.
+// 파일이 없는 배너를 그대로 내려보내면 옛 배너 문구가 먼저 렌더됐다가
+// 클라이언트에서 이미지 404를 감지한 뒤에야 기본 배너로 바뀌는 깜빡임(FOUC)이 생긴다.
+function bannerImageExists(imageUrl: string | null | undefined): boolean {
+  if (!imageUrl) return false;
+  if (!imageUrl.startsWith("/")) return true; // 외부 URL은 서버에서 검증 불가 → 통과
+  const relative = imageUrl.split("?")[0].replace(/^\/+/, "");
+  return existsSync(path.join(process.cwd(), "public", relative));
+}
+
 // 구매회원(CUSTOMER) 외 계정은 메인 페이지 진입 시 각자 대시보드로 리다이렉트
 const ROLE_DASHBOARD: Record<string, string> = {
   CONSULTANT: "/seller",
@@ -191,7 +203,7 @@ export default async function HomePage({
   const [homeStats, homeStories, homeBenefits] = await Promise.all([getHomeStats(), getHomeStories(), getHomeBenefits()]);
 
   // 최고관리자 배너 관리에서 등록한 상단 배너(최대 3개, 슬라이드) + 하단 배너
-  const [heroBanners, bottomBanner, activeCampaignCount] = await Promise.all([
+  const [heroBannersRaw, bottomBannerRaw, activeCampaignCount] = await Promise.all([
     prisma.banner.findMany({
       where: { isActive: true, position: "hero" },
       orderBy: { sortOrder: "asc" },
@@ -203,6 +215,10 @@ export default async function HomePage({
     }),
     prisma.groupBuyCampaign.count({ where: { status: "ACTIVE" } }),
   ]);
+
+  // 이미지 파일이 없는 배너는 서버에서 걸러 첫 렌더부터 기본(사주메이트) 배너가 나가게 한다
+  const heroBanners = heroBannersRaw.filter((b) => bannerImageExists(b.imageUrl));
+  const bottomBanner = bottomBannerRaw && bannerImageExists(bottomBannerRaw.imageUrl) ? bottomBannerRaw : null;
 
   const sellerCtaBg = bottomBanner?.imageUrl || SELLER_CTA_BG_DEFAULT;
   const sellerCtaLink = bottomBanner?.linkUrl || "/become-seller";

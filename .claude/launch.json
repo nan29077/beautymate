@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["next", "dev", "-p", "3022"],
       "port": 3022
+    },
+    {
+      "name": "sajumate-dev-3033",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["next", "dev", "-p", "3033"],
+      "port": 3033
     }
   ]
 }
