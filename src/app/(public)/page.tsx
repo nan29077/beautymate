@@ -14,7 +14,7 @@ import { DEFAULT_PRODUCT_IMAGE, pickSellerAvatar } from "@/lib/defaults";
 import { LIVE_RING_CLASS, OnAirBadge } from "@/components/shared/LiveBadge";
 import { getFeatureFlags } from "@/lib/settings";
 import { getHomeStats, getHomeStories, getHomeBenefits } from "@/lib/siteContent";
-import { Heart, Radio, Sparkles, ShieldCheck, Gift, Award, Quote, Instagram, Youtube, CreditCard, Smartphone, Landmark, Star, Moon, BookOpen, Briefcase, HeartHandshake, Calendar, ClipboardList, MonitorPlay, Clock, Users, X, Check, ArrowRight, LogIn } from 'lucide-react';
+import { Heart, Radio, Sparkles, ShieldCheck, Gift, Award, Quote, Instagram, Youtube, CreditCard, Smartphone, Landmark, Star, Moon, BookOpen, Briefcase, HeartHandshake, Calendar, X, Check, ArrowRight, LogIn } from 'lucide-react';
 
 export const dynamic = "force-dynamic";
 
@@ -43,56 +43,6 @@ const CATEGORIES = [
   { icon: Star, name: "사주" }, { icon: Moon, name: "신점" }, { icon: Sparkles, name: "타로" },
   { icon: Heart, name: "궁합" }, { icon: BookOpen, name: "작명" }, { icon: Briefcase, name: "사업운" },
   { icon: HeartHandshake, name: "연애운" }, { icon: Calendar, name: "택일" },
-];
-
-// 상담사 관점 서비스 흐름 3스텝 — "방송하는 동안 예약이 알아서 들어옵니다"의 실제 동작
-const CONSULTANT_FLOW = [
-  {
-    emoji: "🔮",
-    icon: ClipboardList,
-    title: "상담 상품 등록",
-    desc: "신점·사주·타로 상품과 가격, 상담 시간을 등록하세요.",
-  },
-  {
-    emoji: "📺",
-    icon: MonitorPlay,
-    title: "라이브 방송",
-    desc: "평소처럼 방송하세요. 예약 URL·QR을 설명란에 넣어두면 끝.",
-  },
-  {
-    emoji: "📋",
-    icon: ClipboardList,
-    title: "방송 후 확인",
-    desc: "방송을 마치면 예약이 쌓여 있습니다. 확정하고 상담하세요.",
-  },
-];
-
-// 핵심 기능 4가지
-const CORE_FEATURES = [
-  {
-    emoji: "⏰",
-    icon: Clock,
-    title: "실시간 예약",
-    desc: "방송 중 시청자가 바로 예약+결제. 남은 자리가 줄어드는 FOMO 효과.",
-  },
-  {
-    emoji: "💳",
-    icon: CreditCard,
-    title: "자동 결제",
-    desc: "예약과 동시에 결제 완료. 노쇼·입금확인·일정조율 없음.",
-  },
-  {
-    emoji: "📡",
-    icon: Radio,
-    title: "라이브 위젯",
-    desc: "프리즘·OBS 방송 화면에 남은 예약 자리를 실시간으로 표시.",
-  },
-  {
-    emoji: "👥",
-    icon: Users,
-    title: "고객 CRM",
-    desc: "상담 이력·재방문 관리로 단골 고객을 만드세요.",
-  },
 ];
 
 // 상담사에게 생기는 변화 (Before → After)
@@ -356,66 +306,6 @@ export default async function HomePage({
             <Sparkles size={13} strokeWidth={1.8} className="mt-0.5 flex-shrink-0" />
             라이브커머스에서 방송을 마치고 주문을 확인하듯, 방송이 끝나면 예약이 쌓여 있습니다.
           </p>
-        </div>
-      </section>
-
-      {/* ───── 이렇게 작동합니다 (상담사 3스텝) ───── */}
-      <section className="px-5 pt-8">
-        <span className="inline-flex items-center gap-1 rounded-full bg-[#f3f0fb] px-2.5 py-1 text-[10px] font-bold text-[#4c2f8f]">
-          FOR 상담사
-        </span>
-        <h2 className="mt-2 text-[19px] font-extrabold leading-snug text-gray-900">이렇게 작동합니다</h2>
-        <p className="mt-1 text-[12px] text-gray-500">등록 → 방송 → 확인, 이 세 단계가 전부예요</p>
-
-        <div className="mt-4 space-y-2.5">
-          {CONSULTANT_FLOW.map((s, i) => {
-            const StepIcon = s.icon;
-            const isLast = i === CONSULTANT_FLOW.length - 1;
-            return (
-              <div key={s.title} className="relative">
-                <div className="flex items-start gap-3 rounded-2xl border border-gray-100 bg-white p-4">
-                  <span className="relative w-11 h-11 rounded-2xl bg-gradient-to-br from-[#2d1b69] to-[#6d4aff] flex items-center justify-center flex-shrink-0 text-[18px]">
-                    <span aria-hidden="true">{s.emoji}</span>
-                    <span className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-white ring-1 ring-gray-100 text-[10px] font-extrabold text-[#2d1b69] flex items-center justify-center">
-                      {i + 1}
-                    </span>
-                  </span>
-                  <div className="min-w-0 flex-1 pt-0.5">
-                    <p className="flex items-center gap-1.5 text-[14px] font-bold text-gray-900">
-                      <StepIcon size={15} strokeWidth={1.7} className="text-[#6d4aff] flex-shrink-0" />
-                      {s.title}
-                    </p>
-                    <p className="mt-1 text-[11.5px] leading-relaxed text-gray-500">{s.desc}</p>
-                  </div>
-                </div>
-                {/* 스텝 연결선 */}
-                {!isLast && <div className="mx-auto my-0.5 h-2.5 w-px bg-gray-200" aria-hidden="true" />}
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ───── 핵심 기능 4카드 ───── */}
-      <section className="px-5 pt-8">
-        <h2 className="text-[19px] font-extrabold text-gray-900">방송을 예약으로 바꾸는 기능</h2>
-        <p className="mt-1 text-[12px] text-gray-500">시청자를 고객으로 만드는 4가지</p>
-        <div className="mt-4 grid grid-cols-2 gap-2.5">
-          {CORE_FEATURES.map((f) => {
-            const FeatureIcon = f.icon;
-            return (
-              <div key={f.title} className="rounded-2xl border border-gray-100 bg-white p-4">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-9 h-9 rounded-xl bg-[#f3f0fb] flex items-center justify-center">
-                    <FeatureIcon size={17} strokeWidth={1.6} className="text-[#2d1b69]" />
-                  </span>
-                  <span className="text-[15px]" aria-hidden="true">{f.emoji}</span>
-                </div>
-                <p className="mt-2.5 text-[13px] font-bold text-gray-900">{f.title}</p>
-                <p className="mt-0.5 text-[11px] leading-relaxed text-gray-500">{f.desc}</p>
-              </div>
-            );
-          })}
         </div>
       </section>
 
