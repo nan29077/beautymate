@@ -5,7 +5,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { X, Loader2, Minus, Plus } from 'lucide-react';
 import SafeImage from "@/components/shared/SafeImage";
-import { DEFAULT_CONSULTANT_AVATAR, isLegacyBundledAvatar, shouldUseAvatar } from "@/lib/defaults";
+import { isLegacyBundledAvatar, pickSajuAvatar, shouldUseAvatar } from "@/lib/defaults";
 import ApproveSellerButton from "@/components/shared/ApproveSellerButton";
 import RejectSellerButton from "@/components/shared/RejectSellerButton";
 import RecommendSellerButton from "@/components/shared/RecommendSellerButton";
@@ -33,11 +33,11 @@ interface MiddleAdminOption {
 
 const won = (n: number) => Math.round(n).toLocaleString("ko-KR") + "원";
 
-// 상담사 목록 아바타: 직접 올린 프로필/점집 로고 우선, 없거나 레거시 꿀벌 캐릭터면 사주 테마 기본 아바타.
-function sellerAvatarSrc(s: Pick<Seller, "userImage" | "shopLogo" | "userName" | "shopName">): string | undefined {
+// 상담사 목록 아바타: 직접 올린 프로필/점집 로고 우선, 없거나 레거시 꿀벌 캐릭터면 사주 동물 캐릭터.
+function sellerAvatarSrc(s: Pick<Seller, "userId" | "userImage" | "shopLogo" | "userName" | "shopName">): string | undefined {
   const uploaded = (!isLegacyBundledAvatar(s.userImage) ? s.userImage : null) || s.shopLogo;
   if (uploaded) return uploaded;
-  return shouldUseAvatar(s.userName, s.shopName) ? DEFAULT_CONSULTANT_AVATAR : undefined;
+  return shouldUseAvatar(s.userName, s.shopName) ? pickSajuAvatar(s.userId) : undefined;
 }
 
 function ImpersonateButton({ userId, shopName }: { userId: string; shopName: string }) {

@@ -1,5 +1,5 @@
 // 역할별 기본 아바타 이미지 유틸
-import { DEFAULT_CONSULTANT_AVATAR } from "@/lib/defaults";
+import { SAJU_CUSTOMER_AVATARS } from "@/lib/defaults";
 
 export type UserRole = "SUPER_ADMIN" | "CONSULTANT" | "CUSTOMER";
 
@@ -9,8 +9,8 @@ export function getDefaultAvatar(role: UserRole, gender?: "male" | "female", ind
     case "SUPER_ADMIN":
       return `/avatars/관리자_${i}.png`;
     case "CONSULTANT":
-      // 상담사는 사주 테마 기본 아바타 1종 (기존 꿀벌 캐릭터 폐기)
-      return DEFAULT_CONSULTANT_AVATAR;
+      // 상담사는 사주 동물 캐릭터 풀 사용 (기존 꿀벌 캐릭터 폐기)
+      return SAJU_CUSTOMER_AVATARS[(index ?? 0) % SAJU_CUSTOMER_AVATARS.length];
     case "CUSTOMER":
     default: {
       const bi = ((index ?? 0) % 13) + 1;
@@ -23,7 +23,7 @@ export function getDefaultAvatar(role: UserRole, gender?: "male" | "female", ind
 export function getAvatarCount(role: UserRole): number {
   switch (role) {
     case "SUPER_ADMIN": return 5;
-    case "CONSULTANT": return 1;
+    case "CONSULTANT": return SAJU_CUSTOMER_AVATARS.length;
     case "CUSTOMER": return 13;
     default: return 5;
   }

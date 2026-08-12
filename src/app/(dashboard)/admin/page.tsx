@@ -260,7 +260,7 @@ export default async function AdminDashboard() {
                       src={user.role === "SUPER_ADMIN"
                         ? resolveAdminDashboardAvatar(user.id, user.avatar)
                         : user.role === "CONSULTANT"
-                          ? resolveConsultantAvatar(user.avatar)
+                          ? resolveConsultantAvatar(user.id, user.avatar)
                           : (user.avatar || pickRoleAvatar(user.id, user.role, user.gender))}
                       alt={user.name}
                       width={32}

@@ -22,13 +22,6 @@ export const ADMIN_AVATARS = Array.from({ length: 5 }, (_, i) => `/avatars/관�
 // 중간관리자·노드 (5종)
 export const MIDDLE_ADMIN_AVATARS = Array.from({ length: 5 }, (_, i) => `/avatars/중간관리자_${i + 1}.png`);
 
-// 상담사 기본 프로필 — 사주메이트 테마(밤하늘 보라 + 초승달 + 별) 자체 SVG.
-// 기존 셀러브릭스 꿀벌 캐릭터(/avatars/라이브셀러_*.png)를 대체한다.
-export const DEFAULT_CONSULTANT_AVATAR = "/images/default-consultant-avatar.svg";
-
-// 상담사 — 단일 기본 아바타. (pickSellerAvatar / pickRoleAvatar 가 이 풀에서 고른다)
-export const SELLER_AVATARS = [DEFAULT_CONSULTANT_AVATAR];
-
 // 브랜드사 (6종)
 export const BRAND_AVATARS = Array.from({ length: 6 }, (_, i) => `/avatars/브랜드사_${i + 1}.png`);
 
@@ -37,12 +30,17 @@ export const BUYER_FEMALE_AVATARS = Array.from({ length: 13 }, (_, i) => `/avata
 export const BUYER_MALE_AVATARS = Array.from({ length: 13 }, (_, i) => `/avatars/남성구매회원_${i + 1}.png`);
 export const ALL_BUYER_AVATARS = [...BUYER_FEMALE_AVATARS, ...BUYER_MALE_AVATARS];
 
-// 사주메이트 일반 가입 고객 전용 캐릭터(30종).
+// 사주메이트 랜덤 동물 캐릭터(30종) — 십이지신 계열 동물 + 한복 + 밤하늘/달·별 일러스트.
+// 일반 가입 고객·최고관리자·상담사가 모두 이 풀을 공유한다.
 // 상담사 개인 샵(?ref=<slug>)으로 가입한 고객은 기존 구매회원 캐릭터 풀을 그대로 사용한다.
 export const SAJU_CUSTOMER_AVATARS = Array.from(
   { length: 30 },
   (_, i) => `/avatars/saju/saju-avatar-${String(i + 1).padStart(2, "0")}.png`,
 );
+
+// 상담사 캐릭터 풀 — 사주 동물 캐릭터를 그대로 사용한다.
+// (셀러브릭스 시절 꿀벌 캐릭터 /avatars/라이브셀러_*.png 는 폐기)
+export const SELLER_AVATARS = SAJU_CUSTOMER_AVATARS;
 
 // 전체 아바타 목록 (NodeSettingsClient 등에서 선택 UI용)
 // FEMALE_AVATARS / MALE_AVATARS 는 고객 이미지로 매핑 (레거시 호환용)
@@ -137,10 +135,10 @@ export function resolveAdminDashboardAvatar(seed: string, currentAvatar?: string
 
 // 상담사 프로필 이미지 확정.
 // 직접 업로드한 이미지(점집 로고 · /uploads 등)는 보존하고, DB 에 남아 있는 레거시 꿀벌
-// 캐릭터 경로이거나 이미지가 아예 없으면 사주 테마 기본 아바타로 교체한다.
-export function resolveConsultantAvatar(currentAvatar?: string | null): string {
+// 캐릭터 경로이거나 이미지가 아예 없으면 seed 기반 사주 동물 캐릭터로 교체한다.
+export function resolveConsultantAvatar(seed: string, currentAvatar?: string | null): string {
   if (currentAvatar && !isLegacyBundledAvatar(currentAvatar)) return currentAvatar;
-  return DEFAULT_CONSULTANT_AVATAR;
+  return pickSajuAvatar(seed);
 }
 
 // 정적 placeholder 용 단일 기본 아바타 (SafeImage placeholder 등)

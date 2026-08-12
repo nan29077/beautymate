@@ -1,5 +1,5 @@
 // 역할별 아바타 목록
-import { DEFAULT_CONSULTANT_AVATAR } from "@/lib/defaults";
+import { SAJU_CUSTOMER_AVATARS } from "@/lib/defaults";
 
 export const AVATAR_SETS = {
   // CUSTOMER (구매회원)
@@ -15,8 +15,8 @@ export const AVATAR_SETS = {
   ],
   ADMIN_FEMALE: ["/avatars/관리자_1.png", "/avatars/관리자_4.png"],
 
-  // CONSULTANT (상담사) — 사주 테마 기본 아바타 단일 사용 (기존 꿀벌 캐릭터 폐기)
-  CONSULTANT: [DEFAULT_CONSULTANT_AVATAR],
+  // CONSULTANT (상담사) — 사주 동물 캐릭터 풀 사용 (기존 꿀벌 캐릭터 폐기)
+  CONSULTANT: SAJU_CUSTOMER_AVATARS,
 };
 
 function randomFrom(arr: string[]): string {
