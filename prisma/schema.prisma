@@ -623,6 +623,7 @@ model Reservation {
   items                  ReservationItem[]
   referralCommissions    ReferralCommission[]
   timeSlot               TimeSlot?
+  consultingSession      ConsultingSession?
 
   @@index([sellerId, reservationDate])
   @@map("reservations")
@@ -684,6 +685,38 @@ model TimeSlot {
   @@unique([consultantId, date, startTime])
   @@index([consultantId, date])
   @@map("time_slots")
+}
+
+// ─────────────────────────────────────────────
+// 1:1 영상 상담 세션 (Daily.co)
+// 예약(Reservation) 확정 시 자동 생성되어 예약과 1:1 매핑된다.
+// ⚠️ 운영 DB에는 아직 없는 테이블 — 조회는 safeQuery, 생성은 try-catch 폴백 필수.
+// ─────────────────────────────────────────────
+
+enum ConsultingSessionStatus {
+  WAITING // 예약 확정, 입장 전
+  ACTIVE // 상담 진행 중
+  COMPLETED // 완료
+  CANCELLED // 취소
+}
+
+model ConsultingSession {
+  id            String                  @id @default(cuid())
+  reservationId String                  @unique
+  reservation   Reservation             @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  roomName      String                  @unique // Daily.co room name
+  roomUrl       String // Daily.co room URL
+  hostToken     String                  @db.Text // 상담사용 meeting token
+  guestToken    String                  @db.Text // 고객용 meeting token
+  status        ConsultingSessionStatus @default(WAITING)
+  startedAt     DateTime?
+  endedAt       DateTime?
+  duration      Int? // 실제 상담 분
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
+
+  @@index([status])
+  @@map("consulting_sessions")
 }
 
 // ─────────────────────────────────────────────

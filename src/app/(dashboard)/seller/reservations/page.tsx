@@ -42,6 +42,14 @@ export default async function SellerReservationsPage({
     reservations.filter((r) => r.status === "COMPLETED").map((r) => r.id)
   );
 
+  // 영상 상담 세션 매핑 — consulting_sessions 테이블 미반영 환경에서는 빈 값
+  const sessionRows = await safeQuery("seller reservation sessions", () =>
+    prisma.consultingSession.findMany({
+      where: { reservationId: { in: reservations.map((r) => r.id) } },
+      select: { id: true, reservationId: true, status: true },
+    }), []);
+  const sessionMap = new Map(sessionRows.map((s) => [s.reservationId, s]));
+
   const serialized = reservations.map((r) => ({
     id: r.id,
     reservationNumber: r.reservationNumber,
@@ -61,6 +69,9 @@ export default async function SellerReservationsPage({
     cancelledAt: r.cancelledAt?.toISOString() || null,
     noShowAt: r.noShowAt?.toISOString() || null,
     consultantMemo: memoMap[r.id] ?? null,
+    session: sessionMap.has(r.id)
+      ? { id: sessionMap.get(r.id)!.id, status: sessionMap.get(r.id)!.status }
+      : null,
     user: r.user,
     items: r.items.map((i) => ({
       id: i.id,

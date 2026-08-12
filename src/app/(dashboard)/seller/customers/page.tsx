@@ -76,9 +76,40 @@ export default async function SellerCustomersPage() {
     if (!row.gender && r.gender) row.gender = r.gender;
   }
 
-  const customers = Array.from(map.values()).sort((a, b) =>
-    (b.lastReservationDate ?? "").localeCompare(a.lastReservationDate ?? "")
-  );
+  // 이 점집으로 가입 귀속된 고객 (예약 이력이 없어도 목록에 노출)
+  const referred = await safeQuery("seller referred customers", () =>
+    prisma.buyerProfile.findMany({
+      where: { referredBySellerId: seller.id },
+      select: {
+        userId: true,
+        createdAt: true,
+        user: { select: { id: true, name: true, phone: true } },
+      },
+    }), []);
+  const referredIds = new Set(referred.map((b) => b.userId));
+  for (const b of referred) {
+    const row = map.get(b.userId);
+    if (row) continue; // 예약 이력이 있으면 집계 행 유지
+    map.set(b.userId, {
+      customerId: b.userId,
+      name: b.user?.name || "-",
+      phone: b.user?.phone || "-",
+      birthDate: null,
+      gender: null,
+      totalReservations: 0,
+      completedCount: 0,
+      totalPaid: 0,
+      lastReservationDate: null,
+      firstReservationDate: null,
+      isReferred: true,
+    });
+  }
+
+  const customers = Array.from(map.values())
+    .map((c) => ({ ...c, isReferred: referredIds.has(c.customerId) }))
+    .sort((a, b) =>
+      (b.lastReservationDate ?? "").localeCompare(a.lastReservationDate ?? "")
+    );
 
   return <SellerCustomersClient customers={customers} />;
 }

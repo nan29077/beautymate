@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { isMissingSchemaError } from "@/lib/safeDb";
+import { isMissingSchemaError, safeQuery } from "@/lib/safeDb";
+import {
+  ensureConsultingSession,
+  completeConsultingSession,
+  getReservationConsultingInfo,
+} from "@/lib/consultingSession";
+import { notifyReservationConfirmedToCustomer } from "@/lib/alimtalkTriggers";
 
 export const dynamic = "force-dynamic";
 
@@ -95,6 +101,35 @@ export async function PATCH(
     data: { status, ...extraData },
   });
 
+  // 예약 확정 → 영상 상담이면 세션 자동 생성 + 고객 알림톡 (실패해도 확정 흐름은 유지)
+  if (status === "CONFIRMED") {
+    try {
+      await ensureConsultingSession(id);
+    } catch (e) {
+      console.error(`[reservations] 영상 세션 생성 실패 (${id}):`, e);
+    }
+    notifyReservationConfirmedToCustomer(id).catch((e) =>
+      console.error(`[reservations] 확정 알림톡 발송 실패 (${id}):`, e),
+    );
+  }
+
+  // 상담 완료/취소 → 열려 있는 영상 세션 정리
+  if (status === "COMPLETED" || status === "CANCELLED") {
+    try {
+      const cs = await prisma.consultingSession.findUnique({
+        where: { reservationId: id },
+        select: { id: true, status: true },
+      });
+      if (cs && (cs.status === "WAITING" || cs.status === "ACTIVE")) {
+        await completeConsultingSession(cs.id, { cancelled: status === "CANCELLED" });
+      }
+    } catch (e) {
+      if (!isMissingSchemaError(e)) {
+        console.error(`[reservations] 영상 세션 정리 실패 (${id}):`, e);
+      }
+    }
+  }
+
   return NextResponse.json({ reservation: updated });
 }
 
@@ -143,12 +178,49 @@ export async function GET(
     }
   }
 
+  // 상담 방식(영상/전화/방문) — Reservation 에 저장되지 않으므로 상품에서 역조회
+  const { method: consultingMethod } = await getReservationConsultingInfo(id);
+
+  // 영상 상담 세션 (테이블 미반영 환경에서는 null)
+  const consultingSession = await safeQuery(
+    `reservation session (${id})`,
+    () =>
+      prisma.consultingSession.findUnique({
+        where: { reservationId: id },
+        select: { id: true, status: true },
+      }),
+    null,
+  );
+
+  // 확정된 전화/방문 상담이면 상담사 연락처·상담소 주소를 공개한다 (마스킹 해제)
+  let consultantContact: { phone?: string | null; address?: string | null } | null = null;
+  if (
+    (reservation.status === "CONFIRMED" || reservation.status === "COMPLETED") &&
+    consultingMethod &&
+    ["전화", "방문"].includes(consultingMethod)
+  ) {
+    const sellerDetail = await prisma.sellerProfile.findUnique({
+      where: { id: reservation.sellerId },
+      select: {
+        businessAddress: true,
+        user: { select: { phone: true } },
+      },
+    });
+    consultantContact = {
+      ...(consultingMethod === "전화" ? { phone: sellerDetail?.user.phone ?? null } : {}),
+      ...(consultingMethod === "방문" ? { address: sellerDetail?.businessAddress ?? null } : {}),
+    };
+  }
+
   return NextResponse.json({
     reservation: {
       ...reservation,
       totalAmount: Number(reservation.totalAmount),
       discountAmount: Number(reservation.discountAmount),
       finalAmount: Number(reservation.finalAmount),
+      consultingMethod,
+      consultingSession,
+      consultantContact,
       items: reservation.items.map((i) => ({
         ...i,
         price: Number(i.price),

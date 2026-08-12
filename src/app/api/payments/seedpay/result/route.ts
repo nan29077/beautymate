@@ -9,6 +9,7 @@ import {
 import { logPayment } from "@/lib/paymentLog";
 import { notifyOrderPaid } from "@/lib/notifications";
 import { notifyOrderPlacedToSeller } from "@/lib/alimtalkTriggers";
+import { ensureConsultingSession } from "@/lib/consultingSession";
 
 export const dynamic = "force-dynamic";
 
@@ -161,6 +162,10 @@ export async function POST(request: Request) {
         ...(({ deliveryStatus: "PAYMENT_COMPLETED" }) as any),
       },
     });
+    // 영상 상담 예약이면 세션 자동 생성 (실패해도 결제 처리에 영향 없음)
+    await ensureConsultingSession(order.id).catch((e) =>
+      console.error("[seedpay] 영상 세션 생성 오류:", e),
+    );
     // 결제 완료 → 해당 점집 상담사에게 예약접수 알림톡 (실패해도 결제 처리에 영향 없음)
     await notifyOrderPlacedToSeller(order.id).catch((e) => console.error("[seedpay] 예약접수 알림톡 오류:", e));
     await logPayment({

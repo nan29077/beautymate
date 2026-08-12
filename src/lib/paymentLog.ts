@@ -10,14 +10,15 @@ import { prisma } from "@/lib/prisma";
 // - result/callback: PG 응답 수신, 승인 결과, 검증 실패, 매핑 실패
 // - cancel: 취소 요청, 응답
 
-export type PaymentProvider = "seedpay" | "smartropay" | "ongi";
+export type PaymentProvider = "seedpay" | "smartropay" | "ongi" | "mock";
 export type PaymentStage =
   | "prepare"
   | "launch"
   | "result"
   | "callback"
   | "approval"
-  | "cancel";
+  | "cancel"
+  | "webhook";
 export type PaymentLogStatus = "info" | "success" | "warn" | "fail";
 
 export interface PaymentLogInput {

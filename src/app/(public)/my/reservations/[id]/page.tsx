@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Calendar, Clock, User, Phone, BookOpen } from "lucide-react";
+import { ChevronLeft, Calendar, Clock, User, Phone, BookOpen, Video, MapPin } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 
 interface ReservationDetail {
@@ -19,6 +19,9 @@ interface ReservationDetail {
   gender: string | null;
   consultingContent: string | null;
   finalAmount: number;
+  consultingMethod: string | null;
+  consultingSession: { id: string; status: string } | null;
+  consultantContact: { phone?: string | null; address?: string | null } | null;
   seller: { shopName: string; slug: string };
   items: { productName: string }[];
   timeSlot: { endTime: string } | null;
@@ -91,9 +94,71 @@ export default function MyReservationDetailPage() {
 
       <div className="px-4 py-4 space-y-3 max-w-lg mx-auto">
         {/* 상태 배지 */}
-        <div className={`inline-flex items-center px-3 py-1.5 rounded-full border text-sm font-medium ${s.color}`}>
-          {s.label}
+        <div className="flex items-center gap-2">
+          <div className={`inline-flex items-center px-3 py-1.5 rounded-full border text-sm font-medium ${s.color}`}>
+            {s.label}
+          </div>
+          {reservation.consultingMethod && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium">
+              {reservation.consultingMethod === "영상통화" ? (
+                <Video size={12} />
+              ) : reservation.consultingMethod === "전화" ? (
+                <Phone size={12} />
+              ) : reservation.consultingMethod === "방문" ? (
+                <MapPin size={12} />
+              ) : null}
+              {reservation.consultingMethod} 상담
+            </span>
+          )}
         </div>
+
+        {/* 영상 상담실 입장 (확정된 영상 상담) */}
+        {reservation.consultingSession &&
+          (reservation.consultingSession.status === "WAITING" ||
+            reservation.consultingSession.status === "ACTIVE") && (
+            <Link
+              href={`/my/sessions/${reservation.consultingSession.id}`}
+              className="w-full py-3.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 hover:bg-indigo-500"
+            >
+              <Video size={17} />
+              영상 상담실 입장
+            </Link>
+          )}
+
+        {/* 전화 상담 — 확정 후 상담사 연락처 공개 */}
+        {reservation.consultantContact?.phone && (
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+            <p className="text-xs text-blue-500 font-semibold mb-1 flex items-center gap-1">
+              <Phone size={12} /> 전화 상담 안내
+            </p>
+            <p className="text-sm text-blue-800">
+              예약 시간에 아래 번호로 전화해 주세요.
+            </p>
+            <a
+              href={`tel:${reservation.consultantContact.phone}`}
+              className="mt-2 inline-flex items-center gap-1.5 text-base font-bold text-blue-700"
+            >
+              <Phone size={15} />
+              {reservation.consultantContact.phone}
+            </a>
+          </div>
+        )}
+
+        {/* 방문 상담 — 확정 후 상담소 주소 표시 */}
+        {reservation.consultantContact?.address && (
+          <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
+            <p className="text-xs text-emerald-600 font-semibold mb-1 flex items-center gap-1">
+              <MapPin size={12} /> 방문 상담 안내
+            </p>
+            <p className="text-sm text-emerald-800">
+              예약 시간에 아래 상담소로 방문해 주세요.
+            </p>
+            <p className="mt-1.5 text-sm font-semibold text-emerald-900 flex items-start gap-1.5">
+              <MapPin size={14} className="mt-0.5 flex-shrink-0" />
+              {reservation.consultantContact.address}
+            </p>
+          </div>
+        )}
 
         {/* 상담사 정보 */}
         <div className="bg-white rounded-xl border border-gray-100 p-4">

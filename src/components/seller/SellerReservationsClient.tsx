@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, List, CalendarDays, Calendar, X, User, Phone, Clock, BookOpen, NotebookPen, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, List, CalendarDays, Calendar, X, User, Phone, Clock, BookOpen, NotebookPen, Loader2, Video } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface Reservation {
   id: string;
@@ -24,6 +25,7 @@ interface Reservation {
   cancelledAt: string | null;
   noShowAt: string | null;
   consultantMemo: string | null;
+  session: { id: string; status: string } | null;
   user: { id: string; name: string; email: string };
   items: { id: string; productName: string; price: number; quantity: number }[];
   timeSlot: { startTime: string; endTime: string } | null;
@@ -159,6 +161,9 @@ export default function SellerReservationsClient({
                         <span className={`w-2 h-2 rounded-full ${s.dot}`} />
                         <span className="font-semibold text-sm text-gray-900">{r.customerName}</span>
                         <span className={`text-xs px-2 py-0.5 rounded-full ${s.color}`}>{s.label}</span>
+                        {r.session && (r.session.status === "WAITING" || r.session.status === "ACTIVE") && (
+                          <Video size={13} className="text-indigo-400" />
+                        )}
                       </div>
                       <p className="text-xs text-gray-500 ml-4">{r.items[0]?.productName}</p>
                     </div>
@@ -334,6 +339,17 @@ function ReservationDetailModal({
             <span className="text-sm text-gray-500">결제 금액</span>
             <span className="font-bold text-gray-900">{formatPrice(r.finalAmount)}</span>
           </div>
+
+          {/* 영상 상담실 입장 (세션이 생성된 확정 예약) */}
+          {r.session && (r.session.status === "WAITING" || r.session.status === "ACTIVE") && (
+            <Link
+              href={`/seller/sessions/${r.session.id}`}
+              className="w-full py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white flex items-center justify-center gap-1.5 hover:bg-indigo-500"
+            >
+              <Video size={15} />
+              영상 상담실 입장
+            </Link>
+          )}
 
           {/* 상담 메모 (상담 완료 건만) */}
           {r.status === "COMPLETED" && <ConsultantMemoEditor reservation={r} />}

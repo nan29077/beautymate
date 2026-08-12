@@ -16,6 +16,8 @@ export interface CustomerRow {
   totalPaid: number;
   lastReservationDate: string | null;
   firstReservationDate: string | null;
+  /** 이 점집으로 가입 귀속된 고객 (예약 이력 없이도 노출) */
+  isReferred?: boolean;
 }
 
 function formatDate(iso: string | null) {
@@ -108,6 +110,11 @@ export default function SellerCustomersClient({ customers }: { customers: Custom
                       <Link href={`/seller/customers/${c.customerId}`} className="font-semibold text-gray-900 hover:underline">
                         {c.name}
                       </Link>
+                      {c.isReferred && (
+                        <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-500 font-medium align-middle">
+                          귀속
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-gray-600">{c.phone}</td>
                     <td className="px-4 py-3 text-right text-gray-700">
@@ -137,7 +144,14 @@ export default function SellerCustomersClient({ customers }: { customers: Custom
               >
                 <div className="flex items-start justify-between">
                   <div className="min-w-0">
-                    <p className="font-semibold text-sm text-gray-900 truncate">{c.name}</p>
+                    <p className="font-semibold text-sm text-gray-900 truncate">
+                      {c.name}
+                      {c.isReferred && (
+                        <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-500 font-medium">
+                          귀속
+                        </span>
+                      )}
+                    </p>
                     <p className="text-xs text-gray-400 mt-0.5">{c.phone}</p>
                   </div>
                   <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />

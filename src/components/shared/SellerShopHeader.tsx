@@ -67,19 +67,38 @@ export default function SellerShopHeader({
           </Link>
         </div>
 
-        {/* 우측: 구매회원 기능 (장바구니 / 알림) */}
-        <div className="flex items-center gap-0.5 flex-shrink-0">
-          <Link
-            href="/cart"
-            onClick={handleCartClick}
-            className="p-3 text-gray-800 hover:opacity-60 transition-opacity"
-            aria-label="장바구니"
-          >
-            <Icon name="Cart" size={32} strokeWidth={1.5} />
-          </Link>
-          {/* 알림 버튼 — 모든 사용자 노출 */}
-          <NotificationBell className="text-gray-800" size={32} buttonClassName="p-3" />
-        </div>
+        {/* 우측: 비로그인 → 점집 전용 로그인/회원가입, 로그인 → 장바구니/알림 */}
+        {session ? (
+          <div className="flex items-center gap-0.5 flex-shrink-0">
+            <Link
+              href="/cart"
+              onClick={handleCartClick}
+              className="p-3 text-gray-800 hover:opacity-60 transition-opacity"
+              aria-label="장바구니"
+            >
+              <Icon name="Cart" size={32} strokeWidth={1.5} />
+            </Link>
+            {/* 알림 버튼 — 모든 사용자 노출 */}
+            <NotificationBell className="text-gray-800" size={32} buttonClassName="p-3" />
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {/* 점집 독립 로그인 — 로그인 후 현재 점집으로 복귀 */}
+            <Link
+              href={`/auth/login?callbackUrl=${encodeURIComponent(`/shop/${sellerSlug}`)}`}
+              className="px-3 py-1.5 text-[13px] font-medium text-gray-600 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"
+            >
+              로그인
+            </Link>
+            {/* 가입 시 이 점집 상담사에게 고객 귀속 (?ref=slug) */}
+            <Link
+              href={`/auth/register?ref=${encodeURIComponent(sellerSlug)}`}
+              className="px-3 py-1.5 text-[13px] font-semibold text-white bg-gray-900 rounded-full hover:bg-gray-700 transition-colors"
+            >
+              회원가입
+            </Link>
+          </div>
+        )}
       </div>
     </header>
   );

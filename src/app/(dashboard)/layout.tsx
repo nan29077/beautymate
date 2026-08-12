@@ -40,12 +40,14 @@ export default async function DashboardLayout({
       { href: "/admin", iconName: "Dashboard", label: "대시보드", group: "메인" },
       // 회원 관리
       { href: "/admin/users", iconName: "Users", label: "회원 관리", group: "회원 관리" },
+      { href: "/admin/customers", iconName: "UserCheck", label: "고객 귀속 관리", group: "회원 관리" },
       { href: "/admin/sellers", iconName: "Store", label: "상담사 관리", group: "회원 관리" },
       // 상담상품 관리
       { href: "/admin/products", iconName: "Package", label: "상담상품 관리", group: "상담상품 관리" },
       { href: "/admin/categories", iconName: "Category", label: "카테고리 관리", group: "상담상품 관리" },
       // 예약·정산
       { href: "/admin/reservations", iconName: "Calendar", label: "예약 관리", group: "예약·정산" },
+      { href: "/admin/sessions", iconName: "Video", label: "영상 세션 관리", group: "예약·정산" },
       { href: "/admin/campaigns", iconName: "Event", label: "단체 상담 관리", group: "예약·정산" },
       { href: "/admin/settlements", iconName: "Settlement", label: "정산·재무 관리", group: "예약·정산" },
       // 콘텐츠

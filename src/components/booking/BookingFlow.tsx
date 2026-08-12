@@ -29,7 +29,13 @@ interface Seller {
   consultantAvatar: string | null;
 }
 
-type Step = "product" | "date" | "time" | "info" | "confirm" | "done";
+type Step = "product" | "date" | "time" | "info" | "confirm" | "pay" | "done";
+
+interface PayProvider {
+  key: string;
+  label: string;
+  checkoutUrl?: string;
+}
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -62,6 +68,9 @@ export default function BookingFlow({
   });
   const [submitting, setSubmitting] = useState(false);
   const [doneReservationId, setDoneReservationId] = useState<string | null>(null);
+  const [payProviders, setPayProviders] = useState<PayProvider[]>([]);
+  const [payAmount, setPayAmount] = useState(0);
+  const [payLaunching, setPayLaunching] = useState<string | null>(null);
 
   const today = new Date().toISOString().slice(0, 10);
 
@@ -141,20 +150,114 @@ export default function BookingFlow({
         consultingContent: form.consultingContent || null,
       }),
     });
-    setSubmitting(false);
     if (res.ok) {
       const data = await res.json();
-      setDoneReservationId(data.reservation.id);
+      const reservationId: string = data.reservation.id;
+      setDoneReservationId(reservationId);
+      // 예약 생성 직후 결제 초기화 — 사용 가능한 PG가 있으면 결제 단계로 이어간다
+      try {
+        const prepRes = await fetch("/api/payments/prepare", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reservationId }),
+        });
+        if (prepRes.ok) {
+          const prep = await prepRes.json();
+          if (Array.isArray(prep.providers) && prep.providers.length > 0) {
+            setPayProviders(prep.providers);
+            setPayAmount(prep.amount);
+            setSubmitting(false);
+            setStep("pay");
+            return;
+          }
+        }
+      } catch {
+        // 결제 초기화 실패 시 기존 흐름(신청 완료 → 상담사 확정 대기)으로 폴백
+      }
+      setSubmitting(false);
       setStep("done");
     } else {
       const data = await res.json();
+      setSubmitting(false);
       alert(data.error || "예약에 실패했습니다.");
+    }
+  };
+
+  // 결제 수단 선택 → PG 결제창으로 이동
+  const handlePay = async (provider: PayProvider) => {
+    if (!doneReservationId) return;
+    setPayLaunching(provider.key);
+    try {
+      if (provider.key === "ongi") {
+        // ONGI 는 prepare 호출로 checkoutUrl 을 받아 이동
+        const res = await fetch("/api/payments/ongi/prepare", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: doneReservationId }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.checkoutUrl) {
+          alert(data.error || "결제창 호출에 실패했습니다.");
+          return;
+        }
+        window.location.href = data.checkoutUrl;
+        return;
+      }
+      if (provider.checkoutUrl) {
+        window.location.href = provider.checkoutUrl;
+        return;
+      }
+      alert("사용할 수 없는 결제 수단입니다.");
+    } finally {
+      setPayLaunching(null);
     }
   };
 
   // 달력 계산
   const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
   const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+  if (step === "pay") {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
+        <div className="w-full max-w-sm bg-white rounded-2xl border border-gray-200 p-5 space-y-4">
+          <div className="text-center">
+            <CheckCircle size={40} className="text-green-500 mx-auto mb-2" />
+            <h1 className="text-lg font-bold text-gray-900">예약이 접수되었습니다</h1>
+            <p className="text-xs text-gray-400 mt-1">
+              결제를 완료하면 예약이 확정됩니다.
+            </p>
+          </div>
+          <div className="border-t border-gray-100 pt-3 flex justify-between items-center text-sm">
+            <span className="text-gray-500">결제 금액</span>
+            <span className="text-lg font-bold text-indigo-600">{formatPrice(payAmount)}</span>
+          </div>
+          <div className="space-y-2">
+            {payProviders.map((p) => (
+              <button
+                key={p.key}
+                onClick={() => handlePay(p)}
+                disabled={payLaunching !== null}
+                className={`w-full py-3 rounded-xl text-sm font-semibold disabled:opacity-50 ${
+                  p.key === "mock"
+                    ? "border border-dashed border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                    : "bg-indigo-600 text-white hover:bg-indigo-500"
+                }`}
+              >
+                {payLaunching === p.key ? "결제창 여는 중..." : p.label}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setStep("done")}
+            className="w-full py-2.5 text-xs text-gray-400 hover:text-gray-600"
+          >
+            나중에 결제하기 (상담사 확정 대기)
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (step === "done") {
     return (
