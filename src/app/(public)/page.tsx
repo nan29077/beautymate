@@ -14,7 +14,7 @@ import { DEFAULT_PRODUCT_IMAGE, pickSellerAvatar } from "@/lib/defaults";
 import { LIVE_RING_CLASS, OnAirBadge } from "@/components/shared/LiveBadge";
 import { getFeatureFlags } from "@/lib/settings";
 import { getHomeStats, getHomeStories, getHomeBenefits } from "@/lib/siteContent";
-import { Heart, Radio, Sparkles, ShieldCheck, Gift, Award, Quote, Instagram, Youtube, CreditCard, Smartphone, Landmark, Star, Moon, BookOpen, Briefcase, HeartHandshake, Calendar, Search, Video, ClipboardList, MonitorPlay, Clock, Users, X, Check, ArrowRight, LogIn } from 'lucide-react';
+import { Heart, Radio, Sparkles, ShieldCheck, Gift, Award, Quote, Instagram, Youtube, CreditCard, Smartphone, Landmark, Star, Moon, BookOpen, Briefcase, HeartHandshake, Calendar, ClipboardList, MonitorPlay, Clock, Users, X, Check, ArrowRight, LogIn } from 'lucide-react';
 
 export const dynamic = "force-dynamic";
 
@@ -43,13 +43,6 @@ const CATEGORIES = [
   { icon: Star, name: "사주" }, { icon: Moon, name: "신점" }, { icon: Sparkles, name: "타로" },
   { icon: Heart, name: "궁합" }, { icon: BookOpen, name: "작명" }, { icon: Briefcase, name: "사업운" },
   { icon: HeartHandshake, name: "연애운" }, { icon: Calendar, name: "택일" },
-];
-
-// 이용 안내 3단계 (고객 관점)
-const HOW_IT_WORKS = [
-  { icon: Search, title: "상담사 검색", desc: "사주·신점·타로 등 원하는 분야의 상담사를 이름·카테고리로 찾아보세요." },
-  { icon: Video, title: "라이브 시청", desc: "유튜브 라이브로 진행 중인 상담을 먼저 보고 분위기를 확인하세요." },
-  { icon: Calendar, title: "예약·결제", desc: "원하는 상담상품을 고르고 바로 예약·결제하면 상담이 확정돼요." },
 ];
 
 // 상담사 관점 서비스 흐름 3스텝 — "방송하는 동안 예약이 알아서 들어옵니다"의 실제 동작
@@ -474,30 +467,6 @@ export default async function HomePage({
                 </span>
                 <span className="text-[11px] font-medium text-gray-700">{c.name}</span>
               </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ───── 이용 안내 (고객 관점) ───── */}
-      <section className="px-5 pt-8">
-        <h2 className="text-[17px] font-extrabold text-gray-900">고객은 이렇게 이용해요</h2>
-        <div className="mt-4 space-y-2.5">
-          {HOW_IT_WORKS.map((s, i) => {
-            const StepIcon = s.icon;
-            return (
-              <div key={s.title} className="flex items-start gap-3 rounded-2xl border border-gray-100 bg-white p-4">
-                <span className="w-9 h-9 rounded-xl bg-[#f3f0fb] flex items-center justify-center flex-shrink-0">
-                  <StepIcon size={17} strokeWidth={1.7} className="text-[#2d1b69]" />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-[13px] font-bold text-gray-900">
-                    <span className="text-[#6d4aff] mr-1">{i + 1}</span>
-                    {s.title}
-                  </p>
-                  <p className="text-[11.5px] text-gray-500 mt-0.5 leading-relaxed">{s.desc}</p>
-                </div>
-              </div>
             );
           })}
         </div>
