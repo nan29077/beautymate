@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Clock, User, Calendar, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
@@ -43,10 +43,16 @@ export default function BookingFlow({
   seller,
   products,
   currentUserId,
+  initialProductId,
+  liveStreamId,
 }: {
   seller: Seller;
   products: Product[];
   currentUserId: string;
+  /** 라이브 등에서 특정 상품으로 진입 시 자동 선택 */
+  initialProductId?: string | null;
+  /** 라이브 방송 유래 예약이면 해당 방송 ID (예약에 기록) */
+  liveStreamId?: string | null;
 }) {
   const [step, setStep] = useState<Step>("product");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -112,6 +118,14 @@ export default function BookingFlow({
     setStep("date");
   };
 
+  // 라이브 등에서 특정 상품으로 진입 시 자동 선택 (최초 1회)
+  useEffect(() => {
+    if (!initialProductId) return;
+    const preset = products.find((p) => p.id === initialProductId);
+    if (preset) handleProductSelect(preset);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handlePrevMonth = () => {
     const nm = currentMonth === 1 ? 12 : currentMonth - 1;
     const ny = currentMonth === 1 ? currentYear - 1 : currentYear;
@@ -148,6 +162,7 @@ export default function BookingFlow({
         birthTime: form.birthTime || null,
         gender: form.gender || null,
         consultingContent: form.consultingContent || null,
+        liveStreamId: liveStreamId || null,
       }),
     });
     if (res.ok) {

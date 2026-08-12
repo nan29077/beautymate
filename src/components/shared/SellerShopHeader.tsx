@@ -83,16 +83,15 @@ export default function SellerShopHeader({
           </div>
         ) : (
           <div className="flex items-center gap-1.5 flex-shrink-0">
-            {/* 점집 독립 로그인 — 로그인 후 현재 점집으로 복귀 */}
+            {/* 점집 독립 로그인/가입 — 사주메이트 메인과 분리된 점집 전용 화면 */}
             <Link
-              href={`/auth/login?callbackUrl=${encodeURIComponent(`/shop/${sellerSlug}`)}`}
+              href={`/shop/${sellerSlug}/login`}
               className="px-3 py-1.5 text-[13px] font-medium text-gray-600 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"
             >
               로그인
             </Link>
-            {/* 가입 시 이 점집 상담사에게 고객 귀속 (?ref=slug) */}
             <Link
-              href={`/auth/register?ref=${encodeURIComponent(sellerSlug)}`}
+              href={`/shop/${sellerSlug}/join`}
               className="px-3 py-1.5 text-[13px] font-semibold text-white bg-gray-900 rounded-full hover:bg-gray-700 transition-colors"
             >
               회원가입

@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function SellerReservationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; view?: string }> | { status?: string; view?: string };
+  searchParams: Promise<{ status?: string; view?: string; live?: string }> | { status?: string; view?: string; live?: string };
 }) {
   const session = await auth();
   if (!session?.user || session.user.role !== "CONSULTANT") redirect("/");
@@ -20,14 +20,27 @@ export default async function SellerReservationsPage({
   });
   if (!seller) redirect("/");
 
-  const { status, view } = await Promise.resolve(searchParams);
+  const { status, view, live } = await Promise.resolve(searchParams);
   const statusFilter = status && status !== "ALL" ? status : undefined;
+
+  // ?live=<liveStreamId> — 특정 방송에서 발생한 예약만 필터 (방송 종료 후 자동 이동 화면)
+  const liveFilter = typeof live === "string" && live ? live : undefined;
+  const liveInfo = liveFilter
+    ? await safeQuery("live info for reservations", () =>
+        prisma.liveStream.findUnique({
+          where: { id: liveFilter },
+          select: { id: true, title: true, sellerId: true },
+        }), null)
+    : null;
+  // 본인 방송이 아니면 필터 무시
+  const validLiveFilter = liveInfo && liveInfo.sellerId === seller.id ? liveFilter : undefined;
 
   const reservations = await safeQuery("seller reservations list", () =>
     prisma.reservation.findMany({
       where: {
         sellerId: seller.id,
         ...(statusFilter ? { status: statusFilter as "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW" } : {}),
+        ...(validLiveFilter ? { liveStreamId: validLiveFilter } : {}),
       },
       include: {
         user: { select: { id: true, name: true, email: true } },
@@ -87,6 +100,11 @@ export default async function SellerReservationsPage({
       reservations={serialized}
       initialStatus={status || "ALL"}
       initialView={(view as "list" | "calendar") || "list"}
+      liveFilter={
+        validLiveFilter && liveInfo
+          ? { id: liveInfo.id, title: liveInfo.title }
+          : null
+      }
     />
   );
 }

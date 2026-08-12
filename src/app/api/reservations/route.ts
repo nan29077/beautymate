@@ -100,6 +100,7 @@ export async function POST(request: Request) {
     birthTime,
     gender,
     consultingContent,
+    liveStreamId,
   } = body;
 
   if (!sellerId || !productId || !timeSlotId || !reservationDate || !reservationTime || !customerName || !customerPhone) {
@@ -142,6 +143,44 @@ export async function POST(request: Request) {
         if (!shopProduct) throw new Error("해당 상담사의 상담 상품이 아닙니다.");
       }
 
+      // 라이브 방송 유래 예약: 방송 검증 + 당일 슬롯 제한 확인
+      let liveId: string | null = null;
+      if (typeof liveStreamId === "string" && liveStreamId) {
+        const live = await tx.liveStream.findUnique({
+          where: { id: liveStreamId },
+          select: { id: true, sellerId: true },
+        });
+        // 방송이 존재하고 예약 대상 상담사의 방송일 때만 연결 (아니면 조용히 무시)
+        if (live && live.sellerId === sellerId) {
+          liveId = live.id;
+          // 당일 예약 가능 슬롯 수 제한 (설정 테이블 미반영 시 무제한)
+          try {
+            const settings = await tx.liveReservationSettings.findUnique({
+              where: { liveStreamId: live.id },
+              select: { dailySlotLimit: true },
+            });
+            if (settings?.dailySlotLimit != null && settings.dailySlotLimit > 0) {
+              const dayStart = new Date();
+              dayStart.setHours(0, 0, 0, 0);
+              const todayCount = await tx.reservation.count({
+                where: {
+                  liveStreamId: live.id,
+                  createdAt: { gte: dayStart },
+                  status: { not: "CANCELLED" },
+                },
+              });
+              if (todayCount >= settings.dailySlotLimit) {
+                throw new Error("LIVE_SLOTS_FULL");
+              }
+            }
+          } catch (e) {
+            if ((e as Error).message === "LIVE_SLOTS_FULL") throw e;
+            if (!isMissingSchemaError(e)) throw e;
+            // 설정 테이블 미반영 — 제한 없이 진행
+          }
+        }
+      }
+
       const amount = Number(product.basePrice);
       const reservationNumber = generateOrderNumber();
 
@@ -151,6 +190,7 @@ export async function POST(request: Request) {
           reservationNumber,
           userId: session.user.id,
           sellerId,
+          liveStreamId: liveId,
           status: "PENDING",
           paymentStatus: "PENDING",
           totalAmount: amount,
@@ -194,6 +234,12 @@ export async function POST(request: Request) {
     const msg = err instanceof Error ? err.message : "예약 생성에 실패했습니다.";
     if (msg === "SLOT_TAKEN") {
       return NextResponse.json({ error: "이미 예약된 시간입니다. 다른 시간을 선택해 주세요." }, { status: 409 });
+    }
+    if (msg === "LIVE_SLOTS_FULL") {
+      return NextResponse.json(
+        { error: "이 방송의 당일 예약 슬롯이 모두 마감되었습니다." },
+        { status: 409 },
+      );
     }
     if (isMissingSchemaError(err)) {
       return NextResponse.json(

@@ -41,6 +41,7 @@ export default async function DashboardLayout({
       // 회원 관리
       { href: "/admin/users", iconName: "Users", label: "회원 관리", group: "회원 관리" },
       { href: "/admin/customers", iconName: "UserCheck", label: "고객 귀속 관리", group: "회원 관리" },
+      { href: "/admin/members", iconName: "Users", label: "점집 회원 관리", group: "회원 관리" },
       { href: "/admin/sellers", iconName: "Store", label: "상담사 관리", group: "회원 관리" },
       // 상담상품 관리
       { href: "/admin/products", iconName: "Package", label: "상담상품 관리", group: "상담상품 관리" },
@@ -54,6 +55,7 @@ export default async function DashboardLayout({
       { href: "/admin/banners", iconName: "Globe", label: "사이트 관리", group: "콘텐츠" },
       { href: "/admin/contents", iconName: "Content", label: "콘텐츠 관리", group: "콘텐츠" },
       { href: "/admin/games", iconName: "Play", label: "게임관리", group: "콘텐츠" },
+      { href: "/admin/lives", iconName: "Live", label: "라이브 관리", group: "콘텐츠" },
       { href: "/admin/live-products", iconName: "Live", label: "라이브 상담상품관리", group: "콘텐츠" },
       // 알림톡
       { href: "/admin/alimtalk", iconName: "Notification", label: "알림톡 관리", group: "알림톡" },
@@ -80,6 +82,7 @@ export default async function DashboardLayout({
       { href: "/seller/timeslots", iconName: "Clock", label: "시간슬롯 관리", group: "예약·정산" },
       { href: "/seller/reservations", iconName: "Calendar", label: "예약 관리", group: "예약·정산" },
       { href: "/seller/customers", iconName: "Users", label: "고객관리(CRM)", group: "예약·정산" },
+      { href: "/seller/members", iconName: "UserCheck", label: "점집 회원", group: "예약·정산" },
       { href: "/seller/settlements", iconName: "Settlement", label: "정산·출금", group: "예약·정산" },
       // 알림톡
       { href: "/seller/alimtalk", iconName: "Notification", label: "알림톡 관리", group: "알림톡" },

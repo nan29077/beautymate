@@ -2,6 +2,7 @@
 
 import { Icon } from '@/components/shared/Icon';
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Radio, Play, Square, Users, Bell, X, Loader2, Clock, CheckCircle, MonitorPlay, ChevronDown, Ban, Mic, MicOff, Image as ImageIcon, Hash, Edit3, MoreVertical, GripVertical, Bot, Settings, Palette, Globe, Link, Save, Type, AlignLeft, Gamepad2, Disc3, Network, Ticket, Zap, HelpCircle, BarChart3, Target, Star, ListOrdered, Trophy, Monitor } from 'lucide-react';
 import GameFields from "@/components/shared/GameFields";
 import { GAME_TYPES, GAME_TYPE_META, GAME_TYPE_GUIDE, defaultConfig, usesItems, usesParticipants, validateGameInput, type GameTypeId } from "@/lib/gameTypes";
@@ -64,6 +65,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bgClass: str
 type PendingCoupon = { code: string; discountType: "PERCENT" | "AMOUNT"; discountValue: string; minOrderAmount: string; validDays: string; maxCount: string };
 
 export default function SellerLivePage() {
+  const router = useRouter();
   const { appAlert } = useAppDialog();
   const { liveCommerce: FEATURE_LIVE_COMMERCE } = useFeatureFlags();
   const [lives, setLives] = useState<LiveStream[]>([]);
@@ -99,6 +101,9 @@ export default function SellerLivePage() {
     benefits: [] as string[],
     notices: "",
     theme: "default" as string,
+    // 점사 예약 방식: 당일 예약 가능 슬롯 수(빈 값 = 무제한) + 방송 중 예약 위젯 표시
+    dailySlotLimit: "",
+    showReservationWidget: true,
   });
 
   // YouTube API 상태
@@ -410,6 +415,9 @@ export default function SellerLivePage() {
           // B방식: YouTube 라이브일 때만 OBS/PRISM 송출용 스트림 키 전달
           streamKey: form.platform === "YOUTUBE" ? form.youtubeStreamKey.trim() || null : undefined,
           productIds: form.selectedProducts, livePrices: form.livePrices,
+          // 점사 예약 방식 설정
+          dailySlotLimit: form.dailySlotLimit.trim() || null,
+          showReservationWidget: form.showReservationWidget,
         }),
       });
       if (res.ok) {
@@ -492,6 +500,11 @@ export default function SellerLivePage() {
           if (n?.notified) appAlert({ message: `알림톡 발송 요청 완료 (접수 ${n.successCount}/${n.attempted}건)`, type: "success" });
           else if (n?.reason && n.reason !== "이미 발송됨") setAlimtalkWarnMsg(`알림톡이 연동되지 않아 알림톡 발송이 안됩니다.\n(${n.reason})`);
         }
+        // 방송 종료 → 이 방송의 예약 목록 확인 화면으로 자동 이동
+        if (action === "end") {
+          router.push(`/seller/reservations?live=${liveId}`);
+          return;
+        }
         fetchLives();
       }
     } catch {} finally { setActionLoading(null); }
@@ -573,7 +586,7 @@ export default function SellerLivePage() {
   const resetCreate = () => {
     setShowCreate(false);
     setCreateStep(1);
-    setForm({ title: "", description: "", thumbnailImage: "", scheduledAt: "", selectedProducts: [], livePrices: {}, platform: null, externalUrl: "", youtubeMode: "url", youtubeChannelInput: "", youtubeStreamKey: "", couponCode: "", couponDiscount: "", liveIntro: "", benefits: [], notices: "", theme: "default" });
+    setForm({ title: "", description: "", thumbnailImage: "", scheduledAt: "", selectedProducts: [], livePrices: {}, platform: null, externalUrl: "", youtubeMode: "url", youtubeChannelInput: "", youtubeStreamKey: "", couponCode: "", couponDiscount: "", liveIntro: "", benefits: [], notices: "", theme: "default", dailySlotLimit: "", showReservationWidget: true });
     setYtDetectError("");
     setPendingCoupons([]);
     setShowCouponForm(false);
@@ -584,7 +597,7 @@ export default function SellerLivePage() {
   // 이전 라이브에서 고른 platform/youtubeMode가 다음 생성에 남아 강제 선택되지 않도록 함.
   const openCreate = () => {
     setCreateStep(1);
-    setForm({ title: "", description: "", thumbnailImage: "", scheduledAt: "", selectedProducts: [], livePrices: {}, platform: null, externalUrl: "", youtubeMode: "url", youtubeChannelInput: "", youtubeStreamKey: "", couponCode: "", couponDiscount: "", liveIntro: "", benefits: [], notices: "", theme: "default" });
+    setForm({ title: "", description: "", thumbnailImage: "", scheduledAt: "", selectedProducts: [], livePrices: {}, platform: null, externalUrl: "", youtubeMode: "url", youtubeChannelInput: "", youtubeStreamKey: "", couponCode: "", couponDiscount: "", liveIntro: "", benefits: [], notices: "", theme: "default", dailySlotLimit: "", showReservationWidget: true });
     setYtDetectError("");
     setPendingCoupons([]);
     setShowCouponForm(false);
@@ -853,8 +866,8 @@ export default function SellerLivePage() {
           {/* Step Indicator */}
           <div className="flex items-center gap-0 px-5 py-3 bg-gray-50 border-b border-gray-100">
             {[
-              { n: 1, label: "기본 정보" },
-              { n: 2, label: "상담상품 선택" },
+              { n: 1, label: "기본 정보·예약 설정" },
+              { n: 2, label: "예약 상담 상품" },
               { n: 3, label: "혜택·공지" },
               { n: 4, label: "확인" },
             ].map((s, i) => (
@@ -891,6 +904,39 @@ export default function SellerLivePage() {
                 <div>
                   <label className="text-xs font-bold text-gray-700 flex items-center gap-1"><Icon name="Calendar" size={12} /> 예정 시간</label>
                   <ScheduledTimePicker value={form.scheduledAt} onChange={(v) => setForm({ ...form, scheduledAt: v })} />
+                </div>
+
+                {/* ★ 점사 예약 설정 — 방송 중 시청자 예약 접수 방식 */}
+                <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3.5 space-y-3">
+                  <p className="text-xs font-bold text-amber-800 flex items-center gap-1">
+                    <Icon name="Calendar" size={13} /> 점사 예약 설정
+                  </p>
+                  <div>
+                    <label className="text-[11px] font-semibold text-gray-700">당일 예약 가능 슬롯 수</label>
+                    <input
+                      type="number"
+                      min={0}
+                      className="input-field mt-1 text-sm py-2"
+                      placeholder="비워두면 무제한 (열어둔 시간슬롯 내에서)"
+                      value={form.dailySlotLimit}
+                      onChange={e => setForm({ ...form, dailySlotLimit: e.target.value })}
+                    />
+                    <p className="text-[10px] text-gray-400 mt-1">이 방송을 통해 당일 접수 가능한 예약 건수를 제한합니다.</p>
+                  </div>
+                  <label className="flex items-center justify-between gap-2 cursor-pointer">
+                    <span className="text-[11px] font-semibold text-gray-700">
+                      방송 중 예약 위젯(예약 현황) 표시
+                      <span className="block text-[10px] font-normal text-gray-400 mt-0.5">
+                        OBS 오버레이 위젯 URL은 <a href="/seller/widget" target="_blank" className="text-amber-600 underline">위젯 설정</a>에서 복사할 수 있어요.
+                      </span>
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={form.showReservationWidget}
+                      onChange={e => setForm({ ...form, showReservationWidget: e.target.checked })}
+                      className="w-4 h-4 accent-amber-500 flex-shrink-0"
+                    />
+                  </label>
                 </div>
                 {/* ★ 외부 라이브 플랫폼 선택 + URL — 관리자 SNS 라이브 연동 토글이 꺼지면 숨김 */}
                 {enableSnsLive && (

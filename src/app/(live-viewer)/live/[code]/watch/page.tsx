@@ -38,6 +38,12 @@ interface LiveData {
   products: { id: string; product: { id: string; name: string; thumbnail: string | null; basePrice: number; comparePrice: number | null; badges: any; description?: string }; livePrice: number | null; sortOrder: number; isActive: boolean }[];
   chatMessages: { id: string; nickname: string; message: string; isManager: boolean; isSystem: boolean; isBot?: boolean; isYoutube?: boolean; createdAt: string }[];
   coupons: LiveCoupon[];
+  // 점사 예약 정보 (예약 설정이 있는 방송만, 미반영 환경은 null)
+  reservationInfo?: {
+    showReservationWidget: boolean;
+    dailySlotLimit: number | null;
+    reservedToday: number;
+  } | null;
 }
 
 interface Notice {
@@ -690,10 +696,35 @@ export default function LiveWatchPage() {
     </div>
   );
 
-  // ── 방송 화면 하단 상담상품 바 (PC · 모바일 공통) ─────────────────
+  // ── 방송 중 예약 위젯: 당일 예약 현황 (설정에서 켠 방송만) ─────────
+  const liveResInfo = live.reservationInfo;
+  const remainingSlots =
+    liveResInfo?.dailySlotLimit != null
+      ? Math.max(0, liveResInfo.dailySlotLimit - liveResInfo.reservedToday)
+      : null;
+  const ReservationStatusChip = () =>
+    liveResInfo?.showReservationWidget ? (
+      <div className="bg-white/95 px-3 py-1.5 flex items-center justify-between gap-2 border-t border-gray-100 text-[11px]">
+        <span className="flex items-center gap-1 font-semibold text-gray-700">
+          <Calendar size={12} style={{ color: PRIMARY }} />
+          오늘 예약 현황
+        </span>
+        <span className="font-bold" style={{ color: remainingSlots === 0 ? "#ff3b5c" : PRIMARY }}>
+          {liveResInfo.dailySlotLimit != null
+            ? remainingSlots === 0
+              ? "당일 예약 마감"
+              : `잔여 ${remainingSlots}자리 · 접수 ${liveResInfo.reservedToday}건`
+            : `접수 ${liveResInfo.reservedToday}건`}
+        </span>
+      </div>
+    ) : null;
+
+  // ── 방송 화면 하단 상담상품 바 (PC · 모바일 공통) — 점사 예약 방식 ──
   const ProductBar = ({ onCartClick, onBuyClick }: { onCartClick: () => void; onBuyClick: () => void }) => (
     currentProduct ? (
-      <div className="bg-white px-3 py-2.5 flex items-center gap-2.5 border-t border-gray-100 shadow-[0_-4px_16px_rgba(0,0,0,0.18)]">
+      <div>
+        <ReservationStatusChip />
+        <div className="bg-white px-3 py-2.5 flex items-center gap-2.5 border-t border-gray-100 shadow-[0_-4px_16px_rgba(0,0,0,0.18)]">
         <div className="flex-shrink-0">
           {currentProduct.product.thumbnail
             ? <img src={currentProduct.product.thumbnail} alt="" className="w-11 h-11 rounded-lg object-cover border border-gray-100" />
@@ -714,10 +745,12 @@ export default function LiveWatchPage() {
             {cartLoading === currentProduct.product.id ? <Loader2 size={15} className="animate-spin" /> : <Calendar size={15} />}
           </button>
           <button onClick={onBuyClick}
-            className="px-3.5 py-2 text-white text-[11px] font-bold rounded-lg shadow-sm"
+            disabled={remainingSlots === 0}
+            className="px-3.5 py-2 text-white text-[11px] font-bold rounded-lg shadow-sm disabled:opacity-50"
             style={{ backgroundColor: PRIMARY }}>
-            구매하기
+            {remainingSlots === 0 ? "예약 마감" : "상담 예약하기"}
           </button>
+        </div>
         </div>
       </div>
     ) : null
@@ -1251,8 +1284,9 @@ export default function LiveWatchPage() {
               </button>
             </div>
             <div className="flex-1 min-h-0 border-t border-gray-100">
-              <iframe src={`/products/${selectedLp.product.id}?from=live&sellerId=${live.seller.id}&embedded=true`}
-                className="w-full h-full border-0" title="상담상품 상세" />
+              {/* 점사 예약 방식: 상품 상세 대신 예약 플로우를 임베드 (방송 유래 예약으로 기록) */}
+              <iframe src={`/shop/${live.seller.slug}/book?product=${selectedLp.product.id}&live=${live.id}&embedded=true`}
+                className="w-full h-full border-0" title="상담 예약" />
             </div>
           </div>
         </div>
@@ -1353,11 +1387,19 @@ export default function LiveWatchPage() {
                       장바구니
                     </button>
                     <button
-                      onClick={() => { setPcSelectedProductId(null); showToast("장바구니에서 예약하세요."); }}
+                      onClick={() => {
+                        // 점사 예약 방식: 예약 플로우를 새 창으로 (방송 유래 예약으로 기록)
+                        window.open(
+                          `/shop/${live.seller.slug}/book?product=${pcSelectedLp.product.id}&live=${live.id}`,
+                          "_blank",
+                          "noopener,noreferrer",
+                        );
+                        setPcSelectedProductId(null);
+                      }}
                       className="flex-1 py-3 px-8 rounded-xl text-black font-bold text-[14px] hover:opacity-90 transition-opacity flex items-center justify-center"
                       style={{ backgroundColor: PRIMARY }}
                     >
-                      바로 구매
+                      상담 예약하기
                     </button>
                   </div>
                 </div>

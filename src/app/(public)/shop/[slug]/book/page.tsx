@@ -66,11 +66,16 @@ async function getSeller(slug: string) {
 
 export default async function BookingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }> | { slug: string };
+  searchParams?:
+    | Promise<{ product?: string; live?: string }>
+    | { product?: string; live?: string };
 }) {
   const session = await auth();
   const { slug } = await Promise.resolve(params);
+  const { product: productParam, live: liveParam } = (await Promise.resolve(searchParams)) ?? {};
 
   if (!session?.user) {
     redirect(getShopAwareLoginPath(`/shop/${slug}/book`));
@@ -95,6 +100,40 @@ export default async function BookingPage({
     };
   });
 
+  // 라이브 등에서 특정 상품으로 진입: 목록에 없지만 이 상담사 소유 상품이면 추가
+  if (productParam && !products.some((p) => p.id === productParam)) {
+    type ExtraProduct = BookProduct & { sellerId: string | null; isActive: boolean };
+    let extra: ExtraProduct | null = null;
+    try {
+      extra = (await prisma.product.findUnique({
+        where: { id: productParam },
+        select: { ...CONSULTING_PRODUCT_SELECT, sellerId: true, isActive: true },
+      })) as ExtraProduct | null;
+    } catch {
+      try {
+        extra = (await prisma.product.findUnique({
+          where: { id: productParam },
+          select: { ...BASE_PRODUCT_SELECT, sellerId: true, isActive: true },
+        })) as ExtraProduct | null;
+      } catch {
+        extra = null;
+      }
+    }
+    if (extra && extra.isActive && extra.sellerId === seller.id) {
+      products.unshift({
+        id: extra.id,
+        name: extra.name,
+        basePrice: Number(extra.basePrice),
+        consultingType: extra.consultingType ?? null,
+        consultingMethod: extra.consultingMethod ?? null,
+        durationMinutes: extra.durationMinutes ?? null,
+        thumbnail: extra.thumbnail,
+        description: extra.description,
+        sellerPrice: null,
+      });
+    }
+  }
+
   return (
     <BookingFlow
       seller={{
@@ -109,6 +148,8 @@ export default async function BookingPage({
       }}
       products={products}
       currentUserId={session.user.id}
+      initialProductId={productParam || null}
+      liveStreamId={liveParam || null}
     />
   );
 }

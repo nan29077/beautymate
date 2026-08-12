@@ -101,6 +101,8 @@ model User {
   packageProducts         PackageProduct[]     @relation("PackageCreator")
   // 패키지 발주서 수신자
   packagePurchaseOrders   PackagePurchaseOrder[] @relation("PackagePurchaseOrderRecipient")
+  // 점집 독립 회원 멤버십
+  shopMemberships         ShopMembership[]       @relation("ShopMemberships")
 
   @@map("users")
 }
@@ -221,6 +223,9 @@ model SellerProfile {
   // 셀러 직접 등록 일반상품 & 셀러샵 노출 설정
   directProducts DirectProduct[]
   shopExposure   ShopDirectProductExposure?
+
+  // 점집 독립 회원 멤버십
+  shopMembers ShopMembership[] @relation("ShopMembers")
 
   @@map("seller_profiles")
 }
@@ -565,6 +570,10 @@ model Reservation {
   seller          SellerProfile     @relation("ConsultantReservations", fields: [sellerId], references: [id])
   campaignId      String?
   campaign        GroupBuyCampaign? @relation(fields: [campaignId], references: [id])
+  // 라이브 방송 중 발생한 예약이면 해당 방송 ID (방송별 예약 집계용)
+  // reservations 테이블 자체가 운영 DB 미반영이므로 컬럼 추가가 안전하다.
+  liveStreamId    String?
+  liveStream      LiveStream?       @relation(fields: [liveStreamId], references: [id])
   status          ReservationStatus @default(PENDING)
   paymentStatus   PaymentStatus     @default(PENDING)
   totalAmount     Decimal           @db.Decimal(12, 2)
@@ -626,6 +635,7 @@ model Reservation {
   consultingSession      ConsultingSession?
 
   @@index([sellerId, reservationDate])
+  @@index([liveStreamId])
   @@map("reservations")
 }
 
@@ -685,6 +695,29 @@ model TimeSlot {
   @@unique([consultantId, date, startTime])
   @@index([consultantId, date])
   @@map("time_slots")
+}
+
+// ─────────────────────────────────────────────
+// 점집 독립 회원 (ShopMembership)
+// 점집(SellerProfile) 단위의 자체 회원 체계. 점집 전용 가입/로그인 화면을 통해
+// 가입한 고객이 어느 점집 소속인지 기록한다. 인증 자체는 공용 User 를 쓰되,
+// 멤버십으로 점집별 회원을 완전히 분리 조회한다.
+// ⚠️ 운영 DB에는 아직 없는 테이블 — 조회는 safeQuery, 생성은 try-catch 폴백 필수.
+// ─────────────────────────────────────────────
+
+model ShopMembership {
+  id           String        @id @default(cuid())
+  shopId       String // SellerProfile.id
+  shop         SellerProfile @relation("ShopMembers", fields: [shopId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User          @relation("ShopMemberships", fields: [userId], references: [id], onDelete: Cascade)
+  consultantId String // 점집 상담사 User.id (조회 편의 비정규화)
+  joinedAt     DateTime      @default(now())
+
+  @@unique([shopId, userId])
+  @@index([consultantId])
+  @@index([userId])
+  @@map("shop_memberships")
 }
 
 // ─────────────────────────────────────────────
@@ -1112,11 +1145,32 @@ model LiveStream {
   products     LiveStreamProduct[]
   chatMessages LiveChatMessage[]
   coupons      LiveCoupon[]
+  // 점사 예약 방식 라이브 — 예약 설정과 방송 유래 예약
+  reservationSettings LiveReservationSettings?
+  reservations        Reservation[]
 
   @@index([sellerId])
   @@index([shareCode])
   @@index([status])
   @@map("live_streams")
+}
+
+// ─────────────────────────────────────────────
+// 라이브 예약 설정 (점사 예약 방식 방송)
+// live_streams 는 운영 DB에 이미 존재하므로 컬럼을 추가하지 않고 별도 테이블로 확장한다.
+// ⚠️ 운영 DB에는 아직 없는 테이블 — 조회는 safeQuery, 생성은 try-catch 폴백 필수.
+// ─────────────────────────────────────────────
+
+model LiveReservationSettings {
+  id                    String     @id @default(cuid())
+  liveStreamId          String     @unique
+  liveStream            LiveStream @relation(fields: [liveStreamId], references: [id], onDelete: Cascade)
+  dailySlotLimit        Int? // 당일 예약 가능 슬롯 수 (null = 무제한)
+  showReservationWidget Boolean    @default(true) // 방송 중 예약 위젯(예약 현황) 표시
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+
+  @@map("live_reservation_settings")
 }
 
 model LiveStreamProduct {

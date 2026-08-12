@@ -53,10 +53,12 @@ export default function SellerReservationsClient({
   reservations,
   initialStatus,
   initialView,
+  liveFilter,
 }: {
   reservations: Reservation[];
   initialStatus: string;
   initialView: "list" | "calendar";
+  liveFilter?: { id: string; title: string } | null;
 }) {
   const router = useRouter();
   const [statusFilter, setStatusFilter] = useState(initialStatus);
@@ -118,6 +120,19 @@ export default function SellerReservationsClient({
           </button>
         </div>
       </div>
+
+      {/* 라이브 방송 필터 배너 — 방송 종료 후 자동 이동 시 표시 */}
+      {liveFilter && (
+        <div className="mb-3 flex items-center justify-between gap-2 rounded-xl border border-indigo-100 bg-indigo-50 px-3.5 py-2.5">
+          <p className="text-xs text-indigo-700">
+            <Video size={12} className="inline mr-1 -mt-0.5" />
+            <b>{liveFilter.title}</b> 방송에서 접수된 예약만 보고 있어요.
+          </p>
+          <Link href="/seller/reservations" className="text-[11px] text-indigo-500 font-medium hover:underline flex-shrink-0">
+            전체 예약 보기
+          </Link>
+        </div>
+      )}
 
       {/* 필터 탭 */}
       <div className="flex gap-1 overflow-x-auto scrollbar-hide mb-4">

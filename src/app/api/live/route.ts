@@ -5,6 +5,7 @@ import { notifyLiveStartToFollowers, type LiveNotifyResult } from "@/lib/liveNot
 import { createLiveStartNotifications } from "@/lib/notifications";
 import { forwardSiteChatToYoutube } from "@/lib/youtubeChatForward";
 import { sellerProfileImage } from "@/lib/sellerLive";
+import { isMissingSchemaError } from "@/lib/safeDb";
 
 // B방식(OBS/PRISM → YouTube 송출)용 고정 RTMP 서버 주소
 const YOUTUBE_RTMP_URL = "rtmp://a.rtmp.youtube.com/live2";
@@ -82,12 +83,50 @@ export async function GET(req: NextRequest) {
     // 스트림 키는 송출용 비밀값 — 공개 시청 페이지 응답에서 제외
     const { streamKey: _sk2, ...liveSafe } = live;
     const { user: _sellerUser, ...sellerRest } = live.seller;
+
+    // 점사 예약 정보 — 설정·당일 예약 수 (테이블 미반영 환경에서는 null)
+    let reservationInfo: {
+      showReservationWidget: boolean;
+      dailySlotLimit: number | null;
+      reservedToday: number;
+    } | null = null;
+    try {
+      const settings = await prisma.liveReservationSettings.findUnique({
+        where: { liveStreamId: live.id },
+        select: { dailySlotLimit: true, showReservationWidget: true },
+      });
+      if (settings) {
+        let reservedToday = 0;
+        try {
+          const dayStart = new Date();
+          dayStart.setHours(0, 0, 0, 0);
+          reservedToday = await prisma.reservation.count({
+            where: {
+              liveStreamId: live.id,
+              createdAt: { gte: dayStart },
+              status: { not: "CANCELLED" },
+            },
+          });
+        } catch (e) {
+          if (!isMissingSchemaError(e)) throw e;
+        }
+        reservationInfo = {
+          showReservationWidget: settings.showReservationWidget,
+          dailySlotLimit: settings.dailySlotLimit,
+          reservedToday,
+        };
+      }
+    } catch (e) {
+      if (!isMissingSchemaError(e)) throw e;
+    }
+
     return NextResponse.json({
       live: {
         ...liveSafe,
         seller: { ...sellerRest, shopLogo: sellerProfileImage(live.seller) },
         products: live.products.map(p => ({ ...p, product: { ...p.product, basePrice: Number(p.product.basePrice), comparePrice: p.product.comparePrice ? Number(p.product.comparePrice) : null }, livePrice: p.livePrice ? Number(p.livePrice) : null })),
         coupons: live.coupons.map(c => ({ ...c, discountValue: Number(c.discountValue), minOrderAmount: c.minOrderAmount ? Number(c.minOrderAmount) : null })),
+        reservationInfo,
       }
     });
   }
@@ -233,6 +272,27 @@ export async function POST(req: NextRequest) {
           livePrice: body.livePrices?.[pid] ? parseFloat(body.livePrices[pid]) : null,
         })),
       });
+    }
+
+    // 예약 설정 (점사 예약 방식 방송) — 테이블 미반영(P2021) 환경에서는 생략
+    try {
+      const dailySlotLimit =
+        body.dailySlotLimit != null && !Number.isNaN(parseInt(body.dailySlotLimit))
+          ? Math.max(0, parseInt(body.dailySlotLimit))
+          : null;
+      await prisma.liveReservationSettings.create({
+        data: {
+          liveStreamId: live.id,
+          dailySlotLimit,
+          showReservationWidget: body.showReservationWidget !== false,
+        },
+      });
+    } catch (e) {
+      if (isMissingSchemaError(e)) {
+        console.warn("[live:create] live_reservation_settings 미반영 — 예약 설정 생략");
+      } else {
+        console.error("[live:create] 예약 설정 저장 실패:", e);
+      }
     }
 
     // 쿠폰 생성 (코드와 할인값이 있을 때만)
