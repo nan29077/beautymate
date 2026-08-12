@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { getFeatureFlags } from "@/lib/settings";
 import { safeQuery } from "@/lib/safeDb";
 import { formatPrice } from "@/lib/utils";
-import { pickRoleAvatar, resolveAdminDashboardAvatar } from "@/lib/defaults";
+import { pickRoleAvatar, resolveAdminDashboardAvatar, resolveConsultantAvatar } from "@/lib/defaults";
 import SafeImage from "@/components/shared/SafeImage";
 import SeedDataButton from "@/components/admin/SeedDataButton";
 
@@ -259,7 +259,9 @@ export default async function AdminDashboard() {
                     <SafeImage
                       src={user.role === "SUPER_ADMIN"
                         ? resolveAdminDashboardAvatar(user.id, user.avatar)
-                        : (user.avatar || pickRoleAvatar(user.id, user.role, user.gender))}
+                        : user.role === "CONSULTANT"
+                          ? resolveConsultantAvatar(user.avatar)
+                          : (user.avatar || pickRoleAvatar(user.id, user.role, user.gender))}
                       alt={user.name}
                       width={32}
                       height={32}

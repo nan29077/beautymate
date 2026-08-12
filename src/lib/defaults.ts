@@ -22,8 +22,12 @@ export const ADMIN_AVATARS = Array.from({ length: 5 }, (_, i) => `/avatars/관�
 // 중간관리자·노드 (5종)
 export const MIDDLE_ADMIN_AVATARS = Array.from({ length: 5 }, (_, i) => `/avatars/중간관리자_${i + 1}.png`);
 
-// 상담사 (10종)
-export const SELLER_AVATARS = Array.from({ length: 10 }, (_, i) => `/avatars/라이브셀러_${i + 1}.png`);
+// 상담사 기본 프로필 — 사주메이트 테마(밤하늘 보라 + 초승달 + 별) 자체 SVG.
+// 기존 셀러브릭스 꿀벌 캐릭터(/avatars/라이브셀러_*.png)를 대체한다.
+export const DEFAULT_CONSULTANT_AVATAR = "/images/default-consultant-avatar.svg";
+
+// 상담사 — 단일 기본 아바타. (pickSellerAvatar / pickRoleAvatar 가 이 풀에서 고른다)
+export const SELLER_AVATARS = [DEFAULT_CONSULTANT_AVATAR];
 
 // 브랜드사 (6종)
 export const BRAND_AVATARS = Array.from({ length: 6 }, (_, i) => `/avatars/브랜드사_${i + 1}.png`);
@@ -118,15 +122,25 @@ export function randomSajuAvatar(): string {
   return SAJU_CUSTOMER_AVATARS[Math.floor(Math.random() * SAJU_CUSTOMER_AVATARS.length)];
 }
 
+// 셀러브릭스 시절 번들 캐릭터(/avatars/*.png — 꿀벌 상담사·구매회원 등) 여부.
+// /avatars/saju/* 는 사주메이트 전용 캐릭터이므로 레거시가 아니다.
+export function isLegacyBundledAvatar(path?: string | null): boolean {
+  return Boolean(path?.startsWith("/avatars/") && !path.startsWith("/avatars/saju/"));
+}
+
 // 관리자 화면에서는 기존 번들 기본 캐릭터를 새 사주 캐릭터로 교체한다.
 // 직접 업로드한 이미지(/uploads 등)는 그대로 보존한다.
 export function resolveAdminDashboardAvatar(seed: string, currentAvatar?: string | null): string {
-  const isLegacyBundledAvatar = Boolean(
-    currentAvatar?.startsWith("/avatars/") && !currentAvatar.startsWith("/avatars/saju/"),
-  );
-
-  if (currentAvatar && !isLegacyBundledAvatar) return currentAvatar;
+  if (currentAvatar && !isLegacyBundledAvatar(currentAvatar)) return currentAvatar;
   return pickSajuAvatar(`admin:${seed}`);
+}
+
+// 상담사 프로필 이미지 확정.
+// 직접 업로드한 이미지(점집 로고 · /uploads 등)는 보존하고, DB 에 남아 있는 레거시 꿀벌
+// 캐릭터 경로이거나 이미지가 아예 없으면 사주 테마 기본 아바타로 교체한다.
+export function resolveConsultantAvatar(currentAvatar?: string | null): string {
+  if (currentAvatar && !isLegacyBundledAvatar(currentAvatar)) return currentAvatar;
+  return DEFAULT_CONSULTANT_AVATAR;
 }
 
 // 정적 placeholder 용 단일 기본 아바타 (SafeImage placeholder 등)

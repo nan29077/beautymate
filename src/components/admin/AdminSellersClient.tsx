@@ -5,7 +5,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { X, Loader2, Minus, Plus } from 'lucide-react';
 import SafeImage from "@/components/shared/SafeImage";
-import { pickSellerAvatar, shouldUseAvatar } from "@/lib/defaults";
+import { DEFAULT_CONSULTANT_AVATAR, isLegacyBundledAvatar, shouldUseAvatar } from "@/lib/defaults";
 import ApproveSellerButton from "@/components/shared/ApproveSellerButton";
 import RejectSellerButton from "@/components/shared/RejectSellerButton";
 import RecommendSellerButton from "@/components/shared/RecommendSellerButton";
@@ -32,6 +32,13 @@ interface MiddleAdminOption {
 }
 
 const won = (n: number) => Math.round(n).toLocaleString("ko-KR") + "원";
+
+// 상담사 목록 아바타: 직접 올린 프로필/점집 로고 우선, 없거나 레거시 꿀벌 캐릭터면 사주 테마 기본 아바타.
+function sellerAvatarSrc(s: Pick<Seller, "userImage" | "shopLogo" | "userName" | "shopName">): string | undefined {
+  const uploaded = (!isLegacyBundledAvatar(s.userImage) ? s.userImage : null) || s.shopLogo;
+  if (uploaded) return uploaded;
+  return shouldUseAvatar(s.userName, s.shopName) ? DEFAULT_CONSULTANT_AVATAR : undefined;
+}
 
 function ImpersonateButton({ userId, shopName }: { userId: string; shopName: string }) {
   const { appConfirm, appAlert } = useAppDialog();
@@ -182,7 +189,7 @@ export default function AdminSellersClient({
             {pending.map((seller) => (
               <div key={seller.id} className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 bg-white rounded-lg border border-gray-100 p-2.5 sm:p-3">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 overflow-hidden flex-shrink-0">
-                  <SafeImage src={seller.userImage || seller.shopLogo || (shouldUseAvatar(seller.userName, seller.shopName) ? pickSellerAvatar(seller.userId) : undefined)} alt={seller.shopName} width={40} height={40} fallbackText={seller.shopName.charAt(0)} />
+                  <SafeImage src={sellerAvatarSrc(seller)} alt={seller.shopName} width={40} height={40} fallbackText={seller.shopName.charAt(0)} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-bold text-gray-900 truncate">{seller.shopName}</p>
@@ -217,7 +224,7 @@ export default function AdminSellersClient({
           <div key={seller.id} className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4">
             <div className="flex flex-wrap sm:flex-nowrap items-start sm:items-center gap-2.5 sm:gap-3 mb-3">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-100 overflow-hidden flex-shrink-0">
-                <SafeImage src={seller.userImage || seller.shopLogo || (shouldUseAvatar(seller.userName, seller.shopName) ? pickSellerAvatar(seller.userId) : undefined)} alt={seller.shopName} width={48} height={48} fallbackText={seller.shopName.charAt(0)} />
+                <SafeImage src={sellerAvatarSrc(seller)} alt={seller.shopName} width={48} height={48} fallbackText={seller.shopName.charAt(0)} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
@@ -325,7 +332,7 @@ export default function AdminSellersClient({
 
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
-                <SafeImage src={detailSeller.userImage || detailSeller.shopLogo || (shouldUseAvatar(detailSeller.userName, detailSeller.shopName) ? pickSellerAvatar(detailSeller.userId) : undefined)} alt={detailSeller.shopName} width={48} height={48} fallbackText={detailSeller.shopName.charAt(0)} />
+                <SafeImage src={sellerAvatarSrc(detailSeller)} alt={detailSeller.shopName} width={48} height={48} fallbackText={detailSeller.shopName.charAt(0)} />
               </div>
               <div>
                 <p className="text-sm font-bold text-gray-900">{detailSeller.shopName}</p>

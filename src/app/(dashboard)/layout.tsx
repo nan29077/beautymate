@@ -5,7 +5,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getFeatureFlags } from "@/lib/settings";
-import { pickRoleAvatar, resolveAdminDashboardAvatar, shouldUseAvatar } from "@/lib/defaults";
+import { pickRoleAvatar, resolveAdminDashboardAvatar, resolveConsultantAvatar, shouldUseAvatar } from "@/lib/defaults";
 import type { FeatureFlags } from "@/lib/featureFlags";
 import { Shield, Building2, Crown, User } from 'lucide-react';
 import LogoutButton from "@/components/shared/LogoutButton";
@@ -137,9 +137,15 @@ export default async function DashboardLayout({
 
   // 역할 기반 랜덤 캐릭터 아바타 (기존 프로필 이미지 우선, 없으면 역할별 캐릭터)
   // 제외 목록(예: 천송이 쇼핑/김혜선)은 아바타를 적용하지 않음
+  // CONSULTANT 는 점집 로고/업로드 이미지를 우선하고, 없거나 레거시 꿀벌 캐릭터면
+  // 사주 테마 기본 아바타로 교체한다. (아바타 제외 계정은 기존 동작 유지)
   const resolvedProfileImage = role === "SUPER_ADMIN"
     ? resolveAdminDashboardAvatar(session.user.id, profileImage || userAvatar)
-    : profileImage;
+    : role === "CONSULTANT"
+      ? (shouldUseAvatar(session.user.name, sellerShopName)
+          ? resolveConsultantAvatar(profileImage || userAvatar)
+          : profileImage || userAvatar)
+      : profileImage;
   const roleAvatarFallback = shouldUseAvatar(session.user.name, sellerShopName)
     ? (userAvatar || pickRoleAvatar(session.user.id, role, userGender))
     : (userAvatar || null);

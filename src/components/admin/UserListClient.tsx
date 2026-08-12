@@ -11,7 +11,7 @@ import { withVatRate } from "@/lib/utils";
 import Pagination, { usePagination } from "@/components/shared/Pagination";
 import SignupBadges from "@/components/shared/SignupBadges";
 import SafeImage from "@/components/shared/SafeImage";
-import { pickRoleAvatar, pickSajuAvatar, resolveAdminDashboardAvatar } from "@/lib/defaults";
+import { pickRoleAvatar, pickSajuAvatar, resolveAdminDashboardAvatar, resolveConsultantAvatar } from "@/lib/defaults";
 
 interface User {
   id: string;
@@ -46,6 +46,8 @@ function getUserAvatar(user: User): string {
   if (user.role === "SUPER_ADMIN") {
     return resolveAdminDashboardAvatar(user.id, user.avatar);
   }
+  // 상담사는 DB 에 남은 레거시 꿀벌 캐릭터도 사주 테마 기본 아바타로 교체한다.
+  if (user.role === "CONSULTANT") return resolveConsultantAvatar(user.avatar);
   if (user.avatar) return user.avatar;
   return user.role === "CUSTOMER"
     ? pickSajuAvatar(user.id)
