@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/utils";
 import SafeImage from "@/components/shared/SafeImage";
 import BrandWordmark from "@/components/shared/BrandWordmark";
-import { pickSellerAvatar, DEFAULT_PRODUCT_IMAGE } from "@/lib/defaults";
+import { resolveSellerDisplayImage, DEFAULT_PRODUCT_IMAGE } from "@/lib/defaults";
 import { getShopCustomization } from "@/lib/shopCustomization";
 import { Clock, Video, CalendarCheck, Sparkles, ChevronRight } from "lucide-react";
 
@@ -86,16 +86,28 @@ export async function generateMetadata({
   const { slug } = await Promise.resolve(params);
   const seller = await prisma.sellerProfile.findUnique({
     where: { slug },
-    select: { shopName: true, shopDescription: true },
+    select: { id: true, shopName: true, shopDescription: true, shopBanner: true },
   });
   if (!seller) return { title: "사주메이트" };
 
-  const title = `${seller.shopName} 상담 예약 | 사주메이트`;
-  const description = seller.shopDescription || `${seller.shopName} 상담사에게 라이브 점사를 예약하세요.`;
+  const custom = await getShopCustomization(seller.id);
+  const title = `${seller.shopName}의 점집 - 사주메이트`;
+  const description =
+    custom.tagline || seller.shopDescription || `${seller.shopName}에게 지금 상담을 예약하세요.`;
+  const image = seller.shopBanner || "/opengraph-image";
+
   return {
     title,
     description,
-    openGraph: { title, description, url: `/c/${slug}`, siteName: "사주메이트", type: "profile" },
+    openGraph: {
+      title,
+      description,
+      url: `/c/${slug}`,
+      siteName: "사주메이트",
+      type: "profile",
+      images: [{ url: image, width: 1200, height: 630, alt: `${seller.shopName}의 점집` }],
+    },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
   };
 }
 
@@ -134,7 +146,7 @@ export default async function ConsultantLandingPage({
   );
 
   const bookHref = `/shop/${seller.slug}/book`;
-  const avatar = seller.shopLogo || seller.user.avatar;
+  const avatar = resolveSellerDisplayImage(seller);
 
   return (
     <div className="animate-fade-in bg-gradient-to-b from-[#1a0b33] via-[#2d1b69] to-white min-h-screen">
@@ -160,7 +172,7 @@ export default async function ConsultantLandingPage({
           <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-purple-300/40 shadow-xl bg-white mx-auto">
             <SafeImage
               src={avatar}
-              placeholder={pickSellerAvatar(seller.id)}
+              placeholder={resolveSellerDisplayImage(seller)}
               alt={seller.shopName}
               width={96}
               height={96}

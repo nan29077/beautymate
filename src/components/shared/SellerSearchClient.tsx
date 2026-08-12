@@ -6,7 +6,7 @@ import { List, X, ChevronRight, Radio, Eye } from 'lucide-react';
 import Link from "next/link";
 import SafeImage from "@/components/shared/SafeImage";
 import { sellerShopUrl } from "@/lib/utils";
-import { pickSellerAvatar } from "@/lib/defaults";
+
 
 interface ProductInfo {
   id: string;
@@ -254,7 +254,6 @@ function SellerRankingCard({ seller, rank }: { seller: Seller; rank: number }) {
           }`}>
             <SafeImage
               src={seller.shopLogo}
-              placeholder={pickSellerAvatar(seller.slug)}
               alt={seller.shopName}
               width={44}
               height={44}
@@ -354,7 +353,7 @@ function SellerGridCard({ seller }: { seller: Seller }) {
                 ? "border-red-400 ring-2 ring-red-300 animate-heartbeat"
                 : "border-gray-200"
             }`}>
-              <SafeImage src={seller.shopLogo} placeholder={pickSellerAvatar(seller.slug)} alt={seller.shopName} width={32} height={32} fallbackText={seller.shopName.charAt(0)} />
+              <SafeImage src={seller.shopLogo} alt={seller.shopName} width={32} height={32} fallbackText={seller.shopName.charAt(0)} />
             </div>
             {seller.isLive && (
               <span className="flex items-center gap-0.5 bg-red-500 text-white text-[6px] font-bold px-1 py-[1px] rounded-full -mt-1.5 relative z-10 shadow-sm">

@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { X, Sparkles } from 'lucide-react';
 import SafeImage from "@/components/shared/SafeImage";
-import { pickSellerAvatar } from "@/lib/defaults";
+
 import LiveBadge, { LIVE_RING_CLASS } from "@/components/shared/LiveBadge";
 
 interface SellerResult {
@@ -162,7 +162,6 @@ export default function SellerSearchHero() {
                           <div className={`w-10 h-10 rounded-full overflow-hidden bg-gray-100 ${s.isLive ? LIVE_RING_CLASS : "ring-1 ring-gray-100"}`}>
                             <SafeImage
                               src={s.profileImage}
-                              placeholder={pickSellerAvatar(s.slug)}
                               alt={s.shopName}
                               width={40}
                               height={40}

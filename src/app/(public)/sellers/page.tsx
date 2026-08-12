@@ -2,6 +2,7 @@ import { Icon } from '@/components/shared/Icon';
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { resolveSellerDisplayImage } from "@/lib/defaults";
 import { parseJsonArray } from "@/lib/utils";
 import {  } from "lucide-react";
 import SellerSearchClient from "@/components/shared/SellerSearchClient";
@@ -26,7 +27,7 @@ export default async function SellersPage({
   const sellers = await prisma.sellerProfile.findMany({
     where: { isApproved: true, ...(category ? { category } : {}) },
     include: {
-      user: { select: { name: true } },
+      user: { select: { name: true, avatar: true } },
       _count: { select: { campaigns: true, shopProducts: true, fans: true } },
       // 현재 라이브 중인지 확인
       liveStreams: {
@@ -104,7 +105,8 @@ export default async function SellersPage({
       slug: s.slug,
       shopName: s.shopName,
       startPrice,
-      shopLogo: s.shopLogo,
+      // 상담사 표시 이미지 단일 진입점 (점집 로고 > 회원 동물 캐릭터 > id 해시 캐릭터)
+      shopLogo: resolveSellerDisplayImage(s),
       shopBanner: s.shopBanner,
       shopDescription: s.shopDescription,
       category: s.category,

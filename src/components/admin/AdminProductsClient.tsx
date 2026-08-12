@@ -13,7 +13,7 @@ import ProductChatPanel from "@/components/shared/ProductChatPanel";
 import ProductSellerChatPanel from "@/components/shared/ProductSellerChatPanel";
 import { useAppDialog } from "@/components/shared/AppDialog";
 import SafeImage from "@/components/shared/SafeImage";
-import { pickSellerAvatar } from "@/lib/defaults";
+import { pickSajuAvatar } from "@/lib/defaults";
 
 type RegistrarType = "CONSULTANT" | "BRAND" | "ADMIN";
 
@@ -417,7 +417,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                       {(product.activeSellers || []).map((s) => (
                         <div key={s.id} className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 border border-emerald-100 rounded-full">
                           <div className="w-3.5 h-3.5 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-                            <SafeImage src={s.shopLogo} placeholder={pickSellerAvatar(s.id)} alt={s.shopName} width={14} height={14} fallbackText={s.shopName.charAt(0)} className="w-full h-full object-cover" />
+                            <SafeImage src={s.shopLogo} placeholder={pickSajuAvatar(s.id)} alt={s.shopName} width={14} height={14} fallbackText={s.shopName.charAt(0)} className="w-full h-full object-cover" />
                           </div>
                           <span className="text-[10px] text-emerald-700 font-medium">{s.shopName}</span>
                         </div>

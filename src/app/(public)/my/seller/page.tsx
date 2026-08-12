@@ -7,7 +7,7 @@ import { getShopAwareLoginPath } from "@/lib/shopLoginRedirect";
 import {  } from "lucide-react";
 import SafeImage from "@/components/shared/SafeImage";
 import PickSellerButton from "@/components/shared/PickSellerButton";
-import { pickSellerAvatar } from "@/lib/defaults";
+import { pickSajuAvatar } from "@/lib/defaults";
 import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
 import LiveStatusPoller from "@/components/shared/LiveStatusPoller";
 import LiveBadge, {
@@ -133,7 +133,7 @@ export default async function MySellerPage() {
                       >
                         <SafeImage
                           src={sellerProfileImage(seller)}
-                          placeholder={pickSellerAvatar(seller.id)}
+                          placeholder={pickSajuAvatar(seller.id)}
                           alt={seller.shopName}
                           width={56}
                           height={56}

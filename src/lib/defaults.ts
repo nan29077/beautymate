@@ -141,6 +141,46 @@ export function resolveConsultantAvatar(seed: string, currentAvatar?: string | n
   return pickSajuAvatar(seed);
 }
 
+// ─── 점집 기본 배너 (public/images/banners/*.svg) ───────────────────────────
+// 배너를 올리지 않은 상담사에게 점집·사주 분위기의 기본 배너를 배정한다.
+// 상담사 id 해시 기반이라 같은 상담사는 항상 같은 배너를 본다.
+export const SHOP_BANNERS = Array.from(
+  { length: 6 },
+  (_, i) => `/images/banners/shop-banner-${String(i + 1).padStart(2, "0")}.svg`,
+);
+
+export function pickShopBanner(seed: string): string {
+  return SHOP_BANNERS[computeHash(seed) % SHOP_BANNERS.length];
+}
+
+/** 점집 배너 확정 — 업로드한 배너가 있으면 그대로, 없으면 seed 기반 기본 배너. */
+export function resolveShopBanner(shopBanner: string | null | undefined, seed: string): string {
+  return shopBanner && shopBanner.trim() ? shopBanner : pickShopBanner(seed);
+}
+
+// ─── 상담사 표시 이미지 단일 진입점 ─────────────────────────────────────────
+// 앱 전체에서 상담사 프로필 이미지는 반드시 이 함수로 구한다.
+// (예전에는 화면마다 pickSellerAvatar(seller.id) / pickSellerAvatar(seller.slug) 처럼
+//  seed 가 제각각이라 같은 상담사가 화면마다 다른 캐릭터로 보였다.)
+//
+// 우선순위: 점집 로고 > 회원 아바타(가입 시 배정된 동물 캐릭터) > sellerId 해시 동물 캐릭터
+// 레거시 꿀벌 경로(/avatars/라이브셀러_*.png 등)는 무시하고 동물 캐릭터로 대체한다.
+export interface SellerImageInput {
+  id?: string | null;
+  shopLogo?: string | null;
+  user?: { avatar?: string | null } | null;
+}
+
+export function resolveSellerDisplayImage(seller: SellerImageInput, seedFallback?: string): string {
+  const logo = seller.shopLogo;
+  if (logo && !isLegacyBundledAvatar(logo)) return logo;
+
+  const avatar = seller.user?.avatar;
+  if (avatar && !isLegacyBundledAvatar(avatar)) return avatar;
+
+  return pickSajuAvatar(seller.id || seedFallback || "seller");
+}
+
 // 정적 placeholder 용 단일 기본 아바타 (SafeImage placeholder 등)
 export const DEFAULT_AVATAR = BUYER_FEMALE_AVATARS[0]; // /avatars/여성구매회원_1.png
 

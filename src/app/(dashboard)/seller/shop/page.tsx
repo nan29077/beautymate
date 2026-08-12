@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Link2, Camera } from 'lucide-react';
 import SafeImage from "@/components/shared/SafeImage";
-import { DEFAULT_SHOP_BANNER, DEFAULT_AVATAR } from "@/lib/defaults";
+import { resolveSellerDisplayImage, resolveShopBanner } from "@/lib/defaults";
 import ShopLinkButton from "@/components/shared/ShopLinkButton";
 import ShopThemeColorPicker from "@/components/shared/ShopThemeColorPicker";
 import ReferralLinkManager from "@/components/shared/ReferralLinkManager";
@@ -17,6 +17,7 @@ import SellerShopDashboardTabs from "@/components/shared/SellerShopDashboardTabs
 import ShopQRSection from "@/components/shared/ShopQRSection";
 import { getFeatureFlags } from "@/lib/settings";
 import { getShopCustomization } from "@/lib/shopCustomization";
+import ConsultantAvatarPicker from "@/components/shared/ConsultantAvatarPicker";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,7 @@ export default async function SellerShopPage() {
   const seller = await prisma.sellerProfile.findUnique({
     where: { userId: session!.user!.id },
     include: {
+      user: { select: { avatar: true } },
       _count: { select: { fans: true, shopProducts: true, campaigns: true, referredBuyers: true } },
     },
   });
@@ -37,6 +39,9 @@ export default async function SellerShopPage() {
 
   // 점집 커스터마이징(한줄 소개·상세 소개·상담 분야 태그) — Setting 테이블 저장분
   const customization = await getShopCustomization(seller.id);
+  // 프로필 캐릭터 / 배너 — 미설정 시 상담사 id 기반 기본값
+  const displayAvatar = resolveSellerDisplayImage(seller);
+  const displayBanner = resolveShopBanner(seller.shopBanner, seller.id);
 
   // 지난 방송(종료된 라이브) 목록 — 점집 노출 스위치용. 라이브 상담이 운영 정책상 켜진 경우에만 노출.
   const endedLives = flags.liveCommerce
@@ -88,6 +93,24 @@ export default async function SellerShopPage() {
         }}
         initialCustomization={customization}
       />
+
+      {/* 프로필 캐릭터 선택 */}
+      <div className="mt-4">
+        <ConsultantAvatarPicker currentImage={displayAvatar} hasShopLogo={!!seller.shopLogo} />
+      </div>
+
+      {/* 현재 점집 배너 미리보기 */}
+      <div className="bg-white rounded-xl border border-gray-100 p-5 mt-4">
+        <h3 className="text-sm font-bold text-gray-900 mb-1">현재 점집 배너</h3>
+        <p className="text-[10px] text-gray-400 mb-3">
+          {seller.shopBanner
+            ? "직접 등록하신 배너입니다. 위 '점집 배너 이미지'에서 변경할 수 있어요."
+            : "배너를 등록하지 않아 사주메이트 기본 배너가 자동 적용됐습니다. 직접 등록하면 교체됩니다."}
+        </p>
+        <div className="w-full h-32 rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
+          <img src={displayBanner} alt="점집 배너 미리보기" className="w-full h-full object-cover" />
+        </div>
+      </div>
 
       {/* 점집 테마 색상 (배너 그라디언트·강조색에 반영) */}
       <div className="mt-4">

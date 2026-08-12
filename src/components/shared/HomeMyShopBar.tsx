@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import SafeImage from "@/components/shared/SafeImage";
 import {  } from 'lucide-react';
-import { pickSellerAvatar } from "@/lib/defaults";
+import { pickSajuAvatar } from "@/lib/defaults";
 import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
 import LiveBadge, { LIVE_RING_CLASS } from "@/components/shared/LiveBadge";
 
@@ -122,7 +122,7 @@ export default async function HomeMyShopBar() {
                     <div className={`w-14 h-14 rounded-full overflow-hidden bg-gray-50 ${live ? LIVE_RING_CLASS : "ring-2 ring-pink-200"}`}>
                       <SafeImage
                         src={sellerProfileImage(s)}
-                        placeholder={pickSellerAvatar(s.id)}
+                        placeholder={pickSajuAvatar(s.id)}
                         alt={s.shopName}
                         width={56}
                         height={56}

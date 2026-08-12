@@ -50,39 +50,39 @@ export default async function DashboardLayout({
       { href: "/admin/settlements", iconName: "Settlement", label: "정산·재무 관리", group: "예약·정산" },
       // 콘텐츠
       { href: "/admin/banners", iconName: "Globe", label: "사이트 관리", group: "콘텐츠" },
-      { href: "/admin/contents", iconName: "Star", label: "콘텐츠 관리", group: "콘텐츠" },
+      { href: "/admin/contents", iconName: "Content", label: "콘텐츠 관리", group: "콘텐츠" },
       { href: "/admin/games", iconName: "Play", label: "게임관리", group: "콘텐츠" },
       { href: "/admin/live-products", iconName: "Live", label: "라이브 상담상품관리", group: "콘텐츠" },
       // 알림톡
       { href: "/admin/alimtalk", iconName: "Notification", label: "알림톡 관리", group: "알림톡" },
       // 고객지원
-      { href: "/admin/inquiries", iconName: "Comment", label: "문의 관리", group: "고객지원" },
-      { href: "/admin/contact-settings", iconName: "CustomerService", label: "고객지원 설정", group: "고객지원" },
+      { href: "/admin/inquiries", iconName: "Inquiry", label: "문의 관리", group: "고객지원" },
+      { href: "/admin/contact-settings", iconName: "Support", label: "고객지원 설정", group: "고객지원" },
       // 시스템
-      { href: "/admin/settings", iconName: "Settings", label: "운영 설정", group: "시스템" },
+      { href: "/admin/settings", iconName: "Operation", label: "운영 설정", group: "시스템" },
     ],
     CONSULTANT: [
-      { href: "/seller", iconName: "Dashboard_icon", label: "대시보드", group: "메인" },
+      { href: "/seller", iconName: "Dashboard", label: "대시보드", group: "메인" },
       // 점집 관리
-      { href: "/seller/shop", iconName: "ShopManagement_icon", label: "내 점집 관리", group: "점집 관리" },
+      { href: "/seller/shop", iconName: "Store", label: "내 점집 관리", group: "점집 관리" },
       // 상담상품 관리
-      { href: "/seller/products", iconName: "ProductManagement_icon", label: "상담상품 관리", group: "상담상품 관리" },
-      { href: "/seller/contents", iconName: "ProductContent_icon", label: "콘텐츠 관리", group: "상담상품 관리" },
+      { href: "/seller/products", iconName: "Package", label: "상담상품 관리", group: "상담상품 관리" },
+      { href: "/seller/contents", iconName: "Content", label: "콘텐츠 관리", group: "상담상품 관리" },
       // 판매·라이브
-      { href: "/seller/live-mode", iconName: "Broadcast", label: "라이브 모드", group: "판매·라이브" },
-      { href: "/seller/live", iconName: "Live_icon", label: "라이브 상담", group: "판매·라이브" },
-      { href: "/seller/widget", iconName: "Broadcast", label: "위젯 설정", group: "판매·라이브" },
+      { href: "/seller/live-mode", iconName: "Video", label: "라이브 모드", group: "판매·라이브" },
+      { href: "/seller/live", iconName: "Live", label: "라이브 상담", group: "판매·라이브" },
+      { href: "/seller/widget", iconName: "QrCode", label: "위젯 설정", group: "판매·라이브" },
       { href: "/seller/campaigns", iconName: "Event", label: "단체 상담 관리", group: "판매·라이브" },
       { href: "/seller/games", iconName: "Play", label: "게임관리", group: "판매·라이브" },
       // 예약·정산
       { href: "/seller/timeslots", iconName: "Clock", label: "시간슬롯 관리", group: "예약·정산" },
       { href: "/seller/reservations", iconName: "Calendar", label: "예약 관리", group: "예약·정산" },
       { href: "/seller/customers", iconName: "Users", label: "고객관리(CRM)", group: "예약·정산" },
-      { href: "/seller/settlements", iconName: "Settlement_icon", label: "정산·출금", group: "예약·정산" },
+      { href: "/seller/settlements", iconName: "Settlement", label: "정산·출금", group: "예약·정산" },
       // 알림톡
       { href: "/seller/alimtalk", iconName: "Notification", label: "알림톡 관리", group: "알림톡" },
       // 설정
-      { href: "/seller/settings", iconName: "Settings", label: "설정", group: "설정" },
+      { href: "/seller/settings", iconName: "Operation", label: "설정", group: "설정" },
     ],
     CUSTOMER: [],
   };

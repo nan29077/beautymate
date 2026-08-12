@@ -8,7 +8,7 @@ import { useCallback } from "react";
 ;
 import SafeImage from "@/components/shared/SafeImage";
 import NotificationBell from "@/components/shared/NotificationBell";
-import { pickSellerAvatar } from "@/lib/defaults";
+import { pickSajuAvatar } from "@/lib/defaults";
 
 // 점집 전용 상단 바.
 // - 좌측 상단: 사주메이트 로고 대신 "상담사 프로필 사진(또는 점집 로고) + 상담사 이름".
@@ -56,7 +56,7 @@ export default function SellerShopHeader({
             <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-50 flex-shrink-0 ring-1 ring-gray-200">
               <SafeImage
                 src={sellerLogo}
-                placeholder={pickSellerAvatar(sellerId || sellerSlug)}
+                placeholder={pickSajuAvatar(sellerId || sellerSlug)}
                 alt={sellerName}
                 width={36}
                 height={36}

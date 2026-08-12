@@ -5,6 +5,17 @@ import type { CSSProperties } from "react";
 import {
   AlertTriangle,
   ArrowRight,
+  LayoutDashboard,
+  CalendarClock,
+  Landmark,
+  Globe,
+  Images,
+  MessageSquareText,
+  Ticket,
+  ListChecks,
+  Headset,
+  SlidersHorizontal,
+  Link2,
   BadgeCheck,
   BarChart3,
   Bell,
@@ -145,6 +156,18 @@ const SYSTEM_ICONS: Record<string, LucideIcon> = {
   Copy,
   Coupon: TicketPercent,
   Menu,
+  // ─ 관리자 사이드바 전용 (모두 lucide 라인 아이콘으로 통일) ─
+  Dashboard: LayoutDashboard,
+  Event: CalendarClock,
+  Settlement: Landmark,
+  Globe,
+  Content: Images,
+  Comment: MessageSquareText,
+  Coupon2: Ticket,
+  Inquiry: ListChecks,
+  Support: Headset,
+  Operation: SlidersHorizontal,
+  LinkShorten_icon: Link2,
 };
 
 export function Icon({

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { X, Loader2 } from 'lucide-react';
 import SafeImage from "@/components/shared/SafeImage";
-import { pickSellerAvatar } from "@/lib/defaults";
+import { pickSajuAvatar } from "@/lib/defaults";
 import { useFeatureFlags } from "@/components/shared/FeatureFlagsProvider";
 import LiveBadge, { LIVE_RING_CLASS, OnAirBadge } from "@/components/shared/LiveBadge";
 
@@ -220,7 +220,7 @@ function SellerCardAvatar({ s }: { s: SellerCard }) {
   return (
     <div className="relative flex-shrink-0">
       <div className={`w-14 h-14 rounded-full overflow-hidden bg-gray-50 ${s.isLive ? LIVE_RING_CLASS : "ring-2 ring-brand-100"}`}>
-        <SafeImage src={s.profileImage} placeholder={pickSellerAvatar(s.id)} alt={s.shopName} width={56} height={56} fallbackText={s.shopName.charAt(0)} />
+        <SafeImage src={s.profileImage} placeholder={pickSajuAvatar(s.id)} alt={s.shopName} width={56} height={56} fallbackText={s.shopName.charAt(0)} />
       </div>
       {s.isLive && (
         <LiveBadge className="absolute -bottom-1 left-1/2 -translate-x-1/2" />

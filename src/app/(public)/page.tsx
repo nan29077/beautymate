@@ -10,7 +10,7 @@ import HeroBannerSlider from "@/components/shared/HeroBannerSlider";
 import SellerMarquee from "@/components/shared/SellerMarquee";
 import HomeFaq from "@/components/shared/HomeFaq";
 import StarField from "@/components/shared/StarField";
-import { DEFAULT_PRODUCT_IMAGE, pickSellerAvatar } from "@/lib/defaults";
+import { DEFAULT_PRODUCT_IMAGE, pickSajuAvatar } from "@/lib/defaults";
 import { LIVE_RING_CLASS, OnAirBadge } from "@/components/shared/LiveBadge";
 import { getFeatureFlags } from "@/lib/settings";
 import { getHomeStats, getHomeStories, getHomeBenefits } from "@/lib/siteContent";
@@ -240,7 +240,7 @@ export default async function HomePage({
                   {/* 라이브 중 프로필 — 라이브 메뉴(/live)와 동일한 두근두근 링 (LIVE_RING_CLASS) */}
                   <div className="relative w-10 h-10 flex-shrink-0">
                     <div className={`w-10 h-10 rounded-full overflow-hidden bg-gray-100 ${LIVE_RING_CLASS}`}>
-                      <SafeImage src={s.shopLogo} placeholder={pickSellerAvatar(s.id)} alt={s.shopName} width={40} height={40} fallbackText={s.shopName.charAt(0)} />
+                      <SafeImage src={s.shopLogo} placeholder={pickSajuAvatar(s.id)} alt={s.shopName} width={40} height={40} fallbackText={s.shopName.charAt(0)} />
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">

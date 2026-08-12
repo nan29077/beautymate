@@ -5,6 +5,8 @@
 //   2) 점집 관리 "라이브 중 표시" 수동 스위치 (isManualLive)
 //   → 둘 중 하나라도 true 이면 LIVE.
 
+import { resolveSellerDisplayImage, type SellerImageInput } from "@/lib/defaults";
+
 type LiveInput = {
   isManualLive?: boolean | null;
   liveStreams?: { id: string }[] | null;
@@ -15,13 +17,9 @@ export function isSellerLive(s: LiveInput | null | undefined): boolean {
   return !!s.isManualLive || (s.liveStreams?.length ?? 0) > 0;
 }
 
-type ImageInput = {
-  shopLogo?: string | null;
-  user?: { avatar?: string | null } | null;
-};
-
-// 실제 상담사 프로필 사진: 점집 로고 우선, 없으면 회원(성별 기반) 아바타.
-export function sellerProfileImage(s: ImageInput | null | undefined): string | null {
+// 실제 상담사 프로필 사진 — lib/defaults 의 단일 진입점으로 위임한다.
+// (점집 로고 > 회원 동물 캐릭터 > sellerId 해시 동물 캐릭터)
+export function sellerProfileImage(s: SellerImageInput | null | undefined): string | null {
   if (!s) return null;
-  return s.shopLogo || s.user?.avatar || null;
+  return resolveSellerDisplayImage(s);
 }

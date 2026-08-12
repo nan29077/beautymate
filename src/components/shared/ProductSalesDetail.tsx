@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { X, Loader2 } from 'lucide-react';
 import ProductImage from "@/components/shared/ProductImage";
 import SafeImage from "@/components/shared/SafeImage";
-import { pickSellerAvatar } from "@/lib/defaults";
+import { pickSajuAvatar } from "@/lib/defaults";
 
 interface SellerSale {
   sellerId: string;
@@ -148,7 +148,7 @@ export default function ProductSalesDetail({ productId, productName, thumbnail, 
                               alt={seller.shopName}
                               width={40}
                               height={40}
-                              placeholder={pickSellerAvatar(seller.sellerId)}
+                              placeholder={pickSajuAvatar(seller.sellerId)}
                               fallbackText={seller.shopName.charAt(0)}
                             />
                           </div>

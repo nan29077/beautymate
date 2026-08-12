@@ -9,7 +9,7 @@ import MyPageBottomMenu from "@/components/shared/MyPageBottomMenu";
 import ApplySellerButton from "@/components/shared/ApplySellerButton";
 import { getFeatureFlags } from "@/lib/settings";
 import { requireBuyerSession } from "@/lib/buyerGuard";
-import { NO_IMAGE, pickBuyerAvatar, pickSellerAvatar } from "@/lib/defaults";
+import { NO_IMAGE, pickBuyerAvatar, pickSajuAvatar } from "@/lib/defaults";
 import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
 import LiveBadge, { LIVE_RING_CLASS } from "@/components/shared/LiveBadge";
 
@@ -219,7 +219,7 @@ export default async function MyPage() {
                       <div className={`w-14 h-14 rounded-full overflow-hidden bg-gray-100 ${live ? LIVE_RING_CLASS : "ring-2 ring-gray-100"}`}>
                         <SafeImage
                           src={sellerProfileImage(seller)}
-                          placeholder={pickSellerAvatar(seller.id)}
+                          placeholder={pickSajuAvatar(seller.id)}
                           alt={seller.shopName}
                           width={56}
                           height={56}

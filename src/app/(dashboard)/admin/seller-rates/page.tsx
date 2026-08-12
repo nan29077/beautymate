@@ -7,7 +7,7 @@ import { useAppDialog } from "@/components/shared/AppDialog";
 import SavedPopup from "@/components/shared/SavedPopup";
 import Pagination, { usePagination } from "@/components/shared/Pagination";
 import SafeImage from "@/components/shared/SafeImage";
-import { pickSellerAvatar } from "@/lib/defaults";
+import { pickSajuAvatar } from "@/lib/defaults";
 
 interface SellerRate {
   id: string; shopName: string; shopLogo: string | null; slug: string;
@@ -391,7 +391,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                   {isSelected ? <Icon name="Check" size={18} className="text-brand-600" /> : <Square size={18} className="text-gray-300" />}
                 </button>
                 <div className="w-10 h-10 rounded-full bg-gray-100 overflow-hidden flex-shrink-0">
-                  <SafeImage src={seller.shopLogo} alt={seller.shopName} width={40} height={40} placeholder={pickSellerAvatar(seller.id)} fallbackText={seller.shopName.charAt(0)} className="w-full h-full object-cover" />
+                  <SafeImage src={seller.shopLogo} alt={seller.shopName} width={40} height={40} placeholder={pickSajuAvatar(seller.id)} fallbackText={seller.shopName.charAt(0)} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">

@@ -20,7 +20,7 @@ const metadataBase: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://sajumate.co.kr"),
   title: "사주메이트 - 라이브 점사 예약 플랫폼",
   description:
-    "유튜브 라이브 방송 중인 사주·신점·타로 상담사를 즉시 예약하세요",
+    "방송하는 동안 예약이 알아서 들어옵니다. 유튜브·SNS 사주·신점·타로 상담사를 위한 예약 커머스",
   keywords: ["사주메이트", "사주", "신점", "타로", "궁합", "작명", "라이브 상담", "점사 예약"],
   icons: {
     icon: [
@@ -35,7 +35,7 @@ const metadataBase: Metadata = {
   openGraph: {
     title: "사주메이트 - 라이브 점사 예약 플랫폼",
     description:
-      "유튜브 라이브 방송 중인 사주·신점·타로 상담사를 즉시 예약하세요",
+      "방송하는 동안 예약이 알아서 들어옵니다. 유튜브·SNS 사주·신점·타로 상담사를 위한 예약 커머스",
     url: "/",
     siteName: "사주메이트",
     locale: "ko_KR",
@@ -53,7 +53,7 @@ const metadataBase: Metadata = {
     card: "summary_large_image",
     title: "사주메이트 - 라이브 점사 예약 플랫폼",
     description:
-      "유튜브 라이브 방송 중인 사주·신점·타로 상담사를 즉시 예약하세요",
+      "방송하는 동안 예약이 알아서 들어옵니다. 유튜브·SNS 사주·신점·타로 상담사를 위한 예약 커머스",
     images: ["/opengraph-image"],
   },
 };

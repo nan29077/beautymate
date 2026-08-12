@@ -1,448 +1,304 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
-import { formatPrice, formatDiscount, getProgressPercent, parseJsonArray } from "@/lib/utils";
-import CampaignCard from "@/components/shared/CampaignCard";
+import { formatPrice } from "@/lib/utils";
 import SafeImage from "@/components/shared/SafeImage";
-import PickSellerButton from "@/components/shared/PickSellerButton";
 import SellerShopFooter from "@/components/shared/SellerShopFooter";
-import SellerShopTabs from "@/components/shared/SellerShopTabs";
-import SellerShopJoinCta from "@/components/shared/SellerShopJoinCta";
 import SellerShopHeader from "@/components/shared/SellerShopHeader";
 import SellerShopBottomNav from "@/components/shared/SellerShopBottomNav";
 import ShopContextSync from "@/components/shared/ShopContextSync";
-import { Users, BookOpen, Star, MapPin, MessageCircle, Radio, Eye, Video, Sparkles } from "lucide-react";
+import ShopBookingCalendar, { type DaySlots } from "@/components/shared/ShopBookingCalendar";
+import ShopShareButton from "@/components/shared/ShopShareButton";
+import { CalendarCheck, Clock, Video, Phone, MapPin, Sparkles, ChevronRight, CalendarDays } from "lucide-react";
 import { getFeatureFlags } from "@/lib/settings";
-import { DEFAULT_PRODUCT_IMAGE, pickSellerAvatar } from "@/lib/defaults";
+import { DEFAULT_PRODUCT_IMAGE, resolveSellerDisplayImage, resolveShopBanner } from "@/lib/defaults";
 import { OnAirBadge } from "@/components/shared/LiveBadge";
 import { getShopCustomization } from "@/lib/shopCustomization";
+import { safeQuery } from "@/lib/safeDb";
 
 export const dynamic = "force-dynamic";
+
+// ─────────────────────────────────────────────────────────────
+// /shop/[slug] — 상담사 점집 공개 페이지 (예약 커머스)
+//
+// 구성: 프로필 헤더 → 오늘의 예약 현황 → 상담 메뉴 → 상세 소개 → 예약 달력 → 콘텐츠
+// 커머스(장바구니·배송·구매 버튼·구매 리뷰·팔로우 마케팅 UI)는 제거되었다.
+//
+// ⚠️ TimeSlot / Reservation 테이블은 운영 DB 에 아직 반영되지 않았다(스키마 드리프트).
+//    safeQuery 로 감싸 빈 값으로 폴백하므로, 미반영 환경에서는 예약 현황·달력이
+//    "열린 시간 없음" 상태로 표시된다. (페이지 자체는 죽지 않는다)
+// ─────────────────────────────────────────────────────────────
+
+const BASE_PRODUCT_SELECT = {
+  id: true,
+  name: true,
+  basePrice: true,
+  thumbnail: true,
+  description: true,
+} as const;
+
+const CONSULTING_PRODUCT_SELECT = {
+  ...BASE_PRODUCT_SELECT,
+  consultingType: true,
+  consultingMethod: true,
+  durationMinutes: true,
+} as const;
+
+interface ShopProduct {
+  id: string;
+  name: string;
+  basePrice: unknown;
+  thumbnail: string | null;
+  description: string | null;
+  consultingType?: string;
+  consultingMethod?: string;
+  durationMinutes?: number;
+}
+
+function sellerInclude(productSelect: object) {
+  return {
+    user: { select: { id: true, name: true, avatar: true } },
+    shopProducts: {
+      where: { isActive: true },
+      include: { product: { select: productSelect } },
+      orderBy: { displayOrder: "asc" as const },
+    },
+    liveStreams: {
+      where: { status: "LIVE" as const },
+      take: 1,
+      select: { id: true, shareCode: true, title: true },
+    },
+    _count: { select: { fans: true, followers: true } },
+  };
+}
+
+/** 상담 컬럼(consultingType 등) 미반영 환경 대비 폴백 조회 */
+async function getSeller(slug: string) {
+  try {
+    const full = await prisma.sellerProfile.findUnique({
+      where: { slug },
+      include: sellerInclude(CONSULTING_PRODUCT_SELECT),
+    });
+    return { seller: full, hasConsultingFields: true as const };
+  } catch (e) {
+    console.error("점집 페이지: 상담 컬럼 조회 실패, 기본 컬럼으로 폴백", e);
+    const basic = await prisma.sellerProfile.findUnique({
+      where: { slug },
+      include: sellerInclude(BASE_PRODUCT_SELECT),
+    });
+    return { seller: basic, hasConsultingFields: false as const };
+  }
+}
+
+function toYmd(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+const METHOD_META: Record<string, { label: string; Icon: typeof Video }> = {
+  video: { label: "영상 상담", Icon: Video },
+  phone: { label: "전화 상담", Icon: Phone },
+  visit: { label: "방문 상담", Icon: MapPin },
+};
+
+function methodMeta(raw?: string | null) {
+  if (!raw) return null;
+  const key = raw.toLowerCase();
+  if (METHOD_META[key]) return METHOD_META[key];
+  if (raw.includes("영상")) return METHOD_META.video;
+  if (raw.includes("전화")) return METHOD_META.phone;
+  if (raw.includes("방문")) return METHOD_META.visit;
+  return { label: raw, Icon: Video };
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }> | { slug: string };
+}): Promise<Metadata> {
+  const { slug } = await Promise.resolve(params);
+  const seller = await prisma.sellerProfile.findUnique({
+    where: { slug },
+    select: { id: true, shopName: true, shopDescription: true, shopBanner: true },
+  });
+  if (!seller) return { title: "점집을 찾을 수 없습니다 | 사주메이트" };
+
+  const custom = await getShopCustomization(seller.id);
+  const title = `${seller.shopName}의 점집 - 사주메이트`;
+  const description =
+    custom.tagline || seller.shopDescription || `${seller.shopName}에게 지금 상담을 예약하세요.`;
+  const image = seller.shopBanner || "/opengraph-image";
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `/shop/${slug}`,
+      siteName: "사주메이트",
+      type: "profile",
+      images: [{ url: image, width: 1200, height: 630, alt: `${seller.shopName}의 점집` }],
+    },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
+  };
+}
 
 export default async function SellerShopPage({
   params,
 }: {
   params: Promise<{ slug: string }> | { slug: string };
 }) {
-  const { groupBuy: FEATURE_GROUP_BUY, liveCommerce: FEATURE_LIVE_COMMERCE, referral: FEATURE_REFERRAL } = await getFeatureFlags();
-  const resolvedParams = await Promise.resolve(params);
-  const seller = await prisma.sellerProfile.findUnique({
-    where: { slug: resolvedParams.slug },
-    include: {
-      user: { select: { name: true, avatar: true } },
-      shopExposure: true,
-      shopProducts: {
-        where: { isActive: true },
-        include: {
-          product: {
-            include: { category: true, images: { take: 1 } },
-          },
-        },
-        orderBy: { displayOrder: "asc" },
-      },
-      campaigns: {
-        where: { status: { in: ["ACTIVE", "SCHEDULED"] } },
-        include: { product: true },
-        orderBy: { startDate: "desc" },
-      },
-      // 현재 진행 중 + 예정된 라이브
-      liveStreams: {
-        where: { status: { in: ["LIVE", "SCHEDULED", "ENDED"] } },
-        orderBy: [{ status: "asc" }, { createdAt: "desc" }],
-        take: 20,
-        include: {
-          products: {
-            include: { product: { select: { id: true, name: true, thumbnail: true, basePrice: true, comparePrice: true } } },
-            orderBy: { sortOrder: "asc" },
-          },
-        },
-      },
-      _count: {
-        select: { fans: true, followers: true, campaigns: true },
-      },
-    },
-  });
-
+  const { brix: FEATURE_CONTENT } = await getFeatureFlags();
+  const { slug } = await Promise.resolve(params);
+  const { seller, hasConsultingFields } = await getSeller(slug);
   if (!seller || !seller.isApproved) notFound();
 
-  // 일반상담상품 노출 (상담사가 스위치 ON한 경우)
-  // include: { shopExposure: true } 로 가져오되, Prisma 클라이언트 타입 불일치 대비 직접 조회 fallback
-  let shopExposureData = (seller as any).shopExposure as { isEnabled: boolean; productIds: string | null } | null;
-  if (!shopExposureData) {
-    shopExposureData = await (prisma as any).shopDirectProductExposure.findUnique({
-      where: { sellerProfileId: seller.id },
-      select: { isEnabled: true, productIds: true },
-    }) ?? null;
-  }
-  const directExposureOn = shopExposureData?.isEnabled ?? false;
-  let directProductsData: { id: string; name: string; price: number; shippingFee: number; images: string[]; stock: number }[] = [];
-  if (directExposureOn) {
-    const selectedDirectIds = parseJsonArray(shopExposureData?.productIds);
-    if (selectedDirectIds.length > 0) {
-      // 점집관리 > 일반상담상품에서 선택된 특정 상담상품들만 노출
-      const dps = await prisma.directProduct.findMany({
-        where: { sellerId: seller.id, id: { in: selectedDirectIds }, isActive: true },
-      });
-      const orderMap = new Map(selectedDirectIds.map((id, idx) => [id, idx]));
-      directProductsData = dps
-        .sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0))
-        .map((p) => ({
-          id: p.id,
-          name: p.name,
-          price: Number(p.price),
-          shippingFee: Number(p.shippingFee),
-          images: parseJsonArray(p.images),
-          stock: p.stock,
-        }));
-    } else {
-      // 상담상품관리 > 일반상담상품 탭에서 스위치만 켠 경우: isActive=true인 상담상품 전체 노출
-      const dps = await prisma.directProduct.findMany({
-        where: { sellerId: seller.id, isActive: true },
-        orderBy: { createdAt: "desc" },
-      });
-      directProductsData = dps.map((p) => ({
-        id: p.id,
-        name: p.name,
-        price: Number(p.price),
-        shippingFee: Number(p.shippingFee),
-        images: parseJsonArray(p.images),
-        stock: p.stock,
-      }));
-    }
-  }
-
-  // 점집 커스터마이징(한줄 소개·상세 소개·상담 분야 태그) — 상담사가 점집 관리에서 설정
   const customization = await getShopCustomization(seller.id);
-
-  const activeCampaigns = FEATURE_GROUP_BUY ? seller.campaigns.filter((c) => c.status === "ACTIVE") : [];
   const themeColor = seller.shopThemeColor || "#f5a700";
-  // 상담 분야 칩: 상담사가 지정한 태그 우선, 없으면 대표 상담 분야/상담 스타일로 폴백
+  const avatar = resolveSellerDisplayImage(seller);
+  const banner = resolveShopBanner(seller.shopBanner, seller.id);
+
+  // ─── 상담 메뉴 ───
+  const products = seller.shopProducts.map((sp) => {
+    const p = sp.product as unknown as ShopProduct;
+    return {
+      id: p.id,
+      name: p.name,
+      price: Number((sp as any).sellerPrice ?? p.basePrice),
+      thumbnail: p.thumbnail,
+      description: p.description,
+      consultingType: hasConsultingFields ? p.consultingType ?? null : null,
+      consultingMethod: hasConsultingFields ? p.consultingMethod ?? null : null,
+      durationMinutes: hasConsultingFields ? p.durationMinutes ?? null : null,
+    };
+  });
+
+  // ─── 상담 분야 태그 (상담사 지정 > 상품 consultingType > 카테고리) ───
   const consultTags = customization.tags.length > 0
     ? customization.tags
-    : [seller.category, seller.mood].filter((v): v is string => !!v);
-  // 상담사의 "점집 기능관리 > 라이브 상담" 스위치(featureLiveCommerce)가 켜진 경우에만 라이브 상담상품을 노출.
-  // (전역 관리자 플래그 AND 상담사 스위치)
-  const sellerLiveOn = FEATURE_LIVE_COMMERCE && (seller.featureLiveCommerce ?? false);
-  // ★ 라이브 진행 여부 — 인앱 시청 페이지(/live)와 분리.
-  //   프로필 LIVE 뱃지: 상담사가 직접 켠 "라이브 중 표시"(isManualLive) 또는 실제 진행중 라이브일 때 노출.
-  //   링크 우선순위: 진행중 인앱 라이브 /live/shareCode > 수동 liveLink.
-  const currentLiveRaw = seller.liveStreams.find((l) => l.status === "LIVE") || null;
-  const manualLiveOn = (seller as any).isManualLive ?? false;
-  const manualLiveLink = (seller as any).liveLink || null;
-  // 진행중 인앱 라이브는 항상 사주메이트 시청페이지로 연결 (외부 URL 직접연결 금지)
-  const inAppLiveHref = sellerLiveOn && currentLiveRaw ? `/live/${currentLiveRaw.shareCode}` : null;
-  // 최종 프로필 링크: 1) 진행중 라이브 → 인앱 시청페이지 2) (인앱 라이브 없는 수동표시) 수동 liveLink
-  const profileLiveHref = inAppLiveHref || manualLiveLink || null;
-  const showProfileLive = manualLiveOn || !!currentLiveRaw;
-  // 인앱 라이브 탭/스트림 목록은 상담사 라이브 스위치에 따라.
-  const currentLive = sellerLiveOn ? currentLiveRaw ?? undefined : undefined;
-  const scheduledLives = sellerLiveOn ? seller.liveStreams.filter((l) => l.status === "SCHEDULED") : [];
-  // 지난 방송 상담상품: 라이브 상담 스위치와 무관하게, 상담사가 일자별 노출 스위치(showPastInShop)를
-  //   켠 종료 방송은 항상 점집에 노출한다. (지난방송 = 별도 노출 스위치로 관리)
-  const endedLives = seller.liveStreams.filter((l) => l.status === "ENDED" && l.showPastInShop);
+    : Array.from(new Set(products.map((p) => p.consultingType).filter((t): t is string => !!t))).length > 0
+      ? Array.from(new Set(products.map((p) => p.consultingType).filter((t): t is string => !!t)))
+      : [seller.category, seller.mood].filter((v): v is string => !!v);
 
-  // 수동 라이브 노출 상담상품 (isManualLive 스위치와 연동)
-  const manualProductIds: string[] = (() => {
-    try { return JSON.parse((seller as any).manualLiveProductIds || "[]"); } catch { return []; }
-  })();
-  const manualProductMap = new Map(
-    seller.shopProducts
-      .filter((sp) => manualProductIds.includes(sp.product.id))
-      .map((sp) => [sp.product.id, sp.product])
+  // ─── 예약 가능 슬롯 (오늘 ~ 60일) ───
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const rangeEnd = new Date(todayStart);
+  rangeEnd.setDate(rangeEnd.getDate() + 60);
+
+  const rawSlots = await safeQuery(
+    "shop page timeslots",
+    () =>
+      prisma.timeSlot.findMany({
+        where: {
+          consultantId: seller.user.id,
+          isAvailable: true,
+          reservationId: null,
+          date: { gte: todayStart, lte: rangeEnd },
+        },
+        select: { date: true, startTime: true },
+        orderBy: [{ date: "asc" }, { startTime: "asc" }],
+        take: 800,
+      }),
+    [] as { date: Date; startTime: string }[],
   );
-  const manualProductsData = manualProductIds
-    .map((id) => manualProductMap.get(id))
-    .filter(Boolean)
-    .map((p) => ({
-      id: p!.id,
-      name: p!.name,
-      thumbnail: p!.thumbnail,
-      basePrice: Number(p!.basePrice),
-      comparePrice: p!.comparePrice ? Number(p!.comparePrice) : null,
-    }));
-  // isManualLive ON + 라이브 상담 없음 → "현재 라이브 중 상담상품" 탭에 노출
-  // isManualLive ON + 라이브 상담 진행 중 → 라이브 상담 우선, 수동 상담상품 숨김
-  // isManualLive OFF → "지난 방송 상담상품" 탭에 노출
-  const manualLiveProducts = manualLiveOn && !currentLiveRaw ? manualProductsData : [];
-  const manualPastProducts = !manualLiveOn ? manualProductsData : [];
 
-  // Feature flags — 상담사 점집 기능관리 스위치를 그대로 반영.
-  const features = {
-    groupBuy: FEATURE_GROUP_BUY && (seller.featureGroupBuy ?? true),
-    liveCommerce: sellerLiveOn,
-  };
+  const byDate = new Map<string, string[]>();
+  for (const s of rawSlots) {
+    const key = toYmd(new Date(s.date));
+    const list = byDate.get(key) ?? [];
+    list.push(s.startTime);
+    byDate.set(key, list);
+  }
+  const daySlots: DaySlots[] = Array.from(byDate.entries())
+    .map(([date, times]) => ({ date, times: times.sort() }))
+    .sort((a, b) => a.date.localeCompare(b.date));
 
-  const hasLive = sellerLiveOn && seller.liveStreams.length > 0;
+  const todayKey = toYmd(now);
+  const nowHm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+  const todayRemaining = (byDate.get(todayKey) ?? []).filter((t) => t > nowHm).sort();
+  const nextAvailable =
+    todayRemaining.length > 0
+      ? { date: todayKey, time: todayRemaining[0], isToday: true }
+      : (() => {
+          const future = daySlots.find((d) => d.date > todayKey);
+          return future ? { date: future.date, time: future.times[0], isToday: false } : null;
+        })();
 
-  // Serialize data for client component
-  const tabData = {
-    campaigns: activeCampaigns.map((c) => ({
-      id: c.id,
-      title: c.title,
-      status: c.status,
-      currentQuantity: c.currentQuantity,
-      goalQuantity: c.goalQuantity,
-      participantCount: c.participantCount,
-      bannerImage: c.bannerImage,
-      campaignPrice: Number(c.campaignPrice),
-      originalPrice: Number(c.originalPrice),
-      endDate: new Date(c.endDate).toISOString(),
-      seller: {
-        slug: seller.slug,
-        shopName: seller.shopName,
-        shopLogo: seller.shopLogo,
-      },
-      product: {
-        name: c.product.name,
-        thumbnail: c.product.thumbnail,
-      },
-    })),
-    products: seller.shopProducts.map((sp) => ({
-      id: sp.product.id,
-      name: sp.product.name,
-      thumbnail: sp.product.thumbnail,
-      basePrice: Number(sp.product.basePrice),
-      comparePrice: sp.product.comparePrice ? Number(sp.product.comparePrice) : null,
-      category: sp.product.category?.name || null,
-      images: sp.product.images,
-      shopNumber: (sp as any).shopNumber ?? null,
-    })),
-    // 점집에 바로 노출하기 (라이브 없이 상담상품 직접 노출)
-    directExpose: (seller as any).shopDirectExpose ?? false,
-    numbering: (seller as any).shopNumbering ?? false,
-    // 상담사 직접 등록 일반상담상품 (점집관리/상담상품관리 > 일반상담상품 스위치 ON)
-    directExposureOn,
-    directProducts: directProductsData,
-    currentLive: currentLive ? {
-      id: currentLive.id,
-      title: currentLive.title,
-      description: currentLive.description,
-      thumbnailImage: currentLive.thumbnailImage,
-      shareCode: currentLive.shareCode,
-      viewerCount: currentLive.viewerCount,
-      products: currentLive.products.map((p) => ({
-        id: p.id,
-        livePrice: p.livePrice ? Number(p.livePrice) : null,
-        sortOrder: p.sortOrder,
-        product: {
-          id: p.product.id,
-          name: p.product.name,
-          thumbnail: p.product.thumbnail,
-          basePrice: Number(p.product.basePrice),
-          comparePrice: p.product.comparePrice ? Number(p.product.comparePrice) : null,
-        },
-      })),
-    } : null,
-    scheduledLives: scheduledLives.map((l) => ({
-      id: l.id,
-      title: l.title,
-      description: l.description,
-      thumbnailImage: l.thumbnailImage,
-      shareCode: l.shareCode,
-      scheduledAt: l.scheduledAt ? new Date(l.scheduledAt).toISOString() : null,
-      products: l.products.map((p) => ({
-        id: p.id,
-        livePrice: p.livePrice ? Number(p.livePrice) : null,
-        sortOrder: p.sortOrder,
-        product: {
-          id: p.product.id,
-          name: p.product.name,
-          thumbnail: p.product.thumbnail,
-          basePrice: Number(p.product.basePrice),
-        },
-      })),
-    })),
-    endedLives: endedLives.map((l) => ({
-      id: l.id,
-      title: l.title,
-      description: l.description,
-      thumbnailImage: l.thumbnailImage,
-      shareCode: l.shareCode,
-      viewerCount: l.viewerCount,
-      peakViewerCount: l.peakViewerCount,
-      likeCount: l.likeCount,
-      isVodSaved: l.isVodSaved,
-      startedAt: l.startedAt ? new Date(l.startedAt).toISOString() : null,
-      endedAt: l.endedAt ? new Date(l.endedAt).toISOString() : null,
-      products: l.products.map((p) => ({
-        id: p.id,
-        livePrice: p.livePrice ? Number(p.livePrice) : null,
-        sortOrder: p.sortOrder,
-        product: {
-          id: p.product.id,
-          name: p.product.name,
-          thumbnail: p.product.thumbnail,
-          basePrice: Number(p.product.basePrice),
-          comparePrice: p.product.comparePrice ? Number(p.product.comparePrice) : null,
-        },
-      })),
-    })),
-    themeColor,
-    features,
-    hasLive,
-    isLive: !!currentLive,
-    sellerProfileImage: seller.shopLogo || seller.user.avatar || null,
-    manualLiveProducts,
-    manualPastProducts,
-  };
+  // ─── 콘텐츠 (선택) ───
+  const contents = FEATURE_CONTENT && (seller.featureContent ?? true)
+    ? await safeQuery(
+        "shop page contents",
+        () =>
+          prisma.contentPost.findMany({
+            where: { sellerId: seller.id, isPublished: true },
+            orderBy: { createdAt: "desc" },
+            take: 6,
+            select: { id: true, title: true, images: true, createdAt: true },
+          }),
+        [] as { id: string; title: string; images: string | null; createdAt: Date }[],
+      )
+    : [];
+
+  // ─── 라이브 진행 여부 ───
+  const currentLive = seller.liveStreams[0] ?? null;
+  const manualLiveOn = (seller as any).isManualLive ?? false;
+  const showLive = manualLiveOn || !!currentLive;
+  const liveHref = currentLive ? `/live/${currentLive.shareCode}` : (seller as any).liveLink || null;
+
+  const bookHref = `/shop/${seller.slug}/book`;
 
   return (
-    <div className="animate-fade-in">
-      {/* 상담사 컨텍스트 쿠키 동기화 — 서브페이지(장바구니/내정보 등)에서도 상담사 전용 크롬 유지 */}
-      <ShopContextSync shop={{ slug: seller.slug, name: seller.shopName, logo: seller.shopLogo }} />
+    <div className="animate-fade-in bg-[#fdfaf0] min-h-screen">
+      <ShopContextSync shop={{ slug: seller.slug, name: seller.shopName, logo: avatar }} />
 
-      {/* ───── 점집 전용 상단 바 (상담사 로고 + 이름, 메인 이동 없음) ───── */}
       <SellerShopHeader
         sellerName={seller.shopName}
-        sellerLogo={seller.shopLogo}
+        sellerLogo={avatar}
         sellerSlug={seller.slug}
         sellerId={seller.id}
-        showLive={showProfileLive}
-        liveHref={profileLiveHref}
+        showLive={showLive}
+        liveHref={liveHref}
       />
 
-      {/* ───── 상담사 프로필 헤더 ───── */}
+      {/* ───── 1. 상담사 프로필 헤더 ───── */}
       <section className="relative">
-        {/* 배너 — 업로드한 이미지가 없으면 테마 색상 기반 기본 그라디언트 배너 */}
-        <div className="h-44 overflow-hidden bg-gray-200 relative">
-          {seller.shopBanner ? (
-            <>
-              <SafeImage
-                src={seller.shopBanner}
-                alt={seller.shopName}
-                width={480}
-                height={200}
-                fallbackText={seller.shopName}
-              />
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: `linear-gradient(to top, ${themeColor}40 0%, transparent 60%)`,
-                }}
-              />
-            </>
-          ) : (
-            <div
-              className="absolute inset-0 flex items-center justify-center"
-              style={{
-                background: `linear-gradient(135deg, #241445 0%, ${themeColor}cc 55%, ${themeColor} 100%)`,
-              }}
-            >
-              <Sparkles size={18} className="absolute top-6 left-7 text-white/30" aria-hidden="true" />
-              <Sparkles size={12} className="absolute bottom-8 right-9 text-white/25" aria-hidden="true" />
-              <p className="px-6 text-center text-lg font-extrabold text-white/90 tracking-tight drop-shadow-sm line-clamp-2">
-                {seller.shopName}
-              </p>
-            </div>
-          )}
+        <div className="h-40 overflow-hidden bg-gray-200 relative">
+          <img src={banner} alt={`${seller.shopName} 배너`} className="w-full h-full object-cover" />
+          <div
+            className="absolute inset-0"
+            style={{ background: `linear-gradient(to top, ${themeColor}33 0%, transparent 55%)` }}
+          />
         </div>
 
-        {/* 프로필 카드 */}
         <div className="relative px-4 -mt-12">
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 pb-5">
-            {/* 상단: 로고 + 이름 */}
             <div className="flex items-start gap-3">
-              {/* 프로필 이미지 - 라이브 중이면 두근두근 + 클릭 시 라이브로 이동 */}
               <div className="flex flex-col items-center flex-shrink-0 -mt-8">
-                {(() => {
-                  const ring = (
-                    <div className={`relative w-16 h-16 rounded-full overflow-hidden ring-4 bg-white shadow-md ${
-                      showProfileLive ? "ring-red-400 animate-heartbeat" : "ring-white"
-                    }`}>
-                      <SafeImage
-                        src={seller.shopLogo}
-                        placeholder={pickSellerAvatar(seller.id)}
-                        alt={seller.shopName}
-                        width={64}
-                        height={64}
-                        fallbackText={seller.shopName.charAt(0)}
-                      />
-                    </div>
-                  );
-                  if (!showProfileLive || !profileLiveHref) return ring;
-                  // 라이브 링크(인앱 시청페이지·외부)는 항상 새창으로 연다.
-                  return (
-                    <a
-                      href={profileLiveHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`${seller.shopName} 라이브 보기`}
-                      className="block cursor-pointer active:scale-95 transition-transform"
-                    >
-                      {ring}
-                    </a>
-                  );
-                })()}
-                {/* 라이브 표시 뱃지 - 링크 있으면 연결(외부면 새 탭), 없으면 표시만 */}
-                {showProfileLive && (() => {
-                  const badgeClass = "flex items-center gap-1 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full -mt-2 relative z-10 shadow-sm transition-colors";
-                  const inner = (
-                    <>
-                      <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                      LIVE
-                    </>
-                  );
-                  if (!profileLiveHref) {
-                    return <span className={badgeClass}>{inner}</span>;
-                  }
-                  // 라이브 링크(인앱 시청페이지·외부)는 항상 새창으로 연다.
-                  return (
-                    <a href={profileLiveHref} target="_blank" rel="noopener noreferrer" className={`${badgeClass} hover:bg-red-600`}>
-                      {inner}
-                    </a>
-                  );
-                })()}
-              </div>
-              <div className="flex-1 min-w-0 pt-0.5">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h1 className="text-lg font-bold text-gray-900 truncate">
-                        {seller.shopName}
-                      </h1>
-                      {showProfileLive && <OnAirBadge className="w-8 h-8" />}
-                    </div>
-                    {/* 한줄 소개 */}
-                    {customization.tagline && (
-                      <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-1">
-                        {customization.tagline}
-                      </p>
-                    )}
-                  </div>
-                  {/* 소셜 링크 */}
-                  <div className="flex items-center gap-1.5">
-                    {seller.instagramUrl && (
-                      <a
-                        href={seller.instagramUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1.5 rounded-full bg-gray-50 text-gray-400 hover:text-pink-500 transition-colors"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24"><defs><linearGradient id="ig-shop" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stopColor="#FD5"/><stop offset="10%" stopColor="#FD5"/><stop offset="50%" stopColor="#FF543E"/><stop offset="100%" stopColor="#C837AB"/></linearGradient></defs><rect width="20" height="20" x="2" y="2" rx="5" fill="url(#ig-shop)"/><circle cx="12" cy="12" r="4.5" stroke="white" strokeWidth="1.5" fill="none"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>
-                      </a>
-                    )}
-                    {seller.youtubeUrl && (
-                      <a
-                        href={seller.youtubeUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1.5 rounded-full bg-gray-50 text-gray-400 hover:text-red-500 transition-colors"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#FF0000"/></svg>
-                      </a>
-                    )}
-                    {seller.tiktokUrl && (
-                      <a
-                        href={seller.tiktokUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1.5 rounded-full bg-gray-50 text-gray-400 hover:text-black transition-colors"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.36a8.16 8.16 0 0 0 4.77 1.52V6.43a4.85 4.85 0 0 1-1.84-.04z" fill="currentColor"/></svg>
-                      </a>
-                    )}
-                  </div>
+                <div
+                  className={`relative w-16 h-16 rounded-full overflow-hidden ring-4 bg-white shadow-md ${
+                    showLive ? "ring-red-400 animate-heartbeat" : "ring-white"
+                  }`}
+                >
+                  <SafeImage
+                    src={avatar}
+                    alt={seller.shopName}
+                    width={64}
+                    height={64}
+                    fallbackText={seller.shopName.charAt(0)}
+                  />
                 </div>
+              </div>
+
+              <div className="flex-1 min-w-0 pt-0.5">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-lg font-bold text-gray-900 truncate">{seller.shopName}</h1>
+                  {showLive && <OnAirBadge className="w-8 h-8" />}
+                </div>
+                {customization.tagline && (
+                  <p className="text-[12px] text-gray-500 mt-0.5 line-clamp-2">{customization.tagline}</p>
+                )}
               </div>
             </div>
 
@@ -461,89 +317,214 @@ export default async function SellerShopPage({
               </div>
             )}
 
-            {/* 통계 바 */}
-            <div className="flex items-center justify-around mt-4 py-3 bg-gray-50 rounded-xl">
-              <div className="text-center">
-                <p className="text-base font-bold text-gray-900">{seller.totalFans.toLocaleString()}</p>
-                <p className="text-[10px] text-gray-400">팬</p>
-              </div>
-              <div className="w-px h-6 bg-gray-200" />
-              <div className="text-center">
-                <p className="text-base font-bold text-gray-900">{seller.shopProducts.length}</p>
-                <p className="text-[10px] text-gray-400">상담상품</p>
-              </div>
-              <div className="w-px h-6 bg-gray-200" />
-              <div className="text-center">
-                <p className="text-base font-bold text-gray-900">{activeCampaigns.length}</p>
-                <p className="text-[10px] text-gray-400">진행중</p>
-              </div>
-            </div>
-
-            {/* 설명 */}
-            {seller.shopDescription && (
-              <p className="text-xs text-gray-500 mt-3 leading-relaxed line-clamp-2">
-                {seller.shopDescription}
-              </p>
-            )}
-
-            {/* Pick 버튼 */}
             <div className="mt-4">
-              <PickSellerButton
-                sellerId={seller.id}
-                sellerName={seller.shopName}
-                variant="large"
-              />
-              {/* 비로그인 방문자 가입 유도 (추천인 제도 ON일 때만 노출)
-                  추천인 할인 폐지(2026-07)로 할인율 문구 없이 일반 문구만 표시한다. */}
-              {FEATURE_REFERRAL && (
-                <SellerShopJoinCta
-                  sellerSlug={seller.slug}
-                  sellerName={seller.shopName}
-                />
-              )}
+              <ShopShareButton slug={seller.slug} shopName={seller.shopName} themeColor={themeColor} />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ───── 상담사 소개 ───── */}
-      {customization.intro && (
+      {/* ───── 2. 오늘의 예약 현황 ───── */}
+      <section className="px-4 mt-4">
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <div className="flex items-center gap-1.5 mb-3">
+            <CalendarDays size={15} strokeWidth={1.8} style={{ color: themeColor }} />
+            <h2 className="text-sm font-bold text-gray-900">오늘의 예약 현황</h2>
+          </div>
+
+          <div className="flex items-stretch gap-2">
+            <div className="flex-1 rounded-xl px-3 py-3 text-center" style={{ backgroundColor: `${themeColor}10` }}>
+              <p className="text-[10px] text-gray-500">오늘 남은 자리</p>
+              <p className="text-xl font-extrabold mt-0.5" style={{ color: themeColor }}>
+                {todayRemaining.length}
+              </p>
+            </div>
+            <div className="flex-1 rounded-xl px-3 py-3 text-center bg-gray-50">
+              <p className="text-[10px] text-gray-500">다음 가능 시간</p>
+              <p className="text-[13px] font-bold text-gray-900 mt-1 leading-tight">
+                {nextAvailable
+                  ? nextAvailable.isToday
+                    ? `오늘 ${nextAvailable.time}`
+                    : `${nextAvailable.date.slice(5).replace("-", "/")} ${nextAvailable.time}`
+                  : "예약 대기"}
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href={bookHref}
+            className="mt-3 flex items-center justify-center gap-2 w-full py-3 rounded-xl font-extrabold text-[14px] text-white shadow-sm active:scale-[0.98] transition-transform"
+            style={{ backgroundColor: themeColor }}
+          >
+            <CalendarCheck size={17} strokeWidth={2} />
+            지금 예약하기
+          </Link>
+
+          {daySlots.length === 0 && (
+            <p className="text-[11px] text-gray-400 text-center mt-2">
+              열린 예약 시간이 없어 예약 신청만 접수됩니다.
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* ───── 3. 상담 메뉴 ───── */}
+      <section className="px-4 mt-4">
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <div className="flex items-center gap-1.5 mb-1">
+            <Sparkles size={15} strokeWidth={1.8} style={{ color: themeColor }} />
+            <h2 className="text-sm font-bold text-gray-900">상담 메뉴</h2>
+          </div>
+          <p className="text-[11px] text-gray-400 mb-3">원하는 상담을 고르면 예약 화면으로 이동합니다</p>
+
+          {products.length === 0 ? (
+            <p className="py-10 text-center text-[13px] text-gray-400">
+              아직 등록된 상담 메뉴가 없습니다.
+            </p>
+          ) : (
+            <ul className="space-y-2.5">
+              {products.map((p) => {
+                const mm = methodMeta(p.consultingMethod);
+                return (
+                  <li key={p.id}>
+                    <Link
+                      href={`${bookHref}?productId=${p.id}`}
+                      className="flex items-center gap-3 p-3 rounded-2xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm active:scale-[0.99] transition-all"
+                    >
+                      <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0">
+                        <SafeImage
+                          src={p.thumbnail}
+                          placeholder={DEFAULT_PRODUCT_IMAGE}
+                          alt={p.name}
+                          width={64}
+                          height={64}
+                          fallbackText={p.name.charAt(0)}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-bold text-gray-900 truncate">{p.name}</p>
+                        <div className="mt-1 flex items-center gap-2 text-[10px] text-gray-400 flex-wrap">
+                          {p.consultingType && (
+                            <span className="px-1.5 py-0.5 rounded bg-gray-50 text-gray-500 font-medium">
+                              {p.consultingType}
+                            </span>
+                          )}
+                          {p.durationMinutes && (
+                            <span className="inline-flex items-center gap-0.5">
+                              <Clock size={11} strokeWidth={1.6} />
+                              {p.durationMinutes}분
+                            </span>
+                          )}
+                          {mm && (
+                            <span className="inline-flex items-center gap-0.5">
+                              <mm.Icon size={11} strokeWidth={1.6} />
+                              {mm.label}
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-1 text-[15px] font-extrabold" style={{ color: themeColor }}>
+                          {formatPrice(p.price)}
+                        </p>
+                      </div>
+                      <span
+                        className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold flex-shrink-0"
+                        style={{ backgroundColor: `${themeColor}18`, color: themeColor }}
+                      >
+                        예약하기
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      {/* ───── 4. 상세 소개 ───── */}
+      {(customization.intro || seller.shopDescription) && (
         <section className="px-4 mt-4">
           <div className="bg-white rounded-2xl border border-gray-100 p-4">
             <div className="flex items-center gap-1.5 mb-2">
-              <Sparkles size={14} strokeWidth={1.5} style={{ color: themeColor }} />
+              <Sparkles size={14} strokeWidth={1.8} style={{ color: themeColor }} />
               <h2 className="text-sm font-bold text-gray-900">{seller.shopName} 소개</h2>
             </div>
             <p className="text-[13px] text-gray-600 leading-relaxed whitespace-pre-wrap break-words">
-              {customization.intro}
+              {customization.intro || seller.shopDescription}
             </p>
           </div>
         </section>
       )}
 
-      {/* ───── 탭 콘텐츠 (클라이언트 컴포넌트) ───── */}
-      <SellerShopTabs data={tabData} sellerSlug={seller.slug} sellerName={seller.shopName} sellerId={seller.id} />
+      {/* ───── 5. 예약 달력 ───── */}
+      <section className="px-4 mt-4">
+        <ShopBookingCalendar
+          sellerSlug={seller.slug}
+          slots={daySlots}
+          themeColor={themeColor}
+          today={todayKey}
+        />
+      </section>
 
-      {/* ───── 풋터: 판매자 정보 & 플랫폼 정보 ───── */}
-      <SellerShopFooter
-        sellerInfo={{
-          shopName: seller.shopName,
-          businessType: seller.businessType,
-          representativeName: seller.representativeName,
-          businessRegistrationNo: seller.businessRegistrationNo,
-          telecomSalesLicenseNo: seller.telecomSalesLicenseNo,
-          businessAddress: seller.businessAddress,
-          businessCategory: seller.businessCategory,
-        }}
-      />
+      {/* ───── 6. 콘텐츠 (feature 플래그) ───── */}
+      {contents.length > 0 && (
+        <section className="px-4 mt-4">
+          <div className="bg-white rounded-2xl border border-gray-100 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-bold text-gray-900">상담사 콘텐츠</h2>
+              <Link href="/content" className="text-[11px] text-gray-400 hover:text-gray-600 flex items-center gap-0.5">
+                더보기 <ChevronRight size={12} />
+              </Link>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {contents.map((c) => {
+                let thumb: string | null = null;
+                try {
+                  const arr = JSON.parse(c.images || "[]");
+                  thumb = Array.isArray(arr) ? arr[0] ?? null : null;
+                } catch {
+                  thumb = null;
+                }
+                return (
+                  <Link key={c.id} href={`/content/${c.id}`} className="group">
+                    <div className="aspect-square rounded-xl overflow-hidden bg-gray-100">
+                      <SafeImage
+                        src={thumb}
+                        placeholder={DEFAULT_PRODUCT_IMAGE}
+                        alt={c.title}
+                        width={160}
+                        height={160}
+                        fallbackText={c.title.charAt(0)}
+                      />
+                    </div>
+                    <p className="text-[11px] text-gray-600 mt-1 line-clamp-1 group-hover:text-gray-900">
+                      {c.title}
+                    </p>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
-      {/* 점집 전용 하단 네비 높이만큼 여백 */}
+      <div className="mt-5">
+        <SellerShopFooter
+          sellerInfo={{
+            shopName: seller.shopName,
+            businessType: seller.businessType,
+            representativeName: seller.representativeName,
+            businessRegistrationNo: seller.businessRegistrationNo,
+            telecomSalesLicenseNo: seller.telecomSalesLicenseNo,
+            businessAddress: seller.businessAddress,
+            businessCategory: seller.businessCategory,
+          }}
+        />
+      </div>
+
       <div className="h-16" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }} />
-
-      {/* ───── 점집 전용 하단 네비 (장바구니/예약내역/내정보) ───── */}
       <SellerShopBottomNav sellerSlug={seller.slug} />
 
-      {/* 애니메이션 키프레임 */}
       <style>{`
         @keyframes heartbeat {
           0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
@@ -551,9 +532,7 @@ export default async function SellerShopPage({
           50% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); }
           75% { transform: scale(1.05); box-shadow: 0 0 0 5px rgba(239, 68, 68, 0); }
         }
-        .animate-heartbeat {
-          animation: heartbeat 1.5s ease-in-out infinite;
-        }
+        .animate-heartbeat { animation: heartbeat 1.5s ease-in-out infinite; }
       `}</style>
     </div>
   );
