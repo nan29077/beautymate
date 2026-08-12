@@ -36,33 +36,14 @@ export async function POST(req: NextRequest) {
     });
 
     if (existing) {
-      // Unfollow + 채널인증 기록 삭제
+      // Unfollow
       await prisma.sellerFollower.delete({ where: { id: existing.id } });
-      await prisma.channelVerification.deleteMany({
-        where: { buyerId: buyerProfile.id, sellerId },
-      });
       await prisma.sellerProfile.update({
         where: { id: sellerId },
         data: { totalFans: { decrement: 1 } },
       });
       return NextResponse.json({ picked: false });
     } else {
-      // 거절 이력 확인 — 거절된 적 있으면 재인증 필요
-      const rejected = await prisma.channelVerification.findFirst({
-        where: { buyerId: buyerProfile.id, sellerId, status: "REJECTED" },
-      });
-      if (rejected) {
-        // 거절 기록 삭제 후 팔로워 생성하지 않고, 재인증 안내
-        await prisma.channelVerification.deleteMany({
-          where: { buyerId: buyerProfile.id, sellerId },
-        });
-        return NextResponse.json({
-          picked: false,
-          needVerification: true,
-          message: "이전 인증이 거절되었습니다. 채널 구독 인증을 다시 진행해주세요.",
-        });
-      }
-
       // Follow
       await prisma.sellerFollower.create({
         data: {

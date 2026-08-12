@@ -11,7 +11,6 @@ import SellerShopJoinCta from "@/components/shared/SellerShopJoinCta";
 import SellerShopHeader from "@/components/shared/SellerShopHeader";
 import SellerShopBottomNav from "@/components/shared/SellerShopBottomNav";
 import ShopContextSync from "@/components/shared/ShopContextSync";
-import ShopAddressPopup from "@/components/shared/ShopAddressPopup";
 import { Users, BookOpen, Star, MapPin, MessageCircle, Radio, Eye, Video, Sparkles } from "lucide-react";
 import { getFeatureFlags } from "@/lib/settings";
 import { DEFAULT_PRODUCT_IMAGE, pickSellerAvatar } from "@/lib/defaults";
@@ -292,9 +291,6 @@ export default async function SellerShopPage({
       {/* 상담사 컨텍스트 쿠키 동기화 — 서브페이지(장바구니/내정보 등)에서도 상담사 전용 크롬 유지 */}
       <ShopContextSync shop={{ slug: seller.slug, name: seller.shopName, logo: seller.shopLogo }} />
 
-      {/* 로그인된 고객 첫 진입 시 배송지 확인 팝업 (세션당 1회) */}
-      <ShopAddressPopup sellerSlug={seller.slug} />
-
       {/* ───── 점집 전용 상단 바 (상담사 로고 + 이름, 메인 이동 없음) ───── */}
       <SellerShopHeader
         sellerName={seller.shopName}
@@ -495,13 +491,6 @@ export default async function SellerShopPage({
               <PickSellerButton
                 sellerId={seller.id}
                 sellerName={seller.shopName}
-                sellerChannels={{
-                  instagram: seller.instagramUrl,
-                  youtube: seller.youtubeUrl,
-                  tiktok: seller.tiktokUrl,
-                  facebook: seller.facebookUrl,
-                  twitter: seller.twitterUrl,
-                }}
                 variant="large"
               />
               {/* 비로그인 방문자 가입 유도 (추천인 제도 ON일 때만 노출)

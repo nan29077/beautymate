@@ -13,7 +13,7 @@ interface SellerRate {
   id: string; shopName: string; shopLogo: string | null; slug: string;
   referralCode: string | null; referralCommissionRate: number; referralDiscountRate: number;
   pickDiscountRate: number; commissionRate: number; totalReferralEarnings: number; isApproved: boolean;
-  _count: { referredBuyers: number; followers: number; channelVerifications: number };
+  _count: { referredBuyers: number; followers: number };
 }
 
 export default function AdminSellerRatesPage() {
@@ -268,19 +268,11 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Icon name="Phone" size={10} className="text-blue-600" />
-                  </div>
-                  <div className="text-[11px] text-gray-600">
-                    <b>2단계:</b> 김민수가 수아 뷰티랩의 유튜브 채널 구독 인증 → <b>ChannelVerification</b> (status: VERIFIED)
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
                   <div className="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <Icon name="Cart" size={10} className="text-emerald-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>3단계:</b> 김민수가 수아 뷰티랩의 상담상품 50,000원 구매 시 → 3% 할인 = <b className="text-pink-600">1,500원 할인</b> → <b>48,500원</b> 결제
+                    <b>2단계:</b> 김민수가 수아 뷰티랩의 상담상품 50,000원 예약 시 → 3% 할인 = <b className="text-pink-600">1,500원 할인</b> → <b>48,500원</b> 결제
                   </div>
                 </div>
               </div>

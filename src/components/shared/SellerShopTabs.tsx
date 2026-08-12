@@ -539,18 +539,16 @@ export default function SellerShopTabs({
                     <div className="flex items-center gap-1.5 mt-1">
                       <span className="text-[13px] font-bold text-gray-900">{p.price.toLocaleString()}원</span>
                     </div>
-                    <p className="text-[10px] text-gray-400 mt-0.5">
-                      {p.shippingFee > 0 ? `배송비 ${p.shippingFee.toLocaleString()}원` : "무료배송"}
-                    </p>
                     {/* 일반상담상품(DirectProduct) 구매 — type=direct 로 체크아웃 진입.
-                        비로그인 상태면 체크아웃 페이지가 로그인으로 리다이렉트한다. */}
-                    {p.stock <= 0 || !sellerId ? (
+                        비로그인 상태면 체크아웃 페이지가 로그인으로 리다이렉트한다.
+                        상담 서비스라 재고·배송비 개념이 없어 품절 판정은 하지 않는다. */}
+                    {!sellerId ? (
                       <button
                         type="button"
                         disabled
                         className="mt-2 w-full py-1.5 rounded-lg text-[11px] font-semibold text-center bg-gray-100 text-gray-400 cursor-not-allowed"
                       >
-                        품절
+                        준비 중
                       </button>
                     ) : (
                       <Link

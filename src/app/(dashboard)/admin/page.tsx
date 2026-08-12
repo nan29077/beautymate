@@ -32,7 +32,7 @@ export default async function AdminDashboard() {
   const COMPLETED_STATUSES = ["CONFIRMED", "COMPLETED"] as const;
 
   const [
-    userCount, sellerCount, brandCount, productCount, campaignCount,
+    userCount, sellerCount, productCount, campaignCount,
     reservationCount, totalRevenueAgg, activeCampaigns, pendingSellers, recentOrders,
     recentUsers, recentReviews, activeProductCount,
     todayOrders, todayUsers, pendingOrders,
@@ -40,7 +40,6 @@ export default async function AdminDashboard() {
   ] = await Promise.all([
     prisma.user.count(),
     prisma.sellerProfile.count(),
-    Promise.resolve(0),
     prisma.product.count(),
     prisma.groupBuyCampaign.count(),
     safeQuery("admin dashboard reservationCount", () => prisma.reservation.count(), 0),
@@ -187,7 +186,6 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         {[
           { label: "상담사", value: sellerCount, icon: "Store", href: "/admin/sellers", color: "text-blue-500" },
-          { label: "브랜드", value: brandCount, icon: "Official", color: "text-purple-500" },
           { label: "상담상품", value: `${activeProductCount}/${productCount}`, icon: "Package", href: "/admin/products", color: "text-orange-500", sub: "활성/전체" },
           { label: "캠페인", value: `${activeCampaigns}/${campaignCount}`, icon: "Event", href: "/admin/campaigns", color: "text-pink-500", sub: "진행/전체" },
           { label: "처리 대기", value: pendingOrders, icon: "Cart", href: "/admin/reservations", color: "text-amber-500" },

@@ -174,7 +174,6 @@ export default function ShopDirectExposureManager() {
                         <p className="text-[13px] font-medium text-gray-900 truncate">{p.name}</p>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className="text-xs font-bold text-gray-900">{formatPrice(p.price)}</span>
-                          <span className="text-[10px] text-gray-400">재고 {p.stock}개</span>
                           {!p.isActive && <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-full">판매중지</span>}
                         </div>
                       </div>

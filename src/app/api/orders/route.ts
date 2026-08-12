@@ -6,9 +6,6 @@ import { getPlatformFees, productSettlementRecipient } from "@/lib/settlement";
 
 export const dynamic = "force-dynamic";
 
-// 일반상담상품 재고 차감 실패(동시 예약으로 재고 소진) 신호용 — 트랜잭션을 롤백시키고 409 로 응답한다.
-class DirectStockError extends Error {}
-
 // 예약 목록 조회
 export async function GET() {
   const session = await auth();
@@ -152,7 +149,6 @@ export async function POST(request: Request) {
   let totalAmount = 0;
   const orderItems: any[] = [];
   // 일반상담상품(DirectProduct) 재고 차감 대상 — 예약 생성 트랜잭션 안에서 원자적으로 차감한다.
-  const directStockOps: { id: string; quantity: number }[] = [];
 
   for (const item of items) {
     // 수량 검증 — 양의 정수만 허용 (API 직접 호출 방어)
@@ -182,9 +178,7 @@ export async function POST(request: Request) {
       if (campaign) {
         return NextResponse.json({ error: "일반상담상품은 단체 상담으로 예약할 수 없습니다." }, { status: 400 });
       }
-      if (direct.stock < quantity) {
-        return NextResponse.json({ error: `재고가 부족합니다. (남은 수량: ${direct.stock})` }, { status: 400 });
-      }
+      // 상담 서비스라 재고 개념이 없다. (DirectProduct.stock 컬럼은 남아 있으나 검증·차감하지 않음)
 
       const price = Number(direct.price); // 가격은 서버 DB 값만 신뢰 (클라이언트 price 무시)
       const itemTotal = price * quantity;
@@ -210,9 +204,6 @@ export async function POST(request: Request) {
         recipientRole: "CONSULTANT",
         recipientId: sellerId,
       });
-
-      directStockOps.push({ id: direct.id, quantity });
-
 
       // 공급자·브랜드가 없으므로 중간관리자 브랜드 마진 적립 대상이 아니다.
       continue;
@@ -428,17 +419,6 @@ export async function POST(request: Request) {
 
   // ─── 예약 생성 + 캠페인 카운터 + 커미션 + 장바구니 정리를 원자적으로 ───
   const runOrderTransaction = () => prisma.$transaction(async (tx) => {
-    // 일반상담상품 재고 차감 — 조건부 update 로 경합을 막는다.
-    // 재고 1개짜리 상담상품을 두 고객이 동시에 예약하면 나중 트랜잭션의 count 가 0 이 되어 롤백된다.
-    // (결제를 끝내지 않고 이탈하면 /api/orders/[id]/abort 가 재고를 복원한다)
-    for (const op of directStockOps) {
-      const updated = await tx.directProduct.updateMany({
-        where: { id: op.id, stock: { gte: op.quantity } },
-        data: { stock: { decrement: op.quantity } },
-      });
-      if (updated.count !== 1) throw new DirectStockError();
-    }
-
     const created = await tx.reservation.create({
       data: {
         reservationNumber,
@@ -542,19 +522,7 @@ export async function POST(request: Request) {
     return created;
   });
 
-  // 재고 검증과 차감 사이에 다른 고객이 마지막 재고를 가져간 경우 트랜잭션이 롤백된다.
-  let order: Awaited<ReturnType<typeof runOrderTransaction>>;
-  try {
-    order = await runOrderTransaction();
-  } catch (e) {
-    if (e instanceof DirectStockError) {
-      return NextResponse.json(
-        { error: "재고가 부족합니다. 다른 고객이 방금 결제했을 수 있습니다." },
-        { status: 409 },
-      );
-    }
-    throw e;
-  }
+  const order = await runOrderTransaction();
 
   return NextResponse.json({
     order: {

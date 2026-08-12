@@ -400,7 +400,6 @@ export default async function SellerDashboard() {
           {[
             { href: "/seller/products", label: "상담상품 관리", icon: "ProductManagement_icon", desc: "상담사 상담상품" },
             { href: "/seller/campaigns", label: "캠페인", icon: "Event", desc: "공구 캠페인" },
-            { href: "/seller/fans", label: "팬 관리", icon: "Users_icon", desc: "팬 소통" },
             { href: "/seller/customers", label: "고객 관리", icon: "Users", desc: "CRM · 상담 이력" },
             { href: "/seller/reservations", label: "예약 관리", icon: "OrderManagement_icon", desc: "예약 처리" },
             { href: "/seller/settlements", label: "정산", icon: "Settlement_icon", desc: "수익 정산" },

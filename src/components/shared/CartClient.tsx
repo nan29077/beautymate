@@ -8,10 +8,9 @@ import { Minus, Sparkles } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import SafeImage from "@/components/shared/SafeImage";
 import { useAppDialog } from "@/components/shared/AppDialog";
-import ShippingForm from "@/components/shared/ShippingForm";
+import BookingContactForm from "@/components/shared/BookingContactForm";
 import { useFeatureFlags } from "@/components/shared/FeatureFlagsProvider";
 import { useShopChrome } from "@/components/shared/ShopChromeProvider";
-import { computeOrderShipping } from "@/lib/shipping";
 
 interface CartItem {
   id: string;
@@ -56,15 +55,8 @@ export default function CartClient({ initialItems }: CartClientProps) {
   const [ordering, setOrdering] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [reservationNumber, setOrderNumber] = useState("");
-  const [showShipping, setShowShipping] = useState(false);
-  const [shipping, setShipping] = useState({
-    name: "",
-    phone: "",
-    zipCode: "",
-    address: "",
-    addressDetail: "",
-    memo: "",
-  });
+  const [showContact, setShowContact] = useState(false);
+  const [contact, setContact] = useState({ name: "", phone: "", memo: "" });
   // 장바구니 할인 설정 per seller
   const [cartDiscounts, setCartDiscounts] = useState<Record<string, CartDiscountInfo | null>>({});
 
@@ -110,12 +102,6 @@ export default function CartClient({ initialItems }: CartClientProps) {
     return acc;
   }, {} as Record<string, CartItem[]>);
 
-  // 배송비: 상담사별로 예약이 생성되므로 그룹별 배송비(상담상품 설정 기준)의 합
-  const shippingFee = Object.values(sellerGroups).reduce((sum, group) => {
-    const groupSubtotal = group.reduce((s, i) => s + i.price * i.quantity, 0);
-    return sum + computeOrderShipping(group, groupSubtotal);
-  }, 0);
-
   let totalDiscount = 0;
   const discountBreakdown: { label: string; amount: number; rate: number }[] = [];
   // 장바구니 할인 문턱 미달 넛지: "○○원 더 담으면 N% 할인"
@@ -142,7 +128,8 @@ export default function CartClient({ initialItems }: CartClientProps) {
     }
   });
 
-  const finalTotal = totalPrice - totalDiscount + shippingFee;
+  // 라이브 점사는 배송이 없어 배송비를 더하지 않는다.
+  const finalTotal = totalPrice - totalDiscount;
 
   const updateQuantity = async (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
@@ -198,25 +185,18 @@ export default function CartClient({ initialItems }: CartClientProps) {
       return;
     }
 
-    if (!showShipping) {
-      setShowShipping(true);
+    if (!showContact) {
+      setShowContact(true);
       return;
     }
 
-    if (!shipping.name || !shipping.phone || !shipping.address) {
-      appAlert("상담 방식 정보를 모두 입력해주세요.");
+    if (!contact.name || !contact.phone) {
+      appAlert("예약자 이름과 연락처를 입력해주세요.");
       return;
     }
 
     setOrdering(true);
     try {
-      // 배송지 자동 저장
-      if ((window as any).__saveShippingAddress) {
-        await (window as any).__saveShippingAddress();
-      }
-
-      const fullAddress = [shipping.address, shipping.addressDetail].filter(Boolean).join(" ");
-
       // Group selected items by seller
       const groups = selectedItems.reduce((acc, item) => {
         if (!acc[item.sellerId]) {
@@ -243,10 +223,9 @@ export default function CartClient({ initialItems }: CartClientProps) {
               price: item.price,
               quantity: item.quantity,
             })),
-            customerName: shipping.name,
-            customerPhone: shipping.phone,
-            shippingAddress: fullAddress,
-            shippingMemo: shipping.memo,
+            customerName: contact.name,
+            customerPhone: contact.phone,
+            shippingMemo: contact.memo,
           }),
         });
 
@@ -473,10 +452,10 @@ export default function CartClient({ initialItems }: CartClientProps) {
         })}
       </div>
 
-      {/* 상담 방식 정보 */}
-      {showShipping && (
+      {/* 예약자 정보 */}
+      {showContact && (
         <div className="px-4 mt-4">
-          <ShippingForm value={shipping} onChange={setShipping} />
+          <BookingContactForm value={contact} onChange={setContact} />
         </div>
       )}
 
@@ -498,22 +477,12 @@ export default function CartClient({ initialItems }: CartClientProps) {
                 <span className="font-medium text-brand-600">-{formatPrice(totalDiscount)}</span>
               </div>
             )}
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">배송비</span>
-              <span className="font-medium">
-                {shippingFee === 0 ? (
-                  <span className="text-brand-600">무료</span>
-                ) : (
-                  formatPrice(shippingFee)
-                )}
-              </span>
-            </div>
             <div className="border-t border-gray-100 pt-2 mt-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-gray-900">총 결제금액</span>
                 <div className="text-right">
                   {totalDiscount > 0 && (
-                    <p className="text-[10px] text-gray-400 line-through">{formatPrice(totalPrice + shippingFee)}</p>
+                    <p className="text-[10px] text-gray-400 line-through">{formatPrice(totalPrice)}</p>
                   )}
                   <span className="text-lg font-bold text-brand-600">
                     {formatPrice(finalTotal)}
@@ -537,7 +506,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
               <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               예약 처리 중...
             </span>
-          ) : showShipping ? (
+          ) : showContact ? (
             <>
               <Icon name="Cart" size={18} strokeWidth={1.5} className="mr-2" />
               {formatPrice(finalTotal)} 결제하기

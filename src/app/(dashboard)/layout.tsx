@@ -58,8 +58,6 @@ export default async function DashboardLayout({
       // 고객지원
       { href: "/admin/inquiries", iconName: "Comment", label: "문의 관리", group: "고객지원" },
       { href: "/admin/contact-settings", iconName: "CustomerService", label: "고객지원 설정", group: "고객지원" },
-      // SNS구독 승인은 HIDDEN_MENU_HREFS 로 숨김
-      { href: "/admin/channel-verifications", iconName: "Certified", label: "SNS구독 승인", group: "고객지원" },
       // 시스템
       { href: "/admin/settings", iconName: "Settings", label: "운영 설정", group: "시스템" },
     ],
@@ -83,10 +81,6 @@ export default async function DashboardLayout({
       { href: "/seller/settlements", iconName: "Settlement_icon", label: "정산·출금", group: "예약·정산" },
       // 알림톡
       { href: "/seller/alimtalk", iconName: "Notification", label: "알림톡 관리", group: "알림톡" },
-      // 팬 관리
-      { href: "/seller/fans", iconName: "Heart", label: "팬 관리", group: "팬 관리" },
-      // SNS구독 승인은 HIDDEN_MENU_HREFS 로 숨김
-      { href: "/seller/channel-verifications", iconName: "Certified", label: "SNS구독 승인", group: "팬 관리" },
       // 설정
       { href: "/seller/settings", iconName: "Settings", label: "설정", group: "설정" },
     ],
@@ -102,11 +96,7 @@ export default async function DashboardLayout({
     { match: (h) => h === "/admin/sellers", key: "seller" },
     { match: (h) => h.endsWith("/games"), key: "game" },
   ];
-  // 노출 숨김 메뉴: "SNS구독 승인"(채널 구독 인증) 메뉴는 사이드바에서 감춘다.
-  // (페이지/기능 자체는 유지하되 메뉴 진입만 비노출)
-  const HIDDEN_MENU_HREFS = ["/admin/channel-verifications", "/seller/channel-verifications"];
   const items = (navItems[role] || navItems.CUSTOMER).filter((item) => {
-    if (HIDDEN_MENU_HREFS.includes(item.href)) return false;
     // 라이브 상담상품관리: 라이브 상담 또는 단체 상담 중 하나라도 꺼져 있으면 숨김
     if (item.href === "/admin/live-products") return flags.liveCommerce && flags.groupBuy;
     const gate = MENU_FEATURE_GATE.find((g) => g.match(item.href));

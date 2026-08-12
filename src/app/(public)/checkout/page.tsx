@@ -34,16 +34,15 @@ export default async function CheckoutPage({
     const [direct, directSeller] = await Promise.all([
       prisma.directProduct.findUnique({
         where: { id: productId },
-        select: { id: true, name: true, images: true, price: true, shippingFee: true, stock: true, isActive: true, sellerId: true },
+        select: { id: true, name: true, images: true, price: true, isActive: true, sellerId: true },
       }),
       prisma.sellerProfile.findUnique({ where: { id: sellerId }, select: { id: true, shopName: true } }),
     ]);
-    // 상담상품이 없거나 비활성/품절이거나, 다른 상담사의 상담상품을 이 상담사 이름으로 사려는 경우 차단
+    // 상담상품이 없거나 비활성이거나, 다른 상담사의 상담상품을 이 상담사 이름으로 사려는 경우 차단
+    // (상담 서비스라 재고 검증은 하지 않는다)
     if (!direct || !direct.isActive || !directSeller || direct.sellerId !== directSeller.id) redirect("/");
-    if (direct.stock < qty) redirect(`/shop`);
 
     const images = parseJsonArray(direct.images);
-    const directShippingFee = Number(direct.shippingFee || 0);
 
     return (
       <CheckoutClient
@@ -61,9 +60,9 @@ export default async function CheckoutPage({
           price: Number(direct.price),
           quantity: qty,
           isCampaign: false,
-          shippingFee: directShippingFee,
-          // DirectProduct 에는 무료배송 기준금액 개념이 없다 — 배송비 0원이면 무료배송.
-          freeShipping: directShippingFee === 0,
+          // 상담 서비스라 배송비가 없다.
+          shippingFee: 0,
+          freeShipping: true,
           freeShippingThreshold: null,
         }}
       />

@@ -30,16 +30,6 @@ export async function POST(_request: Request, { params }: { params: { id: string
   }
 
   await prisma.$transaction(async (tx) => {
-    // 일반상담상품 재고 복원 — 예약 생성 시 차감했던 재고를 되돌린다.
-    // (updateMany 사용: 그 사이 상담상품이 삭제됐어도 0건 처리되어 취소 자체는 성공한다)
-    for (const it of order.items) {
-      if (it.itemType !== "DIRECT") continue;
-      await tx.directProduct.updateMany({
-        where: { id: it.productId },
-        data: { stock: { increment: it.quantity } },
-      });
-    }
-
     // 캠페인 카운터 롤백
     if (order.campaignId) {
       const totalQty = order.items.reduce((acc, i) => acc + i.quantity, 0);

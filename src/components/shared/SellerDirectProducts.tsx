@@ -23,7 +23,8 @@ interface DirectProduct {
 
 const formatPrice = (n: number) => n.toLocaleString("ko-KR") + "원";
 
-const emptyForm = { name: "", price: "", shippingFee: "", stock: "", description: "", images: [] as string[] };
+// 상담 서비스라 재고·배송비는 입력받지 않는다. (DB 컬럼은 유지, 미전송 시 기존 값/기본값 0 보존)
+const emptyForm = { name: "", price: "", description: "", images: [] as string[] };
 
 export default function SellerDirectProducts() {
   const { appAlert, appConfirm } = useAppDialog();
@@ -101,8 +102,6 @@ export default function SellerDirectProducts() {
     setForm({
       name: p.name,
       price: String(p.price),
-      shippingFee: String(p.shippingFee ?? 0),
-      stock: String(p.stock),
       description: p.description || "",
       images: p.images || [],
     });
@@ -117,8 +116,6 @@ export default function SellerDirectProducts() {
       const body = {
         name: form.name.trim(),
         price: Number(form.price),
-        shippingFee: form.shippingFee ? Number(form.shippingFee) : 0,
-        stock: form.stock ? Number(form.stock) : 0,
         description: form.description.trim() || null,
         images: form.images,
       };
@@ -257,9 +254,6 @@ export default function SellerDirectProducts() {
               <div className="p-2">
                 <p className="text-xs font-medium text-gray-900 line-clamp-2 leading-tight mb-0.5">{p.name}</p>
                 <p className="text-sm font-bold text-gray-900">{formatPrice(p.price)}</p>
-                <p className="text-[10px] text-gray-400 mt-0.5">
-                  재고 {p.stock}개 · {p.shippingFee > 0 ? `배송비 ${formatPrice(p.shippingFee)}` : "무료배송"}
-                </p>
 
                 {/* 활성화 스위치 */}
                 <div className="mt-1.5 flex items-center justify-between">
@@ -314,30 +308,12 @@ export default function SellerDirectProducts() {
                 <input type="text" className="input-field text-sm" placeholder="상담상품명을 입력하세요" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-semibold text-gray-700 mb-1.5 block">판매가격 <span className="text-red-500">*</span></label>
-                  <div className="relative">
-                    <input type="number" min="0" className="input-field text-sm pr-8" placeholder="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">원</span>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-gray-700 mb-1.5 block">재고수량</label>
-                  <div className="relative">
-                    <input type="number" min="0" className="input-field text-sm pr-8" placeholder="0" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">개</span>
-                  </div>
-                </div>
-              </div>
-
               <div>
-                <label className="text-xs font-semibold text-gray-700 mb-1.5 block">배송비</label>
+                <label className="text-xs font-semibold text-gray-700 mb-1.5 block">판매가격 <span className="text-red-500">*</span></label>
                 <div className="relative">
-                  <input type="number" min="0" className="input-field text-sm pr-8" placeholder="0" value={form.shippingFee} onChange={(e) => setForm({ ...form, shippingFee: e.target.value })} />
+                  <input type="number" min="0" className="input-field text-sm pr-8" placeholder="0" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">원</span>
                 </div>
-                <p className="text-[11px] text-gray-400 mt-1">비워두거나 0원으로 두면 무료배송으로 표시됩니다.</p>
               </div>
 
               <div>

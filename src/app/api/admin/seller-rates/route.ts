@@ -23,7 +23,7 @@ export async function GET() {
       commissionRate: true,
       totalReferralEarnings: true,
       isApproved: true,
-      _count: { select: { referredBuyers: true, followers: true, channelVerifications: true } },
+      _count: { select: { referredBuyers: true, followers: true } },
     },
     orderBy: { createdAt: "desc" },
   });

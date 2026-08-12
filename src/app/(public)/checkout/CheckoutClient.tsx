@@ -7,9 +7,8 @@ import Link from "next/link";
 import { ArrowLeft, Minus, CreditCard, Smartphone, Landmark, X } from 'lucide-react';
 import SafeImage from "@/components/shared/SafeImage";
 import { useAppDialog } from "@/components/shared/AppDialog";
-import ShippingForm from "@/components/shared/ShippingForm";
+import BookingContactForm from "@/components/shared/BookingContactForm";
 import { useFeatureFlags } from "@/components/shared/FeatureFlagsProvider";
-import { computeProductShipping } from "@/lib/shipping";
 
 interface CheckoutItem {
   // PRODUCT: 카탈로그 상담상품(Product) / DIRECT: 상담사 일반상담상품(DirectProduct)
@@ -204,7 +203,7 @@ export default function CheckoutClient({ item }: { item: CheckoutItem }) {
   const { groupBuy: FEATURE_GROUP_BUY } = useFeatureFlags();
   const [quantity, setQuantity] = useState(item.quantity);
   const [ordering, setOrdering] = useState(false);
-  const [shipping, setShipping] = useState({ name: "", phone: "", zipCode: "", address: "", addressDetail: "", memo: "" });
+  const [contact, setContact] = useState({ name: "", phone: "", memo: "" });
   const [cartDiscount, setCartDiscount] = useState<CartDiscountInfo | null>(null);
   const [payMethod, setPayMethod] = useState<PayMethod | null>(null);
   const pendingOrderIdRef = useRef<string | null>(null);
@@ -326,12 +325,8 @@ export default function CheckoutClient({ item }: { item: CheckoutItem }) {
   const cartDiscountEligible = !!cartDiscount && totalPrice >= cartDiscount.threshold;
   const discountAmount =
     cartDiscount && cartDiscountEligible ? Math.round(totalPrice * cartDiscount.rate / 100) : 0;
-  // 배송비: 상담상품 상담 방식 설정 기준 (무료배송/기준금액 반영)
-  const shippingFee = computeProductShipping(
-    { shippingFee: item.shippingFee, freeShipping: item.freeShipping, freeShippingThreshold: item.freeShippingThreshold },
-    totalPrice
-  );
-  const finalTotal = totalPrice - discountAmount - couponDiscountAmount + shippingFee;
+  // 라이브 점사는 배송이 없어 배송비를 더하지 않는다.
+  const finalTotal = totalPrice - discountAmount - couponDiscountAmount;
 
   const handleApplyCoupon = async () => {
     if (!couponInput.trim()) return;
@@ -364,8 +359,8 @@ export default function CheckoutClient({ item }: { item: CheckoutItem }) {
   };
 
   const handleOrder = async () => {
-    if (!shipping.name || !shipping.phone || !shipping.address) {
-      appAlert("상담 방식 정보를 모두 입력해주세요.");
+    if (!contact.name || !contact.phone) {
+      appAlert("예약자 이름과 연락처를 입력해주세요.");
       return;
     }
     if (!payMethod) {
@@ -379,11 +374,6 @@ export default function CheckoutClient({ item }: { item: CheckoutItem }) {
 
     setOrdering(true);
     try {
-      if ((window as any).__saveShippingAddress) {
-        await (window as any).__saveShippingAddress();
-      }
-
-      const fullAddress = [shipping.address, shipping.addressDetail].filter(Boolean).join(" ");
       // SNS 계정 (선택사항) — 선택 + 입력값이 있는 플랫폼만 포함
       const snsAccounts = selectedPlatforms
         .filter((p) => snsHandles[p]?.trim())
@@ -403,10 +393,9 @@ export default function CheckoutClient({ item }: { item: CheckoutItem }) {
             price: item.price,
             quantity,
           }],
-          customerName: shipping.name,
-          customerPhone: shipping.phone,
-          shippingAddress: fullAddress,
-          shippingMemo: shipping.memo,
+          customerName: contact.name,
+          customerPhone: contact.phone,
+          shippingMemo: contact.memo,
           snsAccounts: snsAccounts.length > 0 ? snsAccounts : undefined,
           couponCode: appliedCouponCode || undefined,
         }),
@@ -667,7 +656,7 @@ export default function CheckoutClient({ item }: { item: CheckoutItem }) {
       </div>
 
       <div className="px-4 mt-4">
-        <ShippingForm value={shipping} onChange={setShipping} />
+        <BookingContactForm value={contact} onChange={setContact} />
       </div>
 
       {/* SNS 계정 선택 (선택사항) */}
@@ -813,21 +802,12 @@ export default function CheckoutClient({ item }: { item: CheckoutItem }) {
                 {formatPrice(cartDiscount.threshold - totalPrice)} 더 구매하면 {cartDiscount.rate}% 장바구니 할인
               </p>
             )}
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">배송비</span>
-              <span className="font-medium">
-                {shippingFee === 0 ? <span className="text-brand-600">무료</span> : formatPrice(shippingFee)}
-              </span>
-            </div>
-            {shippingFee > 0 && item.freeShippingThreshold != null && totalPrice < item.freeShippingThreshold && (
-              <p className="text-[10px] text-gray-400">{formatPrice(item.freeShippingThreshold - totalPrice)} 더 구매하면 무료 상담 방식</p>
-            )}
             <div className="border-t border-gray-100 pt-2 mt-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-bold text-gray-900">총 결제금액</span>
                 <div className="text-right">
                   {(discountAmount > 0 || couponDiscountAmount > 0) && (
-                    <p className="text-[10px] text-gray-400 line-through">{formatPrice(totalPrice + shippingFee)}</p>
+                    <p className="text-[10px] text-gray-400 line-through">{formatPrice(totalPrice)}</p>
                   )}
                   <span className="text-lg font-bold text-brand-600">{formatPrice(finalTotal)}</span>
                 </div>

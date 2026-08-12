@@ -58,7 +58,7 @@ export default async function SellerCampaignsPage() {
         <div className="text-center py-20 text-gray-400 bg-white rounded-xl border border-gray-100">
           <Icon name="Cart" size={48} strokeWidth={1.5} className="mx-auto mb-3 opacity-30" />
           <p className="text-sm">등록된 단체 상담이 없습니다.</p>
-          <p className="text-xs text-gray-400 mt-1">위의 브랜드 단체 상담에 참여하거나 직접 단체 상담을 등록하세요.</p>
+          <p className="text-xs text-gray-400 mt-1">라이브 단체 상담을 운영하거나 직접 단체 상담을 등록하세요.</p>
         </div>
       ) : (
         <>

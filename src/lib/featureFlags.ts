@@ -62,7 +62,9 @@ export const FEATURE_DEFAULTS: FeatureFlags = {
   themRainy: false,
   themSummer: false,
   themAutumn: false,
-  game: true,
+  // 게임 관리 — 커머스 라이브 이벤트용 기능이라 사주메이트에서는 기본 비활성.
+  // 최고관리자가 운영 설정에서 켜면 상담사 사이드바에 다시 노출된다.
+  game: false,
 };
 
 // Setting 테이블에 저장되는 key

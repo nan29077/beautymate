@@ -14,17 +14,11 @@ const ICON_MAP: Record<string, LucideIcon> = {
 
 // 슬러그 → 아이콘 이름 폴백 맵
 const SLUG_FALLBACK: Record<string, string> = {
-  fashion: "Shirt", beauty: "Palette", lifestyle: "Leaf", accessories: "Gem",
-  "home-living": "HomeIcon", food: "Utensils", digital: "Laptop", kids: "Baby",
-  sports: "Dumbbell", travel: "Plane", pet: "Dog", books: "BookOpen",
-  audio: "Headphones", photo: "Camera", cafe: "Coffee", health: "Stethoscope",
-  skincare: "Heart", perfume: "Flower2", shoes: "Footprints", bag: "ShoppingBag",
-  watch: "Watch", kitchen: "Utensils", camping: "Tent", game: "Gamepad2",
-  car: "Car", dessert: "Cake", wine: "Wine", craft: "Scissors",
-  movie: "Clapperboard", gardening: "Flower2", gift: "Gift",
-  music: "Music", art: "Paintbrush", outdoor: "Mountain", swim: "Waves",
-  supplement: "Pill", interior: "Lightbulb", electronics: "Smartphone",
-  yoga: "Leaf", fitness: "Dumbbell",
+  saju: "Sun", sinjeom: "Sparkles", tarot: "Star", gunghap: "Heart",
+  jakmyeong: "Paintbrush", gwansang: "Glasses", taegil: "Flag", pungsu: "Compass",
+  astrology: "Globe", dream: "Moon", bujeok: "Ribbon", gut: "Theater",
+  counseling: "Stethoscope", fortune: "Zap", love: "Heart", money: "Gem",
+  career: "Trophy", health: "Stethoscope", family: "HomeIcon", study: "BookOpen",
 };
 
 interface CategoryIconProps {
