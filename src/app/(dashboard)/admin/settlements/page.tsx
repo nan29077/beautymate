@@ -59,7 +59,8 @@ export default async function AdminSettlementsPage() {
     sellerName: p.seller?.shopName || "상담사",
     amount: Number(p.amount),
     netAmount: Number(p.netAmount),
-    reservationCount: p.reservationCount,
+    // reservationCount 컬럼은 운영 DB 미반영 — 전역 omit 으로 기본 조회에서 빠진다 (없으면 0)
+    reservationCount: (p as { reservationCount?: number }).reservationCount ?? 0,
     status: p.status,
     isBusiness: p.isBusiness,
     bizNumber: p.bizNumber,

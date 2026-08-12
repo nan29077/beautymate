@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getSellerSettlementSummary, getPlatformFees } from "@/lib/settlement";
 import { getPayoutFeeRate } from "@/lib/settings";
 import { calcPayoutBreakdown } from "@/lib/payout";
+import { safeQuery, isMissingSchemaError } from "@/lib/safeDb";
 
 // GET: 상담사 정산 요약 + 출금요청 내역 + 출금 수수료율/사업자 여부 조회
 export async function GET() {
@@ -118,40 +119,48 @@ export async function POST(request: Request) {
           throw new Error(EXCEEDS);
         }
 
-        const created = await tx.payoutRequest.create({
-          data: {
-            sellerId: seller.id,
-            amount,
-            netAmount,
-            reservationCount: availableOrderCount,
-            commissionRate: payoutFeeRate,
-            commissionAmount,
-            withholdingTaxAmount,
-            actualPayoutAmount,
-            status: "REQUESTED",
-            isBusiness: requestedAsBusiness,
-            // 비사업자 주민등록번호는 저장하지 않음(원천징수 안내용으로만 사용 → 즉시 폐기). 사업자번호만 보관.
-            bizNumber: requestedAsBusiness ? (bizNumber || null) : null,
-            companyName: requestedAsBusiness ? (companyName || null) : null,
-            bankName: bankName || null,
-            accountNumber: accountNumber || null,
-            accountHolder: accountHolder || null,
-          },
-        });
+        const payoutData = {
+          sellerId: seller.id,
+          amount,
+          netAmount,
+          reservationCount: availableOrderCount,
+          commissionRate: payoutFeeRate,
+          commissionAmount,
+          withholdingTaxAmount,
+          actualPayoutAmount,
+          status: "REQUESTED" as const,
+          isBusiness: requestedAsBusiness,
+          // 비사업자 주민등록번호는 저장하지 않음(원천징수 안내용으로만 사용 → 즉시 폐기). 사업자번호만 보관.
+          bizNumber: requestedAsBusiness ? (bizNumber || null) : null,
+          companyName: requestedAsBusiness ? (companyName || null) : null,
+          bankName: bankName || null,
+          accountNumber: accountNumber || null,
+          accountHolder: accountHolder || null,
+        };
+        let created;
+        try {
+          created = await tx.payoutRequest.create({ data: payoutData });
+        } catch (e) {
+          // reservationCount 컬럼 미반영(P2022) 환경 — 해당 필드 없이 재시도
+          if (!isMissingSchemaError(e)) throw e;
+          const { reservationCount: _omit, ...withoutCount } = payoutData;
+          created = await tx.payoutRequest.create({ data: withoutCount });
+        }
 
         // 출금-예약 스냅샷 기록 (docs/SETTLEMENT_ISSUES.md #3)
         // 신청 금액을 정산일이 빠른 예약부터 FIFO 배분한다. 기존 미반려 출금이
         // 이미 배분한 몫(allocatedAmount)을 제외한 잔여분에만 배분해,
         // 예약별로 어떤 출금에 얼마가 포함됐는지 추적 가능하게 남긴다.
-        const prevAllocs = await tx.payoutRequestReservation.findMany({
-          where: {
-            payoutRequest: {
-              sellerId: seller.id,
-              status: { in: ["REQUESTED", "APPROVED", "PAID"] },
+        const prevAllocs = await safeQuery("payout prevAllocs", () =>
+          tx.payoutRequestReservation.findMany({
+            where: {
+              payoutRequest: {
+                sellerId: seller.id,
+                status: { in: ["REQUESTED", "APPROVED", "PAID"] },
+              },
             },
-          },
-          select: { reservationId: true, allocatedAmount: true },
-        });
+            select: { reservationId: true, allocatedAmount: true },
+          }), []);
         const allocByOrder = new Map<string, number>();
         for (const a of prevAllocs) {
           allocByOrder.set(a.reservationId, (allocByOrder.get(a.reservationId) ?? 0) + Number(a.allocatedAmount));
@@ -185,7 +194,13 @@ export async function POST(request: Request) {
           });
         }
         if (snapshots.length > 0) {
-          await tx.payoutRequestReservation.createMany({ data: snapshots });
+          try {
+            await tx.payoutRequestReservation.createMany({ data: snapshots });
+          } catch (e) {
+            // 스냅샷 테이블 미반영(P2021) 환경 — 스냅샷 없이 출금 요청만 기록
+            if (!isMissingSchemaError(e)) throw e;
+            console.warn("[payouts] payout_request_reservations 테이블 미반영 — 스냅샷 생략");
+          }
         }
 
         return created;

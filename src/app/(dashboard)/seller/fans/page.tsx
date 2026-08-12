@@ -7,6 +7,7 @@ import ChannelVerificationActions from "@/components/shared/ChannelVerificationA
 import ScreenshotThumbnail from "@/components/shared/ScreenshotThumbnail";
 import PaginatedFansList from "./PaginatedFansList";
 import { getFeatureFlags } from "@/lib/settings";
+import { safeQuery } from "@/lib/safeDb";
 import { pickBuyerAvatar } from "@/lib/defaults";
 
 export const dynamic = "force-dynamic";
@@ -20,19 +21,19 @@ export default async function SellerFansPage() {
     include: {
       fans: {
         include: {
-          user: { select: { id: true, name: true, email: true, phone: true, gender: true, birthday: true, avatar: true, createdAt: true, accounts: { select: { provider: true } }, _count: { select: { reservations: true } } } },
+          user: { select: { id: true, name: true, email: true, phone: true, gender: true, birthday: true, avatar: true, createdAt: true, accounts: { select: { provider: true } } } },
         },
       },
       referredBuyers: {
         include: {
-          user: { select: { id: true, name: true, email: true, phone: true, gender: true, birthday: true, avatar: true, createdAt: true, accounts: { select: { provider: true } }, _count: { select: { reservations: true } } } },
+          user: { select: { id: true, name: true, email: true, phone: true, gender: true, birthday: true, avatar: true, createdAt: true, accounts: { select: { provider: true } } } },
         },
       },
       followers: {
         include: {
           buyer: {
             include: {
-              user: { select: { id: true, name: true, email: true, phone: true, gender: true, birthday: true, avatar: true, createdAt: true, accounts: { select: { provider: true } }, _count: { select: { reservations: true } } } },
+              user: { select: { id: true, name: true, email: true, phone: true, gender: true, birthday: true, avatar: true, createdAt: true, accounts: { select: { provider: true } } } },
             },
           },
         },
@@ -53,6 +54,24 @@ export default async function SellerFansPage() {
   if (!seller) redirect("/");
 
   const flags = await getFeatureFlags();
+
+  // 팬별 예약 건수 — reservations 테이블 미반영 환경을 대비해 _count 대신 별도 집계
+  const fanUserIds = [
+    ...new Set([
+      ...seller.fans.map((f) => f.user.id),
+      ...seller.referredBuyers.map((r) => r.user.id),
+      ...seller.followers.map((f) => f.buyer.user.id),
+    ]),
+  ];
+  const reservationCounts = await safeQuery(
+    "seller fans reservation counts",
+    () =>
+      fanUserIds.length
+        ? prisma.reservation.groupBy({ by: ["userId"], where: { userId: { in: fanUserIds } }, _count: { _all: true } })
+        : Promise.resolve([]),
+    [] as { userId: string; _count: { _all: number } }[],
+  );
+  const reservationCountMap = new Map(reservationCounts.map((r) => [r.userId, r._count._all]));
 
   const pendingVerifications = seller.channelVerifications.filter((v) => v.status === "PENDING");
   const approvedVerifications = seller.channelVerifications.filter((v) => v.status === "APPROVED");
@@ -77,12 +96,12 @@ export default async function SellerFansPage() {
     isPrimary: boolean;    // 주력 팬(단골)
   };
   const fanMap = new Map<string, FanRow>();
-  const ensure = (u: { id: string; name: string; email: string | null; phone: string | null; gender: string | null; birthday: string | null; avatar: string | null; createdAt: Date; accounts: { provider: string }[]; _count: { reservations: number } }): FanRow => {
+  const ensure = (u: { id: string; name: string; email: string | null; phone: string | null; gender: string | null; birthday: string | null; avatar: string | null; createdAt: Date; accounts: { provider: string }[] }): FanRow => {
     let row = fanMap.get(u.id);
     if (!row) {
       row = {
         userId: u.id, name: u.name, email: u.email, phone: u.phone, gender: u.gender, birthday: u.birthday, avatar: u.avatar,
-        joinedAt: u.createdAt, reservationCount: u._count.reservations,
+        joinedAt: u.createdAt, reservationCount: reservationCountMap.get(u.id) ?? 0,
         authProviders: [...new Set(u.accounts.map((a) => a.provider))],
         isPick: false, isVerified: false, isReferred: false, isPrimary: false,
       };

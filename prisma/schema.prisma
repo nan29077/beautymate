@@ -1,7 +1,10 @@
 generator client {
-  provider      = "prisma-client-js"
-  output        = "../src/generated/prisma"
-  binaryTargets = ["native", "windows", "darwin-arm64"]
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
+  binaryTargets   = ["native", "windows", "darwin-arm64"]
+  // omitApi: 운영 DB 미반영 컬럼(consultingType 등)을 전역 omit 으로 기본 조회에서
+  // 제외하기 위해 필요 (src/lib/prisma.ts 참고). DB 스키마 반영 후 제거 가능.
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {

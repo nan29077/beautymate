@@ -9,9 +9,10 @@ interface Product {
   id: string;
   name: string;
   basePrice: number;
-  consultingType: string;
-  consultingMethod: string;
-  durationMinutes: number;
+  // 상담 속성 컬럼이 아직 운영 DB 에 없으면 null 로 온다 — null 이면 뱃지를 숨긴다
+  consultingType: string | null;
+  consultingMethod: string | null;
+  durationMinutes: number | null;
   thumbnail: string | null;
   description: string | null;
   sellerPrice: number | null;
@@ -223,11 +224,17 @@ export default function BookingFlow({
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-900 text-sm">{p.name}</p>
                       <div className="flex gap-1.5 mt-1">
-                        <span className="text-xs px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full">{p.consultingType}</span>
-                        <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">{p.consultingMethod}</span>
-                        <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full flex items-center gap-0.5">
-                          <Clock size={10} />{p.durationMinutes}분
-                        </span>
+                        {p.consultingType && (
+                          <span className="text-xs px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full">{p.consultingType}</span>
+                        )}
+                        {p.consultingMethod && (
+                          <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">{p.consultingMethod}</span>
+                        )}
+                        {p.durationMinutes != null && (
+                          <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full flex items-center gap-0.5">
+                            <Clock size={10} />{p.durationMinutes}분
+                          </span>
+                        )}
                       </div>
                       {p.description && (
                         <p className="text-xs text-gray-500 mt-1 line-clamp-2">{p.description}</p>
@@ -413,8 +420,15 @@ export default function BookingFlow({
               <p className="font-semibold text-gray-900">예약 정보 확인</p>
               <Row label="상담사" value={seller.shopName} />
               <Row label="상담 상품" value={selectedProduct.name} />
-              <Row label="상담 유형" value={`${selectedProduct.consultingType} · ${selectedProduct.consultingMethod}`} />
-              <Row label="상담 시간" value={`${selectedProduct.durationMinutes}분`} />
+              {(selectedProduct.consultingType || selectedProduct.consultingMethod) && (
+                <Row
+                  label="상담 유형"
+                  value={[selectedProduct.consultingType, selectedProduct.consultingMethod].filter(Boolean).join(" · ")}
+                />
+              )}
+              {selectedProduct.durationMinutes != null && (
+                <Row label="상담 시간" value={`${selectedProduct.durationMinutes}분`} />
+              )}
               <Row label="예약 날짜" value={selectedDate} />
               <Row label="예약 시간" value={`${selectedSlot.startTime} ~ ${selectedSlot.endTime}`} />
               <div className="border-t border-gray-100 pt-2">
