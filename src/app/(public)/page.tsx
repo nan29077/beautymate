@@ -14,7 +14,7 @@ import { DEFAULT_PRODUCT_IMAGE, pickSellerAvatar } from "@/lib/defaults";
 import { LIVE_RING_CLASS, OnAirBadge } from "@/components/shared/LiveBadge";
 import { getFeatureFlags } from "@/lib/settings";
 import { getHomeStats, getHomeStories, getHomeBenefits } from "@/lib/siteContent";
-import { Heart, Radio, Sparkles, ShieldCheck, Gift, Award, Quote, Instagram, Youtube, CreditCard, Smartphone, Landmark, Star, Moon, Calendar, ArrowRight, LogIn } from 'lucide-react';
+import { Heart, Radio, Sparkles, ShieldCheck, Gift, Award, Quote, Instagram, Youtube, CreditCard, Smartphone, Landmark, ArrowRight, LogIn } from 'lucide-react';
 
 export const dynamic = "force-dynamic";
 
@@ -192,12 +192,8 @@ export default async function HomePage({
     redirect(ROLE_DASHBOARD[role]);
   }
 
-  const { liveCommerce: FEATURE_LIVE, seller: FEATURE_SELLER } = await getFeatureFlags();
+  const { liveCommerce: FEATURE_LIVE } = await getFeatureFlags();
   const { liveSellers, isBuyer } = await getHomeData(FEATURE_LIVE);
-
-  // '상담사 탐색' 기능이 꺼져 있으면 /sellers 는 404다.
-  // 이때는 페이지 안의 상담사 이름 검색(#find-seller)으로 대신 보낸다.
-  const findSellerHref = FEATURE_SELLER ? "/sellers" : "#find-seller";
 
   // 관리자 "사이트 관리 > 메인페이지 관리"에서 수정 가능한 숫자/성공스토리/혜택
   const [homeStats, homeStories, homeBenefits] = await Promise.all([getHomeStats(), getHomeStories(), getHomeBenefits()]);
@@ -221,77 +217,6 @@ export default async function HomePage({
 
   return (
     <div className="bg-white min-h-screen">
-      {/* ───── 히어로: 방송하는 동안 예약이 알아서 들어옵니다 ───── */}
-      <section
-        className="relative overflow-hidden px-5 pt-9 pb-11 text-white"
-        style={{ background: "linear-gradient(160deg, #0d0720 0%, #1a0a2e 45%, #2d1b69 100%)" }}
-      >
-        {/* 별 파티클 */}
-        <StarField />
-
-        {/* 신비로운 오라(빛무리) */}
-        <div className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 rounded-full bg-purple-500/25 blur-3xl animate-aura" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-20 -left-16 w-52 h-52 rounded-full bg-indigo-400/20 blur-3xl animate-aura" style={{ animationDelay: "2s" }} aria-hidden="true" />
-
-        {/* 달·별빛 라인 장식 */}
-        <Moon size={112} strokeWidth={0.7} className="absolute top-6 -right-6 text-white/10 pointer-events-none animate-float-slow" aria-hidden="true" />
-        <Sparkles size={56} strokeWidth={0.9} className="absolute bottom-8 -left-4 text-white/10 pointer-events-none animate-float-slow" style={{ animationDelay: "3s" }} aria-hidden="true" />
-
-        <div className="relative">
-          {/* 로고 + 태그라인 */}
-          <div className="flex items-center gap-2">
-            <span className="w-9 h-9 rounded-2xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center">
-              <Moon size={18} strokeWidth={1.6} className="text-purple-200" />
-            </span>
-            <div className="leading-none">
-              <p className="text-[17px] font-extrabold tracking-tight">사주메이트</p>
-              <p className="mt-1 text-[10px] text-purple-200/70">라이브 점사 예약 커머스</p>
-            </div>
-          </div>
-
-          <span className="mt-6 inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold tracking-wide text-purple-200 ring-1 ring-white/15">
-            <Star size={11} strokeWidth={1.8} /> 유튜브 · 프리즘 라이브 연동
-          </span>
-
-          {/* 메인 카피 */}
-          <h1 className="mt-3.5 text-[29px] font-extrabold leading-[1.25] tracking-tight">
-            방송하는 동안
-            <br />
-            <span className="bg-gradient-to-r from-purple-200 via-white to-indigo-200 bg-clip-text text-transparent">
-              예약이 알아서 들어옵니다
-            </span>
-          </h1>
-
-          {/* 서브 카피 */}
-          <p className="mt-3 text-[13px] leading-relaxed text-purple-100/80">
-            유튜브·SNS에서 활동하는 사주·신점·타로 상담사를 위한
-            <br />예약 커머스 플랫폼
-          </p>
-
-          {/* CTA 2개 */}
-          <div className="mt-6 flex gap-2">
-            <Link
-              href={findSellerHref}
-              className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-3 text-[13px] font-extrabold text-[#2d1b69] shadow-lg shadow-black/20 active:scale-[0.97] transition-transform"
-            >
-              <Calendar size={15} strokeWidth={2} /> 상담 예약하기
-            </Link>
-            <Link
-              href="/auth/login"
-              className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-3 text-[13px] font-extrabold text-white ring-1 ring-white/25 backdrop-blur-sm active:scale-[0.97] transition-transform"
-            >
-              <Radio size={15} strokeWidth={2} /> 상담사로 시작하기
-            </Link>
-          </div>
-
-          {/* 라이브커머스 비유 한 줄 */}
-          <p className="mt-5 flex items-start gap-1.5 text-[11.5px] leading-relaxed text-purple-200/60">
-            <Sparkles size={13} strokeWidth={1.8} className="mt-0.5 flex-shrink-0" />
-            라이브커머스에서 방송을 마치고 주문을 확인하듯, 방송이 끝나면 예약이 쌓여 있습니다.
-          </p>
-        </div>
-      </section>
-
       {/* ───── 상단 배너 슬라이드 (자동+수동, 최대 3페이지 / DB 배너 없으면 기본) ───── */}
       <HeroBannerSlider
         banners={heroBanners.map((b) => ({
