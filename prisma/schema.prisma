@@ -571,6 +571,9 @@ model Reservation {
   gender            String? // "M" | "F"
   consultingContent String? @db.Text // 상담 내용/문의
 
+  // 상담사가 상담 후 남기는 내부 메모 (고객에게 노출되지 않음, CRM 이력에 표시)
+  consultantMemo    String? @db.Text
+
   snsAccounts     String?           @db.Text
   paymentMethod   String?
   pgProvider      String?

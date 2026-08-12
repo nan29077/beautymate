@@ -86,12 +86,14 @@ export default async function DashboardLayout({
       { href: "/seller/products", iconName: "ProductManagement_icon", label: "상담상품 관리", group: "상담상품 관리" },
       { href: "/seller/contents", iconName: "ProductContent_icon", label: "콘텐츠 관리", group: "상담상품 관리" },
       // 판매·라이브
+      { href: "/seller/live-mode", iconName: "Broadcast", label: "라이브 모드", group: "판매·라이브" },
       { href: "/seller/live", iconName: "Live_icon", label: "라이브 상담", group: "판매·라이브" },
       { href: "/seller/campaigns", iconName: "Event", label: "단체 상담 관리", group: "판매·라이브" },
       { href: "/seller/games", iconName: "Play", label: "게임관리", group: "판매·라이브" },
       // 예약·정산
       { href: "/seller/timeslots", iconName: "Clock", label: "시간슬롯 관리", group: "예약·정산" },
       { href: "/seller/reservations", iconName: "Calendar", label: "예약 관리", group: "예약·정산" },
+      { href: "/seller/customers", iconName: "Users", label: "고객관리(CRM)", group: "예약·정산" },
       { href: "/seller/orders", iconName: "OrderManagement_icon", label: "예약 관리(구)", group: "예약·정산" },
       { href: "/seller/package-purchase-orders", iconName: "Package", label: "패키지 발주서", group: "예약·정산" },
       { href: "/seller/settlements", iconName: "Settlement_icon", label: "정산·출금", group: "예약·정산" },

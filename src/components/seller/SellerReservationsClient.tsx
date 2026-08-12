@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, List, CalendarDays, Calendar, X, User, Phone, Clock, BookOpen } from "lucide-react";
+import { ChevronLeft, ChevronRight, List, CalendarDays, Calendar, X, User, Phone, Clock, BookOpen, NotebookPen, Loader2 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
@@ -23,6 +23,7 @@ interface Reservation {
   completedAt: string | null;
   cancelledAt: string | null;
   noShowAt: string | null;
+  consultantMemo: string | null;
   user: { id: string; name: string; email: string };
   items: { id: string; productName: string; price: number; quantity: number }[];
   timeSlot: { startTime: string; endTime: string } | null;
@@ -334,6 +335,9 @@ function ReservationDetailModal({
             <span className="font-bold text-gray-900">{formatPrice(r.finalAmount)}</span>
           </div>
 
+          {/* 상담 메모 (상담 완료 건만) */}
+          {r.status === "COMPLETED" && <ConsultantMemoEditor reservation={r} />}
+
           {/* 상태 변경 버튼 */}
           {nextStatuses.length > 0 && (
             <div className="border-t border-gray-100 pt-3 flex flex-col gap-2">
@@ -350,6 +354,74 @@ function ReservationDetailModal({
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+/** 상담 완료 예약에 상담사가 남기는 내부 메모. 고객에게는 노출되지 않는다. */
+function ConsultantMemoEditor({ reservation }: { reservation: Reservation }) {
+  const [savedMemo, setSavedMemo] = useState(reservation.consultantMemo ?? "");
+  const [memo, setMemo] = useState(reservation.consultantMemo ?? "");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+
+  const dirty = memo !== savedMemo;
+
+  const handleSave = async () => {
+    setSaving(true);
+    setError("");
+    setSaved(false);
+    try {
+      const res = await fetch(`/api/reservations/${reservation.id}/memo`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memo }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "메모 저장에 실패했습니다.");
+        return;
+      }
+      // 저장 성공 시 기준값을 갱신해 "저장" 버튼이 다시 비활성화되도록 한다.
+      setSavedMemo(data.memo ?? "");
+      setMemo(data.memo ?? "");
+      setSaved(true);
+    } catch {
+      setError("메모 저장 중 오류가 발생했습니다.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="border-t border-gray-100 pt-3">
+      <div className="flex items-center gap-1.5 mb-2">
+        <NotebookPen size={14} className="text-gray-400" />
+        <span className="text-xs text-gray-400 uppercase tracking-wide">상담 메모</span>
+        <span className="text-[10px] text-gray-300">· 고객에게 보이지 않습니다</span>
+      </div>
+      <textarea
+        value={memo}
+        onChange={(e) => { setMemo(e.target.value); setSaved(false); setError(""); }}
+        rows={4}
+        maxLength={5000}
+        placeholder="상담 내용, 특이사항, 다음 상담 시 참고할 내용을 기록하세요."
+        className="w-full rounded-xl border border-gray-200 p-3 text-sm text-gray-800 placeholder:text-gray-300 focus:outline-none focus:border-gray-400 resize-none"
+      />
+      <div className="flex items-center justify-between mt-2">
+        <span className="text-[11px] text-gray-400">
+          {error ? <span className="text-red-500">{error}</span> : saved ? "저장되었습니다." : `${memo.length}/5000`}
+        </span>
+        <button
+          onClick={handleSave}
+          disabled={saving || !dirty}
+          className="px-4 py-1.5 rounded-lg bg-gray-900 text-white text-xs font-medium disabled:opacity-40 flex items-center gap-1.5"
+        >
+          {saving && <Loader2 size={12} className="animate-spin" />}
+          메모 저장
+        </button>
       </div>
     </div>
   );

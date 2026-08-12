@@ -61,6 +61,12 @@ export default async function SellerDashboard() {
   weekStart.setDate(todayStart.getDate() - ((todayStart.getDay() + 6) % 7)); // 월요일 시작
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
+  // 오늘(한국 시간 기준) 날짜 문자열. 예약일/슬롯 날짜는 "YYYY-MM-DD"를 UTC 자정으로 저장하므로
+  // 서버 타임존과 무관하게 KST 달력 날짜로 경계를 잡는다.
+  const todayStr = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const dayStartUtc = new Date(todayStr + "T00:00:00.000Z");
+  const dayEndUtc = new Date(todayStr + "T23:59:59.999Z");
+
   const [allOrders, recentOrders, recentReviews, topProducts, pendingOrders] = await Promise.all([
     // 예약 수/매출 집계용 (실데이터 기반)
     prisma.reservation.findMany({
@@ -88,6 +94,38 @@ export default async function SellerDashboard() {
     prisma.reservation.count({ where: { sellerId: seller.id, status: "PENDING" } }),
   ]);
 
+  // ── 오늘의 예약 현황 & 이번 달 실적 ─────────────────────────────
+  const [todayReservations, todaySlots, monthCompletedCount] = await Promise.all([
+    prisma.reservation.findMany({
+      where: {
+        sellerId: seller.id,
+        reservationDate: { gte: dayStartUtc, lte: dayEndUtc },
+        status: { not: "CANCELLED" },
+      },
+      select: { status: true, reservationTime: true, customerName: true },
+      orderBy: { reservationTime: "asc" },
+    }),
+    prisma.timeSlot.findMany({
+      where: { consultantId: session!.user!.id, date: { gte: dayStartUtc, lte: dayEndUtc } },
+      select: { reservationId: true },
+    }),
+    prisma.reservation.count({
+      where: { sellerId: seller.id, status: "COMPLETED", completedAt: { gte: monthStart } },
+    }),
+  ]);
+
+  const todayConfirmed = todayReservations.filter(
+    (r) => r.status === "CONFIRMED" || r.status === "COMPLETED"
+  ).length;
+  const todayReservedSlots = todaySlots.filter((s) => s.reservationId).length;
+  const todayRemainSlots = todaySlots.length - todayReservedSlots;
+  const nextReservation = todayReservations.find(
+    (r) => r.status === "CONFIRMED" || r.status === "PENDING"
+  );
+
+  // 최근 예약 5건 (고객명·상담 종류·일시·상태)
+  const latestReservations = recentOrders.slice(0, 5);
+
   // 예약 수(생성 기준) & 매출(결제완료 기준) 기간별 집계
   const isPaid = (o: { paymentStatus: string; status: string }) =>
     o.paymentStatus === "COMPLETED" && o.status !== "CANCELLED" && o.status !== "REFUNDED";
@@ -109,12 +147,15 @@ export default async function SellerDashboard() {
   }
 
   const statusLabels: Record<string, { label: string; color: string }> = {
-    PENDING: { label: "대기", color: "bg-yellow-50 text-yellow-700" },
-    CONFIRMED: { label: "확인", color: "bg-blue-50 text-blue-700" },
-    SHIPPING: { label: "상담 진행중", color: "bg-indigo-50 text-indigo-700" },
-    DELIVERED: { label: "완료", color: "bg-green-50 text-green-700" },
-    CANCELLED: { label: "취소", color: "bg-red-50 text-red-700" },
+    PENDING: { label: "예약 대기", color: "bg-yellow-50 text-yellow-700" },
+    CONFIRMED: { label: "예약 확정", color: "bg-blue-50 text-blue-700" },
+    COMPLETED: { label: "상담 완료", color: "bg-green-50 text-green-700" },
+    CANCELLED: { label: "취소", color: "bg-gray-100 text-gray-500" },
+    NO_SHOW: { label: "노쇼", color: "bg-red-50 text-red-600" },
   };
+
+  const formatResvDate = (d: Date) =>
+    `${d.getUTCMonth() + 1}/${d.getUTCDate()}`;
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -153,6 +194,62 @@ export default async function SellerDashboard() {
           상담사 승인 대기 중입니다. 관리자 승인 후 점집이 공개됩니다.
         </div>
       )}
+
+      {/* 오늘의 예약 현황 */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider">오늘의 예약 현황</h2>
+          <Link href="/seller/live-mode" className="text-[11px] text-red-500 font-medium hover:underline">
+            라이브 모드 열기 →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+          <div className="bg-gray-900 rounded-xl p-3 sm:p-4 text-white">
+            <p className="text-white/50 text-[9px] sm:text-[10px] font-medium mb-1">확정 예약</p>
+            <p className="text-xl sm:text-2xl font-bold">{todayConfirmed}<span className="text-xs font-normal text-white/50 ml-0.5">건</span></p>
+            <p className="text-white/40 text-[9px] sm:text-[10px] mt-1">
+              {nextReservation ? `다음 ${nextReservation.reservationTime}` : "예정된 상담 없음"}
+            </p>
+          </div>
+          <div className="bg-amber-400 rounded-xl p-3 sm:p-4 text-black">
+            <p className="text-black/60 text-[9px] sm:text-[10px] font-medium mb-1">남은 슬롯</p>
+            <p className="text-xl sm:text-2xl font-bold">{todayRemainSlots}<span className="text-xs font-normal text-black/50 ml-0.5">자리</span></p>
+            <p className="text-black/50 text-[9px] sm:text-[10px] mt-1">전체 {todaySlots.length} · 예약 {todayReservedSlots}</p>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4">
+            <p className="text-gray-400 text-[9px] sm:text-[10px] font-medium mb-1">이번 달 매출</p>
+            <p className="text-[13px] sm:text-base font-bold text-gray-900 leading-tight break-all">{formatPrice(monthSales)}</p>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4">
+            <p className="text-gray-400 text-[9px] sm:text-[10px] font-medium mb-1">이번 달 완료 상담</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900">{monthCompletedCount}<span className="text-xs font-normal text-gray-300 ml-0.5">건</span></p>
+          </div>
+        </div>
+      </div>
+
+      {/* 빠른 액세스 */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        {[
+          { href: "/seller/timeslots", label: "슬롯 관리", desc: "상담 가능 시간", icon: "Clock" },
+          { href: "/seller/reservations", label: "예약 관리", desc: "확정·완료 처리", icon: "Calendar" },
+          { href: "/seller/customers", label: "고객 목록", desc: "상담 이력·메모", icon: "Users" },
+          { href: "/seller/live-mode", label: "라이브 모드", desc: "방송 중 현황", icon: "Live" },
+        ].map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="flex items-center gap-2.5 p-3 sm:p-3.5 bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all group"
+          >
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gray-50 group-hover:bg-gray-100 flex items-center justify-center transition-colors flex-shrink-0">
+              <Icon name={item.icon} size={15} className="text-gray-500" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold text-gray-800 truncate">{item.label}</p>
+              <p className="text-[10px] text-gray-400 mt-0.5 truncate">{item.desc}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
 
       {/* 예약 수 (오늘 / 이번주 / 이번달) */}
       <div>
@@ -217,21 +314,26 @@ export default async function SellerDashboard() {
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-50">
             <h2 className="text-sm font-bold text-gray-900">최근 예약</h2>
-            <Link href="/seller/orders" className="text-[11px] text-gray-400 hover:text-gray-600">전체보기 →</Link>
+            <Link href="/seller/reservations" className="text-[11px] text-gray-400 hover:text-gray-600">전체보기 →</Link>
           </div>
-          {recentOrders.length > 0 ? (
+          {latestReservations.length > 0 ? (
             <div className="divide-y divide-gray-50">
-              {recentOrders.map((order) => {
+              {latestReservations.map((order) => {
                 const st = statusLabels[order.status] || { label: order.status, color: "bg-gray-50 text-gray-600" };
                 return (
                   <div key={order.id} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50/50 transition-colors">
                     <div className="min-w-0 flex-1 pr-2">
-                      {/* 상담상품명 + 고객명 강조, 예약번호는 작게 */}
+                      {/* 고객명 + 상담 종류 강조, 일시는 아래 */}
                       <p className="text-[14px] font-bold text-gray-900 truncate">
-                        {order.items[0]?.productName || "예약 상담상품"}
-                        {order.items.length > 1 && <span className="text-[11px] font-normal text-gray-400"> 외 {order.items.length - 1}건</span>}
+                        {order.customerName || order.user.name}
+                        <span className="text-[12px] font-normal text-gray-500 ml-1.5">
+                          {order.items[0]?.productName || "상담"}
+                          {order.items.length > 1 && ` 외 ${order.items.length - 1}건`}
+                        </span>
                       </p>
-                      <p className="text-[12px] font-semibold text-gray-700">{order.user.name}</p>
+                      <p className="text-[12px] text-gray-500">
+                        {formatResvDate(order.reservationDate)} {order.reservationTime}
+                      </p>
                       <p className="text-[10px] text-gray-300">예약 {order.reservationNumber}</p>
                     </div>
                     <div className="text-right flex-shrink-0 ml-3">
@@ -309,7 +411,8 @@ export default async function SellerDashboard() {
             { href: "/seller/products", label: "상담상품 관리", icon: "ProductManagement_icon", desc: "상담사 상담상품" },
             { href: "/seller/campaigns", label: "캠페인", icon: "Event", desc: "공구 캠페인" },
             { href: "/seller/fans", label: "팬 관리", icon: "Users_icon", desc: "팬 소통" },
-            { href: "/seller/orders", label: "예약", icon: "OrderManagement_icon", desc: "예약 처리" },
+            { href: "/seller/customers", label: "고객 관리", icon: "Users", desc: "CRM · 상담 이력" },
+            { href: "/seller/reservations", label: "예약 관리", icon: "OrderManagement_icon", desc: "예약 처리" },
             { href: "/seller/settlements", label: "정산", icon: "Settlement_icon", desc: "수익 정산" },
             { href: "/seller/live", label: "라이브", icon: "Live_icon", desc: "라이브 방송" },
             { href: `/shop/${seller.slug}`, label: "SHOP 바로가기", icon: "Store", desc: "점집 바로가기" },
