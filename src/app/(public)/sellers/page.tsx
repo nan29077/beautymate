@@ -9,6 +9,9 @@ import { getFeatureFlags } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
+// 메인 랜딩과 동일한 8개 상담 분야 — 등록 상담사가 없어도 필터 칩은 항상 노출한다.
+const CONSULT_CATEGORIES = ["사주", "신점", "타로", "궁합", "작명", "사업운", "연애운", "택일"];
+
 export default async function SellersPage({
   searchParams,
 }: {
@@ -94,9 +97,13 @@ export default async function SellersPage({
       });
     }
 
+    // 시작 가격 = 노출 상담상품 중 최저가 (상담상품이 없으면 null)
+    const startPrice = products.length > 0 ? Math.min(...products.map((p) => p.basePrice)) : null;
+
     return {
       slug: s.slug,
       shopName: s.shopName,
+      startPrice,
       shopLogo: s.shopLogo,
       shopBanner: s.shopBanner,
       shopDescription: s.shopDescription,
@@ -130,14 +137,27 @@ export default async function SellersPage({
             <Link href="/" className="p-1 -ml-1 text-gray-600 hover:text-gray-900 transition-colors">
               <Icon name="ChevronDown" size={22} strokeWidth={1.5} className="rotate-90" />
             </Link>
-            <h1 className="text-base font-bold text-gray-900">상담사</h1>
+            <h1 className="text-base font-bold text-gray-900">상담사 찾기</h1>
           </div>
           <span className="text-xs text-gray-400 font-medium">{serialized.length}명</span>
         </div>
       </div>
 
+      {/* 인트로 — 예약 커머스 포지셔닝 */}
+      <div
+        className="relative overflow-hidden px-4 py-4 text-white"
+        style={{ background: "linear-gradient(150deg, #0d0720 0%, #1a0a2e 55%, #2d1b69 100%)" }}
+      >
+        <div className="max-w-2xl mx-auto relative">
+          <p className="text-[15px] font-extrabold leading-snug">방송 중인 상담사에게 바로 예약하세요</p>
+          <p className="mt-1 text-[11.5px] text-purple-200/70">
+            사주·신점·타로 등 분야를 골라 상담사를 찾아보세요
+          </p>
+        </div>
+      </div>
+
       {/* Seller List */}
-      <SellerSearchClient sellers={serialized} />
+      <SellerSearchClient sellers={serialized} baseCategories={CONSULT_CATEGORIES} />
     </div>
   );
 }

@@ -9,12 +9,12 @@ import HomeMyShopBar from "@/components/shared/HomeMyShopBar";
 import HeroBannerSlider from "@/components/shared/HeroBannerSlider";
 import SellerMarquee from "@/components/shared/SellerMarquee";
 import HomeFaq from "@/components/shared/HomeFaq";
-import HomeStartTabs from "@/components/shared/HomeStartTabs";
+import StarField from "@/components/shared/StarField";
 import { DEFAULT_PRODUCT_IMAGE, pickSellerAvatar } from "@/lib/defaults";
 import { LIVE_RING_CLASS, OnAirBadge } from "@/components/shared/LiveBadge";
 import { getFeatureFlags } from "@/lib/settings";
 import { getHomeStats, getHomeStories, getHomeBenefits } from "@/lib/siteContent";
-import { Heart, Radio, Sparkles, ShieldCheck, Gift, Award, Quote, Instagram, Youtube, Rocket, CreditCard, Smartphone, Landmark, Star, Moon, BookOpen, Briefcase, HeartHandshake, Calendar, Search, Video } from 'lucide-react';
+import { Heart, Radio, Sparkles, ShieldCheck, Gift, Award, Quote, Instagram, Youtube, CreditCard, Smartphone, Landmark, Star, Moon, BookOpen, Briefcase, HeartHandshake, Calendar, Search, Video, ClipboardList, MonitorPlay, Clock, Users, X, Check, ArrowRight, LogIn } from 'lucide-react';
 
 export const dynamic = "force-dynamic";
 
@@ -28,15 +28,15 @@ function buyerAvatar(i: number): string {
 
 // 서비스 차별점 (왜 사주메이트인가)
 const DIFFERENTIATORS = [
-  { icon: Heart, color: "text-pink-500", bg: "bg-pink-50", title: "단골 중심 구조", desc: "아무나 둘러보는 오픈마켓이 아니라, 내가 PICK한 상담사와 깊게 연결돼요." },
-  { icon: Radio, color: "text-rose-500", bg: "bg-rose-50", title: "라이브로 사는 재미", desc: "실시간 방송에서 묻고 바로 사는, 보는 쇼핑의 몰입감." },
+  { icon: Radio, color: "text-rose-500", bg: "bg-rose-50", title: "내 방송이 곧 예약창구", desc: "검색 마켓플레이스가 아니라, 상담사가 자신의 시청자를 그대로 데려오는 구조예요." },
+  { icon: Heart, color: "text-pink-500", bg: "bg-pink-50", title: "단골 중심 구조", desc: "내가 PICK한 상담사와 깊게 연결돼요. 상담사는 팬을 고객으로 만들 수 있어요." },
   { icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-50", title: "안심 거래·정산", desc: "통신판매중개 보호와 투명한 정산으로 안전하게." },
-  { icon: Gift, color: "text-brand-600", bg: "bg-brand-50", title: "소싱 없이 상담사 시작", desc: "브랜드 상담상품을 골라 담기만 하면 누구나 상담사가 될 수 있어요." },
+  { icon: Gift, color: "text-brand-600", bg: "bg-brand-50", title: "5분이면 시작", desc: "상담 상품과 가능한 시간만 등록하면 오늘 방송부터 예약을 받아요." },
 ];
 
 // 라이브 상담 진행 방법 (고객 / 상담사)
-const BUYER_STEPS = ["좋아하는 상담사를 PICK해요", "방송 시작 알림을 받아요", "라이브에 입장해 소통해요", "마음에 들면 바로 구매해요"];
-const SELLER_STEPS = ["판매할 브랜드 상담상품을 골라요", "라이브 방송을 예약·시작해요", "실시간으로 상담상품을 소개해요", "예약·정산은 플랫폼이 처리해요"];
+const BUYER_STEPS = ["좋아하는 상담사를 PICK해요", "방송 시작 알림을 받아요", "라이브에 입장해 소통해요", "원하는 시간에 바로 예약·결제해요"];
+const SELLER_STEPS = ["상담 상품과 가능한 시간을 등록해요", "평소처럼 라이브 방송을 켜요", "예약 URL·QR을 설명란에 걸어둬요", "방송이 끝나면 예약이 쌓여 있어요"];
 
 // 상담 카테고리 (라인형 아이콘)
 const CATEGORIES = [
@@ -45,11 +45,69 @@ const CATEGORIES = [
   { icon: HeartHandshake, name: "연애운" }, { icon: Calendar, name: "택일" },
 ];
 
-// 이용 안내 3단계
+// 이용 안내 3단계 (고객 관점)
 const HOW_IT_WORKS = [
   { icon: Search, title: "상담사 검색", desc: "사주·신점·타로 등 원하는 분야의 상담사를 이름·카테고리로 찾아보세요." },
   { icon: Video, title: "라이브 시청", desc: "유튜브 라이브로 진행 중인 상담을 먼저 보고 분위기를 확인하세요." },
   { icon: Calendar, title: "예약·결제", desc: "원하는 상담상품을 고르고 바로 예약·결제하면 상담이 확정돼요." },
+];
+
+// 상담사 관점 서비스 흐름 3스텝 — "방송하는 동안 예약이 알아서 들어옵니다"의 실제 동작
+const CONSULTANT_FLOW = [
+  {
+    emoji: "🔮",
+    icon: ClipboardList,
+    title: "상담 상품 등록",
+    desc: "신점·사주·타로 상품과 가격, 상담 시간을 등록하세요.",
+  },
+  {
+    emoji: "📺",
+    icon: MonitorPlay,
+    title: "라이브 방송",
+    desc: "평소처럼 방송하세요. 예약 URL·QR을 설명란에 넣어두면 끝.",
+  },
+  {
+    emoji: "📋",
+    icon: ClipboardList,
+    title: "방송 후 확인",
+    desc: "방송을 마치면 예약이 쌓여 있습니다. 확정하고 상담하세요.",
+  },
+];
+
+// 핵심 기능 4가지
+const CORE_FEATURES = [
+  {
+    emoji: "⏰",
+    icon: Clock,
+    title: "실시간 예약",
+    desc: "방송 중 시청자가 바로 예약+결제. 남은 자리가 줄어드는 FOMO 효과.",
+  },
+  {
+    emoji: "💳",
+    icon: CreditCard,
+    title: "자동 결제",
+    desc: "예약과 동시에 결제 완료. 노쇼·입금확인·일정조율 없음.",
+  },
+  {
+    emoji: "📡",
+    icon: Radio,
+    title: "라이브 위젯",
+    desc: "프리즘·OBS 방송 화면에 남은 예약 자리를 실시간으로 표시.",
+  },
+  {
+    emoji: "👥",
+    icon: Users,
+    title: "고객 CRM",
+    desc: "상담 이력·재방문 관리로 단골 고객을 만드세요.",
+  },
+];
+
+// 상담사에게 생기는 변화 (Before → After)
+const BEFORE_AFTER = [
+  { before: "카톡 예약 문의", after: "자동 예약 접수" },
+  { before: "입금 확인", after: "결제 완료 즉시 확정" },
+  { before: "노쇼", after: "결제 완료 = 예약 확정" },
+  { before: "장부 정리", after: "정산 자동화" },
 ];
 
 // 메인 페이지 = "사주메이트 브랜드 소개 + 상담사 진입(이름검색/PICK) + 상담사 신청 유도" 화면.
@@ -206,8 +264,14 @@ export default async function HomePage({
     redirect(ROLE_DASHBOARD[role]);
   }
 
-  const { liveCommerce: FEATURE_LIVE } = await getFeatureFlags();
+  const { liveCommerce: FEATURE_LIVE, seller: FEATURE_SELLER } = await getFeatureFlags();
   const { liveSellers, isBuyer } = await getHomeData(FEATURE_LIVE);
+
+  // '상담사 탐색' 기능이 꺼져 있으면 /sellers 는 404다.
+  // 이때는 페이지 안의 상담사 이름 검색(#find-seller)으로 대신 보낸다.
+  const findSellerHref = FEATURE_SELLER ? "/sellers" : "#find-seller";
+  const categoryHref = (name: string) =>
+    FEATURE_SELLER ? `/sellers?category=${encodeURIComponent(name)}` : "#find-seller";
 
   // 관리자 "사이트 관리 > 메인페이지 관리"에서 수정 가능한 숫자/성공스토리/혜택
   const [homeStats, homeStories, homeBenefits] = await Promise.all([getHomeStats(), getHomeStories(), getHomeBenefits()]);
@@ -231,45 +295,170 @@ export default async function HomePage({
 
   return (
     <div className="bg-white min-h-screen">
-      {/* ───── 히어로: 사주메이트 소개 ───── */}
+      {/* ───── 히어로: 방송하는 동안 예약이 알아서 들어옵니다 ───── */}
       <section
-        className="relative overflow-hidden px-5 pt-10 pb-9 text-white"
-        style={{ background: "linear-gradient(160deg, #1a0a2e 0%, #2d1b69 100%)" }}
+        className="relative overflow-hidden px-5 pt-9 pb-11 text-white"
+        style={{ background: "linear-gradient(160deg, #0d0720 0%, #1a0a2e 45%, #2d1b69 100%)" }}
       >
-        {/* 별빛 장식 */}
-        <Sparkles size={92} strokeWidth={0.9} className="absolute -top-4 -right-3 text-white/10 pointer-events-none" aria-hidden="true" />
-        <Moon size={64} strokeWidth={0.9} className="absolute bottom-2 left-[-10px] text-white/10 pointer-events-none" aria-hidden="true" />
+        {/* 별 파티클 */}
+        <StarField />
+
+        {/* 신비로운 오라(빛무리) */}
+        <div className="pointer-events-none absolute -top-16 -right-16 w-56 h-56 rounded-full bg-purple-500/25 blur-3xl animate-aura" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-20 -left-16 w-52 h-52 rounded-full bg-indigo-400/20 blur-3xl animate-aura" style={{ animationDelay: "2s" }} aria-hidden="true" />
+
+        {/* 달·별빛 라인 장식 */}
+        <Moon size={112} strokeWidth={0.7} className="absolute top-6 -right-6 text-white/10 pointer-events-none animate-float-slow" aria-hidden="true" />
+        <Sparkles size={56} strokeWidth={0.9} className="absolute bottom-8 -left-4 text-white/10 pointer-events-none animate-float-slow" style={{ animationDelay: "3s" }} aria-hidden="true" />
 
         <div className="relative">
-          <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold tracking-wide text-purple-200">
-            <Star size={11} strokeWidth={1.8} /> LIVE 점사 예약
+          {/* 로고 + 태그라인 */}
+          <div className="flex items-center gap-2">
+            <span className="w-9 h-9 rounded-2xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center">
+              <Moon size={18} strokeWidth={1.6} className="text-purple-200" />
+            </span>
+            <div className="leading-none">
+              <p className="text-[17px] font-extrabold tracking-tight">사주메이트</p>
+              <p className="mt-1 text-[10px] text-purple-200/70">라이브 점사 예약 커머스</p>
+            </div>
+          </div>
+
+          <span className="mt-6 inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold tracking-wide text-purple-200 ring-1 ring-white/15">
+            <Star size={11} strokeWidth={1.8} /> 유튜브 · 프리즘 라이브 연동
           </span>
-          <h1 className="mt-3 text-[30px] font-extrabold leading-tight tracking-tight">사주메이트</h1>
-          <p className="mt-2.5 text-[13px] leading-relaxed text-purple-100/85">
-            유튜브 라이브 방송 중인 사주·신점·타로 상담사를
-            <br />즉시 예약하세요
+
+          {/* 메인 카피 */}
+          <h1 className="mt-3.5 text-[29px] font-extrabold leading-[1.25] tracking-tight">
+            방송하는 동안
+            <br />
+            <span className="bg-gradient-to-r from-purple-200 via-white to-indigo-200 bg-clip-text text-transparent">
+              예약이 알아서 들어옵니다
+            </span>
+          </h1>
+
+          {/* 서브 카피 */}
+          <p className="mt-3 text-[13px] leading-relaxed text-purple-100/80">
+            유튜브·SNS에서 활동하는 사주·신점·타로 상담사를 위한
+            <br />예약 커머스 플랫폼
           </p>
 
-          <div className="mt-5 flex gap-2">
+          {/* CTA 2개 */}
+          <div className="mt-6 flex gap-2">
             <Link
-              href="#find-seller"
-              className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2.5 text-[13px] font-bold text-[#2d1b69] active:scale-[0.97] transition-transform"
+              href={findSellerHref}
+              className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-3 text-[13px] font-extrabold text-[#2d1b69] shadow-lg shadow-black/20 active:scale-[0.97] transition-transform"
             >
-              <Search size={15} strokeWidth={1.8} /> 상담사 찾기
+              <Calendar size={15} strokeWidth={2} /> 상담 예약하기
             </Link>
             <Link
-              href="/live"
-              className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-4 py-2.5 text-[13px] font-bold text-white ring-1 ring-white/25 active:scale-[0.97] transition-transform"
+              href="/auth/login"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-3 text-[13px] font-extrabold text-white ring-1 ring-white/25 backdrop-blur-sm active:scale-[0.97] transition-transform"
             >
-              <Video size={15} strokeWidth={1.8} /> 라이브 상담 보기
+              <Radio size={15} strokeWidth={2} /> 상담사로 시작하기
             </Link>
+          </div>
+
+          {/* 라이브커머스 비유 한 줄 */}
+          <p className="mt-5 flex items-start gap-1.5 text-[11.5px] leading-relaxed text-purple-200/60">
+            <Sparkles size={13} strokeWidth={1.8} className="mt-0.5 flex-shrink-0" />
+            라이브커머스에서 방송을 마치고 주문을 확인하듯, 방송이 끝나면 예약이 쌓여 있습니다.
+          </p>
+        </div>
+      </section>
+
+      {/* ───── 이렇게 작동합니다 (상담사 3스텝) ───── */}
+      <section className="px-5 pt-8">
+        <span className="inline-flex items-center gap-1 rounded-full bg-[#f3f0fb] px-2.5 py-1 text-[10px] font-bold text-[#4c2f8f]">
+          FOR 상담사
+        </span>
+        <h2 className="mt-2 text-[19px] font-extrabold leading-snug text-gray-900">이렇게 작동합니다</h2>
+        <p className="mt-1 text-[12px] text-gray-500">등록 → 방송 → 확인, 이 세 단계가 전부예요</p>
+
+        <div className="mt-4 space-y-2.5">
+          {CONSULTANT_FLOW.map((s, i) => {
+            const StepIcon = s.icon;
+            const isLast = i === CONSULTANT_FLOW.length - 1;
+            return (
+              <div key={s.title} className="relative">
+                <div className="flex items-start gap-3 rounded-2xl border border-gray-100 bg-white p-4">
+                  <span className="relative w-11 h-11 rounded-2xl bg-gradient-to-br from-[#2d1b69] to-[#6d4aff] flex items-center justify-center flex-shrink-0 text-[18px]">
+                    <span aria-hidden="true">{s.emoji}</span>
+                    <span className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-white ring-1 ring-gray-100 text-[10px] font-extrabold text-[#2d1b69] flex items-center justify-center">
+                      {i + 1}
+                    </span>
+                  </span>
+                  <div className="min-w-0 flex-1 pt-0.5">
+                    <p className="flex items-center gap-1.5 text-[14px] font-bold text-gray-900">
+                      <StepIcon size={15} strokeWidth={1.7} className="text-[#6d4aff] flex-shrink-0" />
+                      {s.title}
+                    </p>
+                    <p className="mt-1 text-[11.5px] leading-relaxed text-gray-500">{s.desc}</p>
+                  </div>
+                </div>
+                {/* 스텝 연결선 */}
+                {!isLast && <div className="mx-auto my-0.5 h-2.5 w-px bg-gray-200" aria-hidden="true" />}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ───── 핵심 기능 4카드 ───── */}
+      <section className="px-5 pt-8">
+        <h2 className="text-[19px] font-extrabold text-gray-900">방송을 예약으로 바꾸는 기능</h2>
+        <p className="mt-1 text-[12px] text-gray-500">시청자를 고객으로 만드는 4가지</p>
+        <div className="mt-4 grid grid-cols-2 gap-2.5">
+          {CORE_FEATURES.map((f) => {
+            const FeatureIcon = f.icon;
+            return (
+              <div key={f.title} className="rounded-2xl border border-gray-100 bg-white p-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-9 h-9 rounded-xl bg-[#f3f0fb] flex items-center justify-center">
+                    <FeatureIcon size={17} strokeWidth={1.6} className="text-[#2d1b69]" />
+                  </span>
+                  <span className="text-[15px]" aria-hidden="true">{f.emoji}</span>
+                </div>
+                <p className="mt-2.5 text-[13px] font-bold text-gray-900">{f.title}</p>
+                <p className="mt-0.5 text-[11px] leading-relaxed text-gray-500">{f.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ───── 상담사에게 이런 변화가 생깁니다 (Before → After) ───── */}
+      <section className="px-4 pt-8">
+        <div
+          className="relative overflow-hidden rounded-3xl px-5 py-6 text-white"
+          style={{ background: "linear-gradient(150deg, #12082b 0%, #221046 55%, #33206f 100%)" }}
+        >
+          <div className="pointer-events-none absolute -top-14 -right-10 w-40 h-40 rounded-full bg-purple-500/25 blur-3xl animate-aura" aria-hidden="true" />
+          <div className="relative">
+            <h2 className="text-[18px] font-extrabold leading-snug">상담사에게 이런 변화가 생깁니다</h2>
+            <p className="mt-1 text-[11.5px] text-purple-200/70">예약을 받는 방식이 바뀌면, 방송에만 집중할 수 있어요</p>
+
+            <div className="mt-4 space-y-2">
+              {BEFORE_AFTER.map((row) => (
+                <div key={row.before} className="flex items-center gap-2 rounded-2xl bg-white/[0.07] ring-1 ring-white/10 px-3 py-3">
+                  <span className="flex flex-1 items-center gap-1.5 min-w-0">
+                    <X size={13} strokeWidth={2.4} className="text-rose-300 flex-shrink-0" />
+                    <span className="truncate text-[12px] text-purple-100/55 line-through">{row.before}</span>
+                  </span>
+                  <ArrowRight size={13} strokeWidth={2} className="text-purple-300/50 flex-shrink-0" aria-hidden="true" />
+                  <span className="flex flex-1 items-center gap-1.5 min-w-0 justify-end">
+                    <Check size={13} strokeWidth={2.6} className="text-emerald-300 flex-shrink-0" />
+                    <span className="truncate text-[12px] font-bold text-white">{row.after}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* ───── 상담 카테고리 ───── */}
-      <section className="px-5 pt-7">
-        <h2 className="text-[17px] font-extrabold text-gray-900">어떤 상담이 필요하세요?</h2>
+      <section className="px-5 pt-8">
+        <h2 className="text-[19px] font-extrabold text-gray-900">어떤 상담이 필요하세요?</h2>
         <p className="mt-1 text-[12px] text-gray-500">분야별로 상담사를 찾아보세요</p>
         <div className="mt-4 grid grid-cols-4 gap-2.5">
           {CATEGORIES.map((c) => {
@@ -277,7 +466,7 @@ export default async function HomePage({
             return (
               <Link
                 key={c.name}
-                href={`/sellers?category=${encodeURIComponent(c.name)}`}
+                href={categoryHref(c.name)}
                 className="rounded-2xl border border-gray-100 bg-white py-3.5 flex flex-col items-center gap-1.5 active:scale-[0.98] transition-transform"
               >
                 <span className="w-9 h-9 rounded-full bg-[#f3f0fb] flex items-center justify-center">
@@ -290,9 +479,9 @@ export default async function HomePage({
         </div>
       </section>
 
-      {/* ───── 이용 안내 ───── */}
+      {/* ───── 이용 안내 (고객 관점) ───── */}
       <section className="px-5 pt-8">
-        <h2 className="text-[17px] font-extrabold text-gray-900">이렇게 이용해요</h2>
+        <h2 className="text-[17px] font-extrabold text-gray-900">고객은 이렇게 이용해요</h2>
         <div className="mt-4 space-y-2.5">
           {HOW_IT_WORKS.map((s, i) => {
             const StepIcon = s.icon;
@@ -445,8 +634,9 @@ export default async function HomePage({
       <section className="px-5 pt-8 pb-2">
         <h2 className="text-[17px] font-extrabold text-gray-900">사주메이트는요</h2>
         <p className="mt-1.5 text-[13px] text-gray-500 leading-relaxed">
-          브랜드의 좋은 상담상품을, 신뢰하는 상담사(인플루언서)의 목소리로 만나는 곳.
-          정해진 상담사를 통해서만 쇼핑하는, 단골 중심의 새로운 상담 플랫폼이에요.
+          유튜브·SNS에서 활동하는 사주·신점·타로 상담사가 자신의 시청자에게
+          바로 예약을 받을 수 있게 해주는 예약 커머스 플랫폼이에요.
+          검색해서 찾는 마켓이 아니라, 상담사의 방송이 그대로 예약 창구가 됩니다.
         </p>
         <div className="mt-4 grid grid-cols-3 gap-2.5">
           <IntroStat icon={<Icon name="Users" size={18} className="text-brand-600" />} value="단골 PICK" label="나만의 상담사" />
@@ -527,10 +717,10 @@ export default async function HomePage({
           <div className="rounded-2xl border border-gray-100 bg-white p-4">
             <div className="flex items-center gap-2 mb-2.5">
               <div className="w-9 h-9 rounded-xl bg-pink-50 flex items-center justify-center"><Icon name="Cart" size={17} className="text-pink-500" /></div>
-              <p className="text-[14px] font-bold text-gray-900">이렇게 쇼핑하고 싶다면</p>
+              <p className="text-[14px] font-bold text-gray-900">이렇게 상담받고 싶다면</p>
             </div>
             <ul className="space-y-1.5">
-              {["믿을 수 있는 상담사에게만 사고 싶어요", "라이브로 실물 보고 바로 사고 싶어요", "단골 상담사의 큐레이션을 받고 싶어요"].map((t) => (
+              {["믿을 수 있는 상담사에게만 상담받고 싶어요", "방송을 먼저 보고 분위기를 확인하고 싶어요", "전화·카톡 문의 없이 바로 예약하고 싶어요"].map((t) => (
                 <li key={t} className="flex items-start gap-1.5 text-[12.5px] text-gray-600"><Icon name="Check" size={14} className="text-brand-500 mt-0.5 flex-shrink-0" /> {t}</li>
               ))}
             </ul>
@@ -538,10 +728,10 @@ export default async function HomePage({
           <div className="rounded-2xl border border-brand-100 bg-brand-50/50 p-4">
             <div className="flex items-center gap-2 mb-2.5">
               <div className="w-9 h-9 rounded-xl bg-brand-100 flex items-center justify-center"><Icon name="Store" size={17} className="text-brand-600" /></div>
-              <p className="text-[14px] font-bold text-gray-900">이렇게 판매하고 싶다면</p>
+              <p className="text-[14px] font-bold text-gray-900">이렇게 상담하고 싶다면</p>
             </div>
             <ul className="space-y-1.5">
-              {["내 팬·팔로워로 수익을 만들고 싶어요", "상담상품 소싱·재고 부담 없이 시작하고 싶어요", "라이브와 콘텐츠로 판매하고 싶어요"].map((t) => (
+              {["방송 중에 예약을 자동으로 받고 싶어요", "카톡 문의·입금 확인에서 벗어나고 싶어요", "내 시청자를 단골 고객으로 만들고 싶어요"].map((t) => (
                 <li key={t} className="flex items-start gap-1.5 text-[12.5px] text-gray-700"><Icon name="Check" size={14} className="text-brand-600 mt-0.5 flex-shrink-0" /> {t}</li>
               ))}
             </ul>
@@ -582,7 +772,7 @@ export default async function HomePage({
           <div className="rounded-2xl border border-gray-100 bg-white p-4">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center"><Icon name="Wishlist" size={16} className="text-pink-500" /></div>
-              <p className="text-[14px] font-bold text-gray-900">고객라면</p>
+              <p className="text-[14px] font-bold text-gray-900">고객이라면</p>
             </div>
             <ol className="space-y-2">
               {BUYER_STEPS.map((t, i) => (
@@ -618,8 +808,8 @@ export default async function HomePage({
               <Icon name="CreditCard" size={18} strokeWidth={1.8} className="text-black" />
             </span>
             <div>
-              <h2 className="text-[16px] font-extrabold text-gray-900">결제는 1초, 판매는 막힘없이</h2>
-              <p className="text-[11px] text-gray-500 mt-0.5">통장 대조·수기 확인 없이 결제가 자동으로 끝나요</p>
+              <h2 className="text-[16px] font-extrabold text-gray-900">결제는 1초, 예약은 막힘없이</h2>
+              <p className="text-[11px] text-gray-500 mt-0.5">통장 대조·입금 확인 없이 결제가 자동으로 끝나요</p>
             </div>
           </div>
           <div className="mt-4 space-y-2">
@@ -671,9 +861,9 @@ export default async function HomePage({
       <section className="px-5 pt-8 pb-2">
         <h2 className="text-[15px] font-extrabold text-gray-900">이렇게 즐겨요</h2>
         <div className="mt-4 space-y-2.5">
-          <StoryStep no={1} icon={<Icon name="Search" size={16} className="text-brand-600" />} title="상담사를 찾아요" desc="상담사 이름으로 검색해 마음에 드는 상담사를 만나요." />
-          <StoryStep no={2} icon={<Icon name="Wishlist" size={16} className="text-pink-500" />} title="상담사를 PICK해요" desc="PICK하면 단골가게가 되고, 새 소식과 라이브를 놓치지 않아요." />
-          <StoryStep no={3} icon={<Icon name="Live" size={16} className="text-rose-500" />} title="점집·라이브를 즐겨요" desc="상담사별 전용 점집과 라이브에서 상담사의 취향을 그대로 만나요." />
+          <StoryStep no={1} icon={<Icon name="Search" size={16} className="text-brand-600" />} title="상담사를 찾아요" desc="상담사 이름·분야로 검색해 마음에 드는 상담사를 만나요." />
+          <StoryStep no={2} icon={<Icon name="Wishlist" size={16} className="text-pink-500" />} title="상담사를 PICK해요" desc="PICK하면 방송 시작 알림을 받고 예약 소식을 놓치지 않아요." />
+          <StoryStep no={3} icon={<Icon name="Live" size={16} className="text-rose-500" />} title="방송 보고 바로 예약해요" desc="라이브를 보다가 원하는 시간을 골라 그 자리에서 예약·결제해요." />
         </div>
       </section>
 
@@ -691,16 +881,16 @@ export default async function HomePage({
               <span className="text-[10px] font-bold">상담사 모집</span>
             </div>
             <h3 className="text-[18px] font-extrabold leading-snug">
-              내 팬과 함께
-              <br />나만의 점집을 열어보세요
+              방송은 그대로,
+              <br />예약만 자동으로
             </h3>
             <p className="mt-1.5 text-[12px] text-white/85 leading-relaxed">
-              상담상품 소싱 걱정 없이, 브랜드 상담상품을 골라 판매하고 커미션을 받아요.
+              상담 상품과 가능한 시간만 등록하면 오늘 방송부터 예약을 받을 수 있어요.
             </p>
             <div className="mt-3 flex items-center gap-3 text-[11px] text-white/90">
-              <span className="flex items-center gap-1"><Icon name="Chart" size={12} /> 판매 커미션</span>
-              <span className="flex items-center gap-1"><Icon name="Gift" size={12} /> 추천 수익</span>
-              <span className="flex items-center gap-1"><Icon name="Live" size={12} /> 라이브 판매</span>
+              <span className="flex items-center gap-1"><Icon name="Clock" size={12} /> 실시간 예약</span>
+              <span className="flex items-center gap-1"><Icon name="CreditCard" size={12} /> 자동 결제</span>
+              <span className="flex items-center gap-1"><Icon name="Chart" size={12} /> 정산 자동화</span>
             </div>
             <span className="mt-4 inline-flex items-center gap-1 rounded-full bg-white text-brand-700 text-[13px] font-bold px-4 py-2">
               상담사로 신청하기 <Icon name="ChevronDown" size={15} className="-rotate-90" />
@@ -762,8 +952,49 @@ export default async function HomePage({
         </section>
       )}
 
-      {/* ───── 최종 CTA: 지금 바로 시작하세요 (탭: 회원가입 / 상담사로 시작하기) ───── */}
-      <HomeStartTabs />
+      {/* ───── 최종 CTA: 지금 바로 시작하세요 ───── */}
+      <section className="px-4 pt-2 pb-9">
+        <div
+          className="relative overflow-hidden rounded-3xl px-6 pt-9 pb-8 text-center text-white"
+          style={{ background: "linear-gradient(160deg, #0d0720 0%, #1a0a2e 45%, #2d1b69 100%)" }}
+        >
+          <StarField />
+          <div className="pointer-events-none absolute -top-16 -left-14 w-48 h-48 rounded-full bg-purple-500/25 blur-3xl animate-aura" aria-hidden="true" />
+          <div className="pointer-events-none absolute -bottom-16 -right-14 w-48 h-48 rounded-full bg-indigo-400/20 blur-3xl animate-aura" style={{ animationDelay: "2.5s" }} aria-hidden="true" />
+
+          <div className="relative">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold tracking-wide text-purple-200 ring-1 ring-white/15">
+              <Sparkles size={12} strokeWidth={1.8} /> START NOW
+            </span>
+            <h2 className="mt-4 text-[24px] font-extrabold leading-tight">지금 바로 시작하세요</h2>
+            <p className="mt-3 text-[12.5px] leading-relaxed text-purple-100/75">
+              오늘 방송부터 예약을 받을 수 있어요.
+              <br />상품 등록에 5분이면 충분합니다.
+            </p>
+
+            <Link
+              href="/become-seller"
+              className="mt-6 flex items-center justify-center gap-1.5 w-full rounded-2xl bg-white py-3.5 text-[14px] font-extrabold text-[#2d1b69] shadow-lg shadow-black/20 active:scale-[0.98] transition-transform"
+            >
+              상담사 등록하기 <ArrowRight size={16} strokeWidth={2.4} />
+            </Link>
+
+            <Link
+              href="/auth/register"
+              className="mt-2.5 flex items-center justify-center gap-1.5 w-full rounded-2xl bg-white/10 py-3.5 text-[13px] font-bold text-white ring-1 ring-white/20 active:scale-[0.98] transition-transform"
+            >
+              고객으로 회원가입
+            </Link>
+
+            <p className="mt-4 text-[12px] text-purple-200/60">
+              이미 계정이 있으신가요?{" "}
+              <Link href="/auth/login" className="inline-flex items-center gap-1 font-bold text-white underline underline-offset-2">
+                <LogIn size={12} strokeWidth={2.2} /> 로그인
+              </Link>
+            </p>
+          </div>
+        </div>
+      </section>
 
       <div className="h-4" />
     </div>

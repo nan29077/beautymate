@@ -36,6 +36,8 @@ interface Seller {
   isNew?: boolean;
   isLive?: boolean;
   liveInfo?: { shareCode: string; title: string; viewerCount: number } | null;
+  /** 노출 상담상품 중 최저가 (상담상품이 없으면 null) */
+  startPrice?: number | null;
 }
 
 function formatFanCount(n: number): string {
@@ -44,15 +46,25 @@ function formatFanCount(n: number): string {
   return n.toLocaleString();
 }
 
-export default function SellerSearchClient({ sellers }: { sellers: Seller[] }) {
+export default function SellerSearchClient({
+  sellers,
+  baseCategories,
+}: {
+  sellers: Seller[];
+  /** 등록 상담사가 없어도 항상 노출할 기본 분야 칩 (사주·신점·타로 등) */
+  baseCategories?: string[];
+}) {
   const [viewMode, setViewMode] = useState<"ranking" | "grid">("ranking");
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
   const categories = useMemo(() => {
-    const cats = new Set(sellers.map((s) => s.category).filter(Boolean) as string[]);
-    return Array.from(cats).sort();
-  }, [sellers]);
+    const fromSellers = sellers.map((s) => s.category).filter(Boolean) as string[];
+    // 기본 분야를 먼저(정해진 순서대로) 두고, 그 외 상담사가 실제로 쓰는 분야를 뒤에 붙인다.
+    const base = baseCategories ?? [];
+    const extra = Array.from(new Set(fromSellers.filter((c) => !base.includes(c)))).sort();
+    return [...base, ...extra];
+  }, [sellers, baseCategories]);
 
   const filteredSellers = useMemo(() => {
     return sellers.filter((s) => {
@@ -212,6 +224,14 @@ function SellerRankingCard({ seller, rank }: { seller: Seller; rank: number }) {
               </span>
             ))}
           </div>
+          {/* 시작 가격 */}
+          {typeof seller.startPrice === "number" && (
+            <p className="mt-1 text-[11px] text-gray-500">
+              <span className="text-gray-400">상담 </span>
+              <span className="font-bold text-gray-900">{seller.startPrice.toLocaleString()}원</span>
+              <span className="text-gray-400"> 부터</span>
+            </p>
+          )}
         </div>
 
         {/* 하트 + 팬 수 */}
@@ -352,9 +372,13 @@ function SellerGridCard({ seller }: { seller: Seller }) {
             <Icon name="Wishlist" size={10} strokeWidth={2} className="text-gray-300" />
             {formatFanCount(seller.totalFans)}
           </span>
-          {seller._count.shopProducts > 0 && (
+          {typeof seller.startPrice === "number" ? (
+            <span className="text-[10px] text-gray-500">
+              <span className="font-bold text-gray-900">{seller.startPrice.toLocaleString()}원</span> 부터
+            </span>
+          ) : seller._count.shopProducts > 0 ? (
             <span className="text-[10px] text-gray-400">상담상품 {seller._count.shopProducts}</span>
-          )}
+          ) : null}
         </div>
       </div>
     </Link>

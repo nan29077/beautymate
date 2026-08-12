@@ -8,10 +8,12 @@ import { useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 ;
 import { useShopChrome } from "@/components/shared/ShopChromeProvider";
+import { useFeatureFlags } from "@/components/shared/FeatureFlagsProvider";
 import NotificationBell from "@/components/shared/NotificationBell";
 
 export default function Header() {
   const { data: session, status } = useSession();
+  const flags = useFeatureFlags();
   const router = useRouter();
   const pathname = usePathname() ?? "";
   const searchParams = useSearchParams();
@@ -46,6 +48,19 @@ export default function Header() {
           </Link>
 
           <div className="flex items-center gap-0.5 relative z-[70]" style={{ pointerEvents: "auto" }}>
+            {/* 상담사 찾기 — 예약 커머스의 핵심 진입점.
+                '상담사 탐색' 기능이 꺼져 있으면 /sellers 가 404이므로 버튼도 숨긴다. */}
+            {flags.seller && (
+              <Link
+                href="/sellers"
+                prefetch={true}
+                aria-label="상담사 찾기"
+                title="상담사 찾기"
+                className="inline-flex items-center justify-center h-10 px-2 text-gray-900 hover:opacity-60 transition-opacity"
+              >
+                <Icon name="Search" size={22} strokeWidth={1.5} />
+              </Link>
+            )}
             {showCart && (
               <Link
                 href="/cart"

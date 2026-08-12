@@ -73,11 +73,29 @@ module.exports = {
           "50%": { transform: "scale(1.1)" },
           "100%": { transform: "scale(1)" },
         },
+        // 히어로 별빛 반짝임
+        twinkle: {
+          "0%, 100%": { opacity: "0.15", transform: "scale(0.8)" },
+          "50%": { opacity: "0.9", transform: "scale(1.15)" },
+        },
+        // 달·수정구슬 등 큰 장식의 느린 부유
+        "float-slow": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        // 신비로운 오라(빛무리) 호흡
+        aura: {
+          "0%, 100%": { opacity: "0.35", transform: "scale(1)" },
+          "50%": { opacity: "0.6", transform: "scale(1.08)" },
+        },
       },
       animation: {
         "slide-up": "slide-up 0.5s ease-out",
         "fade-in": "fade-in 0.6s ease-out",
         "count-down": "count-down 1s ease-in-out infinite",
+        twinkle: "twinkle 3s ease-in-out infinite",
+        "float-slow": "float-slow 6s ease-in-out infinite",
+        aura: "aura 5s ease-in-out infinite",
       },
     },
   },
