@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import AdminReservationsClient from "@/components/admin/AdminReservationsClient";
+import { safeQuery } from "@/lib/safeDb";
 
 export const dynamic = "force-dynamic";
 
@@ -26,24 +27,25 @@ export default async function AdminReservationsPage({
   }
 
   const [reservations, sellers] = await Promise.all([
-    prisma.reservation.findMany({
-      where,
-      include: {
-        user: { select: { id: true, name: true, email: true } },
-        seller: {
-          select: {
-            id: true,
-            shopName: true,
-            slug: true,
-            user: { select: { name: true } },
+    safeQuery("admin reservations list", () =>
+      prisma.reservation.findMany({
+        where,
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+          seller: {
+            select: {
+              id: true,
+              shopName: true,
+              slug: true,
+              user: { select: { name: true } },
+            },
           },
+          items: true,
+          timeSlot: { select: { startTime: true, endTime: true } },
         },
-        items: true,
-        timeSlot: { select: { startTime: true, endTime: true } },
-      },
-      orderBy: { reservationDate: "desc" },
-      take: 300,
-    }),
+        orderBy: { reservationDate: "desc" },
+        take: 300,
+      }), []),
     prisma.sellerProfile.findMany({
       select: { id: true, shopName: true },
       orderBy: { shopName: "asc" },

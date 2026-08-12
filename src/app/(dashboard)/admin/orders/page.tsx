@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { cleanupStalePendingOrders, VISIBLE_ORDER_FILTER } from "@/lib/orderCleanup";
 import { parseSnsAccounts } from "@/lib/utils";
 import { buildOrderFeeInfoMap } from "@/lib/orderFee";
+import { safeQuery } from "@/lib/safeDb";
 import OrderManagementClient from "@/components/shared/OrderManagementClient";
 
 export const dynamic = "force-dynamic";
@@ -15,22 +16,23 @@ export default async function AdminOrdersPage() {
   // 방치된 미결제 예약 정리 (이탈 PENDING 이 목록·DB 에 남지 않도록)
   await cleanupStalePendingOrders().catch(() => {});
 
-  const orders = await prisma.reservation.findMany({
-    // 미결제 PENDING + 결제 전 이탈한 CANCELLED(pgTid 없음) 제외
-    where: { ...VISIBLE_ORDER_FILTER },
-    include: {
-      user: { select: { name: true, email: true } },
-      seller: { select: { id: true, shopName: true } },
-      items: {
-        include: {
-          variant: { select: { name: true } },
+  const orders = await safeQuery("admin orders list", () =>
+    prisma.reservation.findMany({
+      // 미결제 PENDING + 결제 전 이탈한 CANCELLED(pgTid 없음) 제외
+      where: { ...VISIBLE_ORDER_FILTER },
+      include: {
+        user: { select: { name: true, email: true } },
+        seller: { select: { id: true, shopName: true } },
+        items: {
+          include: {
+            variant: { select: { name: true } },
+          },
         },
+        campaign: { select: { title: true } },
       },
-      campaign: { select: { title: true } },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 200,
-  });
+      orderBy: { createdAt: "desc" },
+      take: 200,
+    }), []);
 
   // Get product → brand mapping
   const productIds = [...new Set(orders.flatMap(o => o.items.map(i => i.productId)))];

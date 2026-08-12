@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { safeQuery, isMissingSchemaError } from "@/lib/safeDb";
 import { generateOrderNumber } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -43,7 +44,7 @@ export async function GET(request: Request) {
     };
   }
 
-  const [reservations, total] = await Promise.all([
+  const [reservations, total] = await safeQuery("reservations list", () => Promise.all([
     prisma.reservation.findMany({
       where,
       include: {
@@ -59,7 +60,7 @@ export async function GET(request: Request) {
       take: limit,
     }),
     prisma.reservation.count({ where }),
-  ]);
+  ]), [[], 0]);
 
   return NextResponse.json({
     reservations: reservations.map((r) => ({
@@ -174,6 +175,12 @@ export async function POST(request: Request) {
     const msg = err instanceof Error ? err.message : "예약 생성에 실패했습니다.";
     if (msg === "SLOT_TAKEN") {
       return NextResponse.json({ error: "이미 예약된 시간입니다. 다른 시간을 선택해 주세요." }, { status: 409 });
+    }
+    if (isMissingSchemaError(err)) {
+      return NextResponse.json(
+        { error: "예약 저장소가 아직 준비되지 않았습니다. 관리자에게 문의해 주세요." },
+        { status: 503 },
+      );
     }
     return NextResponse.json({ error: msg }, { status: 500 });
   }

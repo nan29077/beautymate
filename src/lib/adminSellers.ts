@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getSettlementBusinessDays } from "@/lib/settings";
 import { getSettlementDate, startOfDay } from "@/lib/businessDays";
+import { safeQuery } from "@/lib/safeDb";
 
 /**
  * 관리자 화면(/admin/sellers, /admin/users 상담사 탭)에서 공용으로 쓰는 상담사 목록.
@@ -21,29 +22,39 @@ export async function getAdminSellers() {
           mentor: { select: { id: true, name: true } },
         },
       },
-      _count: { select: { campaigns: true, shopProducts: true, fans: true, orders: true, followers: true } },
+      // orders(Reservation) 는 운영 DB 미반영 가능성이 있어 _count 에서 제외하고 별도 집계
+      _count: { select: { campaigns: true, shopProducts: true, fans: true, followers: true } },
     },
     orderBy: { createdAt: "desc" },
   });
+
+  // 상담사별 예약 건수 (reservations 테이블 미반영 시 0)
+  const reservationCounts = await safeQuery(
+    "adminSellers reservation counts",
+    () => prisma.reservation.groupBy({ by: ["sellerId"], _count: { _all: true } }),
+    [] as { sellerId: string; _count: { _all: number } }[],
+  );
+  const ordersCountMap = new Map(reservationCounts.map((r) => [r.sellerId, r._count._all]));
 
   // ── 정산 요약 계산 (예약 기반) ───────────────────────────────────────────────
   const businessDays = await getSettlementBusinessDays();
   const today = startOfDay(new Date());
 
-  const orders = await prisma.reservation.findMany({
-    where: {
-      paymentStatus: "COMPLETED",
-      status: { notIn: ["CANCELLED", "NO_SHOW"] },
-    },
-    select: {
-      sellerId: true,
-      finalAmount: true,
-      paidAt: true,
-      createdAt: true,
-      cancelStatus: true,
-      seller: { select: { commissionRate: true } },
-    },
-  });
+  const orders = await safeQuery("adminSellers settlement orders", () =>
+    prisma.reservation.findMany({
+      where: {
+        paymentStatus: "COMPLETED",
+        status: { notIn: ["CANCELLED", "NO_SHOW"] },
+      },
+      select: {
+        sellerId: true,
+        finalAmount: true,
+        paidAt: true,
+        createdAt: true,
+        cancelStatus: true,
+        seller: { select: { commissionRate: true } },
+      },
+    }), []);
 
   type Summary = { available: number; scheduled: number };
   const orderSettleMap = new Map<string, Summary>(); // sellerId(SellerProfile.id) 기준
@@ -99,7 +110,7 @@ export async function getAdminSellers() {
       campaignsCount: s._count.campaigns,
       shopProductsCount: s._count.shopProducts,
       fanCount: s._count.fans,
-      ordersCount: s._count.orders,
+      ordersCount: ordersCountMap.get(s.id) ?? 0,
       commissionRate: s.commissionRate != null ? Number(s.commissionRate) : null,
       middleAdminId: s.middleAdmin?.id || null,
       middleAdminName: s.middleAdmin?.name || null,

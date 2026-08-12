@@ -50,7 +50,7 @@ const CHARGE_OPTIONS = [
 
 const TEMPLATES = [
   { id: "live-start", category: "방송시작", Icon: Radio, badgeColor: "bg-red-100 text-red-700", content: "{상담사명}님의 라이브 방송이 시작되었습니다! 지금 바로 참여하세요" },
-  { id: "delivery", category: "상담 시작", Icon: Clock, badgeColor: "bg-blue-100 text-blue-700", content: "예약하신 상담상품이 상담 방식을 시작했습니다. 운송장번호: {운송장번호}" },
+  { id: "delivery", category: "상담 시작", Icon: Clock, badgeColor: "bg-blue-100 text-blue-700", content: "{상담사명}님과의 상담이 곧 시작됩니다. 예약 시간을 확인해 주세요." },
   { id: "campaign-success", category: "단체 상담 성공", Icon: CheckCircle, badgeColor: "bg-green-100 text-green-700", content: "{캠페인명} 단체 상담이 목표 달성에 성공했습니다! 곧 상담 방식이 시작됩니다." },
   { id: "campaign-fail", category: "단체 상담 실패", Icon: AlertCircle, badgeColor: "bg-red-100 text-red-700", content: "{캠페인명} 단체 상담이 미달로 종료되었습니다. 결제가 취소됩니다." },
   { id: "order-confirm", category: "예약확인", Icon: Calendar, badgeColor: "bg-purple-100 text-purple-700", content: "{상담상품명} 예약이 완료되었습니다. 예약번호: {예약번호}" },

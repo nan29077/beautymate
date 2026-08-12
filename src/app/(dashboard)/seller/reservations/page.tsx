@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import SellerReservationsClient from "@/components/seller/SellerReservationsClient";
 import { getConsultantMemos } from "@/lib/consultantMemo";
+import { safeQuery } from "@/lib/safeDb";
 
 export const dynamic = "force-dynamic";
 
@@ -22,18 +23,19 @@ export default async function SellerReservationsPage({
   const { status, view } = await Promise.resolve(searchParams);
   const statusFilter = status && status !== "ALL" ? status : undefined;
 
-  const reservations = await prisma.reservation.findMany({
-    where: {
-      sellerId: seller.id,
-      ...(statusFilter ? { status: statusFilter as "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW" } : {}),
-    },
-    include: {
-      user: { select: { id: true, name: true, email: true } },
-      items: true,
-      timeSlot: { select: { startTime: true, endTime: true } },
-    },
-    orderBy: [{ reservationDate: "desc" }, { reservationTime: "asc" }],
-  });
+  const reservations = await safeQuery("seller reservations list", () =>
+    prisma.reservation.findMany({
+      where: {
+        sellerId: seller.id,
+        ...(statusFilter ? { status: statusFilter as "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW" } : {}),
+      },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+        items: true,
+        timeSlot: { select: { startTime: true, endTime: true } },
+      },
+      orderBy: [{ reservationDate: "desc" }, { reservationTime: "asc" }],
+    }), []);
 
   // 상담 메모는 컬럼 미반영 환경을 대비해 별도 조회(실패 시 빈 값)
   const memoMap = await getConsultantMemos(

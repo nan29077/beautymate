@@ -2,6 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getConsultantMemos } from "@/lib/consultantMemo";
+import { safeQuery } from "@/lib/safeDb";
 import SellerCustomerDetailClient, {
   type CustomerDetail,
   type ConsultingHistoryItem,
@@ -26,15 +27,16 @@ export default async function SellerCustomerDetailPage({
   const { customerId } = await Promise.resolve(params);
 
   // 본인이 상담한 예약만 조회 — 다른 상담사의 고객 정보는 볼 수 없다.
-  const reservations = await prisma.reservation.findMany({
-    where: { sellerId: seller.id, userId: customerId },
-    include: {
-      items: { select: { id: true, productName: true, quantity: true } },
-      timeSlot: { select: { startTime: true, endTime: true } },
-      user: { select: { id: true, name: true, email: true, phone: true } },
-    },
-    orderBy: [{ reservationDate: "desc" }, { reservationTime: "desc" }],
-  });
+  const reservations = await safeQuery("seller customer detail reservations", () =>
+    prisma.reservation.findMany({
+      where: { sellerId: seller.id, userId: customerId },
+      include: {
+        items: { select: { id: true, productName: true, quantity: true } },
+        timeSlot: { select: { startTime: true, endTime: true } },
+        user: { select: { id: true, name: true, email: true, phone: true } },
+      },
+      orderBy: [{ reservationDate: "desc" }, { reservationTime: "desc" }],
+    }), []);
 
   if (reservations.length === 0) notFound();
 

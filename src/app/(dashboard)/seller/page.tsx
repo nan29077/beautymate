@@ -5,6 +5,7 @@ import { Sparkles } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getFeatureFlags } from "@/lib/settings";
+import { safeQuery } from "@/lib/safeDb";
 import { formatPrice } from "@/lib/utils";
 import { DEFAULT_PRODUCT_IMAGE } from "@/lib/defaults";
 import SafeImage from "@/components/shared/SafeImage";
@@ -29,13 +30,20 @@ export default async function SellerDashboard() {
         include: { product: true },
         orderBy: { endDate: "asc" },
       },
+      // reservations 는 운영 DB 미반영 가능성이 있어 _count 에서 제외하고 별도 safeQuery 로 센다
       _count: {
-        select: { fans: true, shopProducts: true, campaigns: true, reservations: true },
+        select: { fans: true, shopProducts: true, campaigns: true },
       },
     },
   });
 
   if (!seller) redirect("/");
+
+  const totalReservationCount = await safeQuery(
+    "seller dashboard reservation count",
+    () => prisma.reservation.count({ where: { sellerId: seller.id } }),
+    0,
+  );
 
   // 상담사가입 추천인코드 조회 (없으면 null, 클라이언트에서 발급 버튼 표시)
   // Prisma 클라이언트/DB에 sellerReferralCode가 아직 반영되지 않아도 대시보드가 죽지 않도록 fallback
@@ -69,16 +77,18 @@ export default async function SellerDashboard() {
 
   const [allOrders, recentOrders, recentReviews, topProducts, pendingOrders] = await Promise.all([
     // 예약 수/매출 집계용 (실데이터 기반)
-    prisma.reservation.findMany({
-      where: { sellerId: seller.id },
-      select: { createdAt: true, paidAt: true, finalAmount: true, paymentStatus: true, status: true },
-    }),
-    prisma.reservation.findMany({
-      where: { sellerId: seller.id },
-      include: { user: { select: { name: true } }, items: { select: { productName: true } } },
-      orderBy: { createdAt: "desc" },
-      take: 6,
-    }),
+    safeQuery("seller dashboard allOrders", () =>
+      prisma.reservation.findMany({
+        where: { sellerId: seller.id },
+        select: { createdAt: true, paidAt: true, finalAmount: true, paymentStatus: true, status: true },
+      }), []),
+    safeQuery("seller dashboard recentOrders", () =>
+      prisma.reservation.findMany({
+        where: { sellerId: seller.id },
+        include: { user: { select: { name: true } }, items: { select: { productName: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+      }), []),
     prisma.review.findMany({
       where: { product: { sellerProducts: { some: { sellerId: seller.id } } } },
       include: { user: { select: { name: true } }, product: { select: { name: true } } },
@@ -91,27 +101,31 @@ export default async function SellerDashboard() {
       orderBy: { product: { soldCount: "desc" } },
       take: 5,
     }),
-    prisma.reservation.count({ where: { sellerId: seller.id, status: "PENDING" } }),
+    safeQuery("seller dashboard pendingOrders", () =>
+      prisma.reservation.count({ where: { sellerId: seller.id, status: "PENDING" } }), 0),
   ]);
 
   // ── 오늘의 예약 현황 & 이번 달 실적 ─────────────────────────────
   const [todayReservations, todaySlots, monthCompletedCount] = await Promise.all([
-    prisma.reservation.findMany({
-      where: {
-        sellerId: seller.id,
-        reservationDate: { gte: dayStartUtc, lte: dayEndUtc },
-        status: { not: "CANCELLED" },
-      },
-      select: { status: true, reservationTime: true, customerName: true },
-      orderBy: { reservationTime: "asc" },
-    }),
-    prisma.timeSlot.findMany({
-      where: { consultantId: session!.user!.id, date: { gte: dayStartUtc, lte: dayEndUtc } },
-      select: { reservationId: true },
-    }),
-    prisma.reservation.count({
-      where: { sellerId: seller.id, status: "COMPLETED", completedAt: { gte: monthStart } },
-    }),
+    safeQuery("seller dashboard todayReservations", () =>
+      prisma.reservation.findMany({
+        where: {
+          sellerId: seller.id,
+          reservationDate: { gte: dayStartUtc, lte: dayEndUtc },
+          status: { not: "CANCELLED" },
+        },
+        select: { status: true, reservationTime: true, customerName: true },
+        orderBy: { reservationTime: "asc" },
+      }), []),
+    safeQuery("seller dashboard todaySlots", () =>
+      prisma.timeSlot.findMany({
+        where: { consultantId: session!.user!.id, date: { gte: dayStartUtc, lte: dayEndUtc } },
+        select: { reservationId: true },
+      }), []),
+    safeQuery("seller dashboard monthCompletedCount", () =>
+      prisma.reservation.count({
+        where: { sellerId: seller.id, status: "COMPLETED", completedAt: { gte: monthStart } },
+      }), 0),
   ]);
 
   const todayConfirmed = todayReservations.filter(
@@ -296,7 +310,7 @@ export default async function SellerDashboard() {
         {[
           { label: "내 상담상품", value: seller._count.shopProducts, icon: "ProductManagement_icon", color: "text-blue-500" },
           { label: "팬 수", value: seller.totalFans, icon: "Users_icon", color: "text-pink-500" },
-          { label: "총 예약", value: seller._count.reservations, icon: "OrderManagement_icon", color: "text-orange-500" },
+          { label: "총 예약", value: totalReservationCount, icon: "OrderManagement_icon", color: "text-orange-500" },
         ].map((kpi) => (
           <div key={kpi.label} className="bg-white rounded-xl p-3 sm:p-4 border border-gray-100">
             <Icon name={kpi.icon} size={16} className={`${kpi.color} mb-1.5 sm:mb-2`} />

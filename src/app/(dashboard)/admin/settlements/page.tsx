@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getSettlementBusinessDays } from "@/lib/settings";
 import { getSellerSettlementSummary, getPlatformFees } from "@/lib/settlement";
 import { getPlatformRevenue } from "@/lib/revenue";
+import { safeQuery } from "@/lib/safeDb";
 import AdminPayoutSettlement from "@/components/admin/AdminPayoutSettlement";
 
 export const dynamic = "force-dynamic";
@@ -15,13 +16,14 @@ export default async function AdminSettlementsPage() {
   const businessDays = await getSettlementBusinessDays();
 
   // 총 매출(gross)은 예약관리 판매금액과 일치하도록 결제완료 예약 합계로 산출
-  const orders = await prisma.reservation.findMany({
-    where: {
-      paymentStatus: "COMPLETED",
-      status: { notIn: ["CANCELLED", "NO_SHOW"] },
-    },
-    select: { finalAmount: true },
-  });
+  const orders = await safeQuery("admin settlements orders", () =>
+    prisma.reservation.findMany({
+      where: {
+        paymentStatus: "COMPLETED",
+        status: { notIn: ["CANCELLED", "NO_SHOW"] },
+      },
+      select: { finalAmount: true },
+    }), []);
   const totalSales = orders.reduce((sum, o) => sum + Number(o.finalAmount), 0);
 
   // 정산 대기/가능액은 각 상담사가 보는 정산액과 정확히 일치해야 하므로,

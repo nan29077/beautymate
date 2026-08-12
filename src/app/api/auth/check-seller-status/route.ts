@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { normalizeRole } from "@/lib/roles";
 
 export async function POST(request: Request) {
   try {
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
       include: { sellerProfile: true },
     });
 
-    if (user && user.role === "CONSULTANT" && user.sellerProfile && !user.sellerProfile.isApproved) {
+    if (user && normalizeRole(user.role) === "CONSULTANT" && user.sellerProfile && !user.sellerProfile.isApproved) {
       return NextResponse.json({ sellerNotApproved: true });
     }
 

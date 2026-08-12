@@ -14,6 +14,8 @@ import {
 } from "@/lib/referral";
 import { verifyImpersonationToken } from "@/lib/impersonation";
 import { pickBuyerAvatar } from "@/lib/defaults";
+import { normalizeRole } from "@/lib/roles";
+import { ensureSellerProfile } from "@/lib/sellerProfile";
 
 // 환경변수 미설정 provider 는 등록하지 않는다 (getProviders() 결과에서도 자동 제외).
 const providers: NextAuthConfig["providers"] = [
@@ -43,18 +45,31 @@ const providers: NextAuthConfig["providers"] = [
       );
       if (!isValid) return null;
 
-      if (user.role === "CONSULTANT" && user.sellerProfile && !user.sellerProfile.isApproved) {
+      // DB 레거시 역할(SELLER/BUYER 등)을 현행 3역할로 정규화
+      const role = normalizeRole(user.role);
+
+      if (role === "CONSULTANT" && user.sellerProfile && !user.sellerProfile.isApproved) {
         throw new Error("CONSULTANT_NOT_APPROVED");
+      }
+
+      // 레거시/테스트 상담사 계정은 SellerProfile 이 없을 수 있다 → 최소 프로필 자동 생성
+      let sellerSlug = user.sellerProfile?.slug || null;
+      if (role === "CONSULTANT" && !user.sellerProfile) {
+        try {
+          sellerSlug = (await ensureSellerProfile(user)).slug;
+        } catch (e) {
+          console.error("[authorize] SellerProfile 자동 생성 실패:", e);
+        }
       }
 
       return {
         id: user.id,
         email: user.email,
         name: user.name,
-        role: user.role,
+        role,
         // image (NextAuth 표준) 우선, 없으면 legacy avatar 사용.
         image: (user as any).image || user.avatar,
-        sellerSlug: user.sellerProfile?.slug || null,
+        sellerSlug,
         mustResetPassword: user.mustResetPassword,
       } as any;
     },
@@ -79,13 +94,23 @@ const providers: NextAuthConfig["providers"] = [
       });
       if (!user || !user.isActive) return null;
 
+      const role = normalizeRole(user.role);
+      let sellerSlug = user.sellerProfile?.slug || null;
+      if (role === "CONSULTANT" && !user.sellerProfile) {
+        try {
+          sellerSlug = (await ensureSellerProfile(user)).slug;
+        } catch (e) {
+          console.error("[impersonate] SellerProfile 자동 생성 실패:", e);
+        }
+      }
+
       return {
         id: user.id,
         email: user.email,
         name: user.name,
-        role: user.role,
+        role,
         image: (user as any).image || user.avatar,
-        sellerSlug: user.sellerProfile?.slug || null,
+        sellerSlug,
       } as any;
     },
   }),
@@ -367,7 +392,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     async jwt({ token, user, trigger, session }) {
       if (user) {
-        token.role = (user as any).role;
+        token.role = normalizeRole((user as any).role);
         token.sellerSlug = (user as any).sellerSlug;
         token.picture = (user as any).image || null;
         token.mustResetPassword = Boolean((user as any).mustResetPassword);
@@ -382,7 +407,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           include: { sellerProfile: true },
         });
         if (u) {
-          token.role = u.role;
+          token.role = normalizeRole(u.role);
           token.sellerSlug = u.sellerProfile?.slug || null;
           token.picture = (u as any).image || u.avatar || null;
         }
@@ -393,7 +418,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user) {
         session.user.id = token.sub!;
         session.user.image = (token.picture as string) || null;
-        session.user.role = token.role as typeof session.user.role;
+        // 기존 발급 JWT 에 레거시 역할이 남아 있을 수 있어 세션에서도 한 번 더 정규화
+        session.user.role = normalizeRole(token.role);
         session.user.sellerSlug = token.sellerSlug as string | null;
         session.user.mustResetPassword = Boolean(token.mustResetPassword);
       }

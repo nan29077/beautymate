@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { cleanupStalePendingOrders, VISIBLE_ORDER_FILTER } from "@/lib/orderCleanup";
 import { parseSnsAccounts } from "@/lib/utils";
 import { buildOrderFeeInfoMap } from "@/lib/orderFee";
+import { safeQuery } from "@/lib/safeDb";
 import SellerOrdersTabs from "@/components/shared/SellerOrdersTabs";
 
 export const dynamic = "force-dynamic";
@@ -20,16 +21,17 @@ export default async function SellerOrdersPage() {
   // 방치된 미결제 예약 정리 (이탈 PENDING 이 목록·DB 에 남지 않도록)
   await cleanupStalePendingOrders().catch(() => {});
 
-  const orders = await prisma.reservation.findMany({
-    // 미결제 PENDING + 결제 전 이탈한 CANCELLED(pgTid 없음) 제외 — 실제 결제 흔적 있는 건만 노출
-    where: { ...VISIBLE_ORDER_FILTER, sellerId: seller.id },
-    include: {
-      user: { select: { name: true, email: true } },
-      items: { include: { variant: { select: { name: true } } } },
-      campaign: { select: { title: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const orders = await safeQuery("seller orders list", () =>
+    prisma.reservation.findMany({
+      // 미결제 PENDING + 결제 전 이탈한 CANCELLED(pgTid 없음) 제외 — 실제 결제 흔적 있는 건만 노출
+      where: { ...VISIBLE_ORDER_FILTER, sellerId: seller.id },
+      include: {
+        user: { select: { name: true, email: true } },
+        items: { include: { variant: { select: { name: true } } } },
+        campaign: { select: { title: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    }), []);
 
   // 장바구니: 이 상담사의 상담상품을 담아둔(아직 구매 전) 항목
   const cartItems = await prisma.cartItem.findMany({

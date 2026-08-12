@@ -5,6 +5,7 @@ import { Sparkles } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getFeatureFlags } from "@/lib/settings";
+import { safeQuery } from "@/lib/safeDb";
 import { formatPrice } from "@/lib/utils";
 import { pickRoleAvatar } from "@/lib/defaults";
 import SafeImage from "@/components/shared/SafeImage";
@@ -42,19 +43,21 @@ export default async function AdminDashboard() {
     Promise.resolve(0),
     prisma.product.count(),
     prisma.groupBuyCampaign.count(),
-    prisma.reservation.count(),
+    safeQuery("admin dashboard reservationCount", () => prisma.reservation.count(), 0),
     // 총매출: 실제 예약 finalAmount 합계 (취소/환불 제외)
-    prisma.reservation.aggregate({
-      _sum: { finalAmount: true },
-      where: { status: { in: [...COMPLETED_STATUSES] } },
-    }),
+    safeQuery("admin dashboard totalRevenue", () =>
+      prisma.reservation.aggregate({
+        _sum: { finalAmount: true },
+        where: { status: { in: [...COMPLETED_STATUSES] } },
+      }), { _sum: { finalAmount: null } }),
     prisma.groupBuyCampaign.count({ where: { status: "ACTIVE" } }),
     prisma.sellerProfile.count({ where: { isApproved: false } }),
-    prisma.reservation.findMany({
-      include: { user: true, seller: true },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }),
+    safeQuery("admin dashboard recentOrders", () =>
+      prisma.reservation.findMany({
+        include: { user: true, seller: true },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      }), []),
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
       take: 5,
@@ -70,27 +73,32 @@ export default async function AdminDashboard() {
     }),
     prisma.product.count({ where: { isActive: true, isApproved: true } }),
     // 오늘 예약 건수
-    prisma.reservation.count({
-      where: { createdAt: { gte: todayStartUTC } },
-    }),
+    safeQuery("admin dashboard todayOrders", () =>
+      prisma.reservation.count({
+        where: { createdAt: { gte: todayStartUTC } },
+      }), 0),
     prisma.user.count({
       where: { createdAt: { gte: todayStartUTC } },
     }),
-    prisma.reservation.count({ where: { status: "PENDING" } }),
+    safeQuery("admin dashboard pendingOrders", () =>
+      prisma.reservation.count({ where: { status: "PENDING" } }), 0),
     // 오늘 매출
-    prisma.reservation.aggregate({
-      _sum: { finalAmount: true },
-      where: { createdAt: { gte: todayStartUTC }, status: { in: [...COMPLETED_STATUSES] } },
-    }),
+    safeQuery("admin dashboard todayRevenue", () =>
+      prisma.reservation.aggregate({
+        _sum: { finalAmount: true },
+        where: { createdAt: { gte: todayStartUTC }, status: { in: [...COMPLETED_STATUSES] } },
+      }), { _sum: { finalAmount: null } }),
     // 이번 주 예약 건수
-    prisma.reservation.count({
-      where: { createdAt: { gte: weekStartUTC } },
-    }),
+    safeQuery("admin dashboard weekOrders", () =>
+      prisma.reservation.count({
+        where: { createdAt: { gte: weekStartUTC } },
+      }), 0),
     // 이번 주 매출
-    prisma.reservation.aggregate({
-      _sum: { finalAmount: true },
-      where: { createdAt: { gte: weekStartUTC }, status: { in: [...COMPLETED_STATUSES] } },
-    }),
+    safeQuery("admin dashboard weekRevenue", () =>
+      prisma.reservation.aggregate({
+        _sum: { finalAmount: true },
+        where: { createdAt: { gte: weekStartUTC }, status: { in: [...COMPLETED_STATUSES] } },
+      }), { _sum: { finalAmount: null } }),
   ]);
 
   const revenue = Number(totalRevenueAgg._sum.finalAmount || 0);

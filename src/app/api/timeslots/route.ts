@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { safeQuery, isMissingSchemaError } from "@/lib/safeDb";
 
 export const dynamic = "force-dynamic";
 
@@ -22,14 +23,15 @@ export async function GET(request: Request) {
     const start = new Date(year, mon - 1, 1);
     const end = new Date(year, mon, 0, 23, 59, 59);
 
-    const slots = await prisma.timeSlot.findMany({
-      where: {
-        consultantId,
-        date: { gte: start, lte: end },
-        ...(allSlots ? {} : { isAvailable: true }),
-      },
-      select: { date: true, isAvailable: true, reservationId: true },
-    });
+    const slots = await safeQuery("timeslots month list", () =>
+      prisma.timeSlot.findMany({
+        where: {
+          consultantId,
+          date: { gte: start, lte: end },
+          ...(allSlots ? {} : { isAvailable: true }),
+        },
+        select: { date: true, isAvailable: true, reservationId: true },
+      }), []);
 
     // 날짜별 슬롯 통계
     const dateMap: Record<string, { total: number; available: number }> = {};
@@ -46,17 +48,18 @@ export async function GET(request: Request) {
     const start = new Date(date + "T00:00:00.000Z");
     const end = new Date(date + "T23:59:59.999Z");
 
-    const slots = await prisma.timeSlot.findMany({
-      where: {
-        consultantId,
-        date: { gte: start, lte: end },
-        ...(allSlots ? {} : { isAvailable: true }),
-      },
-      orderBy: { startTime: "asc" },
-      include: allSlots
-        ? { reservation: { select: { id: true, customerName: true, status: true } } }
-        : undefined,
-    });
+    const slots = await safeQuery("timeslots day list", () =>
+      prisma.timeSlot.findMany({
+        where: {
+          consultantId,
+          date: { gte: start, lte: end },
+          ...(allSlots ? {} : { isAvailable: true }),
+        },
+        orderBy: { startTime: "asc" },
+        include: allSlots
+          ? { reservation: { select: { id: true, customerName: true, status: true } } }
+          : undefined,
+      }), []);
 
     return NextResponse.json({
       slots: slots.map((s) => ({
@@ -99,6 +102,12 @@ export async function POST(request: Request) {
     const errMsg = err instanceof Error ? err.message : "";
     if (errMsg.includes("Unique constraint")) {
       return NextResponse.json({ error: "이미 해당 시간에 슬롯이 존재합니다." }, { status: 409 });
+    }
+    if (isMissingSchemaError(err)) {
+      return NextResponse.json(
+        { error: "시간슬롯 저장소가 아직 준비되지 않았습니다. 관리자에게 문의해 주세요." },
+        { status: 503 },
+      );
     }
     return NextResponse.json({ error: "슬롯 생성에 실패했습니다." }, { status: 500 });
   }

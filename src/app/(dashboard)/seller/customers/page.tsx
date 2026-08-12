@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import SellerCustomersClient, { type CustomerRow } from "@/components/seller/SellerCustomersClient";
+import { safeQuery } from "@/lib/safeDb";
 
 export const dynamic = "force-dynamic";
 
@@ -15,23 +16,24 @@ export default async function SellerCustomersPage() {
   });
   if (!seller) redirect("/");
 
-  const reservations = await prisma.reservation.findMany({
-    where: { sellerId: seller.id },
-    select: {
-      userId: true,
-      status: true,
-      paymentStatus: true,
-      finalAmount: true,
-      reservationDate: true,
-      createdAt: true,
-      customerName: true,
-      customerPhone: true,
-      birthDate: true,
-      gender: true,
-      user: { select: { id: true, name: true, phone: true } },
-    },
-    orderBy: { reservationDate: "desc" },
-  });
+  const reservations = await safeQuery("seller customers reservations", () =>
+    prisma.reservation.findMany({
+      where: { sellerId: seller.id },
+      select: {
+        userId: true,
+        status: true,
+        paymentStatus: true,
+        finalAmount: true,
+        reservationDate: true,
+        createdAt: true,
+        customerName: true,
+        customerPhone: true,
+        birthDate: true,
+        gender: true,
+        user: { select: { id: true, name: true, phone: true } },
+      },
+      orderBy: { reservationDate: "desc" },
+    }), []);
 
   // 고객(User) 단위로 집계. 이름·연락처는 가장 최근 예약 기준.
   const map = new Map<string, CustomerRow>();

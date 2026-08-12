@@ -14,6 +14,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getPlatformFees, type PlatformFees } from "@/lib/settlement";
+import { safeQuery } from "@/lib/safeDb";
 
 // PG 수수료율(%) — 부가세 포함 실효율 (2.6% + 0.26%). 플랫폼이 실제로 부담하는 비용.
 export const PG_FEE_RATE = 2.86;
@@ -55,7 +56,8 @@ export async function getPlatformRevenue(opts: {
   const fees = opts.fees ?? (await getPlatformFees());
 
   // take 제한 없음 — 합계가 틀리면 안 되므로 전 예약을 집계한다.
-  const orders = await prisma.reservation.findMany({
+  const orders = await safeQuery("platform revenue orders", () =>
+    prisma.reservation.findMany({
     where: {
       paymentStatus: "COMPLETED",
       status: { notIn: ["CANCELLED", "NO_SHOW"] },
@@ -84,7 +86,7 @@ export async function getPlatformRevenue(opts: {
       },
     },
     orderBy: { createdAt: "desc" },
-  });
+  }), []);
 
   // 스냅샷이 없는 과거 예약(폴백용) + 관리자 마진용 상담상품 정보
   const productIds = [...new Set(orders.flatMap((o) => o.items.map((i) => i.productId)))];

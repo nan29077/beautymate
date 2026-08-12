@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { safeQuery } from "@/lib/safeDb";
 
 export const dynamic = "force-dynamic";
 
@@ -38,33 +39,35 @@ export async function GET(request: Request) {
   const dayEnd = new Date(date + "T23:59:59.999Z");
 
   const [slots, recent] = await Promise.all([
-    prisma.timeSlot.findMany({
-      where: { consultantId: session.user.id, date: { gte: dayStart, lte: dayEnd } },
-      orderBy: { startTime: "asc" },
-      select: {
-        id: true,
-        startTime: true,
-        endTime: true,
-        isAvailable: true,
-        reservation: { select: { id: true, customerName: true, status: true } },
-      },
-    }),
+    safeQuery("live-status slots", () =>
+      prisma.timeSlot.findMany({
+        where: { consultantId: session.user.id, date: { gte: dayStart, lte: dayEnd } },
+        orderBy: { startTime: "asc" },
+        select: {
+          id: true,
+          startTime: true,
+          endTime: true,
+          isAvailable: true,
+          reservation: { select: { id: true, customerName: true, status: true } },
+        },
+      }), []),
     // 최근 들어온 예약 알림 (오늘 슬롯에 한정하지 않고 최근 생성 순)
-    prisma.reservation.findMany({
-      where: { sellerId: seller.id, status: { not: "CANCELLED" } },
-      orderBy: { createdAt: "desc" },
-      take: 10,
-      select: {
-        id: true,
-        customerName: true,
-        status: true,
-        reservationDate: true,
-        reservationTime: true,
-        finalAmount: true,
-        createdAt: true,
-        items: { select: { productName: true } },
-      },
-    }),
+    safeQuery("live-status recent reservations", () =>
+      prisma.reservation.findMany({
+        where: { sellerId: seller.id, status: { not: "CANCELLED" } },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        select: {
+          id: true,
+          customerName: true,
+          status: true,
+          reservationDate: true,
+          reservationTime: true,
+          finalAmount: true,
+          createdAt: true,
+          items: { select: { productName: true } },
+        },
+      }), []),
   ]);
 
   const reservedSlots = slots.filter((s) => s.reservation != null).length;

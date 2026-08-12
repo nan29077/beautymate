@@ -8,6 +8,7 @@
 // prisma 를 사용하므로 서버 컴포넌트 / route handler 에서만 사용하세요.
 
 import { prisma } from "@/lib/prisma";
+import { safeQuery } from "@/lib/safeDb";
 import { getSettlementBusinessDays } from "@/lib/settings";
 import { getSettlementDate, startOfDay, toYmd } from "@/lib/businessDays";
 import { withVatRate } from "@/lib/utils";
@@ -130,6 +131,7 @@ export async function getSellerSettlementSummary(
   const sellerFeeMul = feeMultiplier(sellerRate);
 
   const [rawOrders, payoutRows] = await Promise.all([
+    safeQuery("settlement rawOrders", () =>
     prisma.reservation.findMany({
       where: {
         sellerId,
@@ -165,7 +167,7 @@ export async function getSellerSettlementSummary(
         },
       },
       orderBy: { createdAt: "desc" },
-    }),
+    }), []),
     prisma.payoutRequest.findMany({
       where: { sellerId },
       orderBy: { requestedAt: "desc" },

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getShopAwareLoginPath } from "@/lib/shopLoginRedirect";
+import { safeQuery } from "@/lib/safeDb";
 import { formatPrice } from "@/lib/utils";
 import { Icon } from "@/components/shared/Icon";
 
@@ -35,25 +36,26 @@ export default async function MyReservationsPage({
   const { status } = await Promise.resolve(searchParams);
   const statusFilter = status && status !== "ALL" ? status : undefined;
 
-  const reservations = await prisma.reservation.findMany({
-    where: {
-      userId: session.user.id,
-      ...(statusFilter ? { status: statusFilter as "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW" } : {}),
-    },
-    include: {
-      seller: {
-        select: {
-          shopName: true,
-          slug: true,
-          shopLogo: true,
-          user: { select: { name: true, avatar: true } },
-        },
+  const reservations = await safeQuery("my reservations list", () =>
+    prisma.reservation.findMany({
+      where: {
+        userId: session.user.id,
+        ...(statusFilter ? { status: statusFilter as "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW" } : {}),
       },
-      items: true,
-      timeSlot: { select: { startTime: true, endTime: true } },
-    },
-    orderBy: { reservationDate: "desc" },
-  });
+      include: {
+        seller: {
+          select: {
+            shopName: true,
+            slug: true,
+            shopLogo: true,
+            user: { select: { name: true, avatar: true } },
+          },
+        },
+        items: true,
+        timeSlot: { select: { startTime: true, endTime: true } },
+      },
+      orderBy: { reservationDate: "desc" },
+    }), []);
 
   const currentStatus = status || "ALL";
 
