@@ -6,6 +6,7 @@ import { formatPrice } from "@/lib/utils";
 import SafeImage from "@/components/shared/SafeImage";
 import BrandWordmark from "@/components/shared/BrandWordmark";
 import { pickSellerAvatar, DEFAULT_PRODUCT_IMAGE } from "@/lib/defaults";
+import { getShopCustomization } from "@/lib/shopCustomization";
 import { Clock, Video, CalendarCheck, Sparkles, ChevronRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -121,9 +122,15 @@ export default async function ConsultantLandingPage({
     };
   });
 
-  // 상담 종류 태그 — 등록된 상담상품의 consultingType 을 중복 없이 모은다.
+  // 점집 커스터마이징(한줄 소개·상세 소개·상담 분야 태그)
+  const customization = await getShopCustomization(seller.id);
+
+  // 상담 종류 태그 — 상담사가 지정한 분야 태그 + 등록된 상담상품의 consultingType 을 중복 없이 모은다.
   const consultingTags = Array.from(
-    new Set(products.map((p) => p.consultingType).filter((t): t is string => !!t))
+    new Set([
+      ...customization.tags,
+      ...products.map((p) => p.consultingType).filter((t): t is string => !!t),
+    ])
   );
 
   const bookHref = `/shop/${seller.slug}/book`;
@@ -165,6 +172,12 @@ export default async function ConsultantLandingPage({
         <h1 className="mt-4 text-2xl font-extrabold text-white tracking-tight">
           {seller.shopName}
         </h1>
+
+        {customization.tagline && (
+          <p className="mt-1.5 text-[13px] font-semibold text-amber-200/90 px-2">
+            {customization.tagline}
+          </p>
+        )}
 
         {seller.shopDescription && (
           <p className="mt-2 text-[13px] text-purple-100/80 leading-relaxed line-clamp-2 px-2">
@@ -261,6 +274,16 @@ export default async function ConsultantLandingPage({
               </li>
             ))}
           </ul>
+        )}
+
+        {/* ───── 상담사 소개 ───── */}
+        {customization.intro && (
+          <div className="mt-7 pt-6 border-t border-gray-100">
+            <h2 className="text-base font-bold text-gray-900 mb-2">{seller.shopName} 소개</h2>
+            <p className="text-[13px] text-gray-600 leading-relaxed whitespace-pre-wrap break-words">
+              {customization.intro}
+            </p>
+          </div>
         )}
 
         {/* ───── Powered by ───── */}

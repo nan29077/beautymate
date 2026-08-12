@@ -8,6 +8,12 @@ import { InstagramIcon, YoutubeIcon } from "@/components/shared/SnsIcons";
 import ImageUploader from "@/components/shared/ImageUploader";
 import SavedPopup from "@/components/shared/SavedPopup";
 import Link from "next/link";
+import {
+  SHOP_TAGLINE_MAX,
+  SHOP_INTRO_MAX,
+  SHOP_TAGS_MAX,
+  type ShopCustomization,
+} from "@/lib/shopCustomization";
 
 interface ShopData {
   slug: string;
@@ -26,18 +32,30 @@ interface ShopData {
 }
 
 const CATEGORY_OPTIONS = [
-  "패션", "뷰티", "라이프스타일", "홈리빙", "푸드", "디지털/가전",
-  "액세서리", "키즈/베이비", "스포츠/아웃도어", "반려동물", "건강/웰빙",
-  "여행", "도서/문구", "핸드메이드", "빈티지", "기타",
+  "사주", "신점", "타로", "작명", "궁합", "관상",
+  "택일", "풍수", "점성술", "꿈해몽", "부적", "굿/의식",
+  "심리상담", "기타",
 ];
 
 const MOOD_OPTIONS = [
-  "미니멀", "캐주얼", "모던", "러블리", "내추럴", "빈티지",
-  "트렌디", "클래식", "스트릿", "럭셔리", "유니크", "에스닉",
-  "심플", "로맨틱", "시크", "기타",
+  "따뜻한", "직설적인", "차분한", "유쾌한", "섬세한", "단호한",
+  "공감형", "현실조언형", "영적인", "논리적인", "친근한", "기타",
 ];
 
-export default function ShopEditForm({ initial }: { initial: ShopData }) {
+/** 상담 분야 태그 추천 목록 — 클릭으로 추가/제거, 직접 입력도 가능 */
+const TAG_SUGGESTIONS = [
+  "연애운", "결혼운", "재물운", "취업운", "이직운", "사업운",
+  "건강운", "학업운", "가족관계", "인간관계", "이별/재회", "속마음",
+  "올해운세", "신년운세", "택일", "작명",
+];
+
+export default function ShopEditForm({
+  initial,
+  initialCustomization,
+}: {
+  initial: ShopData;
+  initialCustomization: ShopCustomization;
+}) {
   const router = useRouter();
   const [form, setForm] = useState({
     shopName: initial.shopName || "",
@@ -52,7 +70,11 @@ export default function ShopEditForm({ initial }: { initial: ShopData }) {
     youtubeChannelId: initial.youtubeChannelId || "",
     shopLogo: initial.shopLogo || "",
     shopBanner: initial.shopBanner || "",
+    tagline: initialCustomization.tagline || "",
+    intro: initialCustomization.intro || "",
   });
+  const [tags, setTags] = useState<string[]>(initialCustomization.tags || []);
+  const [tagInput, setTagInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -63,6 +85,19 @@ export default function ShopEditForm({ initial }: { initial: ShopData }) {
     setSaved(false);
   }, []);
 
+  const toggleTag = useCallback((tag: string) => {
+    setTags(prev => (prev.includes(tag) ? prev.filter(t => t !== tag) : prev.length >= SHOP_TAGS_MAX ? prev : [...prev, tag]));
+    setSaved(false);
+  }, []);
+
+  const addTagInput = useCallback(() => {
+    const t = tagInput.trim();
+    if (!t) return;
+    setTags(prev => (prev.includes(t) || prev.length >= SHOP_TAGS_MAX ? prev : [...prev, t]));
+    setTagInput("");
+    setSaved(false);
+  }, [tagInput]);
+
   const handleSave = useCallback(async () => {
     setSaving(true);
     setError("");
@@ -70,7 +105,7 @@ export default function ShopEditForm({ initial }: { initial: ShopData }) {
       const res = await fetch("/api/seller/shop", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, tags }),
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
@@ -84,21 +119,21 @@ export default function ShopEditForm({ initial }: { initial: ShopData }) {
     } finally {
       setSaving(false);
     }
-  }, [form]);
+  }, [form, tags, router]);
 
   return (
     <>
       <SavedPopup show={showSavedPopup} onClose={() => setShowSavedPopup(false)} />
       {/* Header with Save button */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold text-gray-900">점집 관리</h1>
+        <h2 className="text-base font-bold text-gray-900">점집 기본 정보</h2>
         <div className="flex items-center gap-2">
           <Link
             href={`/shop/${initial.slug}`}
             className="px-3 py-1.5 text-xs font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors flex items-center gap-1.5"
           >
             <Icon name="ArrowRight" size={13} strokeWidth={1.5} />
-            Shop 바로가기
+            점집 바로가기
           </Link>
           <button
             onClick={handleSave}
@@ -232,7 +267,21 @@ export default function ShopEditForm({ initial }: { initial: ShopData }) {
             <p className="text-[10px] text-gray-400 mt-1">점집 주소: /shop/{initial.slug}</p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">카테고리</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">점집 한줄 소개</label>
+            <input
+              type="text"
+              className="input-field"
+              value={form.tagline}
+              maxLength={SHOP_TAGLINE_MAX}
+              onChange={e => handleChange("tagline", e.target.value)}
+              placeholder="예: 30년 경력, 사주로 풀어내는 인생의 방향"
+            />
+            <p className="text-[10px] text-gray-400 mt-1">
+              점집 페이지에서 점집 이름 바로 아래에 표시됩니다. ({form.tagline.length}/{SHOP_TAGLINE_MAX})
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">대표 상담 분야</label>
             <div className="flex flex-wrap gap-1.5">
               {CATEGORY_OPTIONS.map(cat => (
                 <button
@@ -251,7 +300,7 @@ export default function ShopEditForm({ initial }: { initial: ShopData }) {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">무드/컨셉</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">상담 스타일</label>
             <div className="flex flex-wrap gap-1.5">
               {MOOD_OPTIONS.map(m => (
                 <button
@@ -270,14 +319,98 @@ export default function ShopEditForm({ initial }: { initial: ShopData }) {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">점집 설명</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">점집 설명 (요약)</label>
             <textarea
               className="input-field h-24 resize-none"
               value={form.shopDescription}
               onChange={e => handleChange("shopDescription", e.target.value)}
               placeholder="점집에 대한 소개를 작성해주세요"
             />
+            <p className="text-[10px] text-gray-400 mt-1">프로필 카드와 검색 결과에 요약으로 노출됩니다.</p>
           </div>
+        </div>
+
+        {/* 상담 분야 태그 */}
+        <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-3">
+          <div>
+            <h3 className="text-sm font-bold text-gray-900">상담 분야 태그</h3>
+            <p className="text-[10px] text-gray-400 mt-0.5">
+              점집 페이지 프로필 카드에 표시됩니다. 최대 {SHOP_TAGS_MAX}개 ({tags.length}/{SHOP_TAGS_MAX})
+            </p>
+          </div>
+
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {tags.map(tag => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium bg-brand-600 text-white border border-brand-600"
+                >
+                  #{tag}
+                  <X size={11} />
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-1.5">
+            {TAG_SUGGESTIONS.filter(t => !tags.includes(t)).map(tag => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => toggleTag(tag)}
+                disabled={tags.length >= SHOP_TAGS_MAX}
+                className="px-2.5 py-1.5 rounded-lg text-[11px] font-medium bg-white text-gray-500 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                + {tag}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              className="input-field flex-1"
+              value={tagInput}
+              maxLength={12}
+              onChange={e => setTagInput(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addTagInput();
+                }
+              }}
+              placeholder="직접 입력 후 Enter (예: 사업궁합)"
+            />
+            <button
+              type="button"
+              onClick={addTagInput}
+              disabled={tags.length >= SHOP_TAGS_MAX}
+              className="px-3 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+            >
+              추가
+            </button>
+          </div>
+        </div>
+
+        {/* 상세 소개 */}
+        <div className="bg-white rounded-xl border border-gray-100 p-5">
+          <label className="block text-sm font-bold text-gray-900 mb-1">점집 상세 소개</label>
+          <p className="text-[10px] text-gray-400 mb-2">
+            점집 페이지 하단 &ldquo;소개&rdquo; 섹션에 전체 내용이 표시됩니다. 줄바꿈이 그대로 반영됩니다.
+          </p>
+          <textarea
+            className="input-field h-48 resize-y leading-relaxed"
+            value={form.intro}
+            maxLength={SHOP_INTRO_MAX}
+            onChange={e => handleChange("intro", e.target.value)}
+            placeholder={"상담 경력, 상담 방식, 예약 전 안내사항 등을 자유롭게 적어주세요.\n\n예)\n· 사주명리 20년, 누적 상담 1만 건\n· 연애·재물·직업 상담을 주로 봅니다\n· 상담 전 생년월일시를 준비해주세요"}
+          />
+          <p className="text-[10px] text-gray-400 mt-1 text-right">
+            {form.intro.length}/{SHOP_INTRO_MAX}
+          </p>
         </div>
 
         {/* Social Media */}

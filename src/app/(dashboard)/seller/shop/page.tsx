@@ -16,6 +16,7 @@ import ShopEditForm from "@/components/shared/ShopEditForm";
 import SellerShopDashboardTabs from "@/components/shared/SellerShopDashboardTabs";
 import ShopQRSection from "@/components/shared/ShopQRSection";
 import { getFeatureFlags } from "@/lib/settings";
+import { getShopCustomization } from "@/lib/shopCustomization";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,9 @@ export default async function SellerShopPage() {
   });
 
   if (!seller) redirect("/");
+
+  // 점집 커스터마이징(한줄 소개·상세 소개·상담 분야 태그) — Setting 테이블 저장분
+  const customization = await getShopCustomization(seller.id);
 
   // 지난 방송(종료된 라이브) 목록 — 점집 노출 스위치용. 라이브 상담이 운영 정책상 켜진 경우에만 노출.
   const endedLives = flags.liveCommerce
@@ -82,7 +86,13 @@ export default async function SellerShopPage() {
           shopLogo: seller.shopLogo,
           shopBanner: seller.shopBanner,
         }}
+        initialCustomization={customization}
       />
+
+      {/* 점집 테마 색상 (배너 그라디언트·강조색에 반영) */}
+      <div className="mt-4">
+        <ShopThemeColorPicker currentColor={seller.shopThemeColor || "#f5a700"} />
+      </div>
 
       {/* 점집 링크 & 통계 */}
       <div className="bg-white rounded-xl border border-gray-100 p-4 mb-4 mt-4">

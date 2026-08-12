@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getShopCustomization, setShopCustomization } from "@/lib/shopCustomization";
 
 export async function GET() {
   const session = await auth();
@@ -10,13 +11,15 @@ export async function GET() {
   const seller = await prisma.sellerProfile.findUnique({
     where: { userId: session.user!.id },
     select: {
+      id: true,
       shopName: true, category: true, mood: true, shopDescription: true,
       instagramUrl: true, youtubeUrl: true, tiktokUrl: true, facebookUrl: true, twitterUrl: true, youtubeChannelId: true,
       isManualLive: true,
     },
   });
   if (!seller) return NextResponse.json({ error: "Seller not found" }, { status: 404 });
-  return NextResponse.json({ seller });
+  const customization = await getShopCustomization(seller.id);
+  return NextResponse.json({ seller, customization });
 }
 
 export async function PUT(req: NextRequest) {
@@ -27,7 +30,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { shopName, category, mood, shopDescription, instagramUrl, youtubeUrl, tiktokUrl, facebookUrl, twitterUrl, youtubeChannelId, shopLogo, shopBanner } = body;
+    const { shopName, category, mood, shopDescription, instagramUrl, youtubeUrl, tiktokUrl, facebookUrl, twitterUrl, youtubeChannelId, shopLogo, shopBanner, tagline, intro, tags } = body;
 
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
@@ -35,6 +38,16 @@ export async function PUT(req: NextRequest) {
 
     if (!seller) {
       return NextResponse.json({ error: "Seller not found" }, { status: 404 });
+    }
+
+    // 점집 커스터마이징(한줄 소개·상세 소개·상담 분야 태그)은 Setting 테이블에 저장한다.
+    let customization = undefined;
+    if (tagline !== undefined || intro !== undefined || tags !== undefined) {
+      customization = await setShopCustomization(seller.id, {
+        ...(tagline !== undefined && { tagline }),
+        ...(intro !== undefined && { intro }),
+        ...(tags !== undefined && { tags }),
+      });
     }
 
     const updated = await prisma.sellerProfile.update({
@@ -55,7 +68,7 @@ export async function PUT(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, seller: updated });
+    return NextResponse.json({ success: true, seller: updated, customization });
   } catch (error: any) {
     console.error("Shop update error:", error);
     return NextResponse.json({ error: "Failed to update live settings" }, { status: 500 });

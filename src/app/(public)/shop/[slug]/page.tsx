@@ -14,8 +14,9 @@ import ShopContextSync from "@/components/shared/ShopContextSync";
 import ShopAddressPopup from "@/components/shared/ShopAddressPopup";
 import { Users, BookOpen, Star, MapPin, MessageCircle, Radio, Eye, Video, Sparkles } from "lucide-react";
 import { getFeatureFlags } from "@/lib/settings";
-import { DEFAULT_SHOP_BANNER, DEFAULT_PRODUCT_IMAGE, pickSellerAvatar } from "@/lib/defaults";
+import { DEFAULT_PRODUCT_IMAGE, pickSellerAvatar } from "@/lib/defaults";
 import { OnAirBadge } from "@/components/shared/LiveBadge";
+import { getShopCustomization } from "@/lib/shopCustomization";
 
 export const dynamic = "force-dynamic";
 
@@ -111,8 +112,15 @@ export default async function SellerShopPage({
     }
   }
 
+  // 점집 커스터마이징(한줄 소개·상세 소개·상담 분야 태그) — 상담사가 점집 관리에서 설정
+  const customization = await getShopCustomization(seller.id);
+
   const activeCampaigns = FEATURE_GROUP_BUY ? seller.campaigns.filter((c) => c.status === "ACTIVE") : [];
   const themeColor = seller.shopThemeColor || "#f5a700";
+  // 상담 분야 칩: 상담사가 지정한 태그 우선, 없으면 대표 상담 분야/상담 스타일로 폴백
+  const consultTags = customization.tags.length > 0
+    ? customization.tags
+    : [seller.category, seller.mood].filter((v): v is string => !!v);
   // 상담사의 "점집 기능관리 > 라이브 상담" 스위치(featureLiveCommerce)가 켜진 경우에만 라이브 상담상품을 노출.
   // (전역 관리자 플래그 AND 상담사 스위치)
   const sellerLiveOn = FEATURE_LIVE_COMMERCE && (seller.featureLiveCommerce ?? false);
@@ -299,22 +307,38 @@ export default async function SellerShopPage({
 
       {/* ───── 상담사 프로필 헤더 ───── */}
       <section className="relative">
-        {/* 배너 with gradient overlay using theme color */}
+        {/* 배너 — 업로드한 이미지가 없으면 테마 색상 기반 기본 그라디언트 배너 */}
         <div className="h-44 overflow-hidden bg-gray-200 relative">
-          <SafeImage
-            src={seller.shopBanner}
-            placeholder={DEFAULT_SHOP_BANNER}
-            alt={seller.shopName}
-            width={480}
-            height={200}
-            fallbackText={seller.shopName}
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(to top, ${themeColor}40 0%, transparent 60%)`,
-            }}
-          />
+          {seller.shopBanner ? (
+            <>
+              <SafeImage
+                src={seller.shopBanner}
+                alt={seller.shopName}
+                width={480}
+                height={200}
+                fallbackText={seller.shopName}
+              />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(to top, ${themeColor}40 0%, transparent 60%)`,
+                }}
+              />
+            </>
+          ) : (
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{
+                background: `linear-gradient(135deg, #241445 0%, ${themeColor}cc 55%, ${themeColor} 100%)`,
+              }}
+            >
+              <Sparkles size={18} className="absolute top-6 left-7 text-white/30" aria-hidden="true" />
+              <Sparkles size={12} className="absolute bottom-8 right-9 text-white/25" aria-hidden="true" />
+              <p className="px-6 text-center text-lg font-extrabold text-white/90 tracking-tight drop-shadow-sm line-clamp-2">
+                {seller.shopName}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* 프로필 카드 */}
@@ -382,6 +406,12 @@ export default async function SellerShopPage({
                       </h1>
                       {showProfileLive && <OnAirBadge className="w-8 h-8" />}
                     </div>
+                    {/* 한줄 소개 */}
+                    {customization.tagline && (
+                      <p className="text-[11px] text-gray-500 mt-0.5 line-clamp-1">
+                        {customization.tagline}
+                      </p>
+                    )}
                   </div>
                   {/* 소셜 링크 */}
                   <div className="flex items-center gap-1.5">
@@ -419,6 +449,21 @@ export default async function SellerShopPage({
                 </div>
               </div>
             </div>
+
+            {/* 상담 분야 태그 */}
+            {consultTags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-3">
+                {consultTags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2 py-0.5 rounded-full text-[10px] font-semibold border"
+                    style={{ color: themeColor, borderColor: `${themeColor}55`, backgroundColor: `${themeColor}12` }}
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
 
             {/* 통계 바 */}
             <div className="flex items-center justify-around mt-4 py-3 bg-gray-50 rounded-xl">
@@ -471,6 +516,21 @@ export default async function SellerShopPage({
           </div>
         </div>
       </section>
+
+      {/* ───── 상담사 소개 ───── */}
+      {customization.intro && (
+        <section className="px-4 mt-4">
+          <div className="bg-white rounded-2xl border border-gray-100 p-4">
+            <div className="flex items-center gap-1.5 mb-2">
+              <Sparkles size={14} strokeWidth={1.5} style={{ color: themeColor }} />
+              <h2 className="text-sm font-bold text-gray-900">{seller.shopName} 소개</h2>
+            </div>
+            <p className="text-[13px] text-gray-600 leading-relaxed whitespace-pre-wrap break-words">
+              {customization.intro}
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* ───── 탭 콘텐츠 (클라이언트 컴포넌트) ───── */}
       <SellerShopTabs data={tabData} sellerSlug={seller.slug} sellerName={seller.shopName} sellerId={seller.id} />

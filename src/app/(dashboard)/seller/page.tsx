@@ -405,7 +405,7 @@ export default async function SellerDashboard() {
             { href: "/seller/reservations", label: "예약 관리", icon: "OrderManagement_icon", desc: "예약 처리" },
             { href: "/seller/settlements", label: "정산", icon: "Settlement_icon", desc: "수익 정산" },
             { href: "/seller/live", label: "라이브", icon: "Live_icon", desc: "라이브 방송" },
-            { href: `/shop/${seller.slug}`, label: "SHOP 바로가기", icon: "Store", desc: "점집 바로가기" },
+            { href: `/shop/${seller.slug}`, label: "점집 바로가기", icon: "Store", desc: "내 점집 페이지" },
           ].map((item) => (
             <Link
               key={item.href}
