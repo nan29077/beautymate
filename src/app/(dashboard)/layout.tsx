@@ -88,6 +88,7 @@ export default async function DashboardLayout({
       // 판매·라이브
       { href: "/seller/live-mode", iconName: "Broadcast", label: "라이브 모드", group: "판매·라이브" },
       { href: "/seller/live", iconName: "Live_icon", label: "라이브 상담", group: "판매·라이브" },
+      { href: "/seller/widget", iconName: "Broadcast", label: "위젯 설정", group: "판매·라이브" },
       { href: "/seller/campaigns", iconName: "Event", label: "단체 상담 관리", group: "판매·라이브" },
       { href: "/seller/games", iconName: "Play", label: "게임관리", group: "판매·라이브" },
       // 예약·정산
