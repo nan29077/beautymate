@@ -10,11 +10,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const fees = await getPlatformFees();
-    const row = await prisma.platformFeeSettings.findFirst({ orderBy: { id: "asc" } });
-    return NextResponse.json({
-      ...fees,
-      mentorCommissionRate: Number(row?.mentorCommissionRate ?? 1),
-    });
+    return NextResponse.json(fees);
   } catch {
     return NextResponse.json({ error: "수수료 설정을 불러올 수 없습니다" }, { status: 500 });
   }

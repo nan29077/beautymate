@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import AdminManualSettlementClient from "@/components/admin/AdminManualSettlementClient";
+import AdminFinanceNav from "@/components/admin/AdminFinanceNav";
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +68,7 @@ export default async function AdminManualSettlementPage() {
 
   return (
     <div className="animate-fade-in">
+      <AdminFinanceNav />
       <AdminManualSettlementClient
         nodeUsers={nodeUsers}
         middleAdminUsers={middleAdminUsers}

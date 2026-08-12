@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
           name: String(s?.name ?? "").trim(),
           quote: String(s?.quote ?? "").trim(),
           metric: String(s?.metric ?? "").trim(),
-          avatar: String(s?.avatar ?? "").trim() || "/avatars/라이브셀러_2.png",
+          avatar: String(s?.avatar ?? "").trim() || "/avatars/saju/saju-avatar-01.png",
         }))
         .filter((s: HomeStory) => s.name || s.quote);
       await saveHomeStories(stories);
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
           name: String(s?.name ?? "").trim(),
           quote: String(s?.quote ?? "").trim(),
           metric: String(s?.metric ?? "").trim(),
-          avatar: String(s?.avatar ?? "").trim() || "/avatars/라이브셀러_2.png",
+          avatar: String(s?.avatar ?? "").trim() || "/avatars/saju/saju-avatar-01.png",
         }))
         .filter((s: HomeStory) => s.name || s.quote);
       await saveHomeStats(stats);

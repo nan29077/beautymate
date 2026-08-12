@@ -34,6 +34,15 @@ export default function MobileSidebar({ items, roleConfig, user }: MobileSidebar
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [open]);
+
   // Group items
   const groups: { name: string; items: NavItem[] }[] = [];
   items.forEach((item) => {
@@ -46,12 +55,14 @@ export default function MobileSidebar({ items, roleConfig, user }: MobileSidebar
   return (
     <>
       {/* Mobile Top Bar */}
-      <div className="lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100">
-        <div className="flex items-center justify-between px-4 py-2.5">
+      <div className="lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100 safe-area-top">
+        <div className="flex min-h-14 items-center justify-between px-3 sm:px-4 py-2">
           <div className="flex items-center gap-2">
             <button
               onClick={() => setOpen(true)}
-              className="p-1.5 -ml-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="min-w-10 min-h-10 inline-flex items-center justify-center -ml-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors"
+              aria-expanded={open}
+              aria-controls="dashboard-mobile-menu"
               aria-label="메뉴 열기"
             >
               <Menu size={20} strokeWidth={1.5} />
@@ -66,7 +77,7 @@ export default function MobileSidebar({ items, roleConfig, user }: MobileSidebar
           <div className="flex items-center">
             {/* 대시보드 알림(출금 반려 등) — /my/* 는 고객 전용이라 "전체 보기"는 숨긴다 */}
             <NotificationBell size={18} className="text-gray-400 hover:text-gray-600" buttonClassName="p-2" allHref={null} />
-            <Link href="/?main=1" className="p-2 text-gray-400 hover:text-gray-600">
+            <Link href="/?main=1" className="min-w-10 min-h-10 inline-flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-50">
               <Icon name="Home" size={18} strokeWidth={1.5} />
             </Link>
           </div>
@@ -83,16 +94,21 @@ export default function MobileSidebar({ items, roleConfig, user }: MobileSidebar
 
       {/* Slide-in Sidebar */}
       <div
-        className={`lg:hidden fixed top-0 left-0 bottom-0 w-72 bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${
+        id="dashboard-mobile-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden={!open}
+        aria-label="대시보드 메뉴"
+        className={`lg:hidden fixed top-0 left-0 bottom-0 w-[min(88vw,320px)] bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col safe-area-top safe-area-bottom ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+        <div className="flex min-h-16 items-center justify-between px-4 py-3 border-b border-gray-100">
           <BrandWordmark size="sm" />
           <button
             onClick={() => setOpen(false)}
-            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="min-w-10 min-h-10 inline-flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
             aria-label="메뉴 닫기"
           >
             <X size={18} strokeWidth={1.5} />
@@ -119,7 +135,7 @@ export default function MobileSidebar({ items, roleConfig, user }: MobileSidebar
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-3 overflow-y-auto">
+        <nav className="flex-1 px-3 py-3 overflow-y-auto overscroll-contain">
           {groups.map((group, gi) => (
             <div key={group.name || gi} className={gi > 0 ? "mt-3" : ""}>
               {group.name && gi > 0 && (
@@ -138,7 +154,7 @@ export default function MobileSidebar({ items, roleConfig, user }: MobileSidebar
                       key={item.href}
                       href={item.href}
                       onClick={() => setOpen(false)}
-                      className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all ${
+                      className={`flex min-h-11 items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] transition-all ${
                         isActive
                           ? "bg-brand-500 text-black font-bold"
                           : "text-gray-500 hover:bg-gray-50 hover:text-gray-800"
@@ -155,11 +171,11 @@ export default function MobileSidebar({ items, roleConfig, user }: MobileSidebar
         </nav>
 
         {/* Bottom */}
-        <div className="p-3 border-t border-gray-100 space-y-0.5">
+        <div className="p-3 border-t border-gray-100 space-y-0.5 bg-white">
           <Link
             href="/?main=1"
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2.5 px-3 py-2 text-[13px] text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex min-h-11 items-center gap-2.5 px-3 py-2.5 text-[13px] text-gray-400 hover:text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
           >
             <Icon name="Home" size={16} strokeWidth={1.5} />
             메인으로

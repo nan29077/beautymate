@@ -12,7 +12,6 @@ import SafeImage from "@/components/shared/SafeImage";
 import ShopLinkButton from "@/components/shared/ShopLinkButton";
 import HexNumBadge from "@/components/shared/HexNumBadge";
 import SellerLiveCodeCard from "@/components/shared/SellerLiveCodeCard";
-import SellerMenteeReferralCard from "@/components/seller/SellerMenteeReferralCard";
 
 export const dynamic = "force-dynamic";
 
@@ -44,23 +43,6 @@ export default async function SellerDashboard() {
     () => prisma.reservation.count({ where: { sellerId: seller.id } }),
     0,
   );
-
-  // 상담사가입 추천인코드 조회 (없으면 null, 클라이언트에서 발급 버튼 표시)
-  // Prisma 클라이언트/DB에 sellerReferralCode가 아직 반영되지 않아도 대시보드가 죽지 않도록 fallback
-  let sellerReferralCode: string | null = null;
-  try {
-    const sellerUser = await (prisma as any).user.findUnique({
-      where: { id: session!.user!.id },
-      select: { sellerReferralCode: true },
-    });
-    sellerReferralCode = sellerUser?.sellerReferralCode ?? null;
-  } catch (referralError) {
-    console.error("상담사 추천인코드 조회 실패 (null로 fallback):", referralError);
-  }
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "";
-  const sellerReferralLink = sellerReferralCode
-    ? `${siteUrl}/auth/register?role=CONSULTANT&sellerRef=${sellerReferralCode}`
-    : null;
 
   // 기간 경계 (오늘/이번주(월요일 시작)/이번달)
   const now = new Date();
@@ -195,12 +177,6 @@ export default async function SellerDashboard() {
           <ShopLinkButton slug={seller.slug} />
         </div>
       </div>
-
-      {/* 상담사가입 추천인코드 & 추천인링크 */}
-      <SellerMenteeReferralCard
-        referralCode={sellerReferralCode}
-        referralLink={sellerReferralLink}
-      />
 
       {!seller.isApproved && (
         <div className="p-3.5 bg-amber-50 border border-amber-100 rounded-xl text-xs text-amber-700 flex items-center gap-2">

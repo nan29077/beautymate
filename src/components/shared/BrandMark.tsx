@@ -1,0 +1,33 @@
+import type { CSSProperties } from "react";
+
+export default function BrandMark({
+  size = 24,
+  className = "",
+  style,
+}: {
+  size?: number;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  return (
+    <svg
+      viewBox="0 0 64 64"
+      width={size}
+      height={size}
+      className={className}
+      style={style}
+      role="img"
+      aria-label="사주메이트 초승달"
+    >
+      <path
+        d="M40.8 8.2c-12.2 2.9-21.3 13.9-21.3 27 0 11.1 6.6 20.7 16.1 25-2.1.6-4.4.9-6.7.9C14.5 61.1 3 49.6 3 35.3 3 20.9 14.6 9.2 29 9.2c4.2 0 8.2 1 11.8 2.7V8.2Z"
+        fill="currentColor"
+      />
+      <path
+        d="m47.8 9.2 2.1 5.2 5.3 2.1-5.3 2.1-2.1 5.3-2.1-5.3-5.3-2.1 5.3-2.1 2.1-5.2Z"
+        fill="#F2C66D"
+      />
+      <circle cx="55.5" cy="31" r="2.8" fill="#C9B8FF" />
+    </svg>
+  );
+}

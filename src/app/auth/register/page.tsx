@@ -52,7 +52,6 @@ function RegisterForm() {
     address2: "",
     role: roleFromUrl || ("CUSTOMER" as string),
     referralCode: refCode || "",
-    sellerReferralCode: "",  // 상담사가입 추천인코드 (멘토-멘티)
   });
   // 관리자가 설정한 회원가입 항목 권한(필수/선택/숨김). 로드 전에는 코드 기본값 사용.
   const [fieldSettings, setFieldSettings] = useState<RegisterFieldSettings>(REGISTER_FIELD_DEFAULTS);
@@ -60,34 +59,6 @@ function RegisterForm() {
   const isRequired = (key: RegisterFieldKey) => fieldSettings[key] === "required";
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  // 상담사가입 추천인코드 검증 상태
-  const [showSellerReferral, setShowSellerReferral] = useState(false);
-  const [sellerReferralValidating, setSellerReferralValidating] = useState(false);
-  const [sellerReferralValid, setSellerReferralValid] = useState<boolean | null>(null);
-  const [sellerReferralMentorName, setSellerReferralMentorName] = useState<string | null>(null);
-
-  const validateSellerReferralCode = async (code: string) => {
-    if (!code.trim()) {
-      setSellerReferralValid(null);
-      setSellerReferralMentorName(null);
-      return;
-    }
-    setSellerReferralValidating(true);
-    try {
-      const res = await fetch("/api/auth/validate-referral", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: code.trim() }),
-      });
-      const data = await res.json();
-      setSellerReferralValid(data.valid);
-      setSellerReferralMentorName(data.valid ? data.mentorName : null);
-    } catch {
-      setSellerReferralValid(null);
-    } finally {
-      setSellerReferralValidating(false);
-    }
-  };
   const [registrationResult, setRegistrationResult] = useState<{
     success: boolean;
     role: string;
@@ -217,7 +188,6 @@ function RegisterForm() {
           role: form.role,
           sellerRef,
           referralCode: form.referralCode || null,
-          sellerReferralCode: form.role === "CONSULTANT" ? (form.sellerReferralCode || null) : null,
         }),
       });
       const data = await res.json();
@@ -644,70 +614,6 @@ function RegisterForm() {
                     승인 전까지 상담사 기능을 이용할 수 없습니다.
                   </p>
                 </div>
-              </div>
-            )}
-
-            {form.role === "CONSULTANT" && (
-              <div>
-                <label className="flex items-center gap-2 cursor-pointer mb-2">
-                  <input
-                    type="checkbox"
-                    className="w-4 h-4 rounded accent-brand-500"
-                    checked={showSellerReferral}
-                    onChange={(e) => {
-                      setShowSellerReferral(e.target.checked);
-                      if (!e.target.checked) {
-                        setForm((f) => ({ ...f, sellerReferralCode: "" }));
-                        setSellerReferralValid(null);
-                        setSellerReferralMentorName(null);
-                      }
-                    }}
-                  />
-                  <span className="text-xs font-medium text-gray-600">상담사가입 추천인코드가 있으신가요?</span>
-                </label>
-                {showSellerReferral && (
-                  <div>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        className={`input-field text-sm py-2.5 pr-20 uppercase ${
-                          sellerReferralValid === true
-                            ? "border-green-400 bg-green-50"
-                            : sellerReferralValid === false
-                            ? "border-red-400 bg-red-50"
-                            : ""
-                        }`}
-                        placeholder="예: SB4K9M2X"
-                        value={form.sellerReferralCode}
-                        onChange={(e) => {
-                          const val = e.target.value.toUpperCase();
-                          setForm((f) => ({ ...f, sellerReferralCode: val }));
-                          setSellerReferralValid(null);
-                          setSellerReferralMentorName(null);
-                        }}
-                        onBlur={(e) => validateSellerReferralCode(e.target.value)}
-                        maxLength={8}
-                        autoComplete="off"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => validateSellerReferralCode(form.sellerReferralCode)}
-                        disabled={sellerReferralValidating || !form.sellerReferralCode.trim()}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] font-semibold px-2.5 py-1 bg-gray-800 text-white rounded-lg disabled:opacity-40"
-                      >
-                        {sellerReferralValidating ? "확인 중" : "확인"}
-                      </button>
-                    </div>
-                    {sellerReferralValid === true && sellerReferralMentorName && (
-                      <p className="text-[11px] text-green-600 mt-1 flex items-center gap-1">
-                        <Icon name="Check" size={12} /> {sellerReferralMentorName} 상담사의 추천코드가 확인되었습니다
-                      </p>
-                    )}
-                    {sellerReferralValid === false && (
-                      <p className="text-[11px] text-red-500 mt-1">유효하지 않은 추천인코드입니다.</p>
-                    )}
-                  </div>
-                )}
               </div>
             )}
 

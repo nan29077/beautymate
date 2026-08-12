@@ -16,9 +16,6 @@ export async function POST(_request: Request, { params }: { params: { id: string
     where: { id: params.id },
     include: { items: true, referralCommissions: true },
   });
-  const mentorCommissions = order
-    ? await (prisma as any).mentorCommission.findMany({ where: { orderId: params.id, status: "PENDING" } })
-    : [];
   if (!order) {
     return NextResponse.json({ error: "예약을 찾을 수 없습니다." }, { status: 404 });
   }
@@ -65,11 +62,6 @@ export async function POST(_request: Request, { params }: { params: { id: string
           data: { totalReferralEarnings: { decrement: Number(c.commissionAmount) } },
         });
       }
-    }
-
-    // 멘토 커미션 롤백
-    for (const mc of mentorCommissions) {
-      await (tx as any).mentorCommission.delete({ where: { id: mc.id } }).catch(() => {});
     }
 
     await tx.reservation.update({

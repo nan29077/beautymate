@@ -11,7 +11,7 @@ import { withVatRate } from "@/lib/utils";
 import Pagination, { usePagination } from "@/components/shared/Pagination";
 import SignupBadges from "@/components/shared/SignupBadges";
 import SafeImage from "@/components/shared/SafeImage";
-import { pickDefaultAvatar } from "@/lib/defaults";
+import { pickRoleAvatar, pickSajuAvatar, resolveAdminDashboardAvatar } from "@/lib/defaults";
 
 interface User {
   id: string;
@@ -19,6 +19,7 @@ interface User {
   email: string;
   phone?: string | null;
   gender?: string | null;
+  avatar?: string | null;
   birthday?: string | null;
   role: string;
   isActive: boolean;
@@ -40,6 +41,16 @@ const ROLE_MAP: Record<string, { label: string; color: string; order: number }> 
   CONSULTANT: { label: "상담사", color: "bg-blue-50 text-blue-600", order: 4 },
   CUSTOMER: { label: "고객", color: "bg-green-50 text-green-600", order: 5 },
 };
+
+function getUserAvatar(user: User): string {
+  if (user.role === "SUPER_ADMIN") {
+    return resolveAdminDashboardAvatar(user.id, user.avatar);
+  }
+  if (user.avatar) return user.avatar;
+  return user.role === "CUSTOMER"
+    ? pickSajuAvatar(user.id)
+    : pickRoleAvatar(user.id, user.role, user.gender);
+}
 
 export default function UserListClient({ users }: { users: User[] }) {
   const router = useRouter();
@@ -222,25 +233,25 @@ export default function UserListClient({ users }: { users: User[] }) {
           <h1 className="text-xl font-bold text-gray-900">회원 관리</h1>
           <p className="text-sm text-gray-500">총 {users.length}명</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg px-2 py-1.5">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+          <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg px-2 py-1.5 min-w-0">
             <ArrowUpDown size={13} className="text-gray-400" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="text-xs bg-transparent outline-none text-gray-700 pr-1"
+              className="text-xs bg-transparent outline-none text-gray-700 pr-1 min-w-0 w-full"
             >
               <option value="date">가입일순</option>
               <option value="role">회원 유형순</option>
               <option value="name">이름순</option>
             </select>
           </div>
-          <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg px-2 py-1.5">
+          <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg px-2 py-1.5 min-w-0">
             <Filter size={13} className="text-gray-400" />
             <select
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
-              className="text-xs bg-transparent outline-none text-gray-700 pr-1"
+              className="text-xs bg-transparent outline-none text-gray-700 pr-1 min-w-0 w-full"
             >
               <option value="all">전체 ({roleCounts.all})</option>
               <option value="SUPER_ADMIN">관리자 ({roleCounts.SUPER_ADMIN})</option>
@@ -263,7 +274,7 @@ export default function UserListClient({ users }: { users: User[] }) {
       </div>
 
       {/* Role Summary */}
-      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-5">
+      <div className="grid grid-cols-2 min-[430px]:grid-cols-3 sm:grid-cols-5 gap-2 mb-5">
         {Object.entries(ROLE_MAP).map(([key, val]) => (
           <button
             key={key}
@@ -286,7 +297,7 @@ export default function UserListClient({ users }: { users: User[] }) {
             <div key={user.id} className="bg-white rounded-xl border border-gray-100 p-3.5">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
-                  <SafeImage src={null} alt={user.name} width={36} height={36} placeholder={pickDefaultAvatar(user.id, user.gender)} fallbackText={user.name.charAt(0)} className="w-full h-full object-cover" />
+                  <SafeImage src={getUserAvatar(user)} alt={user.name} width={36} height={36} fallbackText={user.name.charAt(0)} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -366,7 +377,7 @@ export default function UserListClient({ users }: { users: User[] }) {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-gray-100 overflow-hidden">
-                          <SafeImage src={null} alt={user.name} width={32} height={32} placeholder={pickDefaultAvatar(user.id, user.gender)} fallbackText={user.name.charAt(0)} className="w-full h-full object-cover" />
+                          <SafeImage src={getUserAvatar(user)} alt={user.name} width={32} height={32} fallbackText={user.name.charAt(0)} className="w-full h-full object-cover" />
                         </div>
                         <span className="font-medium text-gray-900">{user.name}</span>
                       </div>
@@ -552,7 +563,7 @@ export default function UserListClient({ users }: { users: User[] }) {
 
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-11 h-11 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0">
-                  <SafeImage src={null} alt={u.name} width={44} height={44} placeholder={pickDefaultAvatar(u.id, u.gender)} fallbackText={u.name.charAt(0)} className="w-full h-full object-cover" />
+                  <SafeImage src={getUserAvatar(u)} alt={u.name} width={44} height={44} fallbackText={u.name.charAt(0)} className="w-full h-full object-cover" />
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5 flex-wrap">

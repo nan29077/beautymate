@@ -5,11 +5,7 @@ import {
   isValidSellerSlug,
   linkReferralForNewBuyer,
 } from "@/lib/referral";
-import {
-  generateUniqueSellerReferralCode,
-  findMentorByReferralCode,
-} from "@/lib/mentorReferral";
-import { randomAvatar, pickRoleAvatar } from "@/lib/defaults";
+import { randomAvatar, randomSajuAvatar, pickRoleAvatar } from "@/lib/defaults";
 import { getRegisterFieldSettings } from "@/lib/settings";
 import { notifySignupWelcome } from "@/lib/alimtalkTriggers";
 
@@ -19,8 +15,6 @@ export async function POST(request: NextRequest) {
       name, email, password, role, gender, birthday, phone,
       zipCode, address1, address2,
       sellerRef: sellerRefFromBody, referralCode,
-      // 상담사가입 추천인코드 (멘토-멘티 시스템)
-      sellerReferralCode: sellerReferralCodeRaw,
     } = await request.json();
 
     // 상담사 귀속은 URL ?ref= 에서 전달된 body 값만 신뢰한다.
@@ -59,24 +53,6 @@ export async function POST(request: NextRequest) {
     const address1Value = address1Trimmed || null;
     const address2Value = typeof address2 === "string" && address2.trim() ? address2.trim() : null;
 
-    // 상담사 가입 시 멘토 찾기
-    let mentorId: string | null = null;
-    let mentorReferralCodeSaved: string | null = null;
-    if (userRole === "CONSULTANT" && typeof sellerReferralCodeRaw === "string" && sellerReferralCodeRaw.trim()) {
-      const codeInput = sellerReferralCodeRaw.trim().toUpperCase();
-      const mentor = await findMentorByReferralCode(prisma, codeInput);
-      if (mentor) {
-        mentorId = mentor.id;
-        mentorReferralCodeSaved = codeInput;
-      }
-    }
-
-    // 상담사 가입 시 추천인코드 자동 발급
-    let newSellerReferralCode: string | undefined;
-    if (userRole === "CONSULTANT") {
-      newSellerReferralCode = await generateUniqueSellerReferralCode(prisma);
-    }
-
     // 1) User 생성
     const user = await (prisma as any).user.create({
       data: {
@@ -93,13 +69,9 @@ export async function POST(request: NextRequest) {
         address2: address2Value,
         avatar: userRole === "CONSULTANT"
           ? pickRoleAvatar(emailTrimmed, "CONSULTANT")
-          : randomAvatar(genderPick),
-        // 상담사 추천인코드 필드
-        ...(userRole === "CONSULTANT" && {
-          sellerReferralCode: newSellerReferralCode,
-          referredBySellerCode: mentorReferralCodeSaved,
-          mentorId,
-        }),
+          : sellerRef
+            ? randomAvatar(genderPick)
+            : randomSajuAvatar(),
         ...(userRole === "CONSULTANT" && {
           sellerProfile: {
             create: {

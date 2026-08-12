@@ -102,15 +102,6 @@ export async function cleanupStalePendingOrders(): Promise<number> {
           await tx.referralCommission.delete({ where: { id: c.id } }).catch(() => {});
         }
 
-        // 멘토 커미션 롤백 (PENDING 적립 레코드 삭제)
-        const mentorComms = await (prisma as any).mentorCommission.findMany({
-          where: { orderId: order.id, status: "PENDING" },
-          select: { id: true },
-        }).catch(() => []);
-        for (const mc of mentorComms) {
-          await (tx as any).mentorCommission.delete({ where: { id: mc.id } }).catch(() => {});
-        }
-
         // 예약 삭제 (OrderItem 은 onDelete: Cascade).
         // ── 레이스 가드 ──
         // findMany 스냅샷 이후 삭제 직전 사이에 결제 콜백(ONGI 간편계좌 등 비동기 입금)이

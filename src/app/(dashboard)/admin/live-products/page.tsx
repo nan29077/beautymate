@@ -101,18 +101,18 @@ export default function AdminLiveProductsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-5">
-        <div className="bg-white rounded-xl border border-gray-100 p-4">
+      <div className="grid grid-cols-1 min-[430px]:grid-cols-3 gap-2 sm:gap-3 mb-5">
+        <div className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4">
           <Icon name="Package" size={16} className="text-gray-400 mb-1" />
           <p className="text-lg font-bold">{products.length}</p>
           <p className="text-[10px] text-gray-400">전체 상담상품</p>
         </div>
-        <div className="bg-white rounded-xl border border-red-100 p-4">
+        <div className="bg-white rounded-xl border border-red-100 p-3 sm:p-4">
           <Icon name="Live" size={16} className="text-red-500 mb-1" />
           <p className="text-lg font-bold text-red-600">{liveCount}</p>
           <p className="text-[10px] text-gray-400">라이브 상담 등록</p>
         </div>
-        <div className="bg-white rounded-xl border border-emerald-100 p-4">
+        <div className="bg-white rounded-xl border border-emerald-100 p-3 sm:p-4">
           <Icon name="Cart" size={16} className="text-emerald-500 mb-1" />
           <p className="text-lg font-bold text-emerald-600">{groupBuyCount}</p>
           <p className="text-[10px] text-gray-400">단체 상담 등록</p>
@@ -120,7 +120,7 @@ export default function AdminLiveProductsPage() {
       </div>
 
       {/* Search & Filter */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row gap-2 mb-4">
         <div className="flex-1 relative">
           <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
@@ -131,7 +131,7 @@ export default function AdminLiveProductsPage() {
             className="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 outline-none"
           />
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1 overflow-x-auto scrollbar-hide">
           {[
             { id: "all" as const, label: "전체" },
             { id: "live" as const, label: "라이브" },
@@ -155,7 +155,7 @@ export default function AdminLiveProductsPage() {
       {/* Product List */}
       <div className="space-y-2">
         {pageItems.map(product => (
-          <div key={product.id} className="bg-white rounded-xl border border-gray-100 p-3 flex items-center gap-3">
+          <div key={product.id} className="bg-white rounded-xl border border-gray-100 p-3 flex flex-wrap sm:flex-nowrap items-center gap-3">
             <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-gray-50">
               <SafeImage src={product.thumbnail} placeholder={NO_IMAGE} alt={product.name} width={56} height={56} fallbackText={product.name} className="w-full h-full object-cover" />
             </div>
@@ -166,12 +166,12 @@ export default function AdminLiveProductsPage() {
                 <span className="text-[11px] font-medium text-gray-600">{product.basePrice.toLocaleString()}원</span>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 flex-shrink-0">
+            <div className="flex items-center gap-1.5 w-full sm:w-auto flex-shrink-0">
               {/* 단체 상담 토글 */}
               <button
                 onClick={() => toggleFlag(product.id, product.allowGroupBuy ? "disableGroupBuy" : "enableGroupBuy")}
                 disabled={actionLoading === product.id + (product.allowGroupBuy ? "disableGroupBuy" : "enableGroupBuy")}
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-all ${
+                className={`flex flex-1 sm:flex-none items-center justify-center gap-1 px-2.5 py-2 sm:py-1.5 rounded-lg text-[10px] font-bold border transition-all ${
                   product.allowGroupBuy
                     ? "bg-emerald-50 border-emerald-200 text-emerald-600"
                     : "bg-gray-50 border-gray-200 text-gray-400"
@@ -190,7 +190,7 @@ export default function AdminLiveProductsPage() {
               <button
                 onClick={() => toggleFlag(product.id, product.allowLiveCommerce ? "disableLiveCommerce" : "enableLiveCommerce")}
                 disabled={actionLoading === product.id + (product.allowLiveCommerce ? "disableLiveCommerce" : "enableLiveCommerce")}
-                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-all ${
+                className={`flex flex-1 sm:flex-none items-center justify-center gap-1 px-2.5 py-2 sm:py-1.5 rounded-lg text-[10px] font-bold border transition-all ${
                   product.allowLiveCommerce
                     ? "bg-red-50 border-red-200 text-red-600"
                     : "bg-gray-50 border-gray-200 text-gray-400"

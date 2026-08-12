@@ -1,9 +1,8 @@
 "use client";
 
 import { Icon } from '@/components/shared/Icon';
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import {  } from "lucide-react";
 import { useFeatureFlags } from "@/components/shared/FeatureFlagsProvider";
 
 interface BannerSlide {
@@ -18,25 +17,25 @@ interface BannerSlide {
 const DEFAULT_BANNERS: BannerSlide[] = [
   {
     id: "default-1",
-    title: "좋아하는 상담사의\n라이브를 즐기다",
-    subtitle: "사주메이트 LIVE",
-    imageUrl: "/banners/banner1.jpg",
+    title: "라이브를 보다가\n원하는 시간에 바로 예약",
+    subtitle: "LIVE TO BOOKING",
+    imageUrl: "/banners/sajumate/hero-live-v2.jpg",
     linkUrl: "/live",
     gradient: "from-gray-900/80 via-gray-900/35 to-transparent",
   },
   {
     id: "default-2",
-    title: "지금, 상담사와\n실시간으로 소통",
-    subtitle: "LIVE 상담",
-    imageUrl: "/banners/banner2.jpg",
+    title: "내 흐름을 이해하는\n따뜻한 운세 상담",
+    subtitle: "SAJU · TAROT · FORTUNE",
+    imageUrl: "/banners/sajumate/hero-insight-v2.jpg",
     linkUrl: "/live",
     gradient: "from-gray-900/80 via-gray-900/35 to-transparent",
   },
   {
     id: "default-3",
-    title: "상담사가 직접 고른\n오늘의 추천",
-    subtitle: "오늘의 PICK",
-    imageUrl: "/banners/banner3.jpg",
+    title: "남은 상담 시간을 확인하고\n예약과 결제를 한 번에",
+    subtitle: "SIMPLE RESERVATION",
+    imageUrl: "/banners/sajumate/hero-booking-v2.jpg",
     linkUrl: "/live",
     gradient: "from-gray-900/80 via-gray-900/35 to-transparent",
   },
@@ -53,6 +52,44 @@ interface HeroBannerSliderProps {
   liveCampaignCount?: number;
 }
 
+function BannerImage({
+  src,
+  fallback,
+  eager,
+  onFallback,
+}: {
+  src: string;
+  fallback: string;
+  eager: boolean;
+  onFallback: () => void;
+}) {
+  const [resolvedSrc, setResolvedSrc] = useState(src);
+  const imageRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => setResolvedSrc(src), [src]);
+  useEffect(() => {
+    const image = imageRef.current;
+    if (image?.complete && image.naturalWidth === 0 && resolvedSrc !== fallback) {
+      setResolvedSrc(fallback);
+      onFallback();
+    }
+  }, [fallback, onFallback, resolvedSrc]);
+
+  return (
+    <img
+      ref={imageRef}
+      src={resolvedSrc}
+      alt=""
+      className="w-full h-full object-cover"
+      loading={eager ? "eager" : "lazy"}
+      onError={() => {
+        if (resolvedSrc !== fallback) onFallback();
+        setResolvedSrc(fallback);
+      }}
+    />
+  );
+}
+
 export default function HeroBannerSlider({ banners, liveCampaignCount = 0 }: HeroBannerSliderProps) {
   const { groupBuy: FEATURE_GROUP_BUY } = useFeatureFlags();
   const slides: BannerSlide[] =
@@ -60,7 +97,7 @@ export default function HeroBannerSlider({ banners, liveCampaignCount = 0 }: Her
       ? banners.map((b, i) => ({
           id: b.id,
           title: b.title,
-          subtitle: b.subtitle || "사주메이트 Curated",
+          subtitle: b.subtitle || "SAJUMATE CURATED",
           imageUrl: b.imageUrl,
           linkUrl: b.linkUrl || "/",
           gradient: DEFAULT_BANNERS[i % DEFAULT_BANNERS.length].gradient,
@@ -70,6 +107,7 @@ export default function HeroBannerSlider({ banners, liveCampaignCount = 0 }: Her
   const [current, setCurrent] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [fallbackSlideIds, setFallbackSlideIds] = useState<Set<string>>(() => new Set());
 
   const goTo = useCallback(
     (idx: number) => {
@@ -104,7 +142,9 @@ export default function HeroBannerSlider({ banners, liveCampaignCount = 0 }: Her
     setTouchStart(null);
   };
 
-  const slide = slides[current];
+  const slide = fallbackSlideIds.has(slides[current].id)
+    ? { ...DEFAULT_BANNERS[current % DEFAULT_BANNERS.length], id: slides[current].id }
+    : slides[current];
 
   return (
     <div
@@ -119,11 +159,16 @@ export default function HeroBannerSlider({ banners, liveCampaignCount = 0 }: Her
           className="absolute inset-0 transition-opacity duration-700 ease-in-out"
           style={{ opacity: idx === current ? 1 : 0 }}
         >
-          <img
+          <BannerImage
             src={s.imageUrl}
-            alt=""
-            className="w-full h-full object-cover"
-            loading={idx === 0 ? "eager" : "lazy"}
+            fallback={DEFAULT_BANNERS[idx % DEFAULT_BANNERS.length].imageUrl}
+            eager={idx === 0}
+            onFallback={() => setFallbackSlideIds((previous) => {
+              if (previous.has(s.id)) return previous;
+              const nextIds = new Set(previous);
+              nextIds.add(s.id);
+              return nextIds;
+            })}
           />
         </div>
       ))}
@@ -171,7 +216,7 @@ export default function HeroBannerSlider({ banners, liveCampaignCount = 0 }: Her
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
               </span>
-              {liveCampaignCount}개 공구 진행 중
+              {liveCampaignCount}개 단체 상담 진행 중
             </Link>
           )}
         </div>

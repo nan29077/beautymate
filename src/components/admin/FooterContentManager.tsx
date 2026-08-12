@@ -206,9 +206,9 @@ export default function FooterContentManager() {
   return (
     <div>
       <SavedPopup show={showSavedPopup} onClose={() => setShowSavedPopup(false)} />
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <p className="text-xs text-gray-400">지원 페이지(이용약관, FAQ, 상담 방식 안내 등)의 내용을 관리합니다.</p>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2 w-full sm:w-auto">
           <button onClick={load} className="p-2 text-gray-400 hover:text-gray-700">
             <Icon name="Reorder" size={16} />
           </button>
@@ -222,8 +222,8 @@ export default function FooterContentManager() {
       </div>
       <div className="space-y-2">
         {items.map((item) => (
-          <div key={item.slug} className="bg-white rounded-xl border border-gray-100 px-4 py-3 flex items-center justify-between hover:border-amber-200 transition-colors">
-            <div className="flex items-center gap-3">
+          <div key={item.slug} className="bg-white rounded-xl border border-gray-100 px-4 py-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 hover:border-amber-200 transition-colors">
+            <div className="flex items-center gap-3 min-w-0">
               <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
                 <Icon name={SLUG_META[item.slug]?.iconName ?? "File"} size={16} />
               </div>
@@ -237,7 +237,7 @@ export default function FooterContentManager() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-end gap-1.5 w-full sm:w-auto">
               <button
                 onClick={() => setEditing({ ...item })}
                 className="flex items-center gap-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 border border-amber-200 rounded-lg px-3 py-1.5 hover:bg-amber-50 transition-colors"

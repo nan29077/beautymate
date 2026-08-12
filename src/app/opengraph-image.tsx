@@ -53,16 +53,23 @@ export default function OpenGraphImage() {
             zIndex: 1,
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              fontSize: 52,
-              fontWeight: 800,
-              letterSpacing: -2,
-              color: "#ffffff",
-            }}
-          >
-            사주메이트
+          <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+            <div style={{ width: 64, height: 64, borderRadius: 18, display: "flex", position: "relative", background: "#ffffff" }}>
+              <div style={{ position: "absolute", width: 38, height: 46, borderRadius: 999, left: 10, top: 9, background: "#6849d8" }} />
+              <div style={{ position: "absolute", width: 34, height: 43, borderRadius: 999, left: 23, top: 5, background: "#ffffff" }} />
+              <div style={{ position: "absolute", width: 10, height: 10, transform: "rotate(45deg)", right: 8, top: 9, background: "#f2c66d" }} />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                fontSize: 52,
+                fontWeight: 800,
+                letterSpacing: -2,
+                color: "#ffffff",
+              }}
+            >
+              사주메이트
+            </div>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column" }}>

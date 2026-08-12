@@ -55,7 +55,7 @@ export async function POST(
       finalCancelStatus = "COMPLETED";
     }
 
-    // 예약 최종 업데이트 + 이 예약에 적립된 미지급 커미션(레퍼럴/중간관리자/멘토) 취소.
+    // 예약 최종 업데이트 + 이 예약에 적립된 미지급 고객 추천 커미션 취소.
     // 커미션을 함께 취소하지 않으면 취소된 예약의 커미션이 별도 정산 경로에서
     // 지급될 수 있다. 이미 지급(PAID)된 커미션은 건드리지 않는다. (docs/SETTLEMENT_ISSUES.md #6)
     await prisma.$transaction([
@@ -72,10 +72,6 @@ export async function POST(
       }),
       prisma.referralCommission.updateMany({
         where: { reservationId: orderId, status: { in: ["PENDING", "CONFIRMED"] } },
-        data: { status: "CANCELLED" },
-      }),
-      prisma.mentorCommission.updateMany({
-        where: { orderId, status: { in: ["PENDING", "CONFIRMED"] } },
         data: { status: "CANCELLED" },
       }),
     ]);

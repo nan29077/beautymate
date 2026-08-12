@@ -18,14 +18,6 @@ import { Heart, Radio, Sparkles, ShieldCheck, Gift, Award, Quote, Instagram, You
 
 export const dynamic = "force-dynamic";
 
-// 남성/여성 구매회원 캐릭터 이미지 — 항목 인덱스 기반으로 남/여 교대 적용
-const BUYER_MALE_AVATARS = Array.from({ length: 13 }, (_, i) => `/avatars/남성구매회원_${i + 1}.png`);
-const BUYER_FEMALE_AVATARS = Array.from({ length: 13 }, (_, i) => `/avatars/여성구매회원_${i + 1}.png`);
-function buyerAvatar(i: number): string {
-  const arr = i % 2 === 0 ? BUYER_MALE_AVATARS : BUYER_FEMALE_AVATARS;
-  return encodeURI(arr[Math.floor(i / 2) % arr.length]);
-}
-
 // 서비스 차별점 (왜 사주메이트인가)
 const DIFFERENTIATORS = [
   { icon: Radio, color: "text-rose-500", bg: "bg-rose-50", title: "내 방송이 곧 예약창구", desc: "검색 마켓플레이스가 아니라, 상담사가 자신의 시청자를 그대로 데려오는 구조예요." },
@@ -170,7 +162,7 @@ async function getHomeData(featureLive: boolean) {
   return { liveSellers, isBuyer };
 }
 
-const SELLER_CTA_BG_DEFAULT = "/banners/banner5.jpg";
+const SELLER_CTA_BG_DEFAULT = "/banners/sajumate/consultant-cta-v2.jpg";
 
 // 구매회원(CUSTOMER) 외 계정은 메인 페이지 진입 시 각자 대시보드로 리다이렉트
 const ROLE_DASHBOARD: Record<string, string> = {
@@ -364,7 +356,7 @@ export default async function HomePage({
         <div className="flex items-center gap-1.5 px-5 mb-3">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <h2 className="text-[15px] font-extrabold text-gray-900">추천 상담사</h2>
-          <span className="text-[10px] text-gray-400">지금 활동중</span>
+          <span className="text-[10px] text-gray-400">분야별 상담 안내</span>
         </div>
         <SellerMarquee />
       </section>
@@ -413,7 +405,7 @@ export default async function HomePage({
               <Quote size={20} className="text-brand-400" />
               <p className="text-[12.5px] text-gray-700 leading-relaxed mt-2 flex-1">{s.quote}</p>
               <div className="flex items-center gap-2.5 mt-3 pt-3 border-t border-gray-50">
-                <img src={buyerAvatar(i)} alt="" className="w-10 h-10 rounded-full bg-brand-50 ring-2 ring-brand-100 object-cover" />
+                <img src={s.avatar || `/avatars/saju/saju-avatar-${String(i + 1).padStart(2, "0")}.png`} alt="" className="w-10 h-10 rounded-full bg-brand-50 ring-2 ring-brand-100 object-cover" />
                 <div className="min-w-0">
                   <p className="text-[12px] font-bold text-gray-900 truncate">{s.name}</p>
                   <p className="text-[10.5px] text-brand-600 font-bold">{s.metric}</p>

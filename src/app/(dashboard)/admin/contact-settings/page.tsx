@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Save, X, GripVertical, Loader2, Coffee, Moon } from 'lucide-react';
 import { useAppDialog } from "@/components/shared/AppDialog";
 import SavedPopup from "@/components/shared/SavedPopup";
+import AdminSupportSettingsNav from "@/components/admin/AdminSupportSettingsNav";
 
 interface FAQ {
   id: string;
@@ -124,13 +125,14 @@ const [settings, setSettings] = useState<ContactSettings | null>(null);
   const sortedFaqs = [...settings.faqs].sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
-    <div className="animate-fade-in max-w-3xl">
+    <div className="animate-fade-in max-w-3xl min-w-0">
       <SavedPopup show={showSavedPopup} onClose={() => setShowSavedPopup(false)} />
+      <AdminSupportSettingsNav />
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <Icon name="CustomerService" size={20} className="text-brand-500" /> 고객센터 설정
+            <Icon name="CustomerService" size={20} className="text-brand-500" /> 고객지원 설정
           </h1>
           <p className="text-sm text-gray-500">
             응대시간, 챗봇 FAQ를 관리하고 메인 페이지에 자동 동기화됩니다
@@ -139,7 +141,7 @@ const [settings, setSettings] = useState<ContactSettings | null>(null);
         <button
           onClick={handleSave}
           disabled={saving}
-          className="btn-primary text-sm flex items-center gap-1.5"
+          className="btn-primary text-sm flex items-center gap-1.5 w-full sm:w-auto"
         >
           {saving ? (
             <Loader2 size={14} className="animate-spin" />
@@ -159,7 +161,7 @@ const [settings, setSettings] = useState<ContactSettings | null>(null);
       )}
 
       {/* Operating Hours */}
-      <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
+      <div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-5 mb-4">
         <h2 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
           <Icon name="Clock" size={16} className="text-blue-500" /> 응대 시간 설정
         </h2>
@@ -216,7 +218,7 @@ const [settings, setSettings] = useState<ContactSettings | null>(null);
       </div>
 
       {/* Notices */}
-      <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
+      <div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-5 mb-4">
         <h2 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
           <Moon size={16} className="text-indigo-500" /> 안내 메시지
         </h2>
@@ -247,8 +249,8 @@ const [settings, setSettings] = useState<ContactSettings | null>(null);
       </div>
 
       {/* FAQ Management */}
-      <div className="bg-white rounded-xl border border-gray-100 p-5">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2">
             <Icon name="Message" size={16} className="text-brand-500" /> 챗봇 FAQ 관리
             <span className="text-xs text-gray-400 font-normal">
@@ -257,7 +259,7 @@ const [settings, setSettings] = useState<ContactSettings | null>(null);
           </h2>
           <button
             onClick={() => setShowAddFaq(true)}
-            className="text-sm flex items-center gap-1 px-3 py-1.5 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"
+            className="text-sm flex items-center justify-center gap-1 w-full sm:w-auto px-3 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"
           >
             <Icon name="Plus" size={14} /> FAQ 추가
           </button>

@@ -18,8 +18,6 @@ export async function getAdminSellers() {
           avatar: true,
           phone: true,
           createdAt: true,
-          mentorId: true,
-          mentor: { select: { id: true, name: true } },
         },
       },
       // orders(Reservation) 는 운영 DB 미반영 가능성이 있어 _count 에서 제외하고 별도 집계
@@ -115,8 +113,6 @@ export async function getAdminSellers() {
       middleAdminId: s.middleAdmin?.id || null,
       middleAdminName: s.middleAdmin?.name || null,
       middleAdminMarginRate: 0,
-      mentorId: s.user.mentorId || null,
-      mentorName: s.user.mentor?.name || null,
       createdAt: s.createdAt.toISOString(),
       settlementAvailable: orderSummary.available + adj,
       settlementScheduled: orderSummary.scheduled,

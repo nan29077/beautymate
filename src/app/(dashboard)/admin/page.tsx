@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { getFeatureFlags } from "@/lib/settings";
 import { safeQuery } from "@/lib/safeDb";
 import { formatPrice } from "@/lib/utils";
-import { pickRoleAvatar } from "@/lib/defaults";
+import { pickRoleAvatar, resolveAdminDashboardAvatar } from "@/lib/defaults";
 import SafeImage from "@/components/shared/SafeImage";
 import SeedDataButton from "@/components/admin/SeedDataButton";
 
@@ -123,7 +123,7 @@ export default async function AdminDashboard() {
   return (
     <div className="animate-fade-in space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col min-[430px]:flex-row items-start justify-between gap-3">
         <div className="min-w-0 flex items-center gap-2">
           <div>
             <h1 className="text-lg sm:text-xl font-bold text-gray-900">관리자 대시보드</h1>
@@ -133,7 +133,7 @@ export default async function AdminDashboard() {
             className="w-11 h-11 text-[#2d1b69] opacity-70 pointer-events-none select-none hidden sm:block" aria-hidden="true" />}
         </div>
         {pendingSellers > 0 && (
-          <Link href="/admin/sellers" className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-[11px] sm:text-xs font-medium hover:bg-amber-100 transition-colors border border-amber-100 flex-shrink-0">
+          <Link href="/admin/sellers" className="flex items-center justify-center gap-1.5 w-full min-[430px]:w-auto px-2.5 sm:px-3 py-2 bg-amber-50 text-amber-700 rounded-lg text-[11px] sm:text-xs font-medium hover:bg-amber-100 transition-colors border border-amber-100 flex-shrink-0">
             <Icon name="Warning" size={13} />
             <span className="hidden sm:inline">승인 대기</span> {pendingSellers}명
           </Link>
@@ -141,7 +141,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Today Overview */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+      <div className="grid grid-cols-1 min-[430px]:grid-cols-3 gap-2 sm:gap-3">
         <div className="bg-amber-400 rounded-xl p-3 sm:p-4 text-black">
           <p className="text-black/60 text-[9px] sm:text-[10px] font-medium mb-1">오늘 예약</p>
           <p className="text-xl sm:text-2xl font-bold">{todayOrders}</p>
@@ -190,9 +190,9 @@ export default async function AdminDashboard() {
           { label: "브랜드", value: brandCount, icon: "Official", color: "text-purple-500" },
           { label: "상담상품", value: `${activeProductCount}/${productCount}`, icon: "Package", href: "/admin/products", color: "text-orange-500", sub: "활성/전체" },
           { label: "캠페인", value: `${activeCampaigns}/${campaignCount}`, icon: "Event", href: "/admin/campaigns", color: "text-pink-500", sub: "진행/전체" },
-          { label: "처리 대기", value: pendingOrders, icon: "Cart", href: "/admin/orders", color: "text-amber-500" },
+          { label: "처리 대기", value: pendingOrders, icon: "Cart", href: "/admin/reservations", color: "text-amber-500" },
           { label: "진행중 캠페인", value: activeCampaigns, icon: "Chart", href: "/admin/campaigns", color: "text-red-500" },
-          { label: "총 예약", value: reservationCount, icon: "OrderManagement", href: "/admin/orders", color: "text-indigo-500" },
+          { label: "총 예약", value: reservationCount, icon: "OrderManagement", href: "/admin/reservations", color: "text-indigo-500" },
           { label: "전체 회원", value: userCount, icon: "Users", href: "/admin/users", color: "text-teal-500" },
         ].map((kpi) => {
           const Card = kpi.href ? Link : 'div';
@@ -215,16 +215,16 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Recent Orders */}
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-50">
+          <div className="flex items-center justify-between px-3.5 sm:px-5 py-3.5 border-b border-gray-50">
             <h2 className="text-sm font-bold text-gray-900">최근 예약</h2>
-            <Link href="/admin/orders" className="text-[11px] text-gray-400 hover:text-gray-600">전체보기 →</Link>
+            <Link href="/admin/reservations" className="text-[11px] text-gray-400 hover:text-gray-600">전체보기 →</Link>
           </div>
           {recentOrders.length > 0 ? (
             <div className="divide-y divide-gray-50">
               {recentOrders.map((order) => {
                 const st = statusLabels[order.status] || { label: order.status, color: "bg-gray-50 text-gray-600" };
                 return (
-                  <div key={order.id} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50/50 transition-colors">
+                  <div key={order.id} className="flex items-center justify-between px-3.5 sm:px-5 py-3 hover:bg-gray-50/50 transition-colors">
                     <div className="min-w-0">
                       <p className="text-[13px] font-medium text-gray-800 truncate">{order.reservationNumber}</p>
                       <p className="text-[11px] text-gray-400 truncate">{order.user.name} · {order.seller.shopName}</p>
@@ -247,17 +247,19 @@ export default async function AdminDashboard() {
 
         {/* Recent Users */}
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-50">
+          <div className="flex items-center justify-between px-3.5 sm:px-5 py-3.5 border-b border-gray-50">
             <h2 className="text-sm font-bold text-gray-900">최근 가입</h2>
             <Link href="/admin/users" className="text-[11px] text-gray-400 hover:text-gray-600">전체보기 →</Link>
           </div>
           <div className="divide-y divide-gray-50">
             {recentUsers.map((user) => (
-              <div key={user.id} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50/50 transition-colors">
+              <div key={user.id} className="flex items-center justify-between gap-2 px-3.5 sm:px-5 py-3 hover:bg-gray-50/50 transition-colors">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
                     <SafeImage
-                      src={user.avatar || pickRoleAvatar(user.id, user.role, user.gender)}
+                      src={user.role === "SUPER_ADMIN"
+                        ? resolveAdminDashboardAvatar(user.id, user.avatar)
+                        : (user.avatar || pickRoleAvatar(user.id, user.role, user.gender))}
                       alt={user.name}
                       width={32}
                       height={32}
@@ -306,7 +308,7 @@ export default async function AdminDashboard() {
 
       {/* Seed Data Button */}
       {reservationCount === 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <p className="text-sm font-bold text-amber-800">더미 데이터 없음</p>
             <p className="text-xs text-amber-600 mt-0.5">예약/정산 테스트 데이터를 생성하세요</p>
@@ -318,13 +320,13 @@ export default async function AdminDashboard() {
       {/* Quick Actions */}
       <div>
         <h2 className="text-sm font-bold text-gray-900 mb-3">빠른 관리</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        <div className="grid grid-cols-1 min-[390px]:grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
           {[
             { href: "/admin/users", label: "회원 관리", icon: "Users", desc: "회원 목록 & 권한" },
             { href: "/admin/sellers", label: "상담사 관리", icon: "Store", desc: "승인 & 관리" },
             { href: "/admin/products", label: "상담상품 관리", icon: "Package", desc: "상담상품 등록 & 관리" },
             { href: "/admin/campaigns", label: "캠페인", icon: "Event", desc: "공구 캠페인" },
-            { href: "/admin/orders", label: "예약 관리", icon: "OrderManagement", desc: "예약 처리" },
+            { href: "/admin/reservations", label: "예약 관리", icon: "OrderManagement", desc: "예약 처리" },
             { href: "/admin/settlements", label: "정산", icon: "Settlement", desc: "상담사 정산" },
             { href: "/admin/banners", label: "배너", icon: "Notice", desc: "메인 배너" },
             { href: "/", label: "사이트 보기", icon: "Eye", desc: "메인 페이지" },

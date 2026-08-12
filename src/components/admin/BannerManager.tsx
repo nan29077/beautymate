@@ -142,7 +142,7 @@ export default function BannerManager({ initialBanners }: BannerManagerProps) {
     <div>
       <SavedPopup show={showSavedPopup} onClose={() => setShowSavedPopup(false)} />
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-900">배너 관리</h1>
           <p className="text-sm text-gray-500">
@@ -151,7 +151,7 @@ export default function BannerManager({ initialBanners }: BannerManagerProps) {
         </div>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="btn-primary text-sm"
+          className="btn-primary text-sm w-full sm:w-auto"
         >
           <Icon name="Plus" size={16} strokeWidth={1.5} className="mr-1" />
           배너 추가
@@ -160,7 +160,7 @@ export default function BannerManager({ initialBanners }: BannerManagerProps) {
 
       {/* Form Modal */}
       {showForm && (
-        <div id="banner-form" className="mb-6 bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+        <div id="banner-form" className="mb-6 bg-white rounded-xl border border-gray-200 p-4 sm:p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-bold text-gray-900">
               {editingId ? "배너 수정" : "새 배너 추가"}
@@ -278,12 +278,12 @@ export default function BannerManager({ initialBanners }: BannerManagerProps) {
           </h3>
           <div className="grid grid-cols-1 gap-3">
             {topBanners.map((banner) => (
-              <div key={banner.id} className={`bg-white rounded-xl border p-4 flex items-center justify-between ${banner.isActive ? 'border-gray-100' : 'border-gray-200 opacity-60'}`}>
+              <div key={banner.id} className={`bg-white rounded-xl border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${banner.isActive ? 'border-gray-100' : 'border-gray-200 opacity-60'}`}>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">{banner.title}</p>
                   {banner.linkUrl && <p className="text-xs text-gray-400 truncate mt-0.5">{banner.linkUrl}</p>}
                 </div>
-                <div className="flex items-center gap-1 ml-3">
+                <div className="flex items-center justify-end gap-1 w-full sm:w-auto sm:ml-3">
                   <span className={`text-[10px] px-2 py-0.5 rounded-full ${banner.isActive ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400'}`}>{banner.isActive ? '활성' : '비활성'}</span>
                   <button onClick={() => startEdit(banner)} className="p-1.5 text-gray-400 hover:text-gray-600"><Icon name="Edit" size={14} /></button>
                   <button onClick={() => toggleActive(banner)} className="p-1.5 text-gray-400 hover:text-blue-600">{banner.isActive ? <Icon name="Eye" size={14} /> : <Icon name="Eye" size={14} />}</button>

@@ -16,32 +16,32 @@ export type HomeBenefits = { stats: HomeBenefitStat[]; items: HomeBenefitItem[] 
 
 // "숫자로 보는 사주메이트" 기본값
 export const DEFAULT_HOME_STATS: HomeStat[] = [
-  { value: "320억+", label: "누적 거래액" },
-  { value: "1,200+", label: "활동 상담사" },
-  { value: "48,000+", label: "누적 라이브 방송" },
-  { value: "98%", label: "상담 방식 만족도" },
+  { value: "24시간", label: "온라인 예약 접수" },
+  { value: "1분", label: "남은 시간 확인" },
+  { value: "한 번에", label: "예약과 결제" },
+  { value: "LIVE", label: "방송 연동 상담" },
 ];
 
 // "사주메이트로 성공한 상담사" 기본값
 export const DEFAULT_HOME_STORIES: HomeStory[] = [
-  { name: "유나 · 뷰티 상담사", quote: "취미로 올리던 메이크업이 단골 팬을 만나 매달 안정적인 수입이 됐어요. 라이브로 소통하니 재구매가 확 늘었어요.", metric: "월 매출 1,800만+", avatar: "/avatars/라이브셀러_2.png" },
-  { name: "도현 · 리빙 상담사", quote: "상담상품 소싱이 제일 막막했는데, 브랜드 상담상품을 골라 담기만 하면 돼서 시작이 쉬웠어요. 지금은 본업이 됐어요.", metric: "PICK 팬 6.4K", avatar: "/avatars/라이브셀러_5.png" },
-  { name: "소연 · 패션 상담사", quote: "팔로워 1천 명으로 시작했는데, 단골 PICK 구조 덕분에 충성 고객이 빠르게 쌓였어요. 라이브 1회로 완판도 했어요.", metric: "재구매율 71%", avatar: "/avatars/라이브셀러_8.png" },
-  { name: "태리 · 스포츠 상담사", quote: "정산·상담 방식을 신경 안 써도 되니 콘텐츠와 방송에만 집중할 수 있어요. 그게 매출로 바로 이어지더라고요.", metric: "누적 거래 3.2억", avatar: "/avatars/라이브셀러_10.png" },
+  { name: "월령 · 사주명리 상담사", quote: "방송 설명란에 예약 링크만 연결했는데 입금 확인과 시간 조율이 한 번에 정리됐어요. 이제 상담 자체에 더 집중합니다.", metric: "예약·결제 자동화", avatar: "/avatars/saju/saju-avatar-01.png" },
+  { name: "연화 · 타로 상담사", quote: "라이브 중 남은 상담 시간이 바로 보여서 시청자도 편하게 예약해요. 방송이 끝난 뒤 따로 메시지를 정리할 일이 줄었습니다.", metric: "라이브 예약 연결", avatar: "/avatars/saju/saju-avatar-14.png" },
+  { name: "해월 · 재물운 상담사", quote: "PICK 고객에게 방송 소식을 전하고 지난 상담 기록을 확인할 수 있어 재상담 관리가 훨씬 수월해졌어요.", metric: "단골 상담 관리", avatar: "/avatars/saju/saju-avatar-08.png" },
+  { name: "청아 · 궁합 상담사", quote: "유튜브 채팅과 예약 화면이 이어지니 시청자가 방송을 보다가 자연스럽게 원하는 시간을 선택합니다.", metric: "유튜브 LIVE 연동", avatar: "/avatars/saju/saju-avatar-25.png" },
 ];
 
 // "사주메이트로 얻는 것" 기본값
 export const DEFAULT_HOME_BENEFITS: HomeBenefits = {
   stats: [
-    { value: "68%", label: "단골 재구매율", sub: "PICK 상담사 기준" },
-    { value: "3.2x", label: "라이브 평균 체류", sub: "일반 대비" },
-    { value: "1,200+", label: "활동 상담사", sub: "누적" },
-    { value: "4,500+", label: "월 라이브 방송", sub: "플랫폼 합계" },
+    { value: "LIVE", label: "방송 연동", sub: "유튜브·SNS" },
+    { value: "24H", label: "예약 접수", sub: "방송 후에도" },
+    { value: "PICK", label: "단골 관리", sub: "알림과 재상담" },
+    { value: "ONE", label: "예약·결제", sub: "한 흐름으로" },
   ],
   items: [
-    { iconType: "heart", title: "단골 PICK으로 충성 고객", desc: "한 번 PICK한 팬이 다시 찾아오는, 관계 기반의 반복 구매." },
-    { iconType: "radio", title: "라이브로 실시간 소통", desc: "방송 중 바로 묻고 바로 사는, 몰입도 높은 쇼핑 경험." },
-    { iconType: "shield", title: "정산·상담 방식 걱정 없이", desc: "복잡한 운영은 플랫폼이, 상담사는 판매와 소통에만 집중." },
+    { iconType: "heart", title: "PICK으로 이어지는 단골 상담", desc: "한 번 만난 상담사와 다시 연결되는 관계 중심의 상담 경험." },
+    { iconType: "radio", title: "라이브에서 바로 예약", desc: "방송 중 남은 상담 시간을 확인하고 예약과 결제를 한 번에." },
+    { iconType: "shield", title: "입금 확인과 일정 조율을 간편하게", desc: "복잡한 운영은 플랫폼이 맡고 상담사는 상담과 방송에 집중." },
   ],
 };
 

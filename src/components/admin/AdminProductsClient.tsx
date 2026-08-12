@@ -2,12 +2,11 @@
 
 import { Icon } from '@/components/shared/Icon';
 import { useState, useMemo, useCallback } from "react";
-import { X, Loader2, Building2, Crown, Shield, Star, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { X, Loader2, Building2, Crown, Shield, Star } from 'lucide-react';
 import { formatPrice } from "@/lib/utils";
 import ProductImage from "@/components/shared/ProductImage";
 import AdminProductActions from "@/components/shared/AdminProductActions";
 import ProductRegisterForm from "@/components/shared/ProductRegisterForm";
-import PackageRegisterForm from "@/components/shared/PackageRegisterForm";
 import ProductItemActions from "@/components/shared/ProductItemActions";
 import ProductSalesDetail from "@/components/shared/ProductSalesDetail";
 import ProductChatPanel from "@/components/shared/ProductChatPanel";
@@ -45,47 +44,8 @@ interface Brand {
   marginPolicy?: { method: "PERCENTAGE" | "SUPPLY_BASE"; base: "SUPPLY" | "SALE"; rate: number } | null;
 }
 
-interface PendingPackageItem {
-  id: string;
-  name: string;
-  description: string | null;
-  imageUrl: string | null;
-  packagePrice: number;
-  stock: number;
-  status: string;
-  rejectReason: string | null;
-  creatorId: string;
-  creatorRole: string;
-  createdAt: string;
-  creator: { id: string; name: string; email: string };
-  items: {
-    id: string;
-    productId: string;
-    unitPrice: number;
-    quantity: number;
-    product: {
-      id: string;
-      name: string;
-      thumbnail: string | null;
-      supplyPrice?: number | null;
-      basePrice?: number | null;
-    };
-  }[];
-  _count: { packageOrderItems: number };
-}
-
-const ROLE_LABEL: Record<string, string> = {
-  SUPER_ADMIN: "최고관리자",
-  CONSULTANT: "상담사",
-};
-
-export default function AdminProductsClient({ products, pendingShopProducts, soldSellerProducts = [], brands, middleAdmins = [], sellers = [], currentUserId, pendingPackages = [] }: { products: Product[]; pendingShopProducts: PendingShop[]; soldSellerProducts?: any[]; brands: Brand[]; middleAdmins?: { id: string; name: string }[]; sellers?: { id: string; shopName: string }[]; currentUserId?: string; pendingPackages?: PendingPackageItem[] }) {
+export default function AdminProductsClient({ products, pendingShopProducts, soldSellerProducts = [], brands, middleAdmins = [], sellers = [], currentUserId }: { products: Product[]; pendingShopProducts: PendingShop[]; soldSellerProducts?: any[]; brands: Brand[]; middleAdmins?: { id: string; name: string }[]; sellers?: { id: string; shopName: string }[]; currentUserId?: string }) {
   const [searchQuery, setSearchQuery] = useState("");
-  // 승인 대기 탭: "product" | "package"
-  const [pendingTab, setPendingTab] = useState<"product" | "package">("product");
-  // 패키지 상세 펼침
-  const [expandedPkgId, setExpandedPkgId] = useState<string | null>(null);
-  const [pkgActionLoading, setPkgActionLoading] = useState<string | null>(null);
   // 1차 분류 탭 (등록자 유형) + 정렬 + 페이지네이션
   const [typeTab, setTypeTab] = useState<"ALL" | RegistrarType | "SELLING">("ALL");
   const [sortBy, setSortBy] = useState<"latest" | "sales" | "popular" | "name">("latest");
@@ -182,39 +142,6 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
     return c;
   }, [products]);
 
-  // 패키지 승인/반려 핸들러
-  const handlePkgApprove = useCallback(async (pkgId: string) => {
-    if (!await appConfirm({ message: "이 패키지 상담상품을 승인하시겠습니까?" })) return;
-    setPkgActionLoading(pkgId);
-    try {
-      const res = await fetch(`/api/package-products/${pkgId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "approve" }),
-      });
-      if (res.ok) { window.location.reload(); }
-      else { const d = await res.json().catch(() => ({})); await appAlert(d.error || "승인 실패"); }
-    } catch { await appAlert("오류가 발생했습니다."); }
-    setPkgActionLoading(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handlePkgReject = useCallback(async (pkgId: string) => {
-    if (!await appConfirm({ message: "이 패키지 상담상품을 반려하시겠습니까?", type: "warning", confirmText: "반려" })) return;
-    setPkgActionLoading(pkgId);
-    try {
-      const res = await fetch(`/api/package-products/${pkgId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "reject", rejectReason: "" }),
-      });
-      if (res.ok) { window.location.reload(); }
-      else { const d = await res.json().catch(() => ({})); await appAlert(d.error || "반려 실패"); }
-    } catch { await appAlert("오류가 발생했습니다."); }
-    setPkgActionLoading(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const handleReject = useCallback(async (productId: string) => {
     if (!await appConfirm({ message: "이 상담상품을 반려하시겠습니까?\n반려 시 상담상품이 삭제됩니다.", type: "warning", confirmText: "반려" })) return;
     setActionLoading(productId);
@@ -262,53 +189,23 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
         <div>
           <h1 className="text-lg sm:text-xl font-bold text-gray-900">상담상품 관리</h1>
-          <p className="text-xs sm:text-sm text-gray-500">총 {products.length}개 (일반 상담상품)</p>
+          <p className="text-xs sm:text-sm text-gray-500">총 {products.length}개 상담상품</p>
         </div>
-        <div className="flex items-center gap-2">
-          <PackageRegisterForm mode="admin" />
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <ProductRegisterForm brands={brands} mode="admin" hideGroupBuy />
         </div>
       </div>
 
-      {/* 승인 대기 섹션 — 일반 상담상품 / 패키지 상담상품 탭 분리 */}
-      {(unapproved.length > 0 || pendingPackages.length > 0) && (
+      {/* 상담상품 승인 대기 */}
+      {unapproved.length > 0 && (
         <div className="bg-white rounded-xl border border-amber-200 overflow-hidden mb-5">
-          {/* 탭 헤더 */}
-          <div className="flex items-center border-b border-amber-100 bg-amber-50">
-            <button
-              onClick={() => setPendingTab("product")}
-              className={`flex items-center gap-1.5 px-4 py-3 text-sm font-bold border-b-2 transition-colors ${
-                pendingTab === "product"
-                  ? "border-amber-500 text-amber-700"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <Icon name="Warning" size={14} className="text-amber-500" />
-              상담상품 승인 대기
-              {unapproved.length > 0 && (
-                <span className="ml-1 text-[11px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">{unapproved.length}</span>
-              )}
-            </button>
-            <button
-              onClick={() => setPendingTab("package")}
-              className={`flex items-center gap-1.5 px-4 py-3 text-sm font-bold border-b-2 transition-colors ${
-                pendingTab === "package"
-                  ? "border-amber-500 text-amber-700"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
-            >
-              <Star size={14} className="text-amber-500" />
-              패키지 상담상품 승인 대기
-              {pendingPackages.length > 0 && (
-                <span className="ml-1 text-[11px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">{pendingPackages.length}</span>
-              )}
-            </button>
+          <div className="flex items-center gap-2 border-b border-amber-100 bg-amber-50 px-4 py-3">
+            <Icon name="Warning" size={14} className="text-amber-500" />
+            <p className="text-sm font-bold text-amber-700">상담상품 승인 대기</p>
+            <span className="text-[11px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">{unapproved.length}</span>
           </div>
-
-          {/* 일반 상담상품 승인 대기 탭 */}
-          {pendingTab === "product" && (
-            <>
-              <div className="flex items-center justify-between px-4 py-2.5">
+          <>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 sm:px-4 py-2.5">
                 <p className="text-[11px] text-gray-400">브랜드/관리자가 등록한 상담상품. 승인 시 상담사에게 노출됩니다.</p>
                 <div className="flex items-center gap-2">
                   <button
@@ -337,7 +234,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                   {unapproved.map((p) => {
                     const checked = selectedIds.has(p.id);
                     return (
-                      <label key={p.id} className={`flex items-center gap-3 px-2 py-2.5 rounded-lg cursor-pointer ${checked ? "bg-emerald-50/60" : "hover:bg-gray-50"}`}>
+                      <label key={p.id} className={`flex flex-wrap sm:flex-nowrap items-center gap-3 px-2 py-2.5 rounded-lg cursor-pointer ${checked ? "bg-emerald-50/60" : "hover:bg-gray-50"}`}>
                         <input type="checkbox" checked={checked} onChange={() => toggleSelect(p.id)} className="w-4 h-4 accent-emerald-600 flex-shrink-0" />
                         <div className="w-6 h-6 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                           <ProductImage src={p.thumbnail} alt={p.name} width={40} height={40} className="w-full h-full object-cover" iconSize={10} />
@@ -346,7 +243,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                           <p className="text-[13px] font-medium text-gray-900 truncate">{p.name}</p>
                           <p className="text-[11px] text-gray-400 truncate">{p.brandName || "브랜드 미지정"} · {formatPrice(p.basePrice)}</p>
                         </div>
-                        <div className="flex items-center gap-1.5 flex-shrink-0" onClick={(e) => e.preventDefault()}>
+                        <div className="flex items-center justify-end gap-1.5 w-full sm:w-auto flex-shrink-0" onClick={(e) => e.preventDefault()}>
                           <button
                             onClick={(e) => { e.preventDefault(); window.open(`/products/${p.id}`, "_blank"); }}
                             className="text-[11px] font-medium px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 flex items-center gap-1 whitespace-nowrap"
@@ -368,111 +265,6 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                 </div>
               )}
             </>
-          )}
-
-          {/* 패키지 상담상품 승인 대기 탭 */}
-          {pendingTab === "package" && (
-            <>
-              <p className="text-[11px] text-gray-400 px-4 pt-2.5 pb-2">브랜드/상담사가 등록한 패키지 상담상품. 승인 시 고객에게 노출됩니다.</p>
-              {pendingPackages.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
-                  <Star size={32} className="mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">승인 대기 패키지 상담상품이 없습니다.</p>
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-50">
-                  {pendingPackages.map((pkg) => {
-                    const isExpanded = expandedPkgId === pkg.id;
-                    const totalUnitPrice = pkg.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-                    return (
-                      <div key={pkg.id} className="p-4">
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                            {pkg.imageUrl ? (
-                              <img src={pkg.imageUrl} alt={pkg.name} className="w-full h-full object-cover" />
-                            ) : (
-                              <Star size={20} className="m-auto mt-2.5 text-gray-300" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 truncate">{pkg.name}</p>
-                            <div className="flex items-center gap-2 mt-0.5 flex-wrap text-[10px] text-gray-500">
-                              <span>등록자: {pkg.creator.name} ({ROLE_LABEL[pkg.creatorRole] || pkg.creatorRole})</span>
-                              <span>판매가: <strong className="text-gray-700">{formatPrice(pkg.packagePrice)}원</strong></span>
-                              <span>구성: {pkg.items.length}개</span>
-                              <span>재고: {pkg.stock}개</span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-1.5 flex-shrink-0">
-                            <button
-                              onClick={() => setExpandedPkgId(isExpanded ? null : pkg.id)}
-                              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-500 hover:bg-gray-100 border border-gray-200 transition-colors"
-                            >
-                              {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-                              {isExpanded ? "닫기" : "상세보기"}
-                            </button>
-                            <button
-                              onClick={() => handlePkgApprove(pkg.id)}
-                              disabled={pkgActionLoading === pkg.id}
-                              className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50"
-                            >
-                              {pkgActionLoading === pkg.id ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
-                              승인
-                            </button>
-                            <button
-                              onClick={() => handlePkgReject(pkg.id)}
-                              disabled={pkgActionLoading === pkg.id}
-                              className="px-2.5 py-1.5 text-xs font-bold bg-red-50 text-red-600 rounded-lg hover:bg-red-100 disabled:opacity-50"
-                            >
-                              반려
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* 상세보기 확장 영역 */}
-                        {isExpanded && (
-                          <div className="mt-3 pt-3 border-t border-gray-100">
-                            <p className="text-xs font-bold text-gray-600 mb-2">구성 상담상품 상세</p>
-                            <div className="space-y-2">
-                              {pkg.items.map((item) => (
-                                <div key={item.id} className="bg-gray-50 rounded-lg p-3">
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-md overflow-hidden bg-gray-200 flex-shrink-0">
-                                      {item.product.thumbnail ? (
-                                        <img src={item.product.thumbnail} alt={item.product.name} className="w-full h-full object-cover" />
-                                      ) : (
-                                        <Star size={14} className="m-auto mt-1 text-gray-400" />
-                                      )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                      <p className="text-xs font-medium text-gray-800 truncate">{item.product.name}</p>
-                                                                          </div>
-                                    <div className="text-right">
-                                      <p className="text-xs font-bold text-gray-700">{formatPrice(item.unitPrice)}원 × {item.quantity}</p>
-                                      {(item.product.supplyPrice != null || item.product.basePrice != null) && (
-                                        <div className="text-[10px] text-gray-400 mt-0.5 space-x-2">
-                                          {item.product.supplyPrice != null && <span>공급가 {formatPrice(item.product.supplyPrice)}</span>}
-                                          {item.product.basePrice != null && <span>판매가 {formatPrice(item.product.basePrice)}</span>}
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                            <div className="mt-2 pt-2 border-t border-gray-200 flex justify-between text-xs">
-                              <span className="text-gray-500">구성 단가 합계</span>
-                              <span className="font-bold text-gray-700">{formatPrice(totalUnitPrice)}원</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </>
-          )}
         </div>
       )}
 
@@ -498,7 +290,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
           </div>
           <div className="bg-yellow-50 rounded-xl border border-yellow-100 overflow-hidden divide-y divide-yellow-100">
             {pendingShopProducts.map((sp) => (
-              <div key={sp.id} className="flex items-center gap-3 p-4">
+              <div key={sp.id} className="flex flex-wrap sm:flex-nowrap items-center gap-3 p-3 sm:p-4">
                 <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
                   <ProductImage src={sp.productThumbnail} alt={sp.productName} width={40} height={40} className="w-full h-full object-cover" iconSize={14} />
                 </div>
@@ -511,7 +303,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                     {sp.createdAt && <span className="text-[10px] text-gray-400">{new Date(sp.createdAt).toLocaleDateString("ko-KR", { month: "short", day: "numeric" })}</span>}
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5 flex-shrink-0">
+                <div className="flex items-center justify-end gap-1.5 w-full sm:w-auto flex-shrink-0">
                   <button
                     onClick={() => window.open(`/products/${sp.productId}`, "_blank")}
                     className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
@@ -588,7 +380,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
             const showSellers = typeTab === "SELLING" && (product.activeSellers || []).length > 0;
             return (
             <div key={product.id} className="p-3 sm:p-4 hover:bg-gray-50">
-              <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3">
                 <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
                   <ProductImage src={product.thumbnail} alt={product.name} width={48} height={48} className="w-full h-full object-cover" iconSize={14} />
                 </div>
@@ -667,10 +459,10 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-1 flex-shrink-0">
+                <div className="flex items-center justify-end gap-1 w-full sm:w-auto pt-2 sm:pt-0 mt-1 sm:mt-0 border-t sm:border-t-0 border-gray-100 flex-shrink-0">
                   <button
                     onClick={() => window.open(`/products/${product.id}`, "_blank")}
-                    className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="p-2 sm:p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
                     title="상담상품 상세 보기 (새 창)"
                   >
                     <Icon name="Info" size={14} />
@@ -680,7 +472,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                   ) : product.isActive ? (
                     <button
                       onClick={() => handleProductAction(product.id, "hide")}
-                      className="p-1.5 rounded-lg hover:bg-amber-50 text-amber-500 hover:text-amber-700 transition-colors"
+                      className="p-2 sm:p-1.5 rounded-lg hover:bg-amber-50 text-amber-500 hover:text-amber-700 transition-colors"
                       title="판매중지"
                     >
                       <Icon name="Pause" size={14} />
@@ -688,7 +480,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                   ) : (
                     <button
                       onClick={() => handleProductAction(product.id, "show")}
-                      className="p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-500 hover:text-emerald-700 transition-colors"
+                      className="p-2 sm:p-1.5 rounded-lg hover:bg-emerald-50 text-emerald-500 hover:text-emerald-700 transition-colors"
                       title="판매재개"
                     >
                       <Icon name="Play" size={14} />
@@ -696,7 +488,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                   )}
                   <button
                     onClick={() => handleProductAction(product.id, "delete")}
-                    className="p-1.5 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors"
+                    className="p-2 sm:p-1.5 rounded-lg hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors"
                     title="삭제"
                   >
                     <Icon name="Delete" size={14} />

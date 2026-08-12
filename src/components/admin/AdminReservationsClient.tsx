@@ -95,9 +95,9 @@ export default function AdminReservationsClient({
   });
 
   return (
-    <div className="p-4 md:p-6 max-w-6xl mx-auto">
+    <div className="p-0 md:p-6 max-w-6xl mx-auto min-w-0">
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-900">예약 조회</h1>
           <p className="text-sm text-gray-500 mt-0.5">총 {reservations.length}건</p>
@@ -114,7 +114,7 @@ export default function AdminReservationsClient({
       {/* 필터 패널 */}
       {showFilters && (
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4 space-y-3">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 min-[430px]:grid-cols-2 md:grid-cols-4 gap-3">
             <div>
               <label className="block text-xs text-gray-500 mb-1">상담사</label>
               <select

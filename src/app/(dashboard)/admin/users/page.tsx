@@ -37,6 +37,7 @@ export default async function AdminUsersPage() {
     email: u.email,
     phone: u.phone,
     gender: u.gender,
+    avatar: u.avatar,
     birthday: u.birthday,
     // DB 레거시 역할(SELLER/BUYER 등)을 현행 3역할로 정규화해 표시
     role: normalizeRole(u.role),

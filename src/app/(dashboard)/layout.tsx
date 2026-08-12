@@ -5,7 +5,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getFeatureFlags } from "@/lib/settings";
-import { pickRoleAvatar, shouldUseAvatar } from "@/lib/defaults";
+import { pickRoleAvatar, resolveAdminDashboardAvatar, shouldUseAvatar } from "@/lib/defaults";
 import type { FeatureFlags } from "@/lib/featureFlags";
 import { Shield, Building2, Crown, User } from 'lucide-react';
 import LogoutButton from "@/components/shared/LogoutButton";
@@ -43,18 +43,11 @@ export default async function DashboardLayout({
       { href: "/admin/sellers", iconName: "Store", label: "상담사 관리", group: "회원 관리" },
       // 상담상품 관리
       { href: "/admin/products", iconName: "Package", label: "상담상품 관리", group: "상담상품 관리" },
-      { href: "/admin/package-products", iconName: "Package", label: "패키지 상담상품 승인", group: "상담상품 관리" },
-      { href: "/admin/package-purchase-orders", iconName: "OrderManagement", label: "패키지 발주서", group: "상담상품 관리" },
       { href: "/admin/categories", iconName: "Category", label: "카테고리 관리", group: "상담상품 관리" },
       // 예약·정산
-      { href: "/admin/orders", iconName: "OrderManagement", label: "예약 관리(구)", group: "예약·정산" },
-      { href: "/admin/reservations", iconName: "Calendar", label: "예약 조회", group: "예약·정산" },
+      { href: "/admin/reservations", iconName: "Calendar", label: "예약 관리", group: "예약·정산" },
       { href: "/admin/campaigns", iconName: "Event", label: "단체 상담 관리", group: "예약·정산" },
-      { href: "/admin/settlements", iconName: "Settlement", label: "정산 관리", group: "예약·정산" },
-      { href: "/admin/deposit-transfer", iconName: "Wallet", label: "입금이체(송금)", group: "예약·정산" },
-      { href: "/admin/manual-settlement", iconName: "Edit", label: "수기 정산", group: "예약·정산" },
-      { href: "/admin/tax", iconName: "Receipt", label: "세무 관리", group: "예약·정산" },
-      { href: "/admin/revenue", iconName: "Ranking", label: "관리자 수익", group: "예약·정산" },
+      { href: "/admin/settlements", iconName: "Settlement", label: "정산·재무 관리", group: "예약·정산" },
       // 콘텐츠
       { href: "/admin/banners", iconName: "Globe", label: "사이트 관리", group: "콘텐츠" },
       { href: "/admin/contents", iconName: "Star", label: "콘텐츠 관리", group: "콘텐츠" },
@@ -64,13 +57,11 @@ export default async function DashboardLayout({
       { href: "/admin/alimtalk", iconName: "Notification", label: "알림톡 관리", group: "알림톡" },
       // 고객지원
       { href: "/admin/inquiries", iconName: "Comment", label: "문의 관리", group: "고객지원" },
-      { href: "/admin/support/chatbot", iconName: "Message", label: "챗봇 관리", group: "고객지원" },
-      { href: "/admin/contact-settings", iconName: "CustomerService", label: "고객센터 설정", group: "고객지원" },
+      { href: "/admin/contact-settings", iconName: "CustomerService", label: "고객지원 설정", group: "고객지원" },
       // SNS구독 승인은 HIDDEN_MENU_HREFS 로 숨김
       { href: "/admin/channel-verifications", iconName: "Certified", label: "SNS구독 승인", group: "고객지원" },
       // 시스템
-      { href: "/admin/seller-rates", iconName: "Discount", label: "멘티추천커미션·기타 할인율 설정", group: "시스템" },
-      { href: "/admin/settings", iconName: "Settings", label: "권한 설정", group: "시스템" },
+      { href: "/admin/settings", iconName: "Settings", label: "운영 설정", group: "시스템" },
     ],
     CONSULTANT: [
       { href: "/seller", iconName: "Dashboard_icon", label: "대시보드", group: "메인" },
@@ -89,8 +80,6 @@ export default async function DashboardLayout({
       { href: "/seller/timeslots", iconName: "Clock", label: "시간슬롯 관리", group: "예약·정산" },
       { href: "/seller/reservations", iconName: "Calendar", label: "예약 관리", group: "예약·정산" },
       { href: "/seller/customers", iconName: "Users", label: "고객관리(CRM)", group: "예약·정산" },
-      { href: "/seller/orders", iconName: "OrderManagement_icon", label: "예약 관리(구)", group: "예약·정산" },
-      { href: "/seller/package-purchase-orders", iconName: "Package", label: "패키지 발주서", group: "예약·정산" },
       { href: "/seller/settlements", iconName: "Settlement_icon", label: "정산·출금", group: "예약·정산" },
       // 알림톡
       { href: "/seller/alimtalk", iconName: "Notification", label: "알림톡 관리", group: "알림톡" },
@@ -111,7 +100,7 @@ export default async function DashboardLayout({
     { match: (h) => h.endsWith("/live") || h.endsWith("/live-products"), key: "liveCommerce" },
     { match: (h) => h.endsWith("/contents"), key: "brix" },
     { match: (h) => h === "/admin/sellers", key: "seller" },
-    { match: (h) => h === "/seller/games", key: "game" },
+    { match: (h) => h.endsWith("/games"), key: "game" },
   ];
   // 노출 숨김 메뉴: "SNS구독 승인"(채널 구독 인증) 메뉴는 사이드바에서 감춘다.
   // (페이지/기능 자체는 유지하되 메뉴 진입만 비노출)
@@ -148,10 +137,13 @@ export default async function DashboardLayout({
 
   // 역할 기반 랜덤 캐릭터 아바타 (기존 프로필 이미지 우선, 없으면 역할별 캐릭터)
   // 제외 목록(예: 천송이 쇼핑/김혜선)은 아바타를 적용하지 않음
+  const resolvedProfileImage = role === "SUPER_ADMIN"
+    ? resolveAdminDashboardAvatar(session.user.id, profileImage || userAvatar)
+    : profileImage;
   const roleAvatarFallback = shouldUseAvatar(session.user.name, sellerShopName)
     ? (userAvatar || pickRoleAvatar(session.user.id, role, userGender))
     : (userAvatar || null);
-  const displayImage = profileImage || roleAvatarFallback;
+  const displayImage = resolvedProfileImage || roleAvatarFallback;
   const sidebarAvatar = displayImage;
 
   const roleConfig: Record<string, { label: string; labelEn: string; icon: any; color: string; gradient: string }> = {
@@ -162,7 +154,7 @@ export default async function DashboardLayout({
   const rc = roleConfig[role] || roleConfig.CUSTOMER;
 
   return (
-    <div className="min-h-screen bg-[#fdfaf0]">
+    <div className="min-h-screen bg-[#fdfaf0]" data-dashboard-role={role}>
       {/* Desktop Sidebar */}
       <aside className="fixed left-0 top-0 bottom-0 w-[260px] bg-white border-r border-gray-100/80 hidden lg:flex flex-col z-40">
         {/* Logo & Role */}
@@ -226,7 +218,7 @@ export default async function DashboardLayout({
       />
 
       {/* Main Content */}
-      <main className="lg:ml-[260px] min-h-screen p-4 sm:p-6 lg:p-8">
+      <main className="dashboard-content lg:ml-[260px] min-h-screen p-3 sm:p-6 lg:p-8 overflow-x-hidden">
         {children}
       </main>
     </div>

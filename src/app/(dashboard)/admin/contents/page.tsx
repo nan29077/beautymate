@@ -71,36 +71,36 @@ export default async function AdminContentsPage() {
       </div>
 
       {/* 통계 카드 */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-        <div className="bg-white rounded-xl border border-gray-100 p-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 mb-6">
+        <div className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4">
           <div className="flex items-center gap-2 mb-1">
             <Icon name="Chart" size={14} className="text-gray-500" />
             <span className="text-[10px] text-gray-400">전체</span>
           </div>
           <p className="text-xl font-bold text-gray-900">{totalCount}</p>
         </div>
-        <div className="bg-yellow-50 rounded-xl border border-yellow-100 p-4">
+        <div className="bg-yellow-50 rounded-xl border border-yellow-100 p-3 sm:p-4">
           <div className="flex items-center gap-2 mb-1">
             <Icon name="Clock" size={14} className="text-yellow-500" />
             <span className="text-[10px] text-yellow-600">승인 대기</span>
           </div>
           <p className="text-xl font-bold text-yellow-700">{pendingCount}</p>
         </div>
-        <div className="bg-green-50 rounded-xl border border-green-100 p-4">
+        <div className="bg-green-50 rounded-xl border border-green-100 p-3 sm:p-4">
           <div className="flex items-center gap-2 mb-1">
             <Icon name="Check" size={14} className="text-green-500" />
             <span className="text-[10px] text-green-600">공개중</span>
           </div>
           <p className="text-xl font-bold text-green-700">{publishedCount}</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-100 p-4">
+        <div className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4">
           <div className="flex items-center gap-2 mb-1">
             <Icon name="Eye" size={14} className="text-blue-500" />
             <span className="text-[10px] text-gray-400">총 조회수</span>
           </div>
           <p className="text-xl font-bold text-gray-900">{totalViews.toLocaleString()}</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-100 p-4">
+        <div className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4">
           <div className="flex items-center gap-2 mb-1">
             <Icon name="Tag" size={14} className="text-brand-500" />
             <span className="text-[10px] text-gray-400">쇼핑 태그</span>

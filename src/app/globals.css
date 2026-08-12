@@ -12,7 +12,13 @@
 
 @layer base {
   :root {
-    --brand: 338 82% 59%;
+    --brand: 255 75% 62%;
+    --saju-night: #17102d;
+    --saju-ink: #241445;
+    --saju-violet: #6849d8;
+    --saju-lavender: #c9b8ff;
+    --saju-gold: #f2c66d;
+    --saju-cream: #fbf8ff;
   }
   
   body {
@@ -20,9 +26,7 @@
     font-feature-settings: "kern" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* 옅은 베이스 + 육각 패턴 — PC 좌우 여백에 은은하게 노출 */
-    background-color: #fdf6e3;
-    background-image: url("data:image/svg+xml,%3Csvg width='28' height='49' viewBox='0 0 28 49' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f5a700' fill-opacity='0.13'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background: #f7f4fc;
   }
 
   /* 제목(헤딩)은 통통하고 둥근 폰트로 — 부드러운 브랜드 톤 */
@@ -33,17 +37,17 @@
 
   /* 브랜드 테마: 선택 영역 / 폼 컨트롤 accent 색상 통일 */
   ::selection {
-    background-color: #f5a700;
-    color: #111827;
+    background-color: #c9b8ff;
+    color: #241445;
   }
   input[type="checkbox"],
   input[type="radio"],
   input[type="range"],
   progress {
-    accent-color: #f5a700;
+    accent-color: #6849d8;
   }
 
-  /* 스크롤바 커스텀 (허니 톤) */
+  /* 스크롤바 커스텀 */
   ::-webkit-scrollbar {
     width: 6px;
   }
@@ -51,12 +55,86 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #ecc35a;
+    background: #c9b8ff;
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #f5a700;
+    background: #6849d8;
   }
+}
+
+/* 관리자 콘솔 모바일 공통 규칙: 콘텐츠 폭, 폼, 표, 모달을 작은 화면 안에 유지한다. */
+@media (max-width: 639px) {
+  [data-dashboard-role="SUPER_ADMIN"] .dashboard-content {
+    padding: 0.75rem;
+  }
+
+  [data-dashboard-role="SUPER_ADMIN"] .dashboard-content > * {
+    min-width: 0;
+  }
+
+  [data-dashboard-role="SUPER_ADMIN"] .dashboard-content h1 {
+    font-size: 1.125rem;
+    line-height: 1.45;
+    text-wrap: balance;
+  }
+
+  [data-dashboard-role="SUPER_ADMIN"] .dashboard-content input:not([type="checkbox"]):not([type="radio"]),
+  [data-dashboard-role="SUPER_ADMIN"] .dashboard-content select,
+  [data-dashboard-role="SUPER_ADMIN"] .dashboard-content textarea {
+    max-width: 100%;
+    min-height: 2.625rem;
+  }
+
+  [data-dashboard-role="SUPER_ADMIN"] .dashboard-content [role="dialog"] {
+    max-width: calc(100vw - 1.5rem);
+    max-height: calc(100dvh - 1.5rem);
+    overflow-y: auto;
+  }
+
+  [data-dashboard-role="SUPER_ADMIN"] .dashboard-content .overflow-x-auto {
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  [data-dashboard-role="SUPER_ADMIN"] .dashboard-content table {
+    font-size: 0.75rem;
+  }
+
+  [data-dashboard-role="SUPER_ADMIN"] .dashboard-content th,
+  [data-dashboard-role="SUPER_ADMIN"] .dashboard-content td {
+    white-space: nowrap;
+  }
+}
+
+/* 공개 앱의 PC 좌우 여백 전용 초승달·궤도 패턴.
+   OBS/PRISM 위젯과 독립 라이브 화면에는 적용하지 않는다. */
+@media (min-width: 1024px) {
+  .sajumate-public-shell {
+    position: relative;
+    isolation: isolate;
+    background-color: #f7f4fc;
+    background-image:
+      radial-gradient(circle at 18% 16%, rgba(139, 108, 246, 0.17), transparent 28rem),
+      radial-gradient(circle at 82% 78%, rgba(242, 198, 109, 0.13), transparent 25rem),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none'%3E%3Ccircle cx='28' cy='34' r='20' stroke='%236849d8' stroke-opacity='.07'/%3E%3Ccircle cx='36' cy='28' r='20' fill='%23f7f4fc'/%3E%3Cpath d='M128 32l2.6 6.4L137 41l-6.4 2.6L128 50l-2.6-6.4L119 41l6.4-2.6z' fill='%23d1b164' fill-opacity='.13'/%3E%3Ccircle cx='142' cy='126' r='32' stroke='%236849d8' stroke-opacity='.055'/%3E%3Cpath d='M38 137a48 48 0 0 1 65-45' stroke='%236849d8' stroke-opacity='.05' stroke-dasharray='3 8'/%3E%3Ccircle cx='103' cy='92' r='2.5' fill='%236849d8' fill-opacity='.1'/%3E%3C/g%3E%3C/svg%3E");
+    background-attachment: fixed;
+  }
+
+  .sajumate-public-shell::before,
+  .sajumate-public-shell::after {
+    content: "";
+    position: fixed;
+    z-index: 0;
+    width: 22rem;
+    height: 22rem;
+    border: 1px solid rgba(104, 73, 216, 0.07);
+    border-radius: 999px;
+    pointer-events: none;
+  }
+
+  .sajumate-public-shell::before { left: -9rem; top: 17vh; }
+  .sajumate-public-shell::after { right: -10rem; bottom: 10vh; }
 }
 
 /* ── 라이브 뷰어 다크 UI ─────────────────────────────────────────── */

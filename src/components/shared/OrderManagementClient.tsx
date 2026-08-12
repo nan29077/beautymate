@@ -87,8 +87,6 @@ interface Order {
   cancelType?: string | null;
   cancelAmount?: number | null;
   cancelFromSettlement?: boolean | null;
-  // 패키지 예약 여부
-  isPackageOrder?: boolean;
 }
 
 // 정산 수수료 안내 라인 색상

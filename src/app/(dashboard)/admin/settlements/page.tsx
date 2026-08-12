@@ -6,6 +6,7 @@ import { getSellerSettlementSummary, getPlatformFees } from "@/lib/settlement";
 import { getPlatformRevenue } from "@/lib/revenue";
 import { safeQuery } from "@/lib/safeDb";
 import AdminPayoutSettlement from "@/components/admin/AdminPayoutSettlement";
+import AdminFinanceNav from "@/components/admin/AdminFinanceNav";
 
 export const dynamic = "force-dynamic";
 
@@ -77,9 +78,12 @@ export default async function AdminSettlementsPage() {
     .reduce((sum, p) => sum + p.amount, 0);
 
   return (
-    <AdminPayoutSettlement
-      totals={{ totalSales, pendingTotal, availableTotal, requestedTotal, sellerbricksRevenue, businessDays }}
-      payouts={payouts}
-    />
+    <div className="animate-fade-in min-w-0">
+      <AdminFinanceNav />
+      <AdminPayoutSettlement
+        totals={{ totalSales, pendingTotal, availableTotal, requestedTotal, sellerbricksRevenue, businessDays }}
+        payouts={payouts}
+      />
+    </div>
   );
 }

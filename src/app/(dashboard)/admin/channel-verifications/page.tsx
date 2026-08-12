@@ -39,18 +39,18 @@ export default async function AdminChannelVerificationsPage() {
       </div>
 
       {/* KPI */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        <div className="bg-white rounded-xl border border-orange-200 p-4 text-center">
+      <div className="grid grid-cols-1 min-[430px]:grid-cols-3 gap-2 sm:gap-3 mb-6">
+        <div className="bg-white rounded-xl border border-orange-200 p-3 sm:p-4 text-center">
           <Icon name="Clock" size={20} className="mx-auto text-orange-500 mb-1" />
           <p className="text-2xl font-bold text-gray-900">{pending.length}</p>
           <p className="text-xs text-gray-500">승인 대기</p>
         </div>
-        <div className="bg-white rounded-xl border border-emerald-200 p-4 text-center">
+        <div className="bg-white rounded-xl border border-emerald-200 p-3 sm:p-4 text-center">
           <Icon name="Check" size={20} className="mx-auto text-emerald-500 mb-1" />
           <p className="text-2xl font-bold text-gray-900">{approved.length}</p>
           <p className="text-xs text-gray-500">승인 완료</p>
         </div>
-        <div className="bg-white rounded-xl border border-red-200 p-4 text-center">
+        <div className="bg-white rounded-xl border border-red-200 p-3 sm:p-4 text-center">
           <Icon name="Close" size={20} className="mx-auto text-red-400 mb-1" />
           <p className="text-2xl font-bold text-gray-900">{rejected.length}</p>
           <p className="text-xs text-gray-500">거부</p>

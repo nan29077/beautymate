@@ -7,8 +7,8 @@ import QRCode from "qrcode";
 interface Props { slug: string }
 
 const QR_SIZE = 156;
-const BEE_RATIO = 0.22;
-const BEE_PATH = "/favicon.png"; // QR 중앙 브랜드 마크 (로드 실패 시 QR만 렌더)
+const BRAND_MARK_RATIO = 0.22;
+const BRAND_MARK_PATH = "/favicon.png"; // QR 중앙 초승달 마크 (로드 실패 시 QR만 렌더)
 
 /** Returns local (row, col) within a 7x7 finder block if the cell belongs to one; null otherwise. */
 function getFinderLocal(
@@ -39,9 +39,9 @@ function drawModules(
         const inOuter = lr === 0 || lr === 6 || lc === 0 || lc === 6;
         const inInner3 = lr >= 2 && lr <= 4 && lc >= 2 && lc <= 4;
         if (inOuter) {
-          ctx.fillStyle = (lr + lc) % 2 === 0 ? "#F5A623" : "#1A1A1A";
+          ctx.fillStyle = (lr + lc) % 2 === 0 ? "#6849D8" : "#241445";
         } else if (inInner3) {
-          ctx.fillStyle = "#F5A623";
+          ctx.fillStyle = "#6849D8";
         } else {
           ctx.fillStyle = "#FFFFFF";
         }
@@ -71,13 +71,13 @@ function buildQRCanvas(url: string): Promise<HTMLCanvasElement> {
   return new Promise((resolve) => {
     const img = new window.Image();
     img.onload = () => {
-      const beeSize = Math.round(totalPx * BEE_RATIO);
-      const beeXY = Math.round((totalPx - beeSize) / 2);
-      ctx.drawImage(img, beeXY, beeXY, beeSize, beeSize);
+      const markSize = Math.round(totalPx * BRAND_MARK_RATIO);
+      const markXY = Math.round((totalPx - markSize) / 2);
+      ctx.drawImage(img, markXY, markXY, markSize, markSize);
       resolve(canvas);
     };
     img.onerror = () => resolve(canvas);
-    img.src = BEE_PATH;
+    img.src = BRAND_MARK_PATH;
   });
 }
 
@@ -106,12 +106,12 @@ export default function ShopQRSection({ slug }: Props) {
 
     const img = new window.Image();
     img.onload = () => {
-      const beeSize = Math.round(totalPx * BEE_RATIO);
-      const beeXY = Math.round((totalPx - beeSize) / 2);
-      ctx.drawImage(img, beeXY, beeXY, beeSize, beeSize);
+      const markSize = Math.round(totalPx * BRAND_MARK_RATIO);
+      const markXY = Math.round((totalPx - markSize) / 2);
+      ctx.drawImage(img, markXY, markXY, markSize, markSize);
     };
     img.onerror = () => {};
-    img.src = BEE_PATH;
+    img.src = BRAND_MARK_PATH;
   }, [slug]);
 
   const handleDownload = async () => {

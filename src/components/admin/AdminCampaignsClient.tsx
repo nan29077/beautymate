@@ -78,8 +78,8 @@ export default function AdminCampaignsClient({ campaigns }: { campaigns: Campaig
             const progress = c.goalQuantity ? getProgressPercent(c.currentQuantity, c.goalQuantity) : 0;
             return (
               <div key={c.id} className="bg-white rounded-xl border border-gray-100 p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="min-w-0">
                     <p className="text-sm font-medium text-gray-900">{c.title}</p>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                       <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium">
@@ -102,7 +102,7 @@ export default function AdminCampaignsClient({ campaigns }: { campaigns: Campaig
                     {c.status === "ACTIVE" ? "진행중" : c.status === "SCHEDULED" ? "예정" : c.status === "SUCCESS" ? "성공" : c.status}
                   </span>
                 </div>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   <div className="text-center p-2 bg-gray-50 rounded-lg">
                     <p className="text-xs font-bold">{formatPrice(c.campaignPrice)}</p>
                     <p className="text-[9px] text-gray-400">판매가</p>

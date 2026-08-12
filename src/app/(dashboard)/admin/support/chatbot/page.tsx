@@ -3,6 +3,7 @@
 import { Icon } from '@/components/shared/Icon';
 import { useState, useEffect } from "react";
 import { Bot, Loader2, Power } from 'lucide-react';
+import AdminSupportSettingsNav from "@/components/admin/AdminSupportSettingsNav";
 
 export default function AdminChatbotPage() {
   const [enabled, setEnabled] = useState<boolean>(true);
@@ -47,9 +48,10 @@ export default function AdminChatbotPage() {
 
   return (
     <div className="animate-fade-in max-w-2xl">
+      <AdminSupportSettingsNav />
       <div className="mb-6">
         <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-          <Bot size={20} className="text-amber-500" /> 챗봇 관리
+          <Bot size={20} className="text-amber-500" /> 챗봇 노출 설정
         </h1>
         <p className="text-sm text-gray-500 mt-0.5">고객 페이지의 문의하기(챗봇) 노출 여부를 관리합니다.</p>
       </div>

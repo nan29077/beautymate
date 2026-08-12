@@ -2,7 +2,7 @@
 
 import { Icon } from '@/components/shared/Icon';
 import { useState, useEffect, useMemo } from "react";
-import { Save, Users, Link2, Loader2, X, Square } from 'lucide-react';
+import { Save, Link2, Loader2, X, Square } from 'lucide-react';
 import { useAppDialog } from "@/components/shared/AppDialog";
 import SavedPopup from "@/components/shared/SavedPopup";
 import Pagination, { usePagination } from "@/components/shared/Pagination";
@@ -28,17 +28,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
   const [bulkValues, setBulkValues] = useState({ referralCommissionRate: "", referralDiscountRate: "", pickDiscountRate: "" });
   const [bulkSaving, setBulkSaving] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
-  const [mentorCommissionRate, setMentorCommissionRate] = useState<number>(1);
-  const [mentorRateSaving, setMentorRateSaving] = useState(false);
-  const [mentorRateSaved, setMentorRateSaved] = useState(false);
   const [showSavedPopup, setShowSavedPopup] = useState(false);
-
-  useEffect(() => {
-    fetch("/api/admin/mentor-commission-rate")
-      .then((r) => r.json())
-      .then((data) => setMentorCommissionRate(Number(data.mentorCommissionRate ?? 1)))
-      .catch(() => {});
-  }, []);
 
   useEffect(() => {
     fetch("/api/admin/seller-rates")
@@ -115,20 +105,6 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
     finally { setBulkSaving(false); }
   };
 
-  const saveMentorRate = async () => {
-    setMentorRateSaving(true);
-    try {
-      const res = await fetch("/api/admin/mentor-commission-rate", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mentorCommissionRate }),
-      });
-      if (res.ok) { setMentorRateSaved(true); setTimeout(() => setMentorRateSaved(false), 2000); }
-      else { appAlert("저장에 실패했습니다."); }
-    } catch { appAlert("저장에 실패했습니다."); }
-    finally { setMentorRateSaving(false); }
-  };
-
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 size={24} className="animate-spin text-gray-400" /></div>;
 
   const allFilteredSelected = filtered.length > 0 && filtered.every(s => selectedIds.has(s.id));
@@ -139,48 +115,9 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <Icon name="Settings" size={20} className="text-brand-600" />
-          <h1 className="text-xl font-bold text-gray-900">멘티추천커미션·기타 할인율 설정</h1>
+          <h1 className="text-xl font-bold text-gray-900">고객 추천·할인율 설정</h1>
         </div>
-        <p className="text-sm text-gray-500">멘토 추천인 커미션율 및 인플루언서별 할인율을 설정합니다</p>
-      </div>
-
-      {/* 멘토 추천인 커미션율 설정 */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 p-4 mb-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Users size={16} className="text-blue-500" />
-          <div>
-            <p className="text-sm font-bold text-gray-800">추천인 커미션율 (멘토-멘티)</p>
-            <p className="text-[11px] text-gray-500">이 요율로 멘토 상담사의 추천인 커미션이 자동 적립됩니다</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-white rounded-lg border border-blue-100 px-3 py-2 flex-1">
-            <input
-              type="number"
-              min={0}
-              max={10}
-              step={0.1}
-              value={mentorCommissionRate}
-              onChange={(e) => setMentorCommissionRate(Number(e.target.value))}
-              className="flex-1 text-sm font-bold text-center bg-transparent outline-none"
-            />
-            <span className="text-sm font-medium text-gray-500">%</span>
-          </div>
-          <button
-            onClick={saveMentorRate}
-            disabled={mentorRateSaving}
-            className={`flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-xs font-semibold transition-colors ${
-              mentorRateSaved
-                ? "bg-green-100 text-green-700"
-                : "bg-blue-500 text-white hover:bg-blue-600"
-            }`}
-          >
-            {mentorRateSaving ? <Loader2 size={13} className="animate-spin" /> : mentorRateSaved ? <><Icon name="Check" size={13} /> 저장됨</> : <><Save size={13} /> 저장</>}
-          </button>
-        </div>
-        <p className="text-[10px] text-gray-400 mt-2">
-          예: 멘티 상담사 판매 100,000원 × {mentorCommissionRate}% = <b>{Math.round(100000 * mentorCommissionRate / 100).toLocaleString()}원</b>이 멘토 상담사에게 적립됩니다 (플랫폼 수수료에서 차감)
-        </p>
+        <p className="text-sm text-gray-500">상담사별 고객 추천 혜택과 채널 인증 할인율을 설정합니다</p>
       </div>
 
       {/* ★ 상세 설명 가이드 토글 */}
@@ -413,7 +350,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
       {selectedIds.size > 0 && (
         <div className="mb-4 bg-brand-50 rounded-xl border border-brand-200 p-4">
           <p className="text-xs font-bold text-brand-700 mb-3">{selectedIds.size}명 선택됨 - 일괄 적용</p>
-          <div className="grid grid-cols-3 gap-3 mb-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
             <div>
               <label className="block text-[10px] font-semibold text-brand-600 mb-1">추천인 커미션 (%)</label>
               <input type="number" min={0} max={20} step={0.5} value={bulkValues.referralCommissionRate}
@@ -442,7 +379,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
 
       {/* Description */}
       <div className="bg-gradient-to-r from-brand-50 to-purple-50 rounded-xl border border-brand-100 p-4 mb-6">
-        <div className="grid grid-cols-3 gap-3 text-center">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
           <div><p className="text-[10px] text-brand-600 font-semibold mb-0.5">추천인 커미션</p><p className="text-[10px] text-gray-500">추천 코드 구매 시 인플루언서 적립</p></div>
           <div><p className="text-[10px] text-purple-600 font-semibold mb-0.5">추천인 할인</p><p className="text-[10px] text-gray-500">추천 코드 가입 회원 할인</p></div>
           <div><p className="text-[10px] text-pink-600 font-semibold mb-0.5">Pick 채널인증 할인</p><p className="text-[10px] text-gray-500">Pick+구독인증 회원 할인</p></div>
@@ -484,7 +421,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                   {saving === seller.id ? <Loader2 size={12} className="animate-spin" /> : saved === seller.id ? <><Icon name="Check" size={12} /> 저장됨</> : <><Save size={12} /> 저장</>}
                 </button>
               </div>
-              <div className="grid grid-cols-3 gap-3 px-4 py-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 px-4 py-3">
                 <div>
                   <label className="block text-[10px] font-semibold text-brand-600 mb-1">추천인 커미션 (%)</label>
                   <input type="number" min={0} max={20} step={0.5} value={values.referralCommissionRate}

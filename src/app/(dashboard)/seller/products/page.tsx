@@ -5,7 +5,6 @@ import { formatPrice } from "@/lib/utils";
 import { Star, Plus, Search, Clock, CheckCircle2, BookOpen, Radio, EyeOff, Eye, Trash2, Edit3, MoreVertical } from "lucide-react";
 import SafeImage from "@/components/shared/SafeImage";
 import ProductRegisterForm from "@/components/shared/ProductRegisterForm";
-import PackageRegisterForm from "@/components/shared/PackageRegisterForm";
 import ProductItemActions from "@/components/shared/ProductItemActions";
 import SellerProductTabs from "@/components/shared/SellerProductTabs";
 import ShopExposeManager from "@/components/shared/ShopExposeManager";
@@ -173,7 +172,6 @@ export default async function SellerProductsPage() {
           <h1 className="text-lg sm:text-xl font-bold text-gray-900">상담상품 관리</h1>
         </div>
         <div className="flex items-center gap-2">
-          <PackageRegisterForm mode="seller" />
           <ProductRegisterForm brands={[]} mode="seller" />
         </div>
       </div>

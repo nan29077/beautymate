@@ -263,14 +263,14 @@ export default function AdminAlimtalkClient() {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex items-start justify-between gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-900">알림톡 관리</h1>
           <p className="text-sm text-gray-500 mt-0.5">플랫폼 공용 알리고 계정의 템플릿 연결과 발송 현황을 관리합니다</p>
         </div>
         <button
           onClick={() => { fetchUsage(); fetchTemplates(); }}
-          className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shrink-0"
+          className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shrink-0 bg-white"
         >
           <Icon name="Reorder" className="w-4 h-4" />
           새로고침
@@ -295,16 +295,16 @@ export default function AdminAlimtalkClient() {
               const insp = p.inspStatus ? INSP_LABELS[p.inspStatus] : null;
               const msg = purposeMsg[p.purpose];
               return (
-                <div key={p.purpose} className="p-5">
+                <div key={p.purpose} className="p-4 sm:p-5">
                   <div className="flex flex-wrap items-center gap-3">
-                    <div className="min-w-[220px]">
+                    <div className="w-full sm:w-auto sm:min-w-[220px]">
                       <p className="font-medium text-gray-900 text-sm">{p.label}</p>
                       <p className="text-xs text-gray-500 mt-0.5">{p.description}</p>
                     </div>
                     <select
                       value={d.tplCode}
                       onChange={(e) => setDraft((prev) => ({ ...prev, [p.purpose]: { ...d, tplCode: e.target.value } }))}
-                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 min-w-[240px]"
+                      className="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 sm:min-w-[240px]"
                     >
                       <option value="">템플릿 선택</option>
                       {templates.map((t) => (
@@ -507,7 +507,7 @@ export default function AdminAlimtalkClient() {
                 value={sellerQuery}
                 onChange={(e) => setSellerQuery(e.target.value)}
                 placeholder="상담사명 · 점집명 검색"
-                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 min-w-[200px]"
+                className="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 sm:min-w-[200px]"
               />
             </div>
             {visibleSellers.length === 0 ? (

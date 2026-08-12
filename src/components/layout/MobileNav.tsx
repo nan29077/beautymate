@@ -162,7 +162,7 @@ export default function MobileNav() {
               title={item.label}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 w-12 h-12 rounded-xl transition-colors",
-                isActive ? "bg-amber-50 text-amber-800" : "text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                isActive ? "bg-brand-50 text-brand-700" : "text-gray-400 hover:bg-brand-50/70 hover:text-brand-700"
               )}
             >
               <Icon name={item.icon} size={20} className={isActive ? "" : "opacity-60"} />

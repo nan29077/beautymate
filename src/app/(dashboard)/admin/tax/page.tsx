@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import AdminTaxClient, { type TaxRecord } from "@/components/admin/AdminTaxClient";
+import AdminFinanceNav from "@/components/admin/AdminFinanceNav";
 
 export const dynamic = "force-dynamic";
 
@@ -51,6 +52,7 @@ export default async function AdminTaxPage() {
 
   return (
     <div className="animate-fade-in">
+      <AdminFinanceNav />
       <AdminTaxClient
         sellerBusiness={sellerBusiness}
         sellerNonBusiness={sellerNonBusiness}

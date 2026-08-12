@@ -72,7 +72,7 @@ export default function AdminInquiriesPage() {
       </div>
 
       {/* Search + Filter */}
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
         <div className="relative flex-1">
           <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
@@ -80,7 +80,7 @@ export default function AdminInquiriesPage() {
             className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white" />
           {searchQuery && <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><X size={14} /></button>}
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1 w-full sm:w-auto overflow-x-auto scrollbar-hide">
           {(["all", "pending", "replied"] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)}
               className={`px-3 py-2 text-xs font-medium rounded-lg transition-colors ${filter === f ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}>
@@ -110,7 +110,7 @@ export default function AdminInquiriesPage() {
                   </span>
                 </div>
                 <p className="text-sm text-gray-900 truncate">{inquiry.message}</p>
-                <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-400">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[10px] text-gray-400">
                   <span className="flex items-center gap-0.5"><Icon name="MyPage" size={10} /> {inquiry.name}</span>
                   <span className="flex items-center gap-0.5"><Icon name="Mail" size={10} /> {inquiry.email}</span>
                   <span className="flex items-center gap-0.5"><Icon name="Clock" size={10} /> {new Date(inquiry.createdAt).toLocaleDateString("ko-KR")}</span>

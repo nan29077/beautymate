@@ -21,7 +21,6 @@ export interface Seller {
   followersCount: number; shopProductsCount: number; campaignsCount: number; ordersCount: number;
   commissionRate: number | null;
   middleAdminId: string | null; middleAdminName: string | null; middleAdminMarginRate: number;
-  mentorId: string | null; mentorName: string | null;
   createdAt: string;
   settlementAvailable: number;
   settlementScheduled: number;
@@ -181,7 +180,7 @@ export default function AdminSellersClient({
           </div>
           <div className="space-y-2">
             {pending.map((seller) => (
-              <div key={seller.id} className="flex items-center gap-2.5 bg-white rounded-lg border border-gray-100 p-2.5 sm:p-3">
+              <div key={seller.id} className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 bg-white rounded-lg border border-gray-100 p-2.5 sm:p-3">
                 <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 overflow-hidden flex-shrink-0">
                   <SafeImage src={seller.userImage || seller.shopLogo || (shouldUseAvatar(seller.userName, seller.shopName) ? pickSellerAvatar(seller.userId) : undefined)} alt={seller.shopName} width={40} height={40} fallbackText={seller.shopName.charAt(0)} />
                 </div>
@@ -189,7 +188,7 @@ export default function AdminSellersClient({
                   <p className="text-[13px] font-bold text-gray-900 truncate">{seller.shopName}</p>
                   <p className="text-[10px] sm:text-xs text-gray-400 truncate">{seller.userName} · {seller.userEmail}</p>
                 </div>
-                <div className="flex items-center gap-1.5 flex-shrink-0">
+                <div className="flex items-center justify-end gap-1.5 w-full sm:w-auto flex-shrink-0">
                   <ApproveSellerButton sellerId={seller.id} />
                   <RejectSellerButton sellerId={seller.id} sellerName={seller.shopName} />
                 </div>
@@ -216,7 +215,7 @@ export default function AdminSellersClient({
           </div>
         ) : pageItems.map((seller) => (
           <div key={seller.id} className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4">
-            <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 mb-3">
+            <div className="flex flex-wrap sm:flex-nowrap items-start sm:items-center gap-2.5 sm:gap-3 mb-3">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-100 overflow-hidden flex-shrink-0">
                 <SafeImage src={seller.userImage || seller.shopLogo || (shouldUseAvatar(seller.userName, seller.shopName) ? pickSellerAvatar(seller.userId) : undefined)} alt={seller.shopName} width={48} height={48} fallbackText={seller.shopName.charAt(0)} />
               </div>
@@ -226,15 +225,6 @@ export default function AdminSellersClient({
                   <span className={`text-[9px] sm:text-[10px] font-medium px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ${seller.isApproved ? "bg-green-50 text-green-600" : "bg-yellow-50 text-yellow-600"}`}>
                     {seller.isApproved ? "승인됨" : "대기중"}
                   </span>
-                  {seller.mentorId && seller.mentorName ? (
-                    <span className="text-[9px] sm:text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0 bg-blue-50 text-blue-600">
-                      멘토: {seller.mentorName}
-                    </span>
-                  ) : (
-                    <span className="text-[9px] sm:text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0 bg-gray-100 text-gray-400">
-                      멘토없음
-                    </span>
-                  )}
                   <span className="text-[9px] sm:text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0 bg-indigo-50 text-indigo-600 flex items-center gap-0.5">
                     <Icon name="Discount" size={9} />
                     {withVatRate(seller.commissionRate ?? 5)}% (부가세 포함)
@@ -242,7 +232,7 @@ export default function AdminSellersClient({
                 </div>
                 <p className="text-[10px] sm:text-xs text-gray-400 truncate">{seller.userName} · {seller.userEmail}</p>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 flex-wrap justify-end">
+              <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto flex-shrink-0 flex-wrap justify-end">
                 <button
                   onClick={() => setDetailSeller(seller)}
                   className="flex items-center gap-1 text-xs px-2 py-1.5 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors"
@@ -357,9 +347,6 @@ export default function AdminSellersClient({
               <div className="flex items-center gap-2 text-gray-600"><Icon name="Calendar" size={13} className="text-gray-400" /> 가입일 {detailSeller.userCreatedAt ? new Date(detailSeller.userCreatedAt).toLocaleDateString("ko-KR") : "-"}</div>
               {detailSeller.middleAdminName && (
                 <div className="flex items-center gap-2 text-gray-600"><Icon name="Settings" size={13} className="text-gray-400" /> 중간관리자: {detailSeller.middleAdminName}</div>
-              )}
-              {detailSeller.mentorName && (
-                <div className="flex items-center gap-2 text-gray-600"><Icon name="Star" size={13} className="text-gray-400" /> 멘토: {detailSeller.mentorName}</div>
               )}
             </div>
 

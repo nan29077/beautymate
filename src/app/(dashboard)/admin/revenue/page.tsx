@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getPlatformRevenue } from "@/lib/revenue";
 import AdminRevenueClient from "./AdminRevenueClient";
+import AdminFinanceNav from "@/components/admin/AdminFinanceNav";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +42,7 @@ export default async function AdminRevenuePage({
 
   return (
     <div className="animate-fade-in">
+      <AdminFinanceNav />
       <AdminRevenueClient revenue={revenue} period={period} />
     </div>
   );

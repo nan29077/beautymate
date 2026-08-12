@@ -13,7 +13,7 @@ import {
   linkReferralForNewBuyer,
 } from "@/lib/referral";
 import { verifyImpersonationToken } from "@/lib/impersonation";
-import { pickBuyerAvatar } from "@/lib/defaults";
+import { pickBuyerAvatar, pickSajuAvatar } from "@/lib/defaults";
 import { normalizeRole } from "@/lib/roles";
 import { ensureSellerProfile } from "@/lib/sellerProfile";
 
@@ -438,27 +438,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async createUser({ user }) {
       if (!user?.id) return;
 
-      // 소셜 로그인으로 생성된 고객에게 프로필 사진이 없으면 랜덤 고객 캐릭터 자동 배정.
-      // PrismaAdapter 가 OAuth profile.image 를 User.image 에 저장하므로 null 이면 사진 미제공.
-      if (!user.image) {
-        try {
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { avatar: pickBuyerAvatar(user.id) },
-          });
-        } catch (e) {
-          console.error("[createUser] buyer avatar assign error", e);
-        }
-      }
-
-      // PrismaAdapter 는 image 필드만 채워주므로, 기존 UI 컬럼에는 영향 없음.
       try {
-              const cookieStore = await cookies();
+        const cookieStore = await cookies();
         const refCookie = cookieStore.get(SELLER_REF_COOKIE)?.value;
         const sellerSlug = refCookie && isValidSellerSlug(refCookie) ? refCookie : null;
+
+        // 개인 샵 유입 고객은 기존 프로필 풀, 일반 유입 고객은 사주 캐릭터 풀을 사용한다.
+        // 소셜 제공자가 프로필 사진을 준 경우에는 사용자의 원본 이미지를 존중한다.
+        if (!user.image) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { avatar: sellerSlug ? pickBuyerAvatar(user.id) : pickSajuAvatar(user.id) },
+          });
+        }
+
         await linkReferralForNewBuyer(prisma, { userId: user.id, sellerRef: sellerSlug, referralCode: null });
       } catch (e) {
-        console.error("[createUser] referral link error", e);
+        console.error("[createUser] avatar/referral setup error", e);
       }
     },
   },

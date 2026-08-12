@@ -406,37 +406,6 @@ export async function POST(request: Request) {
   const finalAmount = totalAmount - totalDiscountAmount - cartDiscountAmount;
   const totalQty = orderItems.reduce((acc: number, i: any) => acc + i.quantity, 0);
 
-  // 상담사의 멘토 정보 조회 (멘토-멘티 추천인 커미션)
-  let mentorCommissionData: {
-    mentorId: string;
-    menteeId: string;
-    commissionRate: number;
-    commissionAmount: number;
-  } | null = null;
-  try {
-    const sellerUser = await (prisma as any).user.findUnique({
-      where: { id: seller.userId },
-      select: { mentorId: true },
-    });
-    if (sellerUser?.mentorId) {
-      const feeRow = await (prisma as any).platformFeeSettings.findFirst({ orderBy: { id: "asc" } });
-      const mentorRate = Number(feeRow?.mentorCommissionRate ?? 1);
-      if (mentorRate > 0) {
-        const mentorCommAmount = Math.round(finalAmount * mentorRate / 100);
-        if (mentorCommAmount > 0) {
-          mentorCommissionData = {
-            mentorId: sellerUser.mentorId,
-            menteeId: seller.userId,
-            commissionRate: mentorRate,
-            commissionAmount: mentorCommAmount,
-          };
-        }
-      }
-    }
-  } catch (e) {
-    console.error("[orders] 멘토 커미션 산정 실패:", e);
-  }
-
   // 커미션 대상 상담사는 트랜잭션 밖에서 미리 조회 (읽기) — 쓰기만 원자적으로 묶는다.
   let commission: {
     sellerId: string;
@@ -530,21 +499,6 @@ export async function POST(request: Request) {
       await tx.sellerProfile.update({
         where: { id: commission.sellerId },
         data: { totalReferralEarnings: { increment: commission.commAmount } },
-      });
-    }
-
-    // 멘토 커미션 생성 (상담사에게 멘토가 있는 경우)
-    if (mentorCommissionData) {
-      await (tx as any).mentorCommission.create({
-        data: {
-          mentorId: mentorCommissionData.mentorId,
-          menteeId: mentorCommissionData.menteeId,
-          orderId: created.id,
-          baseAmount: finalAmount,
-          commissionRate: mentorCommissionData.commissionRate / 100, // 퍼센트 → 소수점
-          commissionAmount: mentorCommissionData.commissionAmount,
-          status: "PENDING",
-        },
       });
     }
 

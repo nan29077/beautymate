@@ -9,7 +9,7 @@ export default async function AdminProductsPage() {
   const session = await auth();
   if (session?.user?.role !== "SUPER_ADMIN") redirect("/");
 
-  const [products, pendingShopProducts, soldSellerProducts, sellers, shopSellerRows, activeSellerRows, pendingPackages] = await Promise.all([
+  const [products, pendingShopProducts, soldSellerProducts, sellers, shopSellerRows, activeSellerRows] = await Promise.all([
     prisma.product.findMany({
       include: {
         category: true,
@@ -70,28 +70,6 @@ export default async function AdminProductsPage() {
         productId: true,
         seller: { select: { id: true, shopName: true, shopLogo: true } },
       },
-    }),
-    // 패키지 승인 대기 목록
-    prisma.packageProduct.findMany({
-      where: { status: "PENDING" },
-      include: {
-        creator: { select: { id: true, name: true, email: true } },
-        items: {
-          include: {
-            product: {
-              select: {
-                id: true,
-                name: true,
-                thumbnail: true,
-                supplyPrice: true,
-                basePrice: true,
-              },
-            },
-          },
-        },
-        _count: { select: { packageOrderItems: true } },
-      },
-      orderBy: { createdAt: "desc" },
     }),
   ]);
 
@@ -165,31 +143,6 @@ export default async function AdminProductsPage() {
 
   const serializedSellers = sellers.map((s) => ({ id: s.id, shopName: s.shopName }));
 
-  const serializedPendingPackages = pendingPackages.map((p) => ({
-    id: p.id,
-    name: p.name,
-    description: p.description,
-    imageUrl: p.imageUrl,
-    packagePrice: Number(p.packagePrice),
-    stock: p.stock,
-    status: p.status,
-    rejectReason: p.rejectReason,
-    creatorId: p.creatorId,
-    creatorRole: p.creatorRole,
-    createdAt: p.createdAt.toISOString(),
-    creator: p.creator,
-    items: p.items.map((item) => ({
-      ...item,
-      unitPrice: Number(item.unitPrice),
-      product: {
-        ...item.product,
-        supplyPrice: item.product.supplyPrice != null ? Number(item.product.supplyPrice) : null,
-        basePrice: item.product.basePrice != null ? Number(item.product.basePrice) : null,
-      },
-    })),
-    _count: p._count,
-  }));
-
   return (
     <div className="animate-fade-in">
       <AdminProductsClient
@@ -198,7 +151,6 @@ export default async function AdminProductsPage() {
         soldSellerProducts={serializedSold}
         brands={[]}
         sellers={serializedSellers}
-        pendingPackages={serializedPendingPackages}
       />
     </div>
   );

@@ -25,8 +25,8 @@ export default async function PublicLayout({
 
   return (
     <ShopChromeProvider initialShop={initialShop}>
-      <div className="min-h-screen">
-        <div className="max-w-[480px] mx-auto bg-white min-h-screen shadow-[0_0_40px_rgba(0,0,0,0.08)] pb-[env(safe-area-inset-bottom)]">
+      <div className="sajumate-public-shell min-h-screen">
+        <div className="sajumate-app-frame relative z-10 max-w-[480px] mx-auto bg-white min-h-screen shadow-[0_0_52px_rgba(36,20,69,0.14)] pb-[env(safe-area-inset-bottom)]">
           <Suspense fallback={null}>
             <Header />
           </Suspense>

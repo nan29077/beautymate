@@ -57,7 +57,7 @@ export default function AdminGamesClient({ rows }: { rows: GameTypeRow[] }) {
   return (
     <div>
       {/* 헤더 */}
-      <div className="flex items-start justify-between gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
             <Gamepad2 size={20} className="text-brand-500" />
@@ -70,7 +70,7 @@ export default function AdminGamesClient({ rows }: { rows: GameTypeRow[] }) {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-brand-500 hover:bg-brand-600 disabled:opacity-60 text-black text-sm font-semibold shadow-sm transition-colors shrink-0"
+          className="flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:py-2 rounded-lg bg-brand-500 hover:bg-brand-600 disabled:opacity-60 text-black text-sm font-semibold shadow-sm transition-colors shrink-0"
         >
           <Save size={15} />
           {saving ? "저장 중..." : "설정 저장"}

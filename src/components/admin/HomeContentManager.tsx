@@ -11,10 +11,10 @@ type HomeStory = { name: string; quote: string; metric: string; avatar: string }
 type BenefitStat = { value: string; label: string; sub: string };
 type BenefitItem = { iconType: string; title: string; desc: string };
 
-const AVATARS = [
-  "/avatars/여성구매회원_1.png", "/avatars/여성구매회원_2.png", "/avatars/여성구매회원_3.png", "/avatars/여성구매회원_4.png", "/avatars/여성구매회원_5.png",
-  "/avatars/남성구매회원_1.png", "/avatars/남성구매회원_2.png", "/avatars/남성구매회원_3.png", "/avatars/남성구매회원_4.png", "/avatars/남성구매회원_5.png",
-];
+const AVATARS = Array.from(
+  { length: 30 },
+  (_, index) => `/avatars/saju/saju-avatar-${String(index + 1).padStart(2, "0")}.png`,
+);
 
 const ICON_OPTIONS = [
   { value: "heart", label: "❤️ 하트" },

@@ -33,6 +33,13 @@ export const BUYER_FEMALE_AVATARS = Array.from({ length: 13 }, (_, i) => `/avata
 export const BUYER_MALE_AVATARS = Array.from({ length: 13 }, (_, i) => `/avatars/남성구매회원_${i + 1}.png`);
 export const ALL_BUYER_AVATARS = [...BUYER_FEMALE_AVATARS, ...BUYER_MALE_AVATARS];
 
+// 사주메이트 일반 가입 고객 전용 캐릭터(30종).
+// 상담사 개인 샵(?ref=<slug>)으로 가입한 고객은 기존 구매회원 캐릭터 풀을 그대로 사용한다.
+export const SAJU_CUSTOMER_AVATARS = Array.from(
+  { length: 30 },
+  (_, i) => `/avatars/saju/saju-avatar-${String(i + 1).padStart(2, "0")}.png`,
+);
+
 // 전체 아바타 목록 (NodeSettingsClient 등에서 선택 UI용)
 // FEMALE_AVATARS / MALE_AVATARS 는 고객 이미지로 매핑 (레거시 호환용)
 export const FEMALE_AVATARS = BUYER_FEMALE_AVATARS;
@@ -60,7 +67,7 @@ export function pickRoleAvatar(seed: string, role: string, gender?: string | nul
   const idx = computeHash(seed);
   switch (role) {
     case "SUPER_ADMIN":
-      return ADMIN_AVATARS[idx % ADMIN_AVATARS.length];
+      return pickSajuAvatar(`admin:${seed}`);
     case "CONSULTANT":
       return SELLER_AVATARS[idx % SELLER_AVATARS.length];
     case "CUSTOMER":
@@ -101,6 +108,25 @@ export function pickDefaultAvatar(seed: string, gender?: string | null): string 
 export function randomAvatar(gender?: string | null): string {
   const pool = gender === "male" ? BUYER_MALE_AVATARS : gender === "female" ? BUYER_FEMALE_AVATARS : ALL_BUYER_AVATARS;
   return pool[Math.floor(Math.random() * pool.length)];
+}
+
+export function pickSajuAvatar(seed: string): string {
+  return SAJU_CUSTOMER_AVATARS[computeHash(seed) % SAJU_CUSTOMER_AVATARS.length];
+}
+
+export function randomSajuAvatar(): string {
+  return SAJU_CUSTOMER_AVATARS[Math.floor(Math.random() * SAJU_CUSTOMER_AVATARS.length)];
+}
+
+// 관리자 화면에서는 기존 번들 기본 캐릭터를 새 사주 캐릭터로 교체한다.
+// 직접 업로드한 이미지(/uploads 등)는 그대로 보존한다.
+export function resolveAdminDashboardAvatar(seed: string, currentAvatar?: string | null): string {
+  const isLegacyBundledAvatar = Boolean(
+    currentAvatar?.startsWith("/avatars/") && !currentAvatar.startsWith("/avatars/saju/"),
+  );
+
+  if (currentAvatar && !isLegacyBundledAvatar) return currentAvatar;
+  return pickSajuAvatar(`admin:${seed}`);
 }
 
 // 정적 placeholder 용 단일 기본 아바타 (SafeImage placeholder 등)
