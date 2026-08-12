@@ -49,10 +49,10 @@ export async function POST(request: Request) {
 
   // 1) orderId 매핑 — 쿼리 우선, 없으면 이전에 payment_code 로 저장된 예약을 찾는다.
   let order = orderIdFromQuery
-    ? await prisma.order.findUnique({ where: { id: orderIdFromQuery } })
+    ? await prisma.reservation.findUnique({ where: { id: orderIdFromQuery } })
     : null;
   if (!order) {
-    order = await prisma.order.findFirst({
+    order = await prisma.reservation.findFirst({
       where: { pgProvider: "ongi", pgTid: paymentCode },
     });
   }
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
 
   // 3) 실패 결과는 예약을 실패 처리.
   if (!isOngiCallbackSuccess(payload)) {
-    await prisma.order.update({
+    await prisma.reservation.update({
       where: { id: order.id },
       data: {
         status: "CANCELLED",
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
   const expected = Math.round(Number(order.finalAmount));
   if (!paid || paid !== expected) {
     console.warn("[ongi/callback] 금액 불일치", { orderId: order.id, paid, expected });
-    await prisma.order.update({
+    await prisma.reservation.update({
       where: { id: order.id },
       data: {
         status: "CANCELLED",
@@ -138,10 +138,10 @@ export async function POST(request: Request) {
   }
 
   // 5) 정상 완료.
-  await prisma.order.update({
+  await prisma.reservation.update({
     where: { id: order.id },
     data: {
-      status: "PAID",
+      status: "CONFIRMED",
       paymentStatus: "COMPLETED",
       paymentMethod: "BANK",
       pgProvider: "ongi",

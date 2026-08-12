@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
         prisma.sellerShopProduct.deleteMany({ where: { productId } }),
         prisma.groupBuyCampaign.deleteMany({ where: { productId } }),
         prisma.review.deleteMany({ where: { productId } }),
-        prisma.orderItem.deleteMany({ where: { productId } }),
+        prisma.reservationItem.deleteMany({ where: { productId } }),
         prisma.product.delete({ where: { id: productId } }),
       ]);
       return NextResponse.json({ success: true, message: "상담상품이 반려되었습니다" });
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     if (action === "link_brand" && productId && brandId) {
       await prisma.product.update({
         where: { id: productId },
-        data: { brandId },
+        data: {},
       });
       return NextResponse.json({ success: true, message: "브랜드 연결됨" });
     }

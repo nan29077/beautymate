@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       include: { sellerProfile: true },
     });
 
-    if (user && user.role === "SELLER" && user.sellerProfile && !user.sellerProfile.isApproved) {
+    if (user && user.role === "CONSULTANT" && user.sellerProfile && !user.sellerProfile.isApproved) {
       return NextResponse.json({ sellerNotApproved: true });
     }
 

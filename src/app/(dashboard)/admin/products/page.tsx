@@ -9,13 +9,11 @@ export default async function AdminProductsPage() {
   const session = await auth();
   if (session?.user?.role !== "SUPER_ADMIN") redirect("/");
 
-  const [products, pendingShopProducts, soldSellerProducts, brands, middleAdmins, sellers, shopSellerRows, activeSellerRows, pendingPackages] = await Promise.all([
+  const [products, pendingShopProducts, soldSellerProducts, sellers, shopSellerRows, activeSellerRows, pendingPackages] = await Promise.all([
     prisma.product.findMany({
       include: {
-        brand: true,
         category: true,
         registrarSeller: { select: { shopName: true } },
-        middleAdmin: { select: { name: true } },
         _count: { select: { reviews: true, campaigns: true, sellerProducts: true, chats: true, wishlists: true } },
         sellerProducts: {
           include: { seller: { select: { id: true, shopName: true, shopLogo: true } } },
@@ -35,10 +33,10 @@ export default async function AdminProductsPage() {
       where: {
         isApproved: false,
         rejectionReason: null,
-        product: { brandId: null, middleAdminId: null, sellerId: null },
+        product: { sellerId: null },
       },
       include: {
-        product: { include: { brand: true, category: true } },
+        product: { include: { category: true } },
         seller: { include: { user: { select: { name: true } } } },
       },
       orderBy: { createdAt: "desc" },
@@ -48,21 +46,13 @@ export default async function AdminProductsPage() {
       where: {
         isApproved: true,
         isActive: true,
-        product: { brandId: null, middleAdminId: null, sellerId: null },
+        product: { sellerId: null },
       },
       include: {
         product: { select: { id: true, name: true, thumbnail: true } },
         seller: { select: { shopName: true, shopLogo: true } },
       },
       orderBy: { createdAt: "desc" },
-    }),
-    prisma.brandProfile.findMany({
-      orderBy: { brandName: "asc" },
-    }),
-    // 중간관리자별 필터용 목록
-    prisma.middleAdminProfile.findMany({
-      select: { id: true, name: true },
-      orderBy: { name: "asc" },
     }),
     // 상담사별 필터용 목록
     prisma.sellerProfile.findMany({
@@ -95,7 +85,6 @@ export default async function AdminProductsPage() {
                 thumbnail: true,
                 supplyPrice: true,
                 basePrice: true,
-                brand: { select: { brandName: true } },
               },
             },
           },
@@ -127,32 +116,16 @@ export default async function AdminProductsPage() {
     name: p.name,
     basePrice: Number(p.basePrice),
     supplyPrice: p.supplyPrice != null ? Number(p.supplyPrice) : null,
-    middleAdminMargin: p.middleAdminMargin != null ? Number(p.middleAdminMargin) : null,
     thumbnail: p.thumbnail,
     isApproved: p.isApproved,
     isActive: p.isActive,
-    brandName: p.brand?.brandName || null,
-    // 필터용 식별자
-    brandId: p.brandId,
-    middleAdminId: p.middleAdminId ?? p.brand?.middleAdminId ?? null,
+    brandName: null,
     registrarSellerId: p.sellerId,
     shopSellerIds: shopSellerMap.get(p.id) ?? [],
     categoryName: p.category?.name || null,
-    // 등록자 유형: 상담사 > 브랜드 > 중간관리자(본인 등록) > 관리자
-    registrarType: (p.sellerId
-      ? "SELLER"
-      : p.brandId
-        ? "BRAND"
-        : p.middleAdminId
-          ? "MIDDLE_ADMIN"
-          : "ADMIN") as "SELLER" | "BRAND" | "MIDDLE_ADMIN" | "ADMIN",
-    registeredBy: p.brandId
-      ? `브랜드 (${p.brand?.brandName || ""})`
-      : p.sellerId
-        ? `상담사 (${p.registrarSeller?.shopName || ""})`
-        : p.middleAdminId
-          ? `중간관리자 (${p.middleAdmin?.name || ""})`
-          : "관리자",
+    // 등록자 유형: 상담사 > 관리자
+    registrarType: (p.sellerId ? "CONSULTANT" : "ADMIN") as "CONSULTANT" | "BRAND" | "ADMIN",
+    registeredBy: p.sellerId ? `상담사 (${p.registrarSeller?.shopName || ""})` : "관리자",
     sellerNames: p.sellerProducts.map(sp => sp.seller.shopName),
     sellerCount: p._count.sellerProducts,
     reviewCount: p._count.reviews,
@@ -173,7 +146,7 @@ export default async function AdminProductsPage() {
     productId: sp.product.id,
     productName: sp.product.name,
     productThumbnail: sp.product.thumbnail,
-    brandName: sp.product.brand?.brandName || null,
+    brandName: null,
     sellerName: sp.seller.shopName,
     sellerPrice: sp.sellerPrice != null ? Number(sp.sellerPrice) : null,
     createdAt: sp.createdAt.toISOString(),
@@ -190,15 +163,6 @@ export default async function AdminProductsPage() {
     approvedAt: sp.createdAt.toISOString(),
   }));
 
-  const serializedBrands = brands.map((b) => ({
-    id: b.id,
-    brandName: b.brandName,
-    marginPolicy: b.marginMethod && b.marginBase
-      ? { method: b.marginMethod as "PERCENTAGE" | "SUPPLY_BASE", base: b.marginBase as "SUPPLY" | "SALE", rate: Number(b.marginRate) }
-      : null,
-  }));
-
-  const serializedMiddleAdmins = middleAdmins.map((m) => ({ id: m.id, name: m.name }));
   const serializedSellers = sellers.map((s) => ({ id: s.id, shopName: s.shopName }));
 
   const serializedPendingPackages = pendingPackages.map((p) => ({
@@ -232,8 +196,7 @@ export default async function AdminProductsPage() {
         products={serializedProducts}
         pendingShopProducts={serializedPending}
         soldSellerProducts={serializedSold}
-        brands={serializedBrands}
-        middleAdmins={serializedMiddleAdmins}
+        brands={[]}
         sellers={serializedSellers}
         pendingPackages={serializedPendingPackages}
       />

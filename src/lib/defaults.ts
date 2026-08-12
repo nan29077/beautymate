@@ -54,21 +54,16 @@ function computeHash(seed: string): number {
 }
 
 // ─── 역할 기반 아바타 선택 ────────────────────────────────────────────────────
-// role: SUPER_ADMIN | MIDDLE_ADMIN | NODE | SELLER | BRAND_ADMIN | BUYER
+// role: SUPER_ADMIN | CONSULTANT | CUSTOMER
 // gender: "male" | "female" | null (고객 풀 선택에만 사용)
 export function pickRoleAvatar(seed: string, role: string, gender?: string | null): string {
   const idx = computeHash(seed);
   switch (role) {
     case "SUPER_ADMIN":
       return ADMIN_AVATARS[idx % ADMIN_AVATARS.length];
-    case "MIDDLE_ADMIN":
-    case "NODE":
-      return MIDDLE_ADMIN_AVATARS[idx % MIDDLE_ADMIN_AVATARS.length];
-    case "SELLER":
+    case "CONSULTANT":
       return SELLER_AVATARS[idx % SELLER_AVATARS.length];
-    case "BRAND_ADMIN":
-      return BRAND_AVATARS[idx % BRAND_AVATARS.length];
-    case "BUYER":
+    case "CUSTOMER":
     default:
       return pickBuyerAvatar(seed, gender);
   }

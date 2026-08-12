@@ -28,29 +28,29 @@ export default async function AdminDashboard() {
   const weekStartKST = new Date(Date.UTC(nowKST.getUTCFullYear(), nowKST.getUTCMonth(), nowKST.getUTCDate() - diffToMonday, 0, 0, 0, 0));
   const weekStartUTC = new Date(weekStartKST.getTime() - 9 * 60 * 60 * 1000);
 
-  const COMPLETED_STATUSES = ["PAID", "CONFIRMED", "SHIPPING", "DELIVERED"] as const;
+  const COMPLETED_STATUSES = ["CONFIRMED", "COMPLETED"] as const;
 
   const [
     userCount, sellerCount, brandCount, productCount, campaignCount,
-    orderCount, totalRevenueAgg, activeCampaigns, pendingSellers, recentOrders,
+    reservationCount, totalRevenueAgg, activeCampaigns, pendingSellers, recentOrders,
     recentUsers, recentReviews, activeProductCount,
     todayOrders, todayUsers, pendingOrders,
     todayRevenueAgg, weekOrders, weekRevenueAgg,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.sellerProfile.count(),
-    prisma.brandProfile.count(),
+    Promise.resolve(0),
     prisma.product.count(),
     prisma.groupBuyCampaign.count(),
-    prisma.order.count(),
+    prisma.reservation.count(),
     // 총매출: 실제 예약 finalAmount 합계 (취소/환불 제외)
-    prisma.order.aggregate({
+    prisma.reservation.aggregate({
       _sum: { finalAmount: true },
       where: { status: { in: [...COMPLETED_STATUSES] } },
     }),
     prisma.groupBuyCampaign.count({ where: { status: "ACTIVE" } }),
     prisma.sellerProfile.count({ where: { isApproved: false } }),
-    prisma.order.findMany({
+    prisma.reservation.findMany({
       include: { user: true, seller: true },
       orderBy: { createdAt: "desc" },
       take: 5,
@@ -70,24 +70,24 @@ export default async function AdminDashboard() {
     }),
     prisma.product.count({ where: { isActive: true, isApproved: true } }),
     // 오늘 예약 건수
-    prisma.order.count({
+    prisma.reservation.count({
       where: { createdAt: { gte: todayStartUTC } },
     }),
     prisma.user.count({
       where: { createdAt: { gte: todayStartUTC } },
     }),
-    prisma.order.count({ where: { status: "PENDING" } }),
+    prisma.reservation.count({ where: { status: "PENDING" } }),
     // 오늘 매출
-    prisma.order.aggregate({
+    prisma.reservation.aggregate({
       _sum: { finalAmount: true },
       where: { createdAt: { gte: todayStartUTC }, status: { in: [...COMPLETED_STATUSES] } },
     }),
     // 이번 주 예약 건수
-    prisma.order.count({
+    prisma.reservation.count({
       where: { createdAt: { gte: weekStartUTC } },
     }),
     // 이번 주 매출
-    prisma.order.aggregate({
+    prisma.reservation.aggregate({
       _sum: { finalAmount: true },
       where: { createdAt: { gte: weekStartUTC }, status: { in: [...COMPLETED_STATUSES] } },
     }),
@@ -98,11 +98,11 @@ export default async function AdminDashboard() {
   const weekRevenue = Number(weekRevenueAgg._sum.finalAmount || 0);
 
   const roleLabels: Record<string, string> = {
-    SUPER_ADMIN: "관리자", BRAND_ADMIN: "브랜드", SELLER: "상담사", BUYER: "고객",
+    SUPER_ADMIN: "관리자", CONSULTANT: "상담사", CUSTOMER: "고객",
   };
   const roleColors: Record<string, string> = {
-    SUPER_ADMIN: "bg-red-50 text-red-600", BRAND_ADMIN: "bg-purple-50 text-purple-600",
-    SELLER: "bg-blue-50 text-blue-600", BUYER: "bg-gray-50 text-gray-600",
+    SUPER_ADMIN: "bg-red-50 text-red-600",
+    CONSULTANT: "bg-blue-50 text-blue-600", CUSTOMER: "bg-gray-50 text-gray-600",
   };
   const statusLabels: Record<string, { label: string; color: string }> = {
     PENDING: { label: "대기", color: "bg-yellow-50 text-yellow-700" },
@@ -137,7 +137,7 @@ export default async function AdminDashboard() {
         <div className="bg-amber-400 rounded-xl p-3 sm:p-4 text-black">
           <p className="text-black/60 text-[9px] sm:text-[10px] font-medium mb-1">오늘 예약</p>
           <p className="text-xl sm:text-2xl font-bold">{todayOrders}</p>
-          <p className="text-black/50 text-[9px] sm:text-[10px] mt-1">전체 {orderCount}건</p>
+          <p className="text-black/50 text-[9px] sm:text-[10px] mt-1">전체 {reservationCount}건</p>
         </div>
         <div className="bg-amber-400 rounded-xl p-3 sm:p-4 text-black">
           <p className="text-black/60 text-[9px] sm:text-[10px] font-medium mb-1">총 매출</p>
@@ -184,7 +184,7 @@ export default async function AdminDashboard() {
           { label: "캠페인", value: `${activeCampaigns}/${campaignCount}`, icon: "Event", href: "/admin/campaigns", color: "text-pink-500", sub: "진행/전체" },
           { label: "처리 대기", value: pendingOrders, icon: "Cart", href: "/admin/orders", color: "text-amber-500" },
           { label: "진행중 캠페인", value: activeCampaigns, icon: "Chart", href: "/admin/campaigns", color: "text-red-500" },
-          { label: "총 예약", value: orderCount, icon: "OrderManagement", href: "/admin/orders", color: "text-indigo-500" },
+          { label: "총 예약", value: reservationCount, icon: "OrderManagement", href: "/admin/orders", color: "text-indigo-500" },
           { label: "전체 회원", value: userCount, icon: "Users", href: "/admin/users", color: "text-teal-500" },
         ].map((kpi) => {
           const Card = kpi.href ? Link : 'div';
@@ -218,7 +218,7 @@ export default async function AdminDashboard() {
                 return (
                   <div key={order.id} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50/50 transition-colors">
                     <div className="min-w-0">
-                      <p className="text-[13px] font-medium text-gray-800 truncate">{order.orderNumber}</p>
+                      <p className="text-[13px] font-medium text-gray-800 truncate">{order.reservationNumber}</p>
                       <p className="text-[11px] text-gray-400 truncate">{order.user.name} · {order.seller.shopName}</p>
                     </div>
                     <div className="text-right flex-shrink-0 ml-3">
@@ -297,7 +297,7 @@ export default async function AdminDashboard() {
       )}
 
       {/* Seed Data Button */}
-      {orderCount === 0 && (
+      {reservationCount === 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
           <div>
             <p className="text-sm font-bold text-amber-800">더미 데이터 없음</p>

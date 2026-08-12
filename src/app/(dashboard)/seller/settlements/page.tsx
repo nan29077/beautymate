@@ -14,7 +14,7 @@ export default async function SellerSettlementsPage() {
   } catch {
     redirect("/auth/login");
   }
-  if (session?.user?.role !== "SELLER") redirect("/");
+  if (session?.user?.role !== "CONSULTANT") redirect("/");
 
   let seller;
   try {

@@ -13,26 +13,26 @@ export const dynamic = "force-dynamic";
 
 export default async function SellerFansPage() {
   const session = await auth();
-  if (session?.user?.role !== "SELLER") redirect("/");
+  if (session?.user?.role !== "CONSULTANT") redirect("/");
 
   const seller = await prisma.sellerProfile.findUnique({
     where: { userId: session!.user!.id },
     include: {
       fans: {
         include: {
-          user: { select: { id: true, name: true, email: true, phone: true, gender: true, birthday: true, avatar: true, createdAt: true, accounts: { select: { provider: true } }, _count: { select: { orders: true } } } },
+          user: { select: { id: true, name: true, email: true, phone: true, gender: true, birthday: true, avatar: true, createdAt: true, accounts: { select: { provider: true } }, _count: { select: { reservations: true } } } },
         },
       },
       referredBuyers: {
         include: {
-          user: { select: { id: true, name: true, email: true, phone: true, gender: true, birthday: true, avatar: true, createdAt: true, accounts: { select: { provider: true } }, _count: { select: { orders: true } } } },
+          user: { select: { id: true, name: true, email: true, phone: true, gender: true, birthday: true, avatar: true, createdAt: true, accounts: { select: { provider: true } }, _count: { select: { reservations: true } } } },
         },
       },
       followers: {
         include: {
           buyer: {
             include: {
-              user: { select: { id: true, name: true, email: true, phone: true, gender: true, birthday: true, avatar: true, createdAt: true, accounts: { select: { provider: true } }, _count: { select: { orders: true } } } },
+              user: { select: { id: true, name: true, email: true, phone: true, gender: true, birthday: true, avatar: true, createdAt: true, accounts: { select: { provider: true } }, _count: { select: { reservations: true } } } },
             },
           },
         },
@@ -69,7 +69,7 @@ export default async function SellerFansPage() {
     birthday: string | null;
     avatar: string | null;
     joinedAt: Date;
-    orderCount: number;
+    reservationCount: number;
     authProviders: string[]; // 소셜 가입 제공자(kakao·naver·google)
     isPick: boolean;       // 상담사를 PICK한 팔로워
     isVerified: boolean;   // 채널 인증 완료
@@ -77,12 +77,12 @@ export default async function SellerFansPage() {
     isPrimary: boolean;    // 주력 팬(단골)
   };
   const fanMap = new Map<string, FanRow>();
-  const ensure = (u: { id: string; name: string; email: string | null; phone: string | null; gender: string | null; birthday: string | null; avatar: string | null; createdAt: Date; accounts: { provider: string }[]; _count: { orders: number } }): FanRow => {
+  const ensure = (u: { id: string; name: string; email: string | null; phone: string | null; gender: string | null; birthday: string | null; avatar: string | null; createdAt: Date; accounts: { provider: string }[]; _count: { reservations: number } }): FanRow => {
     let row = fanMap.get(u.id);
     if (!row) {
       row = {
         userId: u.id, name: u.name, email: u.email, phone: u.phone, gender: u.gender, birthday: u.birthday, avatar: u.avatar,
-        joinedAt: u.createdAt, orderCount: u._count.orders,
+        joinedAt: u.createdAt, reservationCount: u._count.reservations,
         authProviders: [...new Set(u.accounts.map((a) => a.provider))],
         isPick: false, isVerified: false, isReferred: false, isPrimary: false,
       };

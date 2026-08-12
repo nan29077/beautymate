@@ -12,7 +12,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
     return NextResponse.json({ error: "UNAUTHENTICATED" }, { status: 401 });
   }
 
-  const order = await prisma.order.findUnique({
+  const order = await prisma.reservation.findUnique({
     where: { id: params.id },
     select: {
       id: true,

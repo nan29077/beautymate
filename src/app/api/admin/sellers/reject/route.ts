@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     select: {
       userId: true,
       isApproved: true,
-      _count: { select: { shopProducts: true, campaigns: true, orders: true } },
+      _count: { select: { shopProducts: true, campaigns: true, reservations: true } },
     },
   });
 
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
   }
 
   // 방어적 가드: 활동 데이터가 있으면 삭제하지 않음.
-  if (seller._count.shopProducts > 0 || seller._count.campaigns > 0 || seller._count.orders > 0) {
+  if (seller._count.shopProducts > 0 || seller._count.campaigns > 0 || seller._count.reservations > 0) {
     return NextResponse.json(
       { error: "활동 이력이 있는 상담사는 거절(삭제)할 수 없습니다." },
       { status: 400 },

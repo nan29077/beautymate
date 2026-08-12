@@ -21,7 +21,7 @@ export async function GET(
       return NextResponse.json({ error: "라이브 채널을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    const orders = await prisma.order.findMany({
+    const orders = await prisma.reservation.findMany({
       where: { userId: session.user.id, sellerId: live.sellerId },
       include: { items: true },
       orderBy: { createdAt: "desc" },
@@ -31,7 +31,7 @@ export async function GET(
     return NextResponse.json({
       orders: orders.map((o) => ({
         id: o.id,
-        orderNumber: o.orderNumber,
+        reservationNumber: o.reservationNumber,
         status: o.status,
         paymentStatus: o.paymentStatus,
         finalAmount: Number(o.finalAmount),

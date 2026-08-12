@@ -55,7 +55,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
   const [loading, setLoading] = useState<Record<string, boolean>>({});
   const [ordering, setOrdering] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
-  const [orderNumber, setOrderNumber] = useState("");
+  const [reservationNumber, setOrderNumber] = useState("");
   const [showShipping, setShowShipping] = useState(false);
   const [shipping, setShipping] = useState({
     name: "",
@@ -243,8 +243,8 @@ export default function CartClient({ initialItems }: CartClientProps) {
               price: item.price,
               quantity: item.quantity,
             })),
-            shippingName: shipping.name,
-            shippingPhone: shipping.phone,
+            customerName: shipping.name,
+            customerPhone: shipping.phone,
             shippingAddress: fullAddress,
             shippingMemo: shipping.memo,
           }),
@@ -252,7 +252,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
 
         if (res.ok) {
           const data = await res.json();
-          lastOrderNumber = data.order.orderNumber;
+          lastOrderNumber = data.order.reservationNumber;
         } else {
           const data = await res.json();
           await appAlert(data.error || "예약 처리에 실패했습니다.");
@@ -293,7 +293,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
           <Icon name="Check" size={32} strokeWidth={1.5} className="text-green-500" />
         </div>
         <h2 className="text-lg font-bold text-gray-900 mb-2">예약이 완료되었습니다!</h2>
-        <p className="text-sm text-gray-500 mb-1">예약번호: {orderNumber}</p>
+        <p className="text-sm text-gray-500 mb-1">예약번호: {reservationNumber}</p>
         <p className="text-xs text-gray-400 mb-6">결제 확인 후 상담 방식이 시작됩니다.</p>
         {totalDiscount > 0 && (
           <p className="text-xs text-brand-600 mb-4">

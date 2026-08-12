@@ -33,12 +33,12 @@ export async function POST(request: Request) {
     (oid ? `orderId=${oid}&` : "") +
     `status=fail&msg=${encodeURIComponent(msg)}`;
 
-  // 예약 매핑 — MallReserved(우리 order.id) 우선, 없으면 Moid(orderNumber).
+  // 예약 매핑 — MallReserved(우리 order.id) 우선, 없으면 Moid(reservationNumber).
   let order = MallReserved
-    ? await prisma.order.findUnique({ where: { id: MallReserved } })
+    ? await prisma.reservation.findUnique({ where: { id: MallReserved } })
     : null;
   if (!order && Moid) {
-    order = await prisma.order.findUnique({ where: { orderNumber: Moid } });
+    order = await prisma.reservation.findUnique({ where: { reservationNumber: Moid } });
   }
 
   const formSnapshot = form ? Object.fromEntries(form) : {};
@@ -155,10 +155,10 @@ export async function POST(request: Request) {
       return htmlRedirect(failRedirect(order.id, "승인 금액 불일치"));
     }
 
-    await prisma.order.update({
+    await prisma.reservation.update({
       where: { id: order.id },
       data: {
-        status: "PAID",
+        status: "CONFIRMED",
         paymentStatus: "COMPLETED",
         paymentMethod: approval.PayMethod || "EASYPAY",
         pgProvider: "smartropay",
@@ -214,7 +214,7 @@ export async function GET(request: Request) {
 
 async function markOrderFailed(orderId: string, reason: string) {
   // 방어선 2: 이미 결제완료된 예약은 어떤 경로로도 실패로 덮어쓰지 않는다.
-  const existing = await prisma.order.findUnique({
+  const existing = await prisma.reservation.findUnique({
     where: { id: orderId },
     select: { paymentStatus: true },
   });
@@ -222,7 +222,7 @@ async function markOrderFailed(orderId: string, reason: string) {
     console.warn(`[smartropay/result] markOrderFailed 무시 — 이미 결제완료 (orderId=${orderId}, reason=${reason})`);
     return;
   }
-  await prisma.order.update({
+  await prisma.reservation.update({
     where: { id: orderId },
     data: {
       status: "CANCELLED",

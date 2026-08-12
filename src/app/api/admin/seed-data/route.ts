@@ -17,7 +17,7 @@ export async function POST() {
       include: { campaigns: { take: 3, include: { product: true } }, shopProducts: { take: 5, include: { product: true } } },
     });
     const buyers = await prisma.user.findMany({
-      where: { role: "BUYER" },
+      where: { role: "CUSTOMER" },
       take: 10,
     });
     const products = await prisma.product.findMany({ take: 20 });
@@ -26,7 +26,7 @@ export async function POST() {
       return NextResponse.json({ error: "상담사가 없습니다. 먼저 상담사를 등록하세요." }, { status: 400 });
     }
 
-    const statuses: any[] = ["PENDING", "PAID", "CONFIRMED", "SHIPPING", "DELIVERED"];
+    const statuses: any[] = ["PENDING", "CONFIRMED", "COMPLETED"];
     const createdOrders: string[] = [];
     const createdSettlements: string[] = [];
 
@@ -48,7 +48,7 @@ export async function POST() {
       const quantity = Math.floor(Math.random() * 3) + 1;
 
       const orderData: any = {
-        orderNumber: `ORD-${Date.now()}-${String(i + 1).padStart(3, "0")}`,
+        reservationNumber: `ORD-${Date.now()}-${String(i + 1).padStart(3, "0")}`,
         userId: buyer?.id || seller.userId,
         sellerId: seller.id,
         campaignId: campaign?.id || null,
@@ -56,8 +56,8 @@ export async function POST() {
         discountAmount: discountAmount,
         finalAmount: finalAmount,
         status: status,
-        shippingName: buyer?.name || buyerNames[i % buyerNames.length],
-        shippingPhone: `010-${String(Math.floor(Math.random() * 9000) + 1000)}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
+        customerName: buyer?.name || buyerNames[i % buyerNames.length],
+        customerPhone: `010-${String(Math.floor(Math.random() * 9000) + 1000)}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
         shippingAddress: ["서울시 강남구 테헤란로 123", "경기도 성남시 분당구 판교로 256", "서울시 마포구 홍대입구로 45", "인천시 연수구 송도대로 100", "부산시 해운대구 마린시티로 67"][i % 5],
         items: {
           create: {
@@ -72,7 +72,7 @@ export async function POST() {
       };
 
       try {
-        const order = await prisma.order.create({ data: orderData });
+        const order = await prisma.reservation.create({ data: orderData });
         createdOrders.push(order.id);
       } catch (e: any) {
         console.error(`Order ${i} failed:`, e.message);

@@ -65,7 +65,7 @@ export async function GET(request: Request) {
   };
   const method = METHOD_MAP[payMethodRaw] ?? "CARD";
 
-  const order = await prisma.order.findUnique({
+  const order = await prisma.reservation.findUnique({
     where: { id: orderId },
     include: { items: true, user: { select: { email: true, name: true, phone: true } } },
   });
@@ -102,8 +102,8 @@ export async function GET(request: Request) {
   // - ordTel: 한국 휴대폰 11자리 초과 시 거부 → 앞 11자리만
   // - mbsUsrId: 길이 제한(보통 20자) 초과 시 거부 → cuid 앞 20자만
   // 결제 결과 매핑은 mbsReserved(= 전체 order.id cuid) 로 하므로 truncate 영향 없음.
-  const sanitizedOrdNo = order.orderNumber.replace(/[^A-Za-z0-9]/g, "");
-  const sanitizedOrdTel = (order.shippingPhone || order.user.phone || "")
+  const sanitizedOrdNo = order.reservationNumber.replace(/[^A-Za-z0-9]/g, "");
+  const sanitizedOrdTel = (order.customerPhone || order.user.phone || "")
     .replace(/[^0-9]/g, "")
     .slice(0, 11);
   const sanitizedMbsUsrId = order.userId.slice(0, 20);
@@ -114,7 +114,7 @@ export async function GET(request: Request) {
     goodsNm,
     ordNo: sanitizedOrdNo,
     goodsAmt: String(goodsAmt),
-    ordNm: order.shippingName || order.user.name || "고객",
+    ordNm: order.customerName || order.user.name || "고객",
     ordEmail: order.user.email || "",
     ordTel: sanitizedOrdTel,
     ordIp: "",

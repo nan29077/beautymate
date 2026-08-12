@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     if (existing) return NextResponse.json({ error: "이미 사용 중인 이메일입니다." }, { status: 400 });
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    const userRole = role === "SELLER" ? "SELLER" : "BUYER";
+    const userRole = role === "CONSULTANT" ? "CONSULTANT" : "CUSTOMER";
 
     const genderPick = gender === "male" || gender === "female"
       ? gender
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     // 상담사 가입 시 멘토 찾기
     let mentorId: string | null = null;
     let mentorReferralCodeSaved: string | null = null;
-    if (userRole === "SELLER" && typeof sellerReferralCodeRaw === "string" && sellerReferralCodeRaw.trim()) {
+    if (userRole === "CONSULTANT" && typeof sellerReferralCodeRaw === "string" && sellerReferralCodeRaw.trim()) {
       const codeInput = sellerReferralCodeRaw.trim().toUpperCase();
       const mentor = await findMentorByReferralCode(prisma, codeInput);
       if (mentor) {
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
 
     // 상담사 가입 시 추천인코드 자동 발급
     let newSellerReferralCode: string | undefined;
-    if (userRole === "SELLER") {
+    if (userRole === "CONSULTANT") {
       newSellerReferralCode = await generateUniqueSellerReferralCode(prisma);
     }
 
@@ -91,16 +91,16 @@ export async function POST(request: NextRequest) {
         zipCode: zipCodeValue,
         address1: address1Value,
         address2: address2Value,
-        avatar: userRole === "SELLER"
-          ? pickRoleAvatar(emailTrimmed, "SELLER")
+        avatar: userRole === "CONSULTANT"
+          ? pickRoleAvatar(emailTrimmed, "CONSULTANT")
           : randomAvatar(genderPick),
         // 상담사 추천인코드 필드
-        ...(userRole === "SELLER" && {
+        ...(userRole === "CONSULTANT" && {
           sellerReferralCode: newSellerReferralCode,
           referredBySellerCode: mentorReferralCodeSaved,
           mentorId,
         }),
-        ...(userRole === "SELLER" && {
+        ...(userRole === "CONSULTANT" && {
           sellerProfile: {
             create: {
               slug: emailTrimmed.split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, "-"),
@@ -112,8 +112,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // 2) BUYER 일 때만 고객 추천인 매핑
-    if (userRole === "BUYER") {
+    // 2) CUSTOMER 일 때만 고객 추천인 매핑
+    if (userRole === "CUSTOMER") {
       await linkReferralForNewBuyer(prisma, {
         userId: user.id,
         sellerRef,
@@ -129,10 +129,10 @@ export async function POST(request: NextRequest) {
       success: true,
       userId: user.id,
       role: userRole,
-      message: userRole === "SELLER"
+      message: userRole === "CONSULTANT"
         ? "상담사 가입이 완료되었습니다. 관리자 승인 후 서비스를 이용할 수 있습니다."
         : "회원가입이 완료되었습니다. 바로 로그인하실 수 있습니다.",
-      needsApproval: userRole === "SELLER",
+      needsApproval: userRole === "CONSULTANT",
     });
   } catch (error) {
     console.error("Registration error:", error);

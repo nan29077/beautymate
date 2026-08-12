@@ -30,10 +30,10 @@ export default async function DashboardLayout({
   
   if (!session?.user) redirect("/auth/login");
 
-  const role = (session.user as any).role || "BUYER";
+  const role = (session.user as any).role || "CUSTOMER";
 
   // Buyer는 대시보드 접근 불가
-  if (role === "BUYER") redirect("/");
+  if (role === "CUSTOMER") redirect("/");
 
   const navItems: Record<string, { href: string; iconName: string; label: string; group?: string }[]> = {
     SUPER_ADMIN: [
@@ -77,7 +77,7 @@ export default async function DashboardLayout({
       { href: "/admin/seller-rates", iconName: "Discount", label: "멘티추천커미션·기타 할인율 설정", group: "시스템" },
       { href: "/admin/settings", iconName: "Settings", label: "권한 설정", group: "시스템" },
     ],
-    SELLER: [
+    CONSULTANT: [
       { href: "/seller", iconName: "Dashboard_icon", label: "대시보드", group: "메인" },
       // 점집 관리
       { href: "/seller/shop", iconName: "ShopManagement_icon", label: "내 점집 관리", group: "점집 관리" },
@@ -101,53 +101,13 @@ export default async function DashboardLayout({
       // 설정
       { href: "/seller/settings", iconName: "Settings", label: "설정", group: "설정" },
     ],
-    MIDDLE_ADMIN: [
-      { href: "/middle", iconName: "Dashboard", label: "대시보드", group: "메인" },
-      // 회원 관리
-      { href: "/middle/sellers", iconName: "Store", label: "상담사 관리", group: "회원 관리" },
-      { href: "/middle/brands", iconName: "Official", label: "브랜드사 관리", group: "회원 관리" },
-      // 상담상품
-      { href: "/middle/products", iconName: "Package", label: "상담상품 관리", group: "상담상품" },
-      { href: "/middle/package-products", iconName: "Package", label: "패키지 상담상품", group: "상담상품" },
-      // 예약·정산
-      { href: "/middle/orders", iconName: "OrderManagement", label: "예약 관리", group: "예약·정산" },
-      { href: "/middle/settlements", iconName: "Settlement", label: "마진 정산", group: "예약·정산" },
-      { href: "/middle/brand-settlements", iconName: "Warehouse", label: "브랜드사 정산", group: "예약·정산" },
-      // 설정
-      { href: "/middle/settings", iconName: "Settings", label: "설정", group: "설정" },
-    ],
-    NODE: [
-      { href: "/node", iconName: "Dashboard", label: "대시보드", group: "메인" },
-      { href: "/node/products", iconName: "Package", label: "상담상품 관리", group: "상담상품" },
-      { href: "/node/members", iconName: "Users", label: "전체 회원 관리", group: "회원 관리" },
-      { href: "/node/sellers", iconName: "Store", label: "상담사 관리", group: "회원 관리" },
-      { href: "/node/brands", iconName: "Official", label: "브랜드 관리", group: "회원 관리" },
-      { href: "/node/orders", iconName: "OrderManagement", label: "예약 관리", group: "예약·정산" },
-      { href: "/node/settlements", iconName: "Settlement", label: "정산 관리", group: "예약·정산" },
-      { href: "/node/settings", iconName: "Settings", label: "설정", group: "설정" },
-    ],
-    BRAND_ADMIN: [
-      { href: "/brand", iconName: "Dashboard", label: "대시보드", group: "메인" },
-      // 상담상품·상담사
-      { href: "/brand/products", iconName: "Package", label: "상담상품 관리", group: "상담상품·상담사" },
-      { href: "/brand/sellers", iconName: "Users", label: "상담사 관리", group: "상담상품·상담사" },
-      // 예약·정산
-      { href: "/brand/orders", iconName: "OrderManagement", label: "예약 현황", group: "예약·정산" },
-      { href: "/brand/package-purchase-orders", iconName: "Package", label: "패키지 발주서", group: "예약·정산" },
-      { href: "/brand/settlements", iconName: "Settlement", label: "정산 내역", group: "예약·정산" },
-      { href: "/brand/stats", iconName: "Chart", label: "통계", group: "예약·정산" },
-      // 콘텐츠
-      { href: "/brand/contents", iconName: "Star", label: "콘텐츠 관리", group: "콘텐츠" },
-      // 계정
-      { href: "/brand/settings", iconName: "Settings", label: "브랜드 설정", group: "계정" },
-    ],
-    BUYER: [],
+    CUSTOMER: [],
   };
 
   // 노드 정산 메뉴: 활성 노드 계정이 1개 이상일 때만 표시
   const activeNodeCount =
     role === "SUPER_ADMIN"
-      ? await prisma.user.count({ where: { role: "NODE", isActive: true } })
+      ? 0
       : 0;
 
   // 기능 토글에 따라 관련 메뉴 숨김. (href → 필요한 기능 키)
@@ -162,7 +122,7 @@ export default async function DashboardLayout({
   // 노출 숨김 메뉴: "SNS구독 승인"(채널 구독 인증) 메뉴는 사이드바에서 감춘다.
   // (페이지/기능 자체는 유지하되 메뉴 진입만 비노출)
   const HIDDEN_MENU_HREFS = ["/admin/channel-verifications", "/seller/channel-verifications"];
-  const items = (navItems[role] || navItems.BUYER).filter((item) => {
+  const items = (navItems[role] || navItems.CUSTOMER).filter((item) => {
     if (HIDDEN_MENU_HREFS.includes(item.href)) return false;
     // 노드 정산: 활성 노드가 없으면 메뉴 숨김
     if (item.href === "/admin/node-settlements") return activeNodeCount > 0;
@@ -176,25 +136,22 @@ export default async function DashboardLayout({
   let profileImage = session.user.image || null;
   let userAvatar: string | null = null;
   let userGender: string | null = null;
-  // SELLER 사이드바 표시 이름: session.user.name(JWT) 대신 DB에서 직접 읽은 shopName 사용
+  // CONSULTANT 사이드바 표시 이름: session.user.name(JWT) 대신 DB에서 직접 읽은 shopName 사용
   let sellerShopName: string | null = null;
   try {
     const dbUser = await prisma.user.findUnique({ where: { id: session.user.id }, select: { avatar: true, gender: true } });
     userAvatar = dbUser?.avatar ?? null;
     userGender = dbUser?.gender ?? null;
-    if (role === "SELLER") {
+    if (role === "CONSULTANT") {
       const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user.id }, select: { shopLogo: true, shopName: true } });
       if (seller?.shopLogo) profileImage = seller.shopLogo;
       if (seller?.shopName) sellerShopName = seller.shopName;
-    } else if (role === "BRAND_ADMIN") {
-      const brand = await prisma.brandProfile.findUnique({ where: { userId: session.user.id }, select: { brandLogo: true } });
-      if (brand?.brandLogo) profileImage = brand.brandLogo;
     }
   } catch (e) {
     console.error("Profile image fetch error:", e);
     // Continue with default image
   }
-  // 사이드바에 표시할 이름: SELLER는 shopName(상담사명), 그 외는 User.name
+  // 사이드바에 표시할 이름: CONSULTANT는 shopName(상담사명), 그 외는 User.name
   const sidebarName = sellerShopName || session.user.name;
 
   // 역할 기반 랜덤 캐릭터 아바타 (기존 프로필 이미지 우선, 없으면 역할별 캐릭터)
@@ -207,13 +164,10 @@ export default async function DashboardLayout({
 
   const roleConfig: Record<string, { label: string; labelEn: string; icon: any; color: string; gradient: string }> = {
     SUPER_ADMIN: { label: "최고관리자", labelEn: "Admin Console", icon: Shield, color: "text-red-600 bg-red-50", gradient: "from-red-500 to-rose-600" },
-    NODE: { label: "노드", labelEn: "Node Console", icon: Shield, color: "text-teal-600 bg-teal-50", gradient: "from-teal-500 to-emerald-600" },
-    MIDDLE_ADMIN: { label: "중간관리자", labelEn: "Partner Console", icon: Shield, color: "text-amber-600 bg-amber-50", gradient: "from-amber-500 to-orange-600" },
-    SELLER: { label: "상담사", labelEn: "Consultant Studio", icon: Building2, color: "text-blue-600 bg-blue-50", gradient: "from-blue-500 to-indigo-600" },
-    BRAND_ADMIN: { label: "브랜드", labelEn: "Brand Portal", icon: Crown, color: "text-purple-600 bg-purple-50", gradient: "from-purple-500 to-violet-600" },
-    BUYER: { label: "고객", labelEn: "My Page", icon: User, color: "text-green-600 bg-green-50", gradient: "from-green-500 to-emerald-600" },
+    CONSULTANT: { label: "상담사", labelEn: "Consultant Studio", icon: Building2, color: "text-blue-600 bg-blue-50", gradient: "from-blue-500 to-indigo-600" },
+    CUSTOMER: { label: "고객", labelEn: "My Page", icon: User, color: "text-green-600 bg-green-50", gradient: "from-green-500 to-emerald-600" },
   };
-  const rc = roleConfig[role] || roleConfig.BUYER;
+  const rc = roleConfig[role] || roleConfig.CUSTOMER;
 
   return (
     <div className="min-h-screen bg-[#fdfaf0]">

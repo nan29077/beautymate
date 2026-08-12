@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { resolveApprover } from "@/lib/productApprover";
-import { formatProductNameForSeller } from "@/lib/productName";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +20,7 @@ const MAX_PAGE_SIZE = 100;
 export async function GET(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session || session.user.role !== "SELLER") {
+    if (!session || session.user.role !== "CONSULTANT") {
       return NextResponse.json({ error: "상담사만 접근 가능합니다" }, { status: 403 });
     }
 
@@ -79,7 +78,6 @@ export async function GET(req: NextRequest) {
     const rows = await prisma.product.findMany({
       where,
       include: {
-        brand: { select: { brandName: true } },
         category: { select: { name: true } },
       },
       orderBy: { createdAt: "desc" },
@@ -88,24 +86,22 @@ export async function GET(req: NextRequest) {
     });
 
     const products = rows.map((p) => {
-      // 상담사에게 노출할 공급가 = 공급가 + 중간관리자 마진. 판매가는 상담사가 직접 설정하며,
+      // 상담사에게 노출할 공급가. 판매가는 상담사가 직접 설정하며,
       // 이 공급가가 최소 판매가 기준이 된다. (공급가 미설정이면 판매가로 폴백)
       const supply = p.supplyPrice != null ? Number(p.supplyPrice) : Number(p.basePrice);
-      const margin = p.middleAdminMargin != null ? Number(p.middleAdminMargin) : 0;
       return {
         id: p.id,
-        name: formatProductNameForSeller(p.name, p.middleAdminId),
+        name: p.name,
         thumbnail: p.thumbnail,
         basePrice: Number(p.basePrice),
-        supplyPrice: supply + margin,
+        supplyPrice: supply,
         // 제공 방식: SUPPLY(공급가 제공) / COMMISSION(수수료 제공)
         priceModel: p.priceModel === "COMMISSION" ? "COMMISSION" : "SUPPLY",
         commissionRate: p.commissionRate != null ? Number(p.commissionRate) : null,
-        brandId: p.brandId,
-        brandName: p.brand?.brandName || null,
         categoryName: p.category?.name || null,
-        coupangLowestPrice: p.coupangLowestPrice != null ? Number(p.coupangLowestPrice) : null,
-        naverLowestPrice: p.naverLowestPrice != null ? Number(p.naverLowestPrice) : null,
+        consultingType: p.consultingType,
+        consultingMethod: p.consultingMethod,
+        durationMinutes: p.durationMinutes,
       };
     });
 
@@ -120,7 +116,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session || session.user.role !== "SELLER") {
+    if (!session || session.user.role !== "CONSULTANT") {
       return NextResponse.json({ error: "상담사만 접근 가능합니다" }, { status: 403 });
     }
 
@@ -144,10 +140,7 @@ export async function POST(req: NextRequest) {
         isActive: true,
         isApproved: true,
         sellerId: true,
-        brandId: true,
-        middleAdminId: true,
         priceModel: true,
-        brand: { select: { middleAdminId: true } },
       },
     });
     if (!product || !product.isActive || !product.isApproved || product.sellerId !== null) {
@@ -161,12 +154,8 @@ export async function POST(req: NextRequest) {
       if (!isNaN(n) && n > 0) parsedSellerPrice = n;
     }
 
-    // 승인 주체 판단 (공급 계정 기준)
-    const { approverType, approverId } = resolveApprover({
-      productMiddleAdminId: product.middleAdminId,
-      productBrandId: product.brandId,
-      brandMiddleAdminId: product.brand?.middleAdminId ?? null,
-    });
+    // 승인 주체 판단 — 2자 구조에서는 언제나 최고관리자
+    const { approverType, approverId } = resolveApprover();
 
     // Check if already added
     const existing = await prisma.sellerShopProduct.findUnique({

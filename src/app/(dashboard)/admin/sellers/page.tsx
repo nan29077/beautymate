@@ -10,19 +10,11 @@ export default async function AdminSellersPage() {
   const session = await auth();
   if (session?.user?.role !== "SUPER_ADMIN") redirect("/");
 
-  const [serialized, middleAdmins] = await Promise.all([
+  const [serialized] = await Promise.all([
     getAdminSellers(),
-    prisma.middleAdminProfile.findMany({
-      where: { isActive: true },
-      select: { id: true, name: true },
-      orderBy: { createdAt: "desc" },
-    }),
   ]);
 
-  const serializedMiddleAdmins = middleAdmins.map((m) => ({
-    id: m.id,
-    name: m.name,
-  }));
+  const serializedMiddleAdmins: { id: string; name: string }[] = [];
 
   return (
     <div className="animate-fade-in">

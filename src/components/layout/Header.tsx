@@ -21,7 +21,7 @@ export default function Header() {
   const role = session?.user?.role;
   const loggedOut = !session && status !== "loading";
   // 구매회원(또는 비로그인 방문자)에게만 장바구니 노출. 상담사/브랜드/관리자는 숨김.
-  const showCart = !role || role === "BUYER";
+  const showCart = !role || role === "CUSTOMER";
 
   // 점집 안에서는 글로벌 헤더를 숨기고 점집 전용 헤더(SellerShopHeader)만 노출한다.
   const isSellerShop = /^\/shop\/[^/]+/.test(pathname);

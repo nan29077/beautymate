@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     if (!session) {
       return NextResponse.json({ error: "로그인이 필요합니다" }, { status: 401 });
     }
-    if (session.user?.role !== "SELLER") {
+    if (session.user?.role !== "CONSULTANT") {
       return NextResponse.json({ error: "상담사만 이용할 수 있습니다" }, { status: 403 });
     }
 

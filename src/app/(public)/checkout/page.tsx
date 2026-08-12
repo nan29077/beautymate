@@ -77,9 +77,6 @@ export default async function CheckoutPage({
       name: true,
       thumbnail: true,
       basePrice: true,
-      shippingFee: true,
-      freeShipping: true,
-      freeShippingThreshold: true,
     },
   });
   if (!product) redirect("/");
@@ -144,12 +141,9 @@ export default async function CheckoutPage({
     quantity: qty,
     isCampaign: !!campaignInfo,
     // 상담 방식 설정 (상담상품 기준)
-    shippingFee: Number(product.shippingFee || 0),
-    freeShipping: product.freeShipping,
-    freeShippingThreshold:
-      product.freeShippingThreshold != null
-        ? Number(product.freeShippingThreshold)
-        : null,
+    shippingFee: 0,
+    freeShipping: true,
+    freeShippingThreshold: null,
   };
 
   return <CheckoutClient item={item} />;

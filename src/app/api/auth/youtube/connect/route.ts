@@ -8,7 +8,7 @@ import { absoluteUrl } from "@/lib/appUrl";
 
 export async function GET(req: NextRequest) {
   const session = await auth();
-  if (!session || session.user?.role !== "SELLER") {
+  if (!session || session.user?.role !== "CONSULTANT") {
     return NextResponse.redirect(absoluteUrl("/auth/login"));
   }
 

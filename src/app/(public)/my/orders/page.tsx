@@ -44,7 +44,7 @@ export default async function MyOrdersPage() {
   const session = await auth();
   if (!session?.user) redirect(getShopAwareLoginPath());
 
-  const orders = await prisma.order.findMany({
+  const orders = await prisma.reservation.findMany({
     where: { userId: session.user!.id },
     include: {
       seller: true,
@@ -131,7 +131,7 @@ export default async function MyOrdersPage() {
                       </p>
                       <p className="text-[10px] text-gray-400 mt-0.5">
                         {new Date(order.createdAt).toLocaleDateString("ko-KR")}{" "}
-                        · 예약 {order.orderNumber}
+                        · 예약 {order.reservationNumber}
                       </p>
                     </div>
                     <span

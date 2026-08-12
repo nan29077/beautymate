@@ -46,10 +46,10 @@ export async function POST(request: Request) {
 
   const mbsReserved = get("mbsReserved");
   let order = mbsReserved
-    ? await prisma.order.findUnique({ where: { id: mbsReserved } })
+    ? await prisma.reservation.findUnique({ where: { id: mbsReserved } })
     : null;
   if (!order && orderId) {
-    order = await prisma.order.findUnique({ where: { orderNumber: orderId } });
+    order = await prisma.reservation.findUnique({ where: { reservationNumber: orderId } });
   }
 
   // 멱등성 가드: 이미 결제완료(COMPLETED)된 예약은 중복 콜백(인증토큰 재사용으로 인한
@@ -148,10 +148,10 @@ export async function POST(request: Request) {
       return htmlRedirect(failRedirect(order.id, approval.resultMsg || "승인 실패"));
     }
 
-    await prisma.order.update({
+    await prisma.reservation.update({
       where: { id: order.id },
       data: {
-        status: "PAID",
+        status: "CONFIRMED",
         paymentStatus: "COMPLETED",
         paymentMethod: "CARD",
         pgProvider: "seedpay",
@@ -196,7 +196,7 @@ export async function POST(request: Request) {
 
 async function markOrderFailed(orderId: string, reason: string) {
   // 방어선 2: 이미 결제완료된 예약은 어떤 경로로도 실패로 덮어쓰지 않는다.
-  const existing = await prisma.order.findUnique({
+  const existing = await prisma.reservation.findUnique({
     where: { id: orderId },
     select: { paymentStatus: true },
   });
@@ -204,7 +204,7 @@ async function markOrderFailed(orderId: string, reason: string) {
     console.warn(`[seedpay/result] markOrderFailed 무시 — 이미 결제완료 (orderId=${orderId}, reason=${reason})`);
     return;
   }
-  await prisma.order.update({
+  await prisma.reservation.update({
     where: { id: orderId },
     data: {
       status: "CANCELLED",

@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 // GET: 상담사 사업자 정보 조회
 export async function GET() {
   const session = await auth();
-  if (!session?.user?.id || session.user.role !== "SELLER") {
+  if (!session?.user?.id || session.user.role !== "CONSULTANT") {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
 
@@ -27,7 +27,7 @@ export async function GET() {
 // PUT: 상담사 사업자 정보 수정
 export async function PUT(request: Request) {
   const session = await auth();
-  if (!session?.user?.id || session.user.role !== "SELLER") {
+  if (!session?.user?.id || session.user.role !== "CONSULTANT") {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
 

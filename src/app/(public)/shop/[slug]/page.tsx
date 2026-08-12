@@ -32,16 +32,7 @@ export default async function SellerShopPage({
       user: { select: { name: true, avatar: true } },
       shopExposure: true,
       shopProducts: {
-        where: {
-          isActive: true,
-          product: {
-            OR: [
-              { brandId: null },
-              { brand: { assignedNodeId: null } },
-              { brand: { assignedNode: { isActive: true } } },
-            ],
-          },
-        },
+        where: { isActive: true },
         include: {
           product: {
             include: { category: true, images: { take: 1 } },

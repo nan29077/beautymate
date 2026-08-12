@@ -50,7 +50,7 @@ async function getLiveVideoId(channelId: string, apiKey: string): Promise<string
 
 export async function GET(req: NextRequest) {
   const session = await auth();
-  if (!session || session.user?.role !== "SELLER") {
+  if (!session || session.user?.role !== "CONSULTANT") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

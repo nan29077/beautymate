@@ -17,7 +17,7 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
 };
 
 interface Order {
-  id: string; orderNumber: string; userName: string; sellerName: string;
+  id: string; reservationNumber: string; userName: string; sellerName: string;
   finalAmount: number; status: string; createdAt: string;
 }
 
@@ -29,7 +29,7 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
     const q = searchQuery.toLowerCase();
     return orders.filter(
       (o) =>
-        o.orderNumber.toLowerCase().includes(q) ||
+        o.reservationNumber.toLowerCase().includes(q) ||
         o.userName.toLowerCase().includes(q) ||
         o.sellerName.toLowerCase().includes(q)
     );
@@ -69,7 +69,7 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
               return (
                 <div key={order.id} className="bg-white rounded-xl border border-gray-100 p-3.5">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs font-bold text-gray-900">{order.orderNumber}</p>
+                    <p className="text-xs font-bold text-gray-900">{order.reservationNumber}</p>
                     <span className={`text-[9px] font-medium px-2 py-0.5 rounded-full ${status.color}`}>{status.label}</span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -100,7 +100,7 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
                   const status = STATUS_MAP[order.status] || { label: order.status, color: "bg-gray-100 text-gray-600" };
                   return (
                     <tr key={order.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-900">{order.orderNumber}</td>
+                      <td className="px-4 py-3 font-medium text-gray-900">{order.reservationNumber}</td>
                       <td className="px-4 py-3 text-gray-600">{order.userName}</td>
                       <td className="px-4 py-3 text-gray-600">{order.sellerName}</td>
                       <td className="px-4 py-3 font-semibold">{formatPrice(order.finalAmount)}</td>

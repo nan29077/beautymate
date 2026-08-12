@@ -7,20 +7,20 @@ export const dynamic = "force-dynamic";
 
 // 팬(구매회원)의 구매내역 조회.
 // - SUPER_ADMIN: 해당 회원의 모든 예약
-// - SELLER: 자기 점집에서 발생한 해당 회원의 예약만 (타 상담사 예약은 비노출)
+// - CONSULTANT: 자기 점집에서 발생한 해당 회원의 예약만 (타 상담사 예약은 비노출)
 export async function GET(
   _req: Request,
   { params }: { params: { userId: string } }
 ) {
   const session = await auth();
   const role = session?.user?.role;
-  if (!session?.user || (role !== "SUPER_ADMIN" && role !== "SELLER")) {
+  if (!session?.user || (role !== "SUPER_ADMIN" && role !== "CONSULTANT")) {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
 
   const where: any = { ...VISIBLE_ORDER_FILTER, userId: params.userId };
 
-  if (role === "SELLER") {
+  if (role === "CONSULTANT") {
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user.id },
       select: { id: true },
@@ -31,7 +31,7 @@ export async function GET(
     where.sellerId = seller.id;
   }
 
-  const orders = await prisma.order.findMany({
+  const orders = await prisma.reservation.findMany({
     where,
     include: {
       seller: { select: { shopName: true } },
@@ -54,13 +54,12 @@ export async function GET(
 
   const serialized = orders.map((o) => ({
     id: o.id,
-    orderNumber: o.orderNumber,
+    reservationNumber: o.reservationNumber,
     sellerName: o.seller.shopName,
     status: o.status,
     paymentMethod: o.paymentMethod,
     finalAmount: Number(o.finalAmount),
     totalAmount: Number(o.totalAmount),
-    shippingFee: Number(o.shippingFee),
     discountAmount: Number(o.discountAmount),
     campaignTitle: o.campaign?.title || null,
     createdAt: o.createdAt.toISOString(),
@@ -78,9 +77,9 @@ export async function GET(
   }));
 
   const summary = {
-    orderCount: serialized.length,
+    reservationCount: serialized.length,
     totalSpent: serialized
-      .filter((o) => ["PAID", "CONFIRMED", "SHIPPING", "DELIVERED"].includes(o.status))
+      .filter((o) => ["CONFIRMED", "COMPLETED"].includes(o.status))
       .reduce((s, o) => s + o.finalAmount, 0),
   };
 

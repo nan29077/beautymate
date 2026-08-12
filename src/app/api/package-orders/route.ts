@@ -27,7 +27,6 @@ export async function POST(request: Request) {
             select: {
               id: true,
               name: true,
-              brand: { select: { id: true, userId: true } },
             },
           },
         },
@@ -83,10 +82,10 @@ export async function POST(request: Request) {
     }[] = [];
 
     for (const item of pkg.items) {
-      if (item.product.brand?.userId) {
+      if (false) {
         purchaseOrderData.push({
           packageOrderItemId: orderItem.id,
-          recipientId: item.product.brand.userId,
+          recipientId: "",
           recipientType: "BRAND",
           productId: item.product.id,
           productName: item.product.name,

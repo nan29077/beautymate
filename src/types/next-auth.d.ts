@@ -1,6 +1,6 @@
 import type { DefaultSession } from "next-auth";
 
-type AppRole = "SUPER_ADMIN" | "NODE" | "MIDDLE_ADMIN" | "BRAND_ADMIN" | "SELLER" | "BUYER";
+type AppRole = "SUPER_ADMIN" | "CONSULTANT" | "CUSTOMER";
 
 declare module "next-auth" {
   interface Session {
@@ -8,8 +8,6 @@ declare module "next-auth" {
       id: string;
       role: AppRole;
       sellerSlug: string | null;
-      brandId: string | null;
-      middleAdminId: string | null;
       mustResetPassword: boolean;
     } & DefaultSession["user"];
   }
@@ -19,8 +17,6 @@ declare module "next-auth/jwt" {
   interface JWT {
     role: AppRole;
     sellerSlug: string | null;
-    brandId: string | null;
-    middleAdminId: string | null;
     mustResetPassword: boolean;
   }
 }

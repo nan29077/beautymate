@@ -20,7 +20,6 @@ export default async function WishlistPage() {
     include: {
       product: {
         include: {
-          brand: true,
           sellerProducts: {
             where: { isActive: true },
             include: { seller: true },
@@ -83,7 +82,7 @@ export default async function WishlistPage() {
                     </div>
                     <div className="px-0.5">
                       <p className="text-[10px] text-gray-400 truncate">
-                        {p.sellerProducts[0]?.seller?.shopName || p.brand?.brandName || ""}
+                        {p.sellerProducts[0]?.seller?.shopName || ""}
                       </p>
                       <p className="text-xs font-medium text-gray-900 truncate mt-0.5">{p.name}</p>
                       <div className="flex items-baseline gap-1.5 mt-1">

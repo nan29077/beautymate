@@ -32,8 +32,7 @@ interface Props {
 
 const ROLE_COLORS: Record<string, { bg: string; text: string; label: string }> = {
   SUPER_ADMIN: { bg: "bg-red-50", text: "text-red-600", label: "관리자" },
-  BRAND_ADMIN: { bg: "bg-purple-50", text: "text-purple-600", label: "브랜드" },
-  SELLER: { bg: "bg-blue-50", text: "text-blue-600", label: "상담사" },
+  CONSULTANT: { bg: "bg-blue-50", text: "text-blue-600", label: "상담사" },
 };
 
 export default function ProductSellerChatPanel({ productId, productName, currentUserId, sellers, className }: Props) {
@@ -236,7 +235,7 @@ export default function ProductSellerChatPanel({ productId, productName, current
                   ) : (
                     messages.map((msg) => {
                       const isMine = msg.senderId === currentUserId;
-                      const roleConfig = ROLE_COLORS[msg.senderRole] || ROLE_COLORS.SELLER;
+                      const roleConfig = ROLE_COLORS[msg.senderRole] || ROLE_COLORS.CONSULTANT;
                       return (
                         <div key={msg.id} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
                           <div className={`max-w-[80%] ${isMine ? "items-end" : "items-start"}`}>

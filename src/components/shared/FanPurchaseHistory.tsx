@@ -32,7 +32,7 @@ interface FanOrderItem {
 
 interface FanOrder {
   id: string;
-  orderNumber: string;
+  reservationNumber: string;
   sellerName: string;
   status: string;
   paymentMethod?: string | null;
@@ -48,16 +48,16 @@ interface Props {
   userId: string;
   userName: string;
   /** 기본 예약 건수 (버튼에 표시). API 응답 전까지 노출용 */
-  orderCount?: number;
+  reservationCount?: number;
   /** 버튼 스타일: 행 우측 작은 버튼 */
   variant?: "button" | "compact";
 }
 
-export default function FanPurchaseHistory({ userId, userName, orderCount, variant = "button" }: Props) {
+export default function FanPurchaseHistory({ userId, userName, reservationCount, variant = "button" }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<FanOrder[]>([]);
-  const [summary, setSummary] = useState<{ orderCount: number; totalSpent: number } | null>(null);
+  const [summary, setSummary] = useState<{ reservationCount: number; totalSpent: number } | null>(null);
   const [error, setError] = useState("");
 
   const load = async () => {
@@ -97,7 +97,7 @@ export default function FanPurchaseHistory({ userId, userName, orderCount, varia
         }
       >
         <Icon name="Cart" size={12} />
-        구매내역{typeof orderCount === "number" ? ` ${orderCount}` : ""}
+        구매내역{typeof reservationCount === "number" ? ` ${reservationCount}` : ""}
       </button>
 
       {open && (
@@ -119,7 +119,7 @@ export default function FanPurchaseHistory({ userId, userName, orderCount, varia
                   <h3 className="text-base font-bold text-gray-900">{userName} 구매내역</h3>
                   {summary && (
                     <p className="text-[11px] text-gray-400">
-                      총 {summary.orderCount}건 · 누적 결제 {formatPrice(summary.totalSpent)}
+                      총 {summary.reservationCount}건 · 누적 결제 {formatPrice(summary.totalSpent)}
                     </p>
                   )}
                 </div>
@@ -161,7 +161,7 @@ export default function FanPurchaseHistory({ userId, userName, orderCount, varia
                             </span>
                             <span className="text-[10px] text-gray-400">{formatDate(o.paidAt || o.createdAt)}</span>
                           </div>
-                          <span className="text-[10px] text-gray-300">{o.orderNumber}</span>
+                          <span className="text-[10px] text-gray-300">{o.reservationNumber}</span>
                         </div>
                         <div className="flex gap-3">
                           <div className="w-12 h-12 rounded-lg bg-gray-50 overflow-hidden flex-shrink-0">

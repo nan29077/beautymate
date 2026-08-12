@@ -15,7 +15,7 @@ interface User {
   birthday?: string | null;
   role: string;
   isActive: boolean;
-  orderCount: number;
+  reservationCount: number;
   reviewCount: number;
   createdAt: string;
   authProviders?: string[];

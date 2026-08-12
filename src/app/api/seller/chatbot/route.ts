@@ -74,7 +74,7 @@ const LEGACY_CONFIG_SELECT = {
 // GET: 봇 설정 조회 (mode=logs 이면 최근 봇 발송 메시지 로그)
 export async function GET(req: NextRequest) {
   const session = await auth();
-  if (!session || session.user?.role !== "SELLER") {
+  if (!session || session.user?.role !== "CONSULTANT") {
     return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
   }
   const seller = await getSeller(session.user!.id);
@@ -116,7 +116,7 @@ export async function GET(req: NextRequest) {
 // PUT: 봇 설정 저장 (upsert)
 export async function PUT(req: NextRequest) {
   const session = await auth();
-  if (!session || session.user?.role !== "SELLER") {
+  if (!session || session.user?.role !== "CONSULTANT") {
     return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
   }
   const seller = await getSeller(session.user!.id);

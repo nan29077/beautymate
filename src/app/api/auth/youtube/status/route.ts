@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 
 async function getSeller() {
   const session = await auth();
-  if (!session || session.user?.role !== "SELLER") return null;
+  if (!session || session.user?.role !== "CONSULTANT") return null;
   return prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
 }
 

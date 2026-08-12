@@ -12,7 +12,7 @@ async function requireAdmin() {
   return { session, ok: true as const };
 }
 
-// GET: 수기 정산 내역 조회 (?recipientType=NODE|MIDDLE_ADMIN|BRAND_ADMIN)
+// GET: 수기 정산 내역 조회 (?recipientType=CONSULTANT)
 export async function GET(req: NextRequest) {
   const guard = await requireAdmin();
   if ("error" in guard) return guard.error;
@@ -73,10 +73,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const validTypes = ["NODE", "MIDDLE_ADMIN", "BRAND_ADMIN"];
+    const validTypes = ["CONSULTANT"];
     if (!validTypes.includes(recipientType)) {
       return NextResponse.json(
-        { error: "recipientType 은 NODE | MIDDLE_ADMIN | BRAND_ADMIN 이어야 합니다." },
+        { error: "recipientType 은 CONSULTANT 이어야 합니다." },
         { status: 400 }
       );
     }

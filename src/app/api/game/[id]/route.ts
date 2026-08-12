@@ -77,7 +77,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     // 공동 목표 게이지: 게임 생성 이후 상담사의 결제 완료 예약 수를 실시간 집계
     let goalCurrent: number | undefined;
     if (game.type === "GOAL_GAUGE") {
-      goalCurrent = await prisma.order.count({
+      goalCurrent = await prisma.reservation.count({
         where: {
           sellerId: game.sellerId,
           paymentStatus: "COMPLETED",

@@ -10,7 +10,7 @@ export async function GET() {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
-    if (session.user.role !== "SELLER") {
+    if (session.user.role !== "CONSULTANT") {
       return NextResponse.json({ error: "상담사 전용" }, { status: 403 });
     }
 
@@ -28,7 +28,6 @@ export async function GET() {
         product: {
           select: {
             id: true, name: true, thumbnail: true, basePrice: true,
-            brand: { select: { brandName: true, brandLogo: true } },
             category: { select: { name: true } },
           },
         },
@@ -89,7 +88,7 @@ export async function POST(req: Request) {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
-    if (session.user.role !== "SELLER") {
+    if (session.user.role !== "CONSULTANT") {
       return NextResponse.json({ error: "상담사 전용" }, { status: 403 });
     }
 

@@ -30,9 +30,7 @@ const providers: NextAuthConfig["providers"] = [
         where: { email: credentials.email as string },
         include: {
           sellerProfile: true,
-          brandProfile: true,
           buyerProfile: true,
-          middleAdminProfile: true,
         },
       });
 
@@ -45,8 +43,8 @@ const providers: NextAuthConfig["providers"] = [
       );
       if (!isValid) return null;
 
-      if (user.role === "SELLER" && user.sellerProfile && !user.sellerProfile.isApproved) {
-        throw new Error("SELLER_NOT_APPROVED");
+      if (user.role === "CONSULTANT" && user.sellerProfile && !user.sellerProfile.isApproved) {
+        throw new Error("CONSULTANT_NOT_APPROVED");
       }
 
       return {
@@ -57,8 +55,6 @@ const providers: NextAuthConfig["providers"] = [
         // image (NextAuth 표준) 우선, 없으면 legacy avatar 사용.
         image: (user as any).image || user.avatar,
         sellerSlug: user.sellerProfile?.slug || null,
-        brandId: user.brandProfile?.id || null,
-        middleAdminId: user.middleAdminProfile?.id || null,
         mustResetPassword: user.mustResetPassword,
       } as any;
     },
@@ -78,9 +74,7 @@ const providers: NextAuthConfig["providers"] = [
         where: { id: userId },
         include: {
           sellerProfile: true,
-          brandProfile: true,
           buyerProfile: true,
-          middleAdminProfile: true,
         },
       });
       if (!user || !user.isActive) return null;
@@ -92,8 +86,6 @@ const providers: NextAuthConfig["providers"] = [
         role: user.role,
         image: (user as any).image || user.avatar,
         sellerSlug: user.sellerProfile?.slug || null,
-        brandId: user.brandProfile?.id || null,
-        middleAdminId: user.middleAdminProfile?.id || null,
       } as any;
     },
   }),
@@ -377,8 +369,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.role = (user as any).role;
         token.sellerSlug = (user as any).sellerSlug;
-        token.brandId = (user as any).brandId;
-        token.middleAdminId = (user as any).middleAdminId;
         token.picture = (user as any).image || null;
         token.mustResetPassword = Boolean((user as any).mustResetPassword);
       }
@@ -389,13 +379,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (!token.role && token.sub) {
         const u = await prisma.user.findUnique({
           where: { id: token.sub },
-          include: { sellerProfile: true, brandProfile: true, middleAdminProfile: true },
+          include: { sellerProfile: true },
         });
         if (u) {
           token.role = u.role;
           token.sellerSlug = u.sellerProfile?.slug || null;
-          token.brandId = u.brandProfile?.id || null;
-          token.middleAdminId = u.middleAdminProfile?.id || null;
           token.picture = (u as any).image || u.avatar || null;
         }
       }
@@ -407,8 +395,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.image = (token.picture as string) || null;
         session.user.role = token.role as typeof session.user.role;
         session.user.sellerSlug = token.sellerSlug as string | null;
-        session.user.brandId = token.brandId as string | null;
-        session.user.middleAdminId = token.middleAdminId as string | null;
         session.user.mustResetPassword = Boolean(token.mustResetPassword);
       }
       return session;
@@ -421,7 +407,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      *  1) 소셜 프로필 사진이 없는 고객에게 랜덤 고객 캐릭터 배정
      *  2) 쿠키 sb_ref 에서 상담사 slug 추출
      *  3) linkReferralForNewBuyer 로 BuyerProfile 생성 + 추천인 매핑 + totalFans++
-     *  4) OAuth 가입자는 BUYER 역할 (schema default 유지)
+     *  4) OAuth 가입자는 CUSTOMER 역할 (schema default 유지)
      */
     async createUser({ user }) {
       if (!user?.id) return;

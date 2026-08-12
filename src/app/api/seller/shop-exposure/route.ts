@@ -9,7 +9,7 @@ export async function GET() {
   try {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
-    if (session.user?.role !== "SELLER") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+    if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
 
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id }, select: { id: true } });
     if (!seller) return NextResponse.json({ error: "상담사 프로필을 찾을 수 없습니다." }, { status: 404 });
@@ -32,7 +32,7 @@ export async function PUT(req: NextRequest) {
   try {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
-    if (session.user?.role !== "SELLER") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+    if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
 
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id }, select: { id: true } });
     if (!seller) return NextResponse.json({ error: "상담사 프로필을 찾을 수 없습니다." }, { status: 404 });

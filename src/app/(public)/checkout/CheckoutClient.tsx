@@ -403,8 +403,8 @@ export default function CheckoutClient({ item }: { item: CheckoutItem }) {
             price: item.price,
             quantity,
           }],
-          shippingName: shipping.name,
-          shippingPhone: shipping.phone,
+          customerName: shipping.name,
+          customerPhone: shipping.phone,
           shippingAddress: fullAddress,
           shippingMemo: shipping.memo,
           snsAccounts: snsAccounts.length > 0 ? snsAccounts : undefined,
@@ -472,7 +472,7 @@ export default function CheckoutClient({ item }: { item: CheckoutItem }) {
         // closure 의 예약 정보를 보강해 forward. res 의 값이 있으면 res 우선.
         const fallbackFields: Record<string, string> = {
           MallReserved: orderId,
-          Moid: order.orderNumber || "",
+          Moid: order.reservationNumber || "",
           Amt: String(Math.round(Number(order.finalAmount || finalTotal))),
         };
         sp.payment({

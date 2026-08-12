@@ -9,23 +9,23 @@ export default async function AdminManualSettlementPage() {
   const session = await auth();
   if ((session?.user as any)?.role !== "SUPER_ADMIN") redirect("/");
 
-  // NODE 사용자 목록
+  // 상담사 목록
   const nodeUsers = await prisma.user.findMany({
-    where: { role: "NODE", isActive: true },
+    where: { role: "CONSULTANT", isActive: true },
     select: { id: true, name: true, email: true },
     orderBy: { name: "asc" },
   });
 
-  // MIDDLE_ADMIN 사용자 목록
+  // (레거시 슬롯 — 미사용)
   const middleAdminUsers = await prisma.user.findMany({
-    where: { role: "MIDDLE_ADMIN", isActive: true },
+    where: { role: "SUPER_ADMIN", isActive: true },
     select: { id: true, name: true, email: true },
     orderBy: { name: "asc" },
   });
 
-  // BRAND_ADMIN 사용자 목록
+  // (레거시 슬롯 — 미사용)
   const brandAdminUsers = await prisma.user.findMany({
-    where: { role: "BRAND_ADMIN", isActive: true },
+    where: { role: "SUPER_ADMIN", isActive: true },
     select: { id: true, name: true, email: true },
     orderBy: { name: "asc" },
   });

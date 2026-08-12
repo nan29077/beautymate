@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// POST: 정산 가능 금액 +/- 수기 조정 (SELLER / MIDDLE_ADMIN / BRAND_ADMIN)
+// POST: 정산 가능 금액 +/- 수기 조정 (CONSULTANT)
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session || (session.user as any).role !== "SUPER_ADMIN") {
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "recipientType, userId, amount 필수" }, { status: 400 });
   }
 
-  const validTypes = ["SELLER", "MIDDLE_ADMIN", "BRAND_ADMIN"];
+  const validTypes = ["CONSULTANT"];
   if (!validTypes.includes(recipientType)) {
     return NextResponse.json({ error: "유효하지 않은 recipientType" }, { status: 400 });
   }

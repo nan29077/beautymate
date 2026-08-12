@@ -21,7 +21,7 @@ interface Payout {
   sellerName: string;
   amount: number;
   netAmount: number;
-  orderCount: number;
+  reservationCount: number;
   status: string;
   isBusiness: boolean;
   bizNumber: string | null;
@@ -144,7 +144,7 @@ export default function AdminPayoutSettlement({ totals, payouts }: Props) {
                         <span className="text-[10px] text-gray-400">{new Date(p.requestedAt).toLocaleDateString("ko-KR")}</span>
                       </div>
                       <p className="text-[11px] text-gray-500 mt-1.5">
-                        {p.bankName || "-"} {p.accountNumber || ""} ({p.accountHolder || "-"}) · {p.orderCount}건
+                        {p.bankName || "-"} {p.accountNumber || ""} ({p.accountHolder || "-"}) · {p.reservationCount}건
                       </p>
                       <p className="text-[11px] text-gray-400 mt-0.5">
                         {p.isBusiness

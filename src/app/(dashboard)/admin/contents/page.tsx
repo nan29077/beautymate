@@ -29,7 +29,7 @@ export default async function AdminContentsPage() {
       },
       shoppingTags: {
         include: {
-          product: { select: { id: true, name: true, thumbnail: true, basePrice: true, brandId: true } },
+          product: { select: { id: true, name: true, thumbnail: true, basePrice: true } },
         },
       },
     },

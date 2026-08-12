@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 
   if (role === "SUPER_ADMIN") {
     if (sellerId) where.sellerId = sellerId;
-  } else if (role === "SELLER") {
+  } else if (role === "CONSULTANT") {
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
   const role = session.user.role;
-  if (role !== "SELLER" && role !== "SUPER_ADMIN") {
+  if (role !== "CONSULTANT" && role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "권한 없음" }, { status: 403 });
   }
 
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
 
   let sellerId: string;
 
-  if (role === "SELLER") {
+  if (role === "CONSULTANT") {
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });
@@ -140,7 +140,7 @@ export async function DELETE(req: NextRequest) {
   if (!post) return NextResponse.json({ error: "콘텐츠 없음" }, { status: 404 });
 
   // 상담사는 자기 콘텐츠만 삭제 가능
-  if (role === "SELLER") {
+  if (role === "CONSULTANT") {
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });
@@ -194,7 +194,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   // 상담사: 자기 콘텐츠만 수정
-  if (role === "SELLER") {
+  if (role === "CONSULTANT") {
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });

@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
     const role = session.user.role;
-    if (!["SUPER_ADMIN", "BRAND_ADMIN"].includes(role)) {
+    if (!["SUPER_ADMIN"].includes(role)) {
       return NextResponse.json({ error: "권한 없음" }, { status: 403 });
     }
 
@@ -19,12 +19,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "productId는 필수입니다" }, { status: 400 });
     }
 
-    const isBrand = role === "BRAND_ADMIN";
+    const isBrand = false;
 
     // 상담상품 정보 조회 (판매가/공급가 — 매출 산정 기준에 사용)
     const productInfo = await prisma.product.findUnique({
       where: { id: productId },
-      select: { id: true, name: true, thumbnail: true, basePrice: true, supplyPrice: true, soldCount: true, brandId: true },
+      select: { id: true, name: true, thumbnail: true, basePrice: true, supplyPrice: true, soldCount: true },
     });
     if (!productInfo) {
       return NextResponse.json({ error: "상담상품을 찾을 수 없습니다" }, { status: 404 });
@@ -32,9 +32,6 @@ export async function GET(req: NextRequest) {
 
     // Verify product ownership for brand admin
     if (isBrand) {
-      const brand = await prisma.brandProfile.findUnique({ where: { userId: session.user!.id } });
-      if (!brand) return NextResponse.json({ error: "브랜드 정보 없음" }, { status: 403 });
-      if (productInfo.brandId !== brand.id) return NextResponse.json({ error: "권한 없음" }, { status: 403 });
     }
 
     // 판매가 비노출: 브랜드 매출은 공급가 단가 × 수량으로 집계 (판매가 누출 방지)
@@ -61,7 +58,7 @@ export async function GET(req: NextRequest) {
     });
 
     // Get orders for this product grouped by seller
-    const orders = await prisma.order.findMany({
+    const orders = await prisma.reservation.findMany({
       where: {
         items: { some: { productId } },
         paymentStatus: { in: ["COMPLETED"] },

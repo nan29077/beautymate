@@ -25,7 +25,7 @@ interface Props {
 export default function FanMemberInfo({ userId, name, email, phone, joinedAt, avatar, gender, birthday, authProviders }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [summary, setSummary] = useState<{ orderCount: number; totalSpent: number } | null>(null);
+  const [summary, setSummary] = useState<{ reservationCount: number; totalSpent: number } | null>(null);
   const [error, setError] = useState("");
 
   const handleOpen = async (e: React.MouseEvent) => {
@@ -37,7 +37,7 @@ export default function FanMemberInfo({ userId, name, email, phone, joinedAt, av
       const res = await fetch(`/api/fans/${userId}/orders`);
       const data = await res.json();
       if (!res.ok) setError(data.error || "정보를 불러오지 못했습니다.");
-      else setSummary(data.summary || { orderCount: 0, totalSpent: 0 });
+      else setSummary(data.summary || { reservationCount: 0, totalSpent: 0 });
     } catch {
       setError("정보를 불러오는 중 오류가 발생했습니다.");
     } finally {
@@ -106,7 +106,7 @@ export default function FanMemberInfo({ userId, name, email, phone, joinedAt, av
                 <InfoRow
                   icon={<Icon name="Cart" size={14} className="text-gray-400" />}
                   label="구매 건수"
-                  value={loading ? "" : error ? "-" : `${summary?.orderCount ?? 0}건`}
+                  value={loading ? "" : error ? "-" : `${summary?.reservationCount ?? 0}건`}
                 />
               </div>
 

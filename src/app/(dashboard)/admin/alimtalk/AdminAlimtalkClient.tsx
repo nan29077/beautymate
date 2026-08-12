@@ -85,7 +85,7 @@ interface TemplateInfo {
 const PURPOSE_LABELS: Record<string, string> = {
   LIVE_START: "라이브 방송시작 알림",
   ORDER_PLACED: "예약접수 알림(상담사)",
-  SHIPPING_START: "상담 방식 시작 안내",
+  RESERVATION_CONFIRMED: "예약 확정 안내",
   SIGNUP_WELCOME: "회원가입 환영",
   PASSWORD_RESET: "임시 비밀번호 문자",
 };

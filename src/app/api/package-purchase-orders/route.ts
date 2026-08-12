@@ -34,27 +34,7 @@ export async function GET(request: Request) {
       },
       orderBy: { createdAt: "desc" },
     });
-  } else if (role === "BRAND_ADMIN") {
-    // 본인 브랜드 상담상품이 포함된 발주서
-    purchaseOrders = await prisma.packagePurchaseOrder.findMany({
-      where: {
-        recipientId: userId,
-        recipientType: "BRAND",
-        ...(status ? { status } : {}),
-      },
-      include: {
-        packageOrderItem: {
-          include: {
-            package: {
-              select: { id: true, name: true, packagePrice: true },
-            },
-          },
-        },
-        recipient: { select: { id: true, name: true, email: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-  } else if (role === "SELLER" || role === "MIDDLE_ADMIN") {
+  } else if (role === "CONSULTANT") {
     // 본인이 등록한 패키지의 발주서 (CREATOR 타입) + 본인 수신 발주서
     purchaseOrders = await prisma.packagePurchaseOrder.findMany({
       where: {

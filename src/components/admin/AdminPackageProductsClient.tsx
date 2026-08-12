@@ -16,7 +16,6 @@ interface PackageItem {
     thumbnail: string | null;
     supplyPrice?: number | null;
     basePrice?: number | null;
-    brand: { brandName: string } | null;
   };
 }
 
@@ -45,9 +44,7 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
 
 const ROLE_LABEL: Record<string, string> = {
   SUPER_ADMIN: "최고관리자",
-  BRAND_ADMIN: "브랜드",
-  SELLER: "상담사",
-  MIDDLE_ADMIN: "중간관리자",
+  CONSULTANT: "상담사",
 };
 
 export default function AdminPackageProductsClient({ packages }: { packages: PackageProduct[] }) {
@@ -198,8 +195,7 @@ export default function AdminPackageProductsClient({ packages }: { packages: Pac
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-xs font-semibold text-gray-800 truncate">{item.product.name}</p>
-                              <p className="text-[10px] text-gray-400 mt-0.5">{item.product.brand?.brandName || "브랜드 미지정"}</p>
-                            </div>
+                                                          </div>
                             <div className="text-right flex-shrink-0">
                               <p className="text-xs font-bold text-gray-800">{formatPrice(item.unitPrice)}원 × {item.quantity}</p>
                               <p className="text-[10px] text-gray-500 mt-0.5">소계: {formatPrice(item.unitPrice * item.quantity)}원</p>

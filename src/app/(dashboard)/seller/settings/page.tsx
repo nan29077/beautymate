@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function SellerSettingsPage() {
   const session = await auth();
-  if (!session?.user || session.user.role !== "SELLER") redirect("/");
+  if (!session?.user || session.user.role !== "CONSULTANT") redirect("/");
 
   return <SettingsClient />;
 }

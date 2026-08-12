@@ -102,10 +102,10 @@ export async function createLiveStartNotifications(liveId: string): Promise<numb
  */
 export async function notifyOrderPaid(orderId: string): Promise<void> {
   try {
-    const order = await prisma.order.findUnique({
+    const order = await prisma.reservation.findUnique({
       where: { id: orderId },
       select: {
-        orderNumber: true,
+        reservationNumber: true,
         userId: true,
         seller: { select: { shopName: true } },
         user: { select: { buyerProfile: { select: { notifyOrder: true } } } },
@@ -117,7 +117,7 @@ export async function notifyOrderPaid(orderId: string): Promise<void> {
     await createNotification({
       userId: order.userId,
       title: "예약이 완료되었습니다",
-      message: `${order.seller.shopName} 예약(${order.orderNumber})이 정상 결제되었습니다. 상담 방식이 시작되면 다시 알려드릴게요.`,
+      message: `${order.seller.shopName} 예약(${order.reservationNumber})이 정상 결제되었습니다. 상담 방식이 시작되면 다시 알려드릴게요.`,
       type: "order",
       linkUrl: "/my/orders",
     });

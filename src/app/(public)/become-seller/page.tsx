@@ -50,7 +50,7 @@ export default async function BecomeSellerPage() {
         <div className="relative px-6 pt-12 pb-11 text-white">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-brand-500 text-black px-3 py-1 mb-4">
             <Icon name="Store" size={12} strokeWidth={2.5} />
-            <span className="text-[10px] font-extrabold tracking-wide">SELLER PROGRAM</span>
+            <span className="text-[10px] font-extrabold tracking-wide">CONSULTANT PROGRAM</span>
           </div>
           <div className="flex items-start gap-3">
             <h1 className="text-[28px] font-extrabold leading-tight">
@@ -176,7 +176,7 @@ export default async function BecomeSellerPage() {
         style={{ bottom: "calc(3.5rem + env(safe-area-inset-bottom, 0px))" }}
       >
         <Link
-           href="/auth/register?role=SELLER"
+           href="/auth/register?role=CONSULTANT"
           className="block w-full py-3.5 bg-gray-900 text-white font-bold text-sm text-center rounded-xl hover:bg-gray-800 transition-colors"
         >
           상담사 신청하기

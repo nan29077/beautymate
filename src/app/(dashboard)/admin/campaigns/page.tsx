@@ -18,7 +18,6 @@ export default async function AdminCampaignsPage() {
         select: {
           name: true,
           thumbnail: true,
-          brand: { select: { brandName: true } },
         },
       },
     },
@@ -35,8 +34,8 @@ export default async function AdminCampaignsPage() {
     goalQuantity: c.goalQuantity,
     totalRevenue: Number(c.totalRevenue),
     sellerName: c.seller.shopName,
+    brandName: null,
     productName: c.product.name,
-    brandName: c.product.brand?.brandName || null,
     thumbnail: c.product.thumbnail,
     createdAt: c.createdAt.toISOString(),
   }));

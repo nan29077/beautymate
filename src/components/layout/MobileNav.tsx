@@ -14,9 +14,7 @@ import { useShopChrome } from "@/components/shared/ShopChromeProvider";
 function myPageHref(role?: string): string {
   switch (role) {
     case "SUPER_ADMIN": return "/admin";
-    case "MIDDLE_ADMIN": return "/middle";
-    case "SELLER": return "/seller";
-    case "BRAND_ADMIN": return "/brand";
+    case "CONSULTANT": return "/seller";
     default: return "/my";
   }
 }

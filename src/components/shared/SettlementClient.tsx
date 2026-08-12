@@ -44,7 +44,7 @@ interface Settlement {
 
 interface Props {
   settlements: Settlement[];
-  role: "SUPER_ADMIN" | "SELLER" | "BRAND_ADMIN";
+  role: "SUPER_ADMIN" | "CONSULTANT";
   commissionRate?: number;
 }
 
@@ -202,7 +202,7 @@ export default function SettlementClient({ settlements, role, commissionRate = 1
           <h1 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
             <Icon name="Wallet" size={20} className="text-brand-600" /> 정산 관리
           </h1>
-          {role === "SELLER" && <p className="text-xs text-gray-500 mt-0.5">수수료율 {commissionRate}%</p>}
+          {role === "CONSULTANT" && <p className="text-xs text-gray-500 mt-0.5">수수료율 {commissionRate}%</p>}
         </div>
       </div>
 
@@ -374,7 +374,7 @@ export default function SettlementClient({ settlements, role, commissionRate = 1
                   {group.settlements.map(s => {
                     const st = STATUS_MAP[s.status] || { label: s.status, color: "bg-gray-100 text-gray-600", icon: Clock };
                     const isExpanded = expandedCards.has(s.id);
-                    const canRequest = (role === "SELLER" || role === "BRAND_ADMIN") && (s.status === "CALCULATED" || s.status === "PENDING");
+                    const canRequest = role === "CONSULTANT" && (s.status === "CALCULATED" || s.status === "PENDING");
                     const canApprove = role === "SUPER_ADMIN" && s.status === "REQUESTED";
                     const isSelectedForBulk = selectedIds.has(s.id);
 
@@ -395,7 +395,7 @@ export default function SettlementClient({ settlements, role, commissionRate = 1
                                 <span className={`text-[9px] font-medium px-2 py-0.5 rounded-full ${st.color}`}>{st.label}</span>
                               </div>
                               <div className="text-[10px] text-gray-400 flex items-center gap-2">
-                                {role !== "SELLER" && <span className="text-brand-500 font-medium">{s.sellerName}</span>}
+                                {role !== "CONSULTANT" && <span className="text-brand-500 font-medium">{s.sellerName}</span>}
                                 {s.brandName && <span className="text-purple-500">{s.brandName}</span>}
                                 <span>{new Date(s.periodStart).toLocaleDateString("ko-KR")} ~ {new Date(s.periodEnd).toLocaleDateString("ko-KR")}</span>
                               </div>

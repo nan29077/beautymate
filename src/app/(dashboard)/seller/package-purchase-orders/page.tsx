@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export default async function SellerPackagePurchaseOrdersPage() {
   const session = await auth();
-  if (session?.user?.role !== "SELLER") redirect("/");
+  if (session?.user?.role !== "CONSULTANT") redirect("/");
 
   // 상담사: 본인이 등록한 패키지의 CREATOR 발주서
   const purchaseOrders = await prisma.packagePurchaseOrder.findMany({
@@ -53,7 +53,7 @@ export default async function SellerPackagePurchaseOrdersPage() {
           내가 등록한 패키지 상담상품의 발주서입니다.
         </p>
       </div>
-      <PackagePurchaseOrdersClient purchaseOrders={serialized} role="SELLER" />
+      <PackagePurchaseOrdersClient purchaseOrders={serialized} role="CONSULTANT" />
     </div>
   );
 }

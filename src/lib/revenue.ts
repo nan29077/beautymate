@@ -23,7 +23,7 @@ const vatFee = (rate: number) => (rate * 1.1) / 100;
 
 export interface RevenueRow {
   orderId: string;
-  orderNumber: string;
+  reservationNumber: string;
   sellerName: string;
   finalAmount: number;
   sellerFee: number; // 상담사에게서 받은 플랫폼 수수료
@@ -36,7 +36,7 @@ export interface RevenueRow {
 export interface PlatformRevenue {
   rows: RevenueRow[];
   rowsTruncated: boolean; // 표시용 행을 잘랐는지 (합계는 항상 전체 기준)
-  orderCount: number;
+  reservationCount: number;
   totalSales: number; // 총 결제액(GMV)
   totalSellerFee: number;
   totalSupplierFee: number;
@@ -55,15 +55,15 @@ export async function getPlatformRevenue(opts: {
   const fees = opts.fees ?? (await getPlatformFees());
 
   // take 제한 없음 — 합계가 틀리면 안 되므로 전 예약을 집계한다.
-  const orders = await prisma.order.findMany({
+  const orders = await prisma.reservation.findMany({
     where: {
       paymentStatus: "COMPLETED",
-      status: { notIn: ["CANCELLED", "REFUNDED", "REFUND_REQUESTED"] },
+      status: { notIn: ["CANCELLED", "NO_SHOW"] },
       ...(opts.dateFilter ?? {}),
     },
     select: {
       id: true,
-      orderNumber: true,
+      reservationNumber: true,
       finalAmount: true,
       createdAt: true,
       sellerId: true,
@@ -98,7 +98,6 @@ export async function getPlatformRevenue(opts: {
           priceModel: true,
           commissionRate: true,
           sellerId: true,
-          middleAdminId: true,
         },
       })
     : [];
@@ -148,13 +147,12 @@ export async function getPlatformRevenue(opts: {
         ? it.isSellerProductSnap === true
         : live?.sellerId === o.sellerId;
       const sellerRate = hasSnap ? Number(it.sellerFeeRateSnap) : orderSellerRate;
+      // 공급자는 플랫폼 하나뿐이라 상담사 수수료율을 공급자 요율로 그대로 쓴다.
       const supplierRate = hasSnap
         ? it.supplierFeeRateSnap != null
           ? Number(it.supplierFeeRateSnap)
-          : fees.brandFeeRate
-        : live?.middleAdminId
-          ? fees.middleAdminFeeRate
-          : fees.brandFeeRate;
+          : fees.sellerFeeRate
+        : fees.sellerFeeRate;
 
       if (!hasSnap && !live) continue; // 스냅샷도 상담상품도 없음 → settlement.ts 와 동일하게 0원 처리
 
@@ -200,7 +198,7 @@ export async function getPlatformRevenue(opts: {
     if (rows.length < MAX_ROWS) {
       rows.push({
         orderId: o.id,
-        orderNumber: o.orderNumber,
+        reservationNumber: o.reservationNumber,
         sellerName: o.seller?.shopName ?? "-",
         finalAmount,
         sellerFee: sFee,
@@ -219,7 +217,7 @@ export async function getPlatformRevenue(opts: {
   return {
     rows,
     rowsTruncated: orders.length > MAX_ROWS,
-    orderCount: orders.length,
+    reservationCount: orders.length,
     totalSales,
     totalSellerFee,
     totalSupplierFee,

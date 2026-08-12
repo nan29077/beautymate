@@ -131,7 +131,7 @@ export async function GET(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
 
   const role = session.user?.role;
-  if (role !== "SELLER") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+  if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
 
   const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
   if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
 
   if (action === "create") {
     const role = session.user?.role;
-    if (role !== "SELLER") return NextResponse.json({ error: "상담사만 라이브 생성 가능" }, { status: 403 });
+    if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 라이브 생성 가능" }, { status: 403 });
 
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
     if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
@@ -286,7 +286,7 @@ export async function POST(req: NextRequest) {
   if (action === "update_external_url") {
     // SCHEDULED/LIVE 상태일 때만 외부 라이브 URL(및 플랫폼) 수정 허용.
     const role = session.user?.role;
-    if (role !== "SELLER") return NextResponse.json({ error: "상담사만 가능" }, { status: 403 });
+    if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 가능" }, { status: 403 });
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
     if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
 
@@ -318,7 +318,7 @@ export async function POST(req: NextRequest) {
   if (action === "update_stream_key") {
     // B방식(OBS/PRISM → YouTube 송출)용 스트림 키 저장. 상담사 본인 라이브만 가능.
     const role = session.user?.role;
-    if (role !== "SELLER") return NextResponse.json({ error: "상담사만 가능" }, { status: 403 });
+    if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 가능" }, { status: 403 });
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
     if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
 
@@ -355,7 +355,7 @@ export async function POST(req: NextRequest) {
   if (action === "toggle_past_in_shop") {
     // 종료된 방송을 점집 "지난 방송 상담상품" 영역에 노출할지 상담사가 방송별로 on/off
     const role = session.user?.role;
-    if (role !== "SELLER") return NextResponse.json({ error: "상담사만 가능" }, { status: 403 });
+    if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 가능" }, { status: 403 });
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
     if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
 
@@ -394,7 +394,7 @@ export async function POST(req: NextRequest) {
   if (action === "toggle_yt_forward") {
     // 사이트 채팅 → YouTube 전달 on/off (상담사 본인 라이브만)
     const role = session.user?.role;
-    if (role !== "SELLER") return NextResponse.json({ error: "상담사만 가능" }, { status: 403 });
+    if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 가능" }, { status: 403 });
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
     if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
 

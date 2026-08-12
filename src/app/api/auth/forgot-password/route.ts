@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 상담사/관리자 계정은 고객센터 안내
-    if (user.role !== "BUYER") {
+    if (user.role !== "CUSTOMER") {
       return NextResponse.json(
         {
           error:

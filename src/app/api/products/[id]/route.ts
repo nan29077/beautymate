@@ -24,7 +24,7 @@ export async function GET(
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
     const role = session.user.role;
-    if (!["SUPER_ADMIN", "BRAND_ADMIN", "SELLER", "MIDDLE_ADMIN"].includes(role)) {
+    if (!["SUPER_ADMIN", "CONSULTANT"].includes(role)) {
       return NextResponse.json({ error: "권한 없음" }, { status: 403 });
     }
 
@@ -32,7 +32,6 @@ export async function GET(
       where: { id: params.id },
       include: {
         category: true,
-        brand: true,
         variants: { orderBy: { sortOrder: "asc" } },
         images: { orderBy: { sortOrder: "asc" } },
         sellerProducts: {
@@ -52,16 +51,6 @@ export async function GET(
       return NextResponse.json({ error: "상담상품을 찾을 수 없습니다" }, { status: 404 });
     }
 
-    // Check brand ownership
-    if (role === "BRAND_ADMIN") {
-      const brand = await prisma.brandProfile.findUnique({
-        where: { userId: session.user!.id },
-      });
-      if (!brand || product.brandId !== brand.id) {
-        return NextResponse.json({ error: "이 상담상품에 대한 권한이 없습니다" }, { status: 403 });
-      }
-    }
-
     // Fetch categories for the form
     const categories = await prisma.category.findMany({
       where: { isActive: true },
@@ -69,49 +58,23 @@ export async function GET(
       select: { id: true, name: true, slug: true, parentId: true },
     });
 
-    // 판매가 비노출: 브랜드 역할에는 판매가(basePrice)·정가(comparePrice)·중간관리자 마진을 응답에서 제거.
-    // 브랜드는 공급가(supplyPrice)만 조회/수정한다.
-    const isBrand = role === "BRAND_ADMIN";
-    // 상담사 역할: 상담상품명 포맷 변환
-    // - 중간관리자 상담상품: "(브랜드명 + 중간관리자이름)" → "(중간관리자이름)"
-    // - 브랜드 직접 등록 상담상품: "(브랜드명 + ...)" → "(브랜드명)" / 그대로 유지
-    const isSeller = role === "SELLER";
-    const formatNameForSeller = (name: string, middleAdminId: string | null) => {
-      const match = name.match(/^(.*?)\s*\(([^+)]+?)\s*\+\s*([^)]+?)\s*\)\s*$/);
-      if (match) {
-        const baseName = match[1].trimEnd();
-        const brandPart = match[2].trim();
-        const middlePart = match[3].trim();
-        return middleAdminId
-          ? `${baseName} (${middlePart})`
-          : `${baseName} (${brandPart})`;
-      }
-      return name;
-    };
+    const isSeller = role === "CONSULTANT";
 
-    // 상담사 노출 공급가 = 공급가 + 중간관리자 마진 + 관리자 마진 (공급가 없으면 판매가로 폴백)
+    // 상담사 노출 공급가 = 공급가 + 관리자 마진 (공급가 없으면 판매가로 폴백)
     // 상담사에게는 원본 공급가·마진 내역을 숨기고 합계만 공급가로 보여준다.
     const sellerSupply =
       (product.supplyPrice != null ? Number(product.supplyPrice) : Number(product.basePrice)) +
-      (product.middleAdminMargin != null ? Number(product.middleAdminMargin) : 0) +
       (product.adminMargin != null ? Number(product.adminMargin) : 0);
 
     return NextResponse.json({
       product: {
         ...product,
-        name: isSeller ? formatNameForSeller(product.name, product.middleAdminId) : product.name,
-        basePrice: isBrand ? null : Number(product.basePrice),
-        comparePrice: isBrand ? null : (product.comparePrice ? Number(product.comparePrice) : null),
+        basePrice: Number(product.basePrice),
+        comparePrice: product.comparePrice ? Number(product.comparePrice) : null,
         supplyPrice: isSeller
           ? sellerSupply
           : product.supplyPrice != null ? Number(product.supplyPrice) : null,
-        middleAdminMargin: isBrand || isSeller ? null : (product.middleAdminMargin != null ? Number(product.middleAdminMargin) : null),
         adminMargin: isSeller ? 0 : product.adminMargin,
-        shippingFee: Number(product.shippingFee),
-        freeShippingThreshold: product.freeShippingThreshold ? Number(product.freeShippingThreshold) : null,
-        remoteAreaFee: Number(product.remoteAreaFee),
-        coupangLowestPrice: product.coupangLowestPrice != null ? Number(product.coupangLowestPrice) : null,
-        naverLowestPrice: product.naverLowestPrice != null ? Number(product.naverLowestPrice) : null,
         variants: product.variants.map((v) => ({
           ...v,
           price: Number(v.price),
@@ -135,7 +98,7 @@ export async function PUT(
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
     const role = session.user.role;
-    if (!["SUPER_ADMIN", "BRAND_ADMIN", "SELLER"].includes(role)) {
+    if (!["SUPER_ADMIN", "CONSULTANT"].includes(role)) {
       return NextResponse.json({ error: "권한 없음" }, { status: 403 });
     }
 
@@ -146,18 +109,8 @@ export async function PUT(
       return NextResponse.json({ error: "상담상품을 찾을 수 없습니다" }, { status: 404 });
     }
 
-    // Check brand ownership
-    if (role === "BRAND_ADMIN") {
-      const brand = await prisma.brandProfile.findUnique({
-        where: { userId: session.user!.id },
-      });
-      if (!brand || product.brandId !== brand.id) {
-        return NextResponse.json({ error: "이 상담상품에 대한 권한이 없습니다" }, { status: 403 });
-      }
-    }
-
     // Check seller ownership — 상담사는 본인이 직접 등록한 상담상품만 수정 가능
-    if (role === "SELLER") {
+    if (role === "CONSULTANT") {
       const sellerProfile = await prisma.sellerProfile.findUnique({
         where: { userId: session.user!.id },
       });
@@ -170,38 +123,25 @@ export async function PUT(
     const {
       name, description, basePrice, comparePrice, supplyPrice, categoryId,
       thumbnail, detailContent, variants, images, badges, isActive,
-      shippingFee, freeShipping, freeShippingThreshold, remoteAreaFee, stock,
-      optionGroups, coupangLowestPrice, naverLowestPrice,
+      optionGroups,
+      consultingType, consultingMethod, durationMinutes, maxDailySlots,
     } = body;
-
-    // 판매가 비노출: 브랜드는 판매가(basePrice)·정가를 입력/수정할 수 없다.
-    // 브랜드 요청에 basePrice가 와도 무시하고 기존 판매가를 보존한다.
-    const isBrand = role === "BRAND_ADMIN";
 
     if (!name) {
       return NextResponse.json({ error: "상담상품명은 필수입니다" }, { status: 400 });
     }
 
-    // 판매가 검증·수정은 관리자(SUPER_ADMIN)만. 브랜드는 공급가만 수정.
+    // 판매가 검증·수정
     let parsedBasePrice: number | undefined;
-    if (!isBrand) {
-      if (basePrice === undefined || basePrice === null || basePrice === "") {
-        return NextResponse.json({ error: "상담상품명과 가격은 필수입니다" }, { status: 400 });
-      }
-      parsedBasePrice = parseFloat(String(basePrice));
-      if (isNaN(parsedBasePrice) || parsedBasePrice < 0) {
-        return NextResponse.json({ error: "유효한 가격을 입력해주세요" }, { status: 400 });
-      }
+    if (basePrice === undefined || basePrice === null || basePrice === "") {
+      return NextResponse.json({ error: "상담상품명과 가격은 필수입니다" }, { status: 400 });
+    }
+    parsedBasePrice = parseFloat(String(basePrice));
+    if (isNaN(parsedBasePrice) || parsedBasePrice < 0) {
+      return NextResponse.json({ error: "유효한 가격을 입력해주세요" }, { status: 400 });
     }
 
-    // 재고: 옵션이 있으면 옵션 재고 합계, 없으면 단일 상담상품 재고(stock). 둘 다 미지정이면 기존값 유지
     const variantList = Array.isArray(variants) ? variants.filter((v: any) => v.name) : null;
-    let totalStockUpdate: number | undefined;
-    if (variantList && variantList.length > 0) {
-      totalStockUpdate = variantList.reduce((acc: number, v: any) => acc + (parseInt(String(v.stock || "0")) || 0), 0);
-    } else if (stock !== undefined) {
-      totalStockUpdate = Math.max(0, parseInt(String(stock), 10) || 0);
-    }
 
     // 상담상품 기본 정보 업데이트
     const updateData: any = {
@@ -211,35 +151,23 @@ export async function PUT(
       categoryId: categoryId || null,
       thumbnail: thumbnail || null,
       isActive: isActive !== undefined ? !!isActive : undefined,
-      shippingFee: shippingFee !== undefined ? toMoney(shippingFee, 0) : undefined,
-      freeShipping: freeShipping !== undefined ? !!freeShipping : undefined,
-      freeShippingThreshold: freeShippingThreshold !== undefined ? toMoneyOrNull(freeShippingThreshold) : undefined,
-      remoteAreaFee: remoteAreaFee !== undefined ? toMoney(remoteAreaFee, 0) : undefined,
-      ...(totalStockUpdate !== undefined ? { totalStock: totalStockUpdate } : {}),
+      consultingType: consultingType !== undefined ? String(consultingType) : undefined,
+      consultingMethod: consultingMethod !== undefined ? String(consultingMethod) : undefined,
+      durationMinutes:
+        durationMinutes !== undefined ? Math.max(1, parseInt(String(durationMinutes), 10) || 30) : undefined,
+      maxDailySlots:
+        maxDailySlots !== undefined ? Math.max(1, parseInt(String(maxDailySlots), 10) || 5) : undefined,
     };
 
-    // 브랜드는 판매가 수정 불가, 공급가만 수정
-    if (!isBrand && parsedBasePrice !== undefined) {
+    if (parsedBasePrice !== undefined) {
       updateData.basePrice = parsedBasePrice;
       if (comparePrice !== undefined) {
         updateData.comparePrice = comparePrice ? parseFloat(String(comparePrice)) : null;
       }
     }
     // 상담사 응답의 supplyPrice는 마진이 합산된 노출용 값이므로, 상담사 요청의 공급가는 저장하지 않는다.
-    if (supplyPrice !== undefined && role !== "SELLER") {
+    if (supplyPrice !== undefined && role !== "CONSULTANT") {
       updateData.supplyPrice = toMoneyOrNull(supplyPrice);
-      // 브랜드가 공급가만 수정하는 경우: 중간관리자가 아직 가격을 설정하지 않은 상담상품
-      // (마진 미설정 + 판매가가 등록 시 복사된 기존 공급가 그대로)은 복사된 판매가도
-      // 새 공급가로 함께 갱신한다 — 판매가<공급가 역전이 생기는 것을 방지.
-      if (
-        isBrand &&
-        updateData.supplyPrice != null &&
-        product.middleAdminMargin == null &&
-        product.supplyPrice != null &&
-        Number(product.basePrice) === Number(product.supplyPrice)
-      ) {
-        updateData.basePrice = updateData.supplyPrice;
-      }
     }
     if (badges !== undefined) {
       updateData.badges = badges && Array.isArray(badges) && badges.length > 0 ? JSON.stringify(badges) : null;
@@ -249,16 +177,6 @@ export async function PUT(
         ? JSON.stringify(optionGroups)
         : null;
     }
-    // 외부 최저가: 브랜드·관리자만 수정 가능 (상담사는 무시)
-    if (role !== "SELLER") {
-      if (coupangLowestPrice !== undefined) {
-        updateData.coupangLowestPrice = toMoneyOrNull(coupangLowestPrice);
-      }
-      if (naverLowestPrice !== undefined) {
-        updateData.naverLowestPrice = toMoneyOrNull(naverLowestPrice);
-      }
-    }
-
     // undefined 값 제거 (기존값 유지)
     Object.keys(updateData).forEach(k => { if (updateData[k] === undefined) delete updateData[k]; });
 
@@ -276,7 +194,6 @@ export async function PUT(
             productId: params.id,
             name: v.name,
             price: parseFloat(String(v.price || updated.basePrice)),
-            stock: parseInt(String(v.stock || "0")) || 0,
             sortOrder: i,
             isActive: true,
           })),
@@ -310,7 +227,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
   const session = await auth();
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
   const role = session.user.role;
-  if (role !== "BRAND_ADMIN" && role !== "SUPER_ADMIN") {
+  if (role !== "SUPER_ADMIN") {
     return NextResponse.json({ error: "권한 없음" }, { status: 403 });
   }
 

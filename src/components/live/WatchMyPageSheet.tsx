@@ -21,7 +21,7 @@ interface MyOverviewData {
   };
   orders: Array<{
     id: string;
-    orderNumber: string;
+    reservationNumber: string;
     status: string;
     finalAmount: number;
     discountAmount: number | null;

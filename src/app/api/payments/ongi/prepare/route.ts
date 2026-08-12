@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "orderId가 필요합니다." }, { status: 400 });
   }
 
-  const order = await prisma.order.findUnique({
+  const order = await prisma.reservation.findUnique({
     where: { id: orderId },
     include: { user: { select: { name: true, phone: true } } },
   });
@@ -80,8 +80,8 @@ export async function POST(request: Request) {
   const callbackUrl = `${baseUrl}/api/payments/ongi/callback?orderId=${encodeURIComponent(order.id)}`;
   const returnUrl = `${baseUrl}/checkout/complete?orderId=${encodeURIComponent(order.id)}`;
 
-  const name = order.shippingName || order.user.name || "고객";
-  const phone = (order.shippingPhone || order.user.phone || "").replace(/[^0-9]/g, "");
+  const name = order.customerName || order.user.name || "고객";
+  const phone = (order.customerPhone || order.user.phone || "").replace(/[^0-9]/g, "");
   if (!phone) {
     await logPayment({
       orderId: order.id,
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
   // 넘겨 입금하는 것이 정상이다. 콜백 도착 전까지는 pgProvider 가 비어 있어 stale
   // PENDING 정리에 삭제될 수 있으므로, 여기서 pgProvider="ongi" 로 마킹하여
   // cleanupStalePendingOrders 의 정리 대상에서 제외되도록 한다.
-  await prisma.order
+  await prisma.reservation
     .update({ where: { id: order.id }, data: { pgProvider: "ongi" } })
     .catch(() => {
       /* 마킹 실패가 결제창 진입을 막지 않도록 무시 */

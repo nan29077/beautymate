@@ -29,7 +29,7 @@ export default function AdminRevenueClient({ revenue, period }: Props) {
   const {
     rows,
     rowsTruncated,
-    orderCount,
+    reservationCount,
     totalSales,
     totalSellerFee,
     totalSupplierFee,
@@ -79,7 +79,7 @@ export default function AdminRevenueClient({ revenue, period }: Props) {
             <p className="text-sm font-medium text-gray-600">순수익</p>
           </div>
           <p className="text-2xl font-bold text-gray-900">{formatPrice(netRevenue)}</p>
-          <p className="text-[11px] text-gray-400 mt-1">PG 수수료 차감 후 · 예약 {orderCount}건</p>
+          <p className="text-[11px] text-gray-400 mt-1">PG 수수료 차감 후 · 예약 {reservationCount}건</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-100 p-4">
@@ -146,11 +146,11 @@ export default function AdminRevenueClient({ revenue, period }: Props) {
         <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-2">
           <Icon name="Receipt" size={15} className="text-gray-400" strokeWidth={1.5} />
           <h2 className="text-sm font-bold text-gray-900">
-            예약별 수익 내역 ({orderCount}건)
+            예약별 수익 내역 ({reservationCount}건)
           </h2>
           {rowsTruncated && (
             <span className="text-[11px] text-amber-600">
-              목록은 최근 {rows.length}건만 표시 (합계는 전체 {orderCount}건 기준)
+              목록은 최근 {rows.length}건만 표시 (합계는 전체 {reservationCount}건 기준)
             </span>
           )}
         </div>
@@ -178,7 +178,7 @@ export default function AdminRevenueClient({ revenue, period }: Props) {
                 {pageItems.map((row) => (
                   <tr key={row.orderId} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-4 py-2.5 text-[12px] text-gray-500 font-mono whitespace-nowrap">
-                      {row.orderNumber}
+                      {row.reservationNumber}
                     </td>
                     <td className="px-4 py-2.5 text-[12px] text-gray-700 whitespace-nowrap">
                       {row.sellerName}
@@ -211,7 +211,7 @@ export default function AdminRevenueClient({ revenue, period }: Props) {
               <tfoot>
                 <tr className="border-t-2 border-gray-200 bg-gray-50">
                   <td colSpan={3} className="px-4 py-3 text-[12px] font-bold text-gray-700">
-                    합계 (전체 {orderCount}건)
+                    합계 (전체 {reservationCount}건)
                   </td>
                   <td className="px-4 py-3 text-[12px] font-bold text-gray-900 text-right">
                     {formatPrice(totalSales)}

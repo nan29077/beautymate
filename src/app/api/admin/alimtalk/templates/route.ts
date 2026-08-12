@@ -7,7 +7,7 @@ async function requireAdmin() {
   const session = await auth();
   if (!session?.user) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   const role = (session.user as any).role;
-  if (role !== "SUPER_ADMIN" && role !== "MIDDLE_ADMIN") {
+  if (role !== "SUPER_ADMIN") {
     return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
   }
   return { error: null };

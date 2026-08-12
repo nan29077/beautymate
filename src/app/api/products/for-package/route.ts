@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   }
 
   const role = (session.user as any).role as string;
-  if (!["SUPER_ADMIN", "BRAND_ADMIN", "SELLER", "MIDDLE_ADMIN"].includes(role)) {
+  if (!["SUPER_ADMIN", "CONSULTANT"].includes(role)) {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
 
@@ -25,29 +25,14 @@ export async function GET(request: Request) {
   const where: any = {
     isApproved: true,
     isActive: true,
-    brandId: { not: null }, // 브랜드 상담상품만 (브랜드 userId가 있어야 발주서 생성 가능)
   };
 
-  // 중간관리자: 소속(하위) 브랜드 상담상품만 패키지 구성 가능
-  const middleAdminId =
-    role === "MIDDLE_ADMIN" ? ((session.user as any).middleAdminId as string | undefined) : undefined;
-  if (role === "MIDDLE_ADMIN") {
-    if (!middleAdminId) {
-      return NextResponse.json({ error: "중간관리자 정보를 찾을 수 없습니다." }, { status: 403 });
-    }
-    where.brand = { middleAdminId };
-  }
-
   if (categoryId) where.categoryId = categoryId;
-  if (brandId) where.brandId = brandId;
   if (search) {
     where.name = { contains: search };
   }
 
-  const brandWhere: any = { isApproved: true };
-  if (middleAdminId) brandWhere.middleAdminId = middleAdminId;
-
-  const [products, categories, brands] = await Promise.all([
+  const [products, categories] = await Promise.all([
     prisma.product.findMany({
       where,
       select: {
@@ -58,8 +43,6 @@ export async function GET(request: Request) {
         supplyPrice: true,
         categoryId: true,
         category: { select: { id: true, name: true } },
-        brandId: true,
-        brand: { select: { id: true, brandName: true, userId: true } },
       },
       orderBy: { createdAt: "desc" },
       take: 200,
@@ -69,12 +52,8 @@ export async function GET(request: Request) {
       select: { id: true, name: true },
       orderBy: { sortOrder: "asc" },
     }),
-    prisma.brandProfile.findMany({
-      where: brandWhere,
-      select: { id: true, brandName: true },
-      orderBy: { brandName: "asc" },
-    }),
   ]);
+  const brands: { id: string; brandName: string }[] = [];
 
   return NextResponse.json({
     products: products.map((p) => ({

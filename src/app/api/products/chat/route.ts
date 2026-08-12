@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
     const role = session.user.role;
-    if (!["SUPER_ADMIN", "BRAND_ADMIN", "SELLER"].includes(role)) {
+    if (!["SUPER_ADMIN", "CONSULTANT"].includes(role)) {
       return NextResponse.json({ error: "권한 없음" }, { status: 403 });
     }
 
@@ -20,18 +20,13 @@ export async function GET(req: NextRequest) {
     }
 
     // Verify the user has access to this product
-    if (role === "SELLER") {
+    if (role === "CONSULTANT") {
       const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
       if (!seller) return NextResponse.json({ error: "상담사 정보 없음" }, { status: 403 });
       const shopProduct = await prisma.sellerShopProduct.findFirst({
         where: { sellerId: seller.id, productId },
       });
       if (!shopProduct) return NextResponse.json({ error: "권한 없음" }, { status: 403 });
-    } else if (role === "BRAND_ADMIN") {
-      const brand = await prisma.brandProfile.findUnique({ where: { userId: session.user!.id } });
-      if (!brand) return NextResponse.json({ error: "브랜드 정보 없음" }, { status: 403 });
-      const product = await prisma.product.findUnique({ where: { id: productId } });
-      if (!product || product.brandId !== brand.id) return NextResponse.json({ error: "권한 없음" }, { status: 403 });
     }
 
     const messages = await prisma.productChat.findMany({
@@ -64,7 +59,7 @@ export async function POST(req: NextRequest) {
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
     const role = session.user.role;
-    if (!["SUPER_ADMIN", "BRAND_ADMIN", "SELLER"].includes(role)) {
+    if (!["SUPER_ADMIN", "CONSULTANT"].includes(role)) {
       return NextResponse.json({ error: "권한 없음" }, { status: 403 });
     }
 
@@ -76,7 +71,7 @@ export async function POST(req: NextRequest) {
     let senderName = session.user!.name || "알 수 없음";
 
     // Verify access
-    if (role === "SELLER") {
+    if (role === "CONSULTANT") {
       const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
       if (!seller) return NextResponse.json({ error: "상담사 정보 없음" }, { status: 403 });
       const shopProduct = await prisma.sellerShopProduct.findFirst({
@@ -84,12 +79,6 @@ export async function POST(req: NextRequest) {
       });
       if (!shopProduct) return NextResponse.json({ error: "권한 없음" }, { status: 403 });
       senderName = seller.shopName;
-    } else if (role === "BRAND_ADMIN") {
-      const brand = await prisma.brandProfile.findUnique({ where: { userId: session.user!.id } });
-      if (!brand) return NextResponse.json({ error: "브랜드 정보 없음" }, { status: 403 });
-      const product = await prisma.product.findUnique({ where: { id: productId } });
-      if (!product || product.brandId !== brand.id) return NextResponse.json({ error: "권한 없음" }, { status: 403 });
-      senderName = brand.brandName;
     }
 
     const chatMessage = await prisma.productChat.create({

@@ -22,7 +22,6 @@ export async function getAdminSellers() {
         },
       },
       _count: { select: { campaigns: true, shopProducts: true, fans: true, orders: true, followers: true } },
-      middleAdmin: { select: { id: true, name: true } },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -31,10 +30,10 @@ export async function getAdminSellers() {
   const businessDays = await getSettlementBusinessDays();
   const today = startOfDay(new Date());
 
-  const orders = await prisma.order.findMany({
+  const orders = await prisma.reservation.findMany({
     where: {
       paymentStatus: "COMPLETED",
-      status: { notIn: ["CANCELLED", "REFUNDED", "REFUND_REQUESTED"] },
+      status: { notIn: ["CANCELLED", "NO_SHOW"] },
     },
     select: {
       sellerId: true,
@@ -65,12 +64,12 @@ export async function getAdminSellers() {
     orderSettleMap.set(order.sellerId, cur);
   }
 
-  // 수기 조정 내역(ManualSettlement, recipientType="SELLER")
+  // 수기 조정 내역(ManualSettlement, recipientType="CONSULTANT")
   const sellerUserIds = sellers.map((s: any) => s.user.id);
   let adjustments: Array<{ recipientId: string; amount: number }> = [];
   try {
     adjustments = await (prisma as any).manualSettlement.findMany({
-      where: { recipientType: "SELLER", recipientId: { in: sellerUserIds } },
+      where: { recipientType: "CONSULTANT", recipientId: { in: sellerUserIds } },
       select: { recipientId: true, amount: true },
     });
   } catch { /* ignore */ }

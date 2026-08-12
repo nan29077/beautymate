@@ -17,11 +17,11 @@ export default async function CheckoutCompletePage({
   const { orderId, status, msg } = searchParams;
   if (!orderId) redirect("/");
 
-  const order = await prisma.order.findUnique({
+  const order = await prisma.reservation.findUnique({
     where: { id: orderId },
     select: {
       id: true,
-      orderNumber: true,
+      reservationNumber: true,
       finalAmount: true,
       discountAmount: true,
       paymentStatus: true,
@@ -37,7 +37,7 @@ export default async function CheckoutCompletePage({
     <CheckoutCompleteClient
       initialOrder={{
         id: order.id,
-        orderNumber: order.orderNumber,
+        reservationNumber: order.reservationNumber,
         finalAmount: Number(order.finalAmount),
         discountAmount: Number(order.discountAmount),
         paymentStatus: order.paymentStatus,

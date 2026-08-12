@@ -39,8 +39,7 @@ export async function GET() {
             id: item.variant.id,
             name: item.variant.name,
             price: Number(item.variant.price),
-            stock: item.variant.stock,
-          }
+              }
         : null,
     })),
   });

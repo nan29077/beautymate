@@ -8,7 +8,7 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
   const role = session.user?.role;
-  if (role !== "SELLER") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+  if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
 
   const seller = await prisma.sellerProfile.findUnique({
     where: { userId: session.user!.id },
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
   const role = session.user?.role;
-  if (role !== "SELLER") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+  if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
 
   const seller = await prisma.sellerProfile.findUnique({
     where: { userId: session.user!.id },

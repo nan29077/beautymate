@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 // 해당 라이브가 요청 상담사의 소유인지 검증 후 상담사 프로필/라이브 반환
 async function resolveOwnedLive(liveId: string) {
   const session = await auth();
-  if (!session || session.user?.role !== "SELLER") {
+  if (!session || session.user?.role !== "CONSULTANT") {
     return { error: NextResponse.json({ error: "상담사만 가능" }, { status: 403 }) };
   }
   const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });

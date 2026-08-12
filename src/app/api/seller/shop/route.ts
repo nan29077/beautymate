@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   const session = await auth();
-  if (!session || session.user?.role !== "SELLER") {
+  if (!session || session.user?.role !== "CONSULTANT") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const seller = await prisma.sellerProfile.findUnique({
@@ -22,7 +22,7 @@ export async function GET() {
 export async function PUT(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session || session.user?.role !== "SELLER") {
+    if (!session || session.user?.role !== "CONSULTANT") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -68,7 +68,7 @@ const ALLOWED_PLATFORMS = ["instagram", "youtube", "tiktok", "facebook"];
 export async function PATCH(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session || session.user?.role !== "SELLER") {
+    if (!session || session.user?.role !== "CONSULTANT") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

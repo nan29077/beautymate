@@ -6,18 +6,14 @@ import { X, ChevronRight, SortAsc, SortDesc, ArrowUpDown, Clock, CreditCard, Che
 import { useAppDialog } from "@/components/shared/AppDialog";
 import { paymentMethodLabel } from "@/lib/payment";
 import type { OrderFeeInfo, OrderFeeLine } from "@/lib/orderFee";
-import PurchaseOrderModal from "@/components/shared/PurchaseOrderModal";
 import Pagination, { usePagination } from "@/components/shared/Pagination";
 
 const STATUS_MAP: Record<string, { label: string; color: string; icon: any }> = {
-  PENDING: { label: "결제대기", color: "bg-gray-100 text-gray-600", icon: Clock },
-  PAID: { label: "결제완료", color: "bg-blue-50 text-blue-600", icon: CreditCard },
-  CONFIRMED: { label: "확인됨", color: "bg-indigo-50 text-indigo-600", icon: CheckCircle2 },
-  SHIPPING: { label: "상담 진행중", color: "bg-cyan-50 text-cyan-600", icon: Clock },
-  DELIVERED: { label: "상담 완료", color: "bg-green-50 text-green-600", icon: CheckCircle2 },
+  PENDING: { label: "예약신청", color: "bg-gray-100 text-gray-600", icon: Clock },
+  CONFIRMED: { label: "예약확정", color: "bg-indigo-50 text-indigo-600", icon: CheckCircle2 },
+  COMPLETED: { label: "상담완료", color: "bg-green-50 text-green-600", icon: CheckCircle2 },
   CANCELLED: { label: "취소됨", color: "bg-red-50 text-red-600", icon: XCircle },
-  REFUND_REQUESTED: { label: "환불요청", color: "bg-orange-50 text-orange-600", icon: RotateCcw },
-  REFUNDED: { label: "환불완료", color: "bg-gray-100 text-gray-500", icon: RotateCcw },
+  NO_SHOW: { label: "노쇼", color: "bg-orange-50 text-orange-600", icon: RotateCcw },
 };
 
 type OrderType = "all" | "normal" | "groupbuy" | "live" | "myproduct";
@@ -51,24 +47,17 @@ interface OrderItem {
   quantity: number;
   totalPrice: number;
   thumbnail?: string | null;
-  // 발주서 구분 필터용 공급자 메타(중간관리자/브랜드 페이지에서만 채워짐)
-  productMiddleAdminId?: string | null; // 상담상품 직접 등록 중간관리자
-  brandId?: string | null; // 상담상품의 브랜드 id
-  brandMiddleAdminId?: string | null; // 브랜드를 관리하는 중간관리자
 }
 
 interface Order {
   id: string;
-  orderNumber: string;
+  reservationNumber: string;
   userName: string;
   userEmail?: string;
   sellerName: string;
   sellerId?: string;
-  brandName?: string | null;
-  brandId?: string | null;
   finalAmount: number;
   totalAmount: number;
-  shippingFee: number;
   discountAmount: number;
   discountType?: string | null;
   status: string;
@@ -76,23 +65,23 @@ interface Order {
   paymentMethod?: string | null;
   campaignId?: string | null;
   campaignTitle?: string | null;
-  shippingName?: string | null;
-  shippingPhone?: string | null;
-  shippingAddress?: string | null;
-  shippingMemo?: string | null;
+  customerName?: string | null;
+  customerPhone?: string | null;
+  reservationDate?: string | null;
+  reservationTime?: string | null;
+  birthDate?: string | null;
+  birthTime?: string | null;
+  gender?: string | null;
+  consultingContent?: string | null;
   snsAccounts?: { platform: string; handle: string }[] | null;
   createdAt: string;
   paidAt?: string | null;
-  shippedAt?: string | null;
-  deliveredAt?: string | null;
+  confirmedAt?: string | null;
+  completedAt?: string | null;
   thumbnail?: string | null;
   items: OrderItem[];
   canViewDetail?: boolean;
   feeInfo?: OrderFeeInfo | null;
-  deliveryStatus?: string | null;
-  deliveryCourier?: string | null;
-  deliveryTracking?: string | null;
-  deliveryUpdatedAt?: string | null;
   // 결제취소 필드
   cancelStatus?: string | null;
   cancelType?: string | null;
@@ -175,52 +164,41 @@ function OrderFeeSection({ fee }: { fee: OrderFeeInfo }) {
 
 interface Props {
   orders: Order[];
-  role: "SUPER_ADMIN" | "SELLER" | "BRAND_ADMIN";
+  role: "SUPER_ADMIN" | "CONSULTANT";
   sellers?: { id: string; name: string }[];
-  brands?: { id: string; name: string }[];
-  // 발주서 구분 필터: "admin"(최고관리자) / "middle"(중간관리자). 미지정 시 미표시
-  poFilter?: "admin" | "middle";
-  middleAdmins?: { id: string; name: string }[]; // 최고관리자용 중간관리자 목록
-  currentMiddleId?: string; // 중간관리자 페이지: 본인 중간관리자 id
-  brandManagerMap?: Record<string, string>; // brandId → 관리 중간관리자명(표시용)
-  canManageDelivery?: boolean; // true: 상담 방식 상태 수정 가능 (SUPER_ADMIN, BRAND_ADMIN, MIDDLE_ADMIN)
+  canManageStatus?: boolean; // true: 예약 상태 변경 가능 (SUPER_ADMIN, 담당 상담사)
 }
 
 const formatPrice = (n: number) => n.toLocaleString("ko-KR") + "원";
 const formatDate = (d: string) => new Date(d).toLocaleDateString("ko-KR");
 const formatDateTime = (d: string | null) => d ? new Date(d).toLocaleString("ko-KR") : "-";
 
-const DELIVERY_STATUS_MAP: Record<string, { label: string; color: string }> = {
-  PAYMENT_COMPLETED:  { label: "결제 완료",        color: "bg-blue-50 text-blue-600 border-blue-100" },
-  PREPARING:          { label: "상담상품 준비 중",      color: "bg-yellow-50 text-yellow-700 border-yellow-100" },
-  SHIPPED:            { label: "상담 방식 준비",          color: "bg-orange-50 text-orange-600 border-orange-100" },
-  DELIVERING:         { label: "상담 방식 중",            color: "bg-cyan-50 text-cyan-600 border-cyan-100" },
-  DELIVERED:          { label: "상담 방식 완료",          color: "bg-emerald-50 text-emerald-700 border-emerald-100" },
-  CANCELLED:          { label: "취소",               color: "bg-red-50 text-red-500 border-red-100" },
-  CANCEL_REQUESTED:   { label: "결제취소 요청중",    color: "bg-amber-50 text-amber-700 border-amber-100" },
-  CANCEL_COMPLETED:   { label: "결제취소 완료",      color: "bg-gray-100 text-gray-500 border-gray-200" },
+const RESERVATION_STATUS_MAP: Record<string, { label: string; color: string }> = {
+  PENDING:   { label: "예약신청", color: "bg-blue-50 text-blue-600 border-blue-100" },
+  CONFIRMED: { label: "예약확정", color: "bg-indigo-50 text-indigo-600 border-indigo-100" },
+  COMPLETED: { label: "상담완료", color: "bg-emerald-50 text-emerald-700 border-emerald-100" },
+  CANCELLED: { label: "취소",     color: "bg-red-50 text-red-500 border-red-100" },
+  NO_SHOW:   { label: "노쇼",     color: "bg-amber-50 text-amber-700 border-amber-100" },
 };
 
 const STATUS_LABEL: Record<string, string> = {
-  PENDING: "결제대기", PAID: "결제완료", CONFIRMED: "확인됨", SHIPPING: "상담 진행중",
-  DELIVERED: "상담 완료", CANCELLED: "취소됨", REFUND_REQUESTED: "환불요청", REFUNDED: "환불완료",
+  PENDING: "예약신청", CONFIRMED: "예약확정", COMPLETED: "상담완료",
+  CANCELLED: "취소됨", NO_SHOW: "노쇼",
 };
 
-/* ── 상담 방식 처리 모달 ── */
-function DeliveryModal({
+/* ── 예약 상태 변경 모달 ── */
+function ReservationStatusModal({
   orderId,
   current,
   onClose,
   onSaved,
 }: {
   orderId: string;
-  current: { status?: string | null; courier?: string | null; tracking?: string | null };
+  current: { status?: string | null };
   onClose: () => void;
-  onSaved: (updated: { deliveryStatus: string; deliveryCourier: string | null; deliveryTracking: string | null }) => void;
+  onSaved: (updated: { status: string }) => void;
 }) {
-  const [status, setStatus] = useState(current.status || "PAYMENT_COMPLETED");
-  const [courier, setCourier] = useState(current.courier || "");
-  const [tracking, setTracking] = useState(current.tracking || "");
+  const [status, setStatus] = useState(current.status || "PENDING");
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -231,11 +209,11 @@ function DeliveryModal({
       const res = await fetch(`/api/orders/${encodeURIComponent(orderId)}/delivery`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deliveryStatus: status, deliveryCourier: courier || null, deliveryTracking: tracking || null }),
+        body: JSON.stringify({ status }),
       });
       const data = await res.json();
       if (!res.ok) { setErr(data.error || "저장에 실패했습니다."); return; }
-      onSaved({ deliveryStatus: status, deliveryCourier: courier || null, deliveryTracking: tracking || null });
+      onSaved({ status });
       onClose();
     } catch {
       setErr("저장 중 오류가 발생했습니다.");
@@ -250,43 +228,23 @@ function DeliveryModal({
       <div className="relative w-full max-w-[400px] bg-white rounded-t-2xl sm:rounded-2xl shadow-xl">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div className="flex items-center gap-1.5">
-            <Icon name="Truck" size={16} className="text-brand-500" />
-            <h2 className="text-[15px] font-bold text-gray-900">상담 방식 처리</h2>
+            <CheckCircle2 size={16} className="text-brand-500" />
+            <h2 className="text-[15px] font-bold text-gray-900">예약 상태 변경</h2>
           </div>
           <button onClick={onClose} className="p-1 text-gray-400 hover:text-gray-700"><X size={20} /></button>
         </div>
         <div className="px-5 py-4 space-y-4">
           <div>
-            <label className="block text-[11px] font-semibold text-gray-500 mb-1.5">상담 방식 상태</label>
+            <label className="block text-[11px] font-semibold text-gray-500 mb-1.5">예약 상태</label>
             <select
               value={status}
               onChange={e => setStatus(e.target.value)}
               className="w-full h-10 border border-gray-200 rounded-xl px-3 text-[13px] text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
             >
-              {Object.entries(DELIVERY_STATUS_MAP).map(([k, v]) => (
+              {Object.entries(RESERVATION_STATUS_MAP).map(([k, v]) => (
                 <option key={k} value={k}>{v.label}</option>
               ))}
             </select>
-          </div>
-          <div>
-            <label className="block text-[11px] font-semibold text-gray-500 mb-1.5">택배사</label>
-            <input
-              type="text"
-              value={courier}
-              onChange={e => setCourier(e.target.value)}
-              placeholder="예: CJ대한통운"
-              className="w-full h-10 border border-gray-200 rounded-xl px-3 text-[13px] text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
-            />
-          </div>
-          <div>
-            <label className="block text-[11px] font-semibold text-gray-500 mb-1.5">운송장 번호</label>
-            <input
-              type="text"
-              value={tracking}
-              onChange={e => setTracking(e.target.value)}
-              placeholder="운송장 번호 입력"
-              className="w-full h-10 border border-gray-200 rounded-xl px-3 text-[13px] text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-brand-400"
-            />
           </div>
           {err && <p className="text-[12px] text-red-500">{err}</p>}
         </div>
@@ -297,7 +255,7 @@ function DeliveryModal({
             disabled={saving}
             className="flex-1 h-11 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-1.5 disabled:opacity-50"
           >
-            {saving ? <Loader2 size={15} className="animate-spin" /> : <Icon name="Share" size={15} />}
+            {saving ? <Loader2 size={15} className="animate-spin" /> : <CheckCircle2 size={15} />}
             저장
           </button>
         </div>
@@ -329,7 +287,7 @@ function CancelConfirmModal({
   onConfirm,
   onClose,
 }: {
-  order: { orderNumber: string; finalAmount: number };
+  order: { reservationNumber: string; finalAmount: number };
   onConfirm: () => void;
   onClose: () => void;
 }) {
@@ -349,7 +307,7 @@ function CancelConfirmModal({
           <div className="bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 space-y-1.5">
             <div className="flex justify-between text-xs text-gray-500">
               <span>예약번호</span>
-              <span className="font-semibold text-gray-700">{order.orderNumber}</span>
+              <span className="font-semibold text-gray-700">{order.reservationNumber}</span>
             </div>
             <div className="flex justify-between text-xs text-gray-500">
               <span>취소 요청 금액</span>
@@ -500,7 +458,7 @@ function buildOrderSheetsHtml(orders: Order[], opts?: { autoPrint?: boolean; ran
     <section class="sheet${idx < orders.length - 1 ? " page-break" : ""}">
       <div class="sheet-head">
         <h1>예약서</h1>
-        <div class="ono">${escapeHtml(o.orderNumber)}</div>
+        <div class="ono">${escapeHtml(o.reservationNumber)}</div>
       </div>
       <table class="meta">
         <tr><th>예약일시</th><td>${formatDateTime(o.createdAt)}</td><th>결제일시</th><td>${formatDateTime(o.paidAt || null)}</td></tr>
@@ -509,11 +467,11 @@ function buildOrderSheetsHtml(orders: Order[], opts?: { autoPrint?: boolean; ran
         ${o.campaignTitle ? `<tr><th>단체 상담</th><td colspan="3">${escapeHtml(o.campaignTitle)}</td></tr>` : ""}
       </table>
 
-      <h2>상담 방식 정보</h2>
+      <h2>예약 정보</h2>
       <table class="meta">
-        <tr><th>수령인</th><td>${escapeHtml(o.shippingName) || "-"}</td><th>연락처</th><td>${escapeHtml(o.shippingPhone) || "-"}</td></tr>
-        <tr><th>주소</th><td colspan="3">${escapeHtml(o.shippingAddress) || "-"}</td></tr>
-        ${o.shippingMemo ? `<tr><th>배송메모</th><td colspan="3">${escapeHtml(o.shippingMemo)}</td></tr>` : ""}
+        <tr><th>예약자</th><td>${escapeHtml(o.customerName) || "-"}</td><th>연락처</th><td>${escapeHtml(o.customerPhone) || "-"}</td></tr>
+        <tr><th>예약일시</th><td colspan="3">${escapeHtml(o.reservationDate ? new Date(o.reservationDate).toLocaleDateString("ko-KR") : "-")} ${escapeHtml(o.reservationTime) || ""}</td></tr>
+        ${o.consultingContent ? `<tr><th>상담 내용</th><td colspan="3">${escapeHtml(o.consultingContent)}</td></tr>` : ""}
       </table>
 
       <h2>예약 상담상품</h2>
@@ -524,7 +482,6 @@ function buildOrderSheetsHtml(orders: Order[], opts?: { autoPrint?: boolean; ran
 
       <table class="totals">
         <tr><th>상담상품 합계</th><td>${formatPrice(o.totalAmount)}</td></tr>
-        <tr><th>배송비</th><td>${formatPrice(o.shippingFee)}</td></tr>
         ${o.discountAmount > 0 ? `<tr><th>할인</th><td>-${formatPrice(o.discountAmount)}</td></tr>` : ""}
         <tr class="grand"><th>최종 결제금액</th><td>${formatPrice(o.finalAmount)}</td></tr>
       </table>
@@ -581,35 +538,22 @@ function getDateRange(period: string): Date {
 }
 
 export default function OrderManagementClient({
-  orders, role, sellers = [], brands = [],
-  poFilter, middleAdmins = [], currentMiddleId, brandManagerMap = {},
-  canManageDelivery = false,
+  orders, role, sellers = [],
+  canManageStatus = false,
 }: Props) {
   const { appAlert } = useAppDialog();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sellerFilter, setSellerFilter] = useState("all");
-  const [brandFilter, setBrandFilter] = useState("all");
-  // ── 발주서 구분 필터 상태 ──
-  // 중간관리자: 전체 / 내가 등록한 상담상품(mine) / 하위 브랜드별(brand)
-  const [poScope, setPoScope] = useState<"all" | "mine" | "brand">("all");
-  const [poScopeBrand, setPoScopeBrand] = useState("all");
-  // 최고관리자: 전체 / 상담사별 / 중간관리자별 / 브랜드별 / 패키지상담상품
-  const [poType, setPoType] = useState<"all" | "seller" | "middle" | "brand" | "package">("all");
-  const [poSellerSel, setPoSellerSel] = useState("all");
-  const [poMiddleSel, setPoMiddleSel] = useState("all");
-  const [poMiddleSub, setPoMiddleSub] = useState<"all" | "own" | "subbrand">("all");
-  const [poBrandSel, setPoBrandSel] = useState("all");
   const [sortBy, setSortBy] = useState<"date" | "amount">("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [showDetail, setShowDetail] = useState<string | null>(null);
-  const [poOrderId, setPoOrderId] = useState<string | null>(null);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [showBulkSheet, setShowBulkSheet] = useState(false);
-  const [deliveryOrderId, setDeliveryOrderId] = useState<string | null>(null);
-  const [deliveryUpdates, setDeliveryUpdates] = useState<Record<string, { deliveryStatus: string; deliveryCourier: string | null; deliveryTracking: string | null }>>({});
+  const [statusModalOrderId, setStatusModalOrderId] = useState<string | null>(null);
+  const [statusUpdates, setStatusUpdates] = useState<Record<string, { status: string }>>({});
   // 결제취소 상태
   const [cancelModalOrder, setCancelModalOrder] = useState<Order | null>(null); // 취소 모달에 표시할 예약
   const [cancelModalState, setCancelModalState] = useState<{ cancelType: "SAME_DAY" | "POST_DAY"; cancelStatus: string; cancelAmount: number } | null>(null);
@@ -621,8 +565,8 @@ export default function OrderManagementClient({
   // ── 날짜 필터 "적용" 전 임시 상태 ──
   const [pendingDateFrom, setPendingDateFrom] = useState("");
   const [pendingDateTo, setPendingDateTo] = useState("");
-  // ── 상담 상태 필터 ──
-  const [deliveryStatusFilter, setDeliveryStatusFilter] = useState("all");
+  // ── 예약 상태 필터 ──
+  const [reservationStatusFilter, setReservationStatusFilter] = useState("all");
 
   const classifyOrder = (order: Order): OrderType => {
     if (order.campaignId) return "groupbuy";
@@ -641,40 +585,6 @@ export default function OrderManagementClient({
       result = result.filter(o => o.sellerId === sellerFilter);
     }
 
-    // Brand filter
-    if (brandFilter !== "all") {
-      result = result.filter(o => o.brandId === brandFilter);
-    }
-
-    // ── 발주서 구분 필터 (중간관리자) ──
-    if (poFilter === "middle") {
-      if (poScope === "mine") {
-        result = result.filter(o => o.items.some(i => i.productMiddleAdminId === currentMiddleId));
-      } else if (poScope === "brand") {
-        result = poScopeBrand === "all"
-          ? result.filter(o => o.items.some(i => i.brandMiddleAdminId === currentMiddleId))
-          : result.filter(o => o.items.some(i => i.brandId === poScopeBrand));
-      }
-    }
-
-    // ── 발주서 구분 필터 (최고관리자) ──
-    if (poFilter === "admin") {
-      if (poType === "seller" && poSellerSel !== "all") {
-        result = result.filter(o => o.sellerId === poSellerSel);
-      } else if (poType === "middle" && poMiddleSel !== "all") {
-        result = result.filter(o => o.items.some(i => {
-          const own = i.productMiddleAdminId === poMiddleSel;
-          const sub = i.brandMiddleAdminId === poMiddleSel;
-          if (poMiddleSub === "own") return own;
-          if (poMiddleSub === "subbrand") return sub;
-          return own || sub;
-        }));
-      } else if (poType === "brand" && poBrandSel !== "all") {
-        result = result.filter(o => o.items.some(i => i.brandId === poBrandSel));
-      } else if (poType === "package") {
-        result = result.filter(o => o.isPackageOrder === true);
-      }
-    }
 
     // Date range filter
     // 버그 수정: new Date("YYYY-MM-DD") 는 UTC 자정으로 파싱되어 KST 오전 예약(=전날 UTC)이
@@ -688,11 +598,11 @@ export default function OrderManagementClient({
       result = result.filter(o => new Date(o.createdAt) <= to);
     }
 
-    // Delivery status filter
-    if (deliveryStatusFilter !== "all") {
+    // 예약 상태 필터
+    if (reservationStatusFilter !== "all") {
       result = result.filter(o => {
-        const ds = deliveryUpdates[o.id]?.deliveryStatus ?? o.deliveryStatus;
-        return ds === deliveryStatusFilter;
+        const rs = statusUpdates[o.id]?.status ?? o.status;
+        return rs === reservationStatusFilter;
       });
     }
 
@@ -701,20 +611,17 @@ export default function OrderManagementClient({
       const q = searchQuery.toLowerCase();
       result = result.filter(
         o =>
-          o.orderNumber.toLowerCase().includes(q) ||
+          o.reservationNumber.toLowerCase().includes(q) ||
           o.userName.toLowerCase().includes(q) ||
           o.sellerName.toLowerCase().includes(q) ||
-          (o.brandName && o.brandName.toLowerCase().includes(q)) ||
           o.items.some(it => it.productName.toLowerCase().includes(q))
       );
     }
 
     return result;
   }, [
-    orders, sellerFilter, brandFilter, searchQuery, dateFrom, dateTo,
-    poFilter, currentMiddleId, poScope, poScopeBrand,
-    poType, poSellerSel, poMiddleSel, poMiddleSub, poBrandSel,
-    deliveryStatusFilter, deliveryUpdates,
+    orders, sellerFilter, searchQuery, dateFrom, dateTo,
+    reservationStatusFilter, statusUpdates,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   ]);
 
@@ -741,7 +648,7 @@ export default function OrderManagementClient({
   
   // Period sales summary
   const periodSales = useMemo(() => {
-    const paidStatuses = ["PAID", "CONFIRMED", "SHIPPING", "DELIVERED"];
+    const paidStatuses = ["CONFIRMED", "COMPLETED"];
     const paidOrders = orders.filter(o => paidStatuses.includes(o.status));
     const now = new Date();
     
@@ -842,7 +749,7 @@ export default function OrderManagementClient({
 
   /* ── 결제취소 승인 핸들러 (관리자) ── */
   const handleCancelApprove = async (order: Order) => {
-    const confirmed = window.confirm(`결제취소를 승인하시겠습니까?\n\n예약번호: ${order.orderNumber}\n금액: ${formatPrice(order.finalAmount)}\n\n승인 시 즉시 취소 처리됩니다.`);
+    const confirmed = window.confirm(`결제취소를 승인하시겠습니까?\n\n예약번호: ${order.reservationNumber}\n금액: ${formatPrice(order.finalAmount)}\n\n승인 시 즉시 취소 처리됩니다.`);
     if (!confirmed) return;
     setCancelApproving(order.id);
     try {
@@ -896,20 +803,18 @@ export default function OrderManagementClient({
       const items = o.items.length > 0 ? o.items : [{ productName: "", variantName: "", quantity: 0, totalPrice: 0 } as any];
       for (const it of items) {
         rows.push({
-          "예약번호": o.orderNumber,
-          "예약일": formatDate(o.paidAt || o.createdAt),
+          "예약번호": o.reservationNumber,
+          "신청일": formatDate(o.paidAt || o.createdAt),
           "상담상품명": it.productName,
           "옵션": it.variantName || "",
           "수량": it.quantity,
           "상담상품금액": it.totalPrice,
           "예약금액(합계)": o.finalAmount,
-          "고객명": o.userName,
-          "수령인": o.shippingName || "",
-          "연락처": o.shippingPhone || "",
-          "주소": o.shippingAddress || "",
-          "배송메모": o.shippingMemo || "",
+          "예약자": o.customerName || o.userName,
+          "연락처": o.customerPhone || "",
+          "예약일": o.reservationDate ? new Date(o.reservationDate).toLocaleDateString("ko-KR") : "",
+          "예약시간": o.reservationTime || "",
           "상담사": o.sellerName,
-          "브랜드": o.brandName || "",
           "상태": STATUS_LABEL[o.status] || o.status,
           "결제수단": paymentMethodLabel(o.paymentMethod),
         });
@@ -929,7 +834,7 @@ export default function OrderManagementClient({
 
   const handleKakaoShare = (order: Order) => {
     const orderUrl = typeof window !== "undefined" ? `${window.location.origin}/my/orders?id=${order.id}` : "";
-    const msg = `📦 예약 안내\n\n예약번호: ${order.orderNumber}\n상담상품: ${order.items.map(i => i.productName).join(", ")}\n금액: ${formatPrice(order.finalAmount)}\n\n예약 페이지: ${orderUrl}`;
+    const msg = `📦 예약 안내\n\n예약번호: ${order.reservationNumber}\n상담상품: ${order.items.map(i => i.productName).join(", ")}\n금액: ${formatPrice(order.finalAmount)}\n\n예약 페이지: ${orderUrl}`;
     if (navigator.share) {
       navigator.share({ title: "예약 안내", text: msg, url: orderUrl }).catch(() => {});
     } else {
@@ -1056,24 +961,13 @@ export default function OrderManagementClient({
         </button>
 
         {/* Seller filter (admin/brand) */}
-        {(role === "SUPER_ADMIN" || role === "BRAND_ADMIN") && sellers.length > 0 && (
+        {role === "SUPER_ADMIN" && sellers.length > 0 && (
           <select
             value={sellerFilter} onChange={e => setSellerFilter(e.target.value)}
             className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
           >
             <option value="all">전체 상담사</option>
             {sellers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
-        )}
-
-        {/* Brand filter (admin only) */}
-        {role === "SUPER_ADMIN" && brands.length > 0 && (
-          <select
-            value={brandFilter} onChange={e => setBrandFilter(e.target.value)}
-            className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
-          >
-            <option value="all">전체 브랜드</option>
-            {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
           </select>
         )}
 
@@ -1095,180 +989,22 @@ export default function OrderManagementClient({
         </button>
       </div>
 
-      {/* 발주서 구분 필터 (중간관리자) */}
-      {poFilter === "middle" && (
-        <div className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-xl bg-gray-50 border border-gray-100">
-          <span className="text-xs font-semibold text-gray-600 flex items-center gap-1">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
-            </svg>
-            발주서 구분
-          </span>
-          <select
-            value={poScope}
-            onChange={e => { setPoScope(e.target.value as any); setPoScopeBrand("all"); }}
-            className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
-          >
-            <option value="all">전체</option>
-            <option value="mine">내가 등록한 상담상품</option>
-            <option value="brand">하위 브랜드별</option>
-          </select>
-          {poScope === "brand" && (
-            <select
-              value={poScopeBrand}
-              onChange={e => setPoScopeBrand(e.target.value)}
-              className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
-            >
-              <option value="all">전체 하위 브랜드</option>
-              {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-            </select>
-          )}
-          <span className="text-xs font-semibold text-gray-600 flex items-center gap-1 ml-2">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
-            </svg>
-            상담 상태
-          </span>
-          <select
-            value={deliveryStatusFilter}
-            onChange={e => setDeliveryStatusFilter(e.target.value)}
-            className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
-          >
-            <option value="all">전체</option>
-            <option value="PAYMENT_COMPLETED">결제완료</option>
-            <option value="PREPARING">상담 준비중</option>
-            <option value="DELIVERING">상담 진행중</option>
-            <option value="DELIVERED">상담 완료</option>
-            <option value="CANCEL_REQUESTED">취소요청중</option>
-            <option value="CANCEL_COMPLETED">취소완료</option>
-          </select>
-        </div>
-      )}
+      {/* 예약 상태 필터 */}
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <span className="text-xs font-semibold text-gray-600">예약 상태</span>
+        <select
+          value={reservationStatusFilter}
+          onChange={e => setReservationStatusFilter(e.target.value)}
+          className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
+        >
+          <option value="all">전체</option>
+          {Object.entries(RESERVATION_STATUS_MAP).map(([k, v]) => (
+            <option key={k} value={k}>{v.label}</option>
+          ))}
+        </select>
+      </div>
 
-      {/* 발주서 구분 필터 (최고관리자) */}
-      {poFilter === "admin" && (
-        <div className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-xl bg-gray-50 border border-gray-100">
-          <span className="text-xs font-semibold text-gray-600 flex items-center gap-1">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
-            </svg>
-            발주서 구분
-          </span>
-          <select
-            value={poType}
-            onChange={e => {
-              setPoType(e.target.value as any);
-              setPoSellerSel("all"); setPoMiddleSel("all"); setPoMiddleSub("all"); setPoBrandSel("all");
-            }}
-            className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
-          >
-            <option value="all">전체</option>
-            <option value="seller">상담사별</option>
-            <option value="middle">중간관리자별</option>
-            <option value="brand">브랜드별</option>
-            <option value="package">패키지 상담상품</option>
-          </select>
 
-          {poType === "seller" && (
-            <select
-              value={poSellerSel}
-              onChange={e => setPoSellerSel(e.target.value)}
-              className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
-            >
-              <option value="all">상담사 선택</option>
-              {sellers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
-          )}
-
-          {poType === "middle" && (
-            <>
-              <select
-                value={poMiddleSel}
-                onChange={e => { setPoMiddleSel(e.target.value); setPoMiddleSub("all"); }}
-                className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
-              >
-                <option value="all">중간관리자 선택</option>
-                {middleAdmins.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-              </select>
-              {poMiddleSel !== "all" && (
-                <select
-                  value={poMiddleSub}
-                  onChange={e => setPoMiddleSub(e.target.value as any)}
-                  className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
-                >
-                  <option value="all">전체</option>
-                  <option value="own">본인 등록 상담상품</option>
-                  <option value="subbrand">하위 브랜드 상담상품</option>
-                </select>
-              )}
-            </>
-          )}
-
-          {poType === "brand" && (
-            <>
-              <select
-                value={poBrandSel}
-                onChange={e => setPoBrandSel(e.target.value)}
-                className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
-              >
-                <option value="all">브랜드 선택</option>
-                {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select>
-              {poBrandSel !== "all" && brandManagerMap[poBrandSel] && (
-                <span className="text-[11px] font-medium text-purple-600 bg-purple-50 border border-purple-100 rounded-lg px-2.5 py-1.5 flex items-center gap-1">
-                  <Building2 size={12} /> 관리 중간관리자: {brandManagerMap[poBrandSel]}
-                </span>
-              )}
-            </>
-          )}
-          <span className="text-xs font-semibold text-gray-600 flex items-center gap-1 ml-2">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
-            </svg>
-            상담 상태
-          </span>
-          <select
-            value={deliveryStatusFilter}
-            onChange={e => setDeliveryStatusFilter(e.target.value)}
-            className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
-          >
-            <option value="all">전체</option>
-            <option value="PAYMENT_COMPLETED">결제완료</option>
-            <option value="PREPARING">상담 준비중</option>
-            <option value="DELIVERING">상담 진행중</option>
-            <option value="DELIVERED">상담 완료</option>
-            <option value="CANCEL_REQUESTED">취소요청중</option>
-            <option value="CANCEL_COMPLETED">취소완료</option>
-          </select>
-        </div>
-      )}
-
-      {/* 상담 상태 필터 (발주서 구분이 없는 역할 — SELLER, BRAND_ADMIN, NODE 등) */}
-      {!poFilter && (
-        <div className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-xl bg-gray-50 border border-gray-100">
-          <span className="text-xs font-semibold text-gray-600 flex items-center gap-1">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
-            </svg>
-            상담 상태
-          </span>
-          <select
-            value={deliveryStatusFilter}
-            onChange={e => setDeliveryStatusFilter(e.target.value)}
-            className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
-          >
-            <option value="all">전체</option>
-            <option value="PAYMENT_COMPLETED">결제완료</option>
-            <option value="PREPARING">상담 준비중</option>
-            <option value="DELIVERING">상담 진행중</option>
-            <option value="DELIVERED">상담 완료</option>
-            <option value="CANCEL_REQUESTED">취소요청중</option>
-            <option value="CANCEL_COMPLETED">취소완료</option>
-          </select>
-        </div>
-      )}
-
-      {/* Orders List */}
       {filtered.length === 0 ? (
         <div className="text-center py-20 text-gray-400 bg-white rounded-xl border border-gray-100">
           <Icon name="File" size={48} strokeWidth={1.5} className="mx-auto mb-3 opacity-30" />
@@ -1302,7 +1038,7 @@ export default function OrderManagementClient({
                   <div className="flex-1 min-w-0">
                     {/* 예약번호(작게) + 배지 */}
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] text-gray-400 font-mono tracking-tight">{order.orderNumber}</span>
+                      <span className="text-[10px] text-gray-400 font-mono tracking-tight">{order.reservationNumber}</span>
                       {getTypeBadge(order)}
                       <span className={`text-[9px] font-medium px-2 py-0.5 rounded-full ${status.color}`}>
                         {status.label}
@@ -1312,17 +1048,6 @@ export default function OrderManagementClient({
                           <Icon name="Cart" size={8} /> 장바구니
                         </span>
                       )}
-                      {(() => {
-                        const ds = deliveryUpdates[order.id]?.deliveryStatus ?? order.deliveryStatus;
-                        if (!ds) return null;
-                        const d = DELIVERY_STATUS_MAP[ds];
-                        if (!d) return null;
-                        return (
-                          <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full border ${d.color}`}>
-                            <Icon name="Truck" size={8} className="inline mr-0.5" />{d.label}
-                          </span>
-                        );
-                      })()}
                       {(() => {
                         const cs = cancelUpdates[order.id]?.cancelStatus ?? order.cancelStatus;
                         if (!cs) return null;
@@ -1346,21 +1071,18 @@ export default function OrderManagementClient({
                     {/* 예약자(고객명) 강조 */}
                     <p className="text-[13px] font-semibold text-gray-700 truncate">
                       {order.userName}
-                      {(role === "SUPER_ADMIN" || role === "BRAND_ADMIN") && (
+                      {role === "SUPER_ADMIN" && (
                         <span className="text-xs font-medium text-brand-500"> → {order.sellerName}</span>
-                      )}
-                      {order.brandName && role === "SUPER_ADMIN" && (
-                        <span className="text-[11px] font-medium text-purple-500"> · {order.brandName}</span>
                       )}
                     </p>
                     {/* 예약 회원(배송지) 연락처 — 목록에서 바로 확인 */}
-                    {order.shippingPhone && (
+                    {order.customerPhone && (
                       <a
-                        href={`tel:${order.shippingPhone}`}
+                        href={`tel:${order.customerPhone}`}
                         onClick={e => e.stopPropagation()}
                         className="inline-flex items-center gap-0.5 text-[11px] font-medium text-gray-500 hover:text-brand-600 mt-0.5"
                       >
-                        <Phone size={10} /> {order.shippingPhone}
+                        <Phone size={10} /> {order.customerPhone}
                       </a>
                     )}
                     {/* 결제일(부각) + 결제수단 */}
@@ -1429,12 +1151,6 @@ export default function OrderManagementClient({
 
                     {/* Actions */}
                     <div className="px-3 sm:px-4 py-2.5 bg-gray-50/50 border-t border-gray-50 flex items-center gap-2 flex-wrap">
-                      <button
-                        onClick={e => { e.stopPropagation(); setPoOrderId(order.id); }}
-                        className="text-[11px] px-3 py-1.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 flex items-center gap-1 font-medium"
-                      >
-                        <Icon name="File" size={12} /> 발주서
-                      </button>
                       {order.canViewDetail && (
                         <button
                           onClick={e => { e.stopPropagation(); setShowDetail(order.id); }}
@@ -1443,12 +1159,12 @@ export default function OrderManagementClient({
                           <Icon name="Eye" size={12} /> 상세보기
                         </button>
                       )}
-                      {canManageDelivery && (
+                      {canManageStatus && (
                         <button
-                          onClick={e => { e.stopPropagation(); setDeliveryOrderId(order.id); }}
+                          onClick={e => { e.stopPropagation(); setStatusModalOrderId(order.id); }}
                           className="text-[11px] px-3 py-1.5 bg-cyan-50 border border-cyan-200 text-cyan-700 rounded-lg hover:bg-cyan-100 flex items-center gap-1 font-medium"
                         >
-                          <Icon name="Truck" size={12} /> 상담 방식 처리
+                          <CheckCircle2 size={12} /> 예약 상태 변경
                         </button>
                       )}
                       {cartType && (
@@ -1460,7 +1176,7 @@ export default function OrderManagementClient({
                         </button>
                       )}
                       {/* ── 상담사: 결제취소요청 버튼 ── */}
-                      {role === "SELLER" && (() => {
+                      {role === "CONSULTANT" && (() => {
                         const cs = cancelUpdates[order.id]?.cancelStatus ?? order.cancelStatus;
                         const payStatus = order.paymentStatus;
                         if (payStatus === "COMPLETED" && !cs) {
@@ -1543,7 +1259,7 @@ export default function OrderManagementClient({
                 <p className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1"><Icon name="File" size={12} /> 예약 정보</p>
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-500">예약번호</span>
-                  <span className="font-bold text-gray-900">{detailOrder.orderNumber}</span>
+                  <span className="font-bold text-gray-900">{detailOrder.reservationNumber}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-500">예약일시</span>
@@ -1565,16 +1281,16 @@ export default function OrderManagementClient({
                     <span className="text-gray-700">{formatDateTime(detailOrder.paidAt)}</span>
                   </div>
                 )}
-                {detailOrder.shippedAt && (
+                {detailOrder.confirmedAt && (
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-500">상담 시작</span>
-                    <span className="text-gray-700">{formatDateTime(detailOrder.shippedAt)}</span>
+                    <span className="text-gray-700">{formatDateTime(detailOrder.confirmedAt)}</span>
                   </div>
                 )}
-                {detailOrder.deliveredAt && (
+                {detailOrder.completedAt && (
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-500">상담 완료</span>
-                    <span className="text-gray-700">{formatDateTime(detailOrder.deliveredAt)}</span>
+                    <span className="text-gray-700">{formatDateTime(detailOrder.completedAt)}</span>
                   </div>
                 )}
               </div>
@@ -1595,25 +1311,38 @@ export default function OrderManagementClient({
               </div>
 
               {/* Shipping Info */}
-              {detailOrder.shippingName && (
+              {detailOrder.customerName && (
                 <div className="bg-gray-50 rounded-xl p-4 space-y-2">
                   <p className="text-xs font-bold text-gray-700 mb-1 flex items-center gap-1"><Icon name="Truck" size={12} /> 상담 방식 정보</p>
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-500">수령인</span>
-                    <span className="text-gray-700">{detailOrder.shippingName}</span>
+                    <span className="text-gray-700">{detailOrder.customerName}</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-500">연락처</span>
-                    <span className="text-gray-700">{detailOrder.shippingPhone}</span>
+                    <span className="text-gray-700">{detailOrder.customerPhone}</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-500">주소</span>
-                    <span className="text-gray-700 text-right max-w-[200px]">{detailOrder.shippingAddress}</span>
+                    <span className="text-gray-500">예약일시</span>
+                    <span className="text-gray-700 text-right max-w-[200px]">
+                      {detailOrder.reservationDate
+                        ? new Date(detailOrder.reservationDate).toLocaleDateString("ko-KR")
+                        : "-"}{" "}
+                      {detailOrder.reservationTime || ""}
+                    </span>
                   </div>
-                  {detailOrder.shippingMemo && (
+                  {(detailOrder.birthDate || detailOrder.birthTime) && (
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-500">배송메모</span>
-                      <span className="text-gray-700">{detailOrder.shippingMemo}</span>
+                      <span className="text-gray-500">생년월일시</span>
+                      <span className="text-gray-700">
+                        {detailOrder.birthDate || "-"} {detailOrder.birthTime || ""}
+                      </span>
+                    </div>
+                  )}
+                  {detailOrder.consultingContent && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-500">상담 내용</span>
+                      <span className="text-gray-700 text-right max-w-[200px]">{detailOrder.consultingContent}</span>
                     </div>
                   )}
                   {detailOrder.snsAccounts && detailOrder.snsAccounts.length > 0 && (
@@ -1665,10 +1394,6 @@ export default function OrderManagementClient({
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-600">상담상품 합계</span>
                   <span>{formatPrice(detailOrder.totalAmount)}</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-600">배송비</span>
-                  <span>{formatPrice(detailOrder.shippingFee)}</span>
                 </div>
                 {detailOrder.discountAmount > 0 && (
                   <div className="flex justify-between text-xs">
@@ -1723,26 +1448,17 @@ export default function OrderManagementClient({
         </div>
       )}
 
-      {/* ★ 발주서 개별 확인 모달 */}
-      {poOrderId && (
-        <PurchaseOrderModal orderId={poOrderId} role={role} onClose={() => setPoOrderId(null)} />
-      )}
-
-      {/* ★ 상담 방식 처리 모달 */}
-      {deliveryOrderId && (() => {
-        const o = orders.find(x => x.id === deliveryOrderId);
+      {/* ★ 예약 상태 변경 모달 */}
+      {statusModalOrderId && (() => {
+        const o = orders.find(x => x.id === statusModalOrderId);
         if (!o) return null;
-        const cached = deliveryUpdates[deliveryOrderId];
+        const cached = statusUpdates[statusModalOrderId];
         return (
-          <DeliveryModal
-            orderId={deliveryOrderId}
-            current={{
-              status: cached?.deliveryStatus ?? o.deliveryStatus ?? "PAYMENT_COMPLETED",
-              courier: cached?.deliveryCourier ?? o.deliveryCourier,
-              tracking: cached?.deliveryTracking ?? o.deliveryTracking,
-            }}
-            onClose={() => setDeliveryOrderId(null)}
-            onSaved={updated => setDeliveryUpdates(prev => ({ ...prev, [deliveryOrderId]: updated }))}
+          <ReservationStatusModal
+            orderId={statusModalOrderId}
+            current={{ status: cached?.status ?? o.status }}
+            onClose={() => setStatusModalOrderId(null)}
+            onSaved={updated => setStatusUpdates(prev => ({ ...prev, [statusModalOrderId]: updated }))}
           />
         );
       })()}

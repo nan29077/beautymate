@@ -7,7 +7,7 @@ import { Loader2 } from 'lucide-react';
 
 interface InitialOrder {
   id: string;
-  orderNumber: string;
+  reservationNumber: string;
   finalAmount: number;
   discountAmount: number;
   paymentStatus: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
@@ -91,7 +91,7 @@ export default function CheckoutCompleteClient({
             <Loader2 size={32} strokeWidth={1.5} className="text-gray-500 animate-spin" />
           </div>
           <h2 className="text-lg font-bold text-gray-900 mb-2">결제 결과를 확인하고 있습니다</h2>
-          <p className="text-sm text-gray-500 mb-1">예약번호: {order.orderNumber}</p>
+          <p className="text-sm text-gray-500 mb-1">예약번호: {order.reservationNumber}</p>
           <p className="text-xs text-gray-400 mb-4">잠시만 기다려 주세요. 자동으로 갱신됩니다.</p>
         </>
       ) : timedOut && order.paymentStatus === "PENDING" ? (
@@ -100,7 +100,7 @@ export default function CheckoutCompleteClient({
             <Loader2 size={32} strokeWidth={1.5} className="text-yellow-500" />
           </div>
           <h2 className="text-lg font-bold text-gray-900 mb-2">결제 결과 확인이 지연되고 있습니다</h2>
-          <p className="text-sm text-gray-500 mb-1">예약번호: {order.orderNumber}</p>
+          <p className="text-sm text-gray-500 mb-1">예약번호: {order.reservationNumber}</p>
           <p className="text-xs text-gray-500 mb-4">
             결제는 정상 처리되었을 수 있습니다. 잠시 후 예약 내역에서 확인해주세요.
           </p>
@@ -111,7 +111,7 @@ export default function CheckoutCompleteClient({
             <Icon name="Check" size={32} strokeWidth={1.5} className="text-green-500" />
           </div>
           <h2 className="text-lg font-bold text-gray-900 mb-2">결제가 완료되었습니다!</h2>
-          <p className="text-sm text-gray-500 mb-1">예약번호: {order.orderNumber}</p>
+          <p className="text-sm text-gray-500 mb-1">예약번호: {order.reservationNumber}</p>
           <p className="text-sm text-gray-700 mb-1">결제금액: {formatPrice(Number(order.finalAmount))}</p>
           {order.pgTid && (
             <p className="text-[11px] text-gray-400 mb-4">거래 ID: {order.pgTid}</p>
@@ -128,7 +128,7 @@ export default function CheckoutCompleteClient({
             <Icon name="Close" size={32} strokeWidth={1.5} className="text-red-500" />
           </div>
           <h2 className="text-lg font-bold text-gray-900 mb-2">결제에 실패했습니다</h2>
-          <p className="text-sm text-gray-500 mb-1">예약번호: {order.orderNumber}</p>
+          <p className="text-sm text-gray-500 mb-1">예약번호: {order.reservationNumber}</p>
           {initialMsg && <p className="text-xs text-gray-500 mb-4">{initialMsg}</p>}
         </>
       )}

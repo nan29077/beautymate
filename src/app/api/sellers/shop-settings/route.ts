@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
-    if (!session || session.user.role !== "SELLER") {
+    if (!session || session.user.role !== "CONSULTANT") {
       return NextResponse.json({ error: "권한이 없습니다" }, { status: 401 });
     }
 

@@ -731,7 +731,7 @@ export default function SellerSettlementClient({
                         <span className="text-[10px] text-gray-400">{new Date(p.requestedAt).toLocaleDateString("ko-KR")}</span>
                       </div>
                       <p className="text-[10px] text-gray-400 mt-1">
-                        {p.bankName} {p.accountNumber} ({p.accountHolder}) · {p.orderCount}건
+                        {p.bankName} {p.accountNumber} ({p.accountHolder}) · {p.reservationCount}건
                       </p>
                     </div>
                     <div className="text-right">

@@ -16,7 +16,6 @@ export async function GET() {
     include: {
       product: {
         include: {
-          brand: true,
           sellerProducts: {
             where: { isActive: true },
             include: { seller: true },
@@ -39,7 +38,6 @@ export async function GET() {
         thumbnail: w.product.thumbnail,
         basePrice: Number(w.product.basePrice),
         comparePrice: w.product.comparePrice ? Number(w.product.comparePrice) : null,
-        brandName: w.product.brand?.brandName || null,
         sellerName: w.product.sellerProducts[0]?.seller?.shopName || null,
         badges: w.product.badges,
       },

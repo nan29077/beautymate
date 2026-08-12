@@ -17,7 +17,6 @@ export default async function PackagesPage() {
               id: true,
               name: true,
               thumbnail: true,
-              brand: { select: { brandName: true } },
             },
           },
         },

@@ -35,7 +35,7 @@ export async function generateUniqueSellerReferralCode(
 
 /**
  * 상담사가입 추천인코드로 멘토 User를 조회
- * - 유효하지 않거나 SELLER 역할이 아닌 경우 null 반환
+ * - 유효하지 않거나 CONSULTANT 역할이 아닌 경우 null 반환
  */
 export async function findMentorByReferralCode(
   prisma: PrismaClient,
@@ -50,19 +50,19 @@ export async function findMentorByReferralCode(
     select: { id: true, name: true, role: true, isActive: true },
   });
 
-  if (!user || user.role !== "SELLER" || !user.isActive) return null;
+  if (!user || user.role !== "CONSULTANT" || !user.isActive) return null;
   return { id: user.id, name: user.name };
 }
 
 /**
- * 기존 SELLER 계정에 sellerReferralCode가 없는 경우 일괄 발급
+ * 기존 CONSULTANT 계정에 sellerReferralCode가 없는 경우 일괄 발급
  * (최초 1회 마이그레이션용)
  */
 export async function backfillSellerReferralCodes(
   prisma: PrismaClient
 ): Promise<number> {
   const sellers = await (prisma as any).user.findMany({
-    where: { role: "SELLER", sellerReferralCode: null },
+    where: { role: "CONSULTANT", sellerReferralCode: null },
     select: { id: true },
   });
 

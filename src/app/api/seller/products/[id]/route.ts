@@ -18,7 +18,7 @@ async function getOwnedProduct(userId: string, productId: string) {
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> | { id: string } }) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
-  if (session.user?.role !== "SELLER") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+  if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
 
   const { id } = await Promise.resolve(params);
   const owned = await getOwnedProduct(session.user!.id, id);
@@ -37,9 +37,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       basePrice: Number(product.basePrice),
       comparePrice: product.comparePrice != null ? Number(product.comparePrice) : null,
       description: product.description,
-      totalStock: product.totalStock,
-      shippingFee: Number(product.shippingFee),
-      freeShipping: product.freeShipping,
+      consultingType: product.consultingType,
+      consultingMethod: product.consultingMethod,
+      durationMinutes: product.durationMinutes,
+      maxDailySlots: product.maxDailySlots,
       // 대표 썸네일이 갤러리 첫 장과 다를 수 있으므로 별도 제공
       thumbnail: product.thumbnail,
       images: product.images.map((img) => img.url),
@@ -51,7 +52,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> | { id: string } }) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
-  if (session.user?.role !== "SELLER") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+  if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
 
   const { id } = await Promise.resolve(params);
   const owned = await getOwnedProduct(session.user!.id, id);

@@ -8,7 +8,7 @@ import { calcPayoutBreakdown } from "@/lib/payout";
 // GET: 상담사 정산 요약 + 출금요청 내역 + 출금 수수료율/사업자 여부 조회
 export async function GET() {
   const session = await auth();
-  if (!session?.user?.id || session.user.role !== "SELLER") {
+  if (!session?.user?.id || session.user.role !== "CONSULTANT") {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
 
@@ -32,7 +32,7 @@ export async function GET() {
 // POST: 출금 요청 생성 (실제 송금 없이 요청 레코드만 생성)
 export async function POST(request: Request) {
   const session = await auth();
-  if (!session?.user?.id || session.user.role !== "SELLER") {
+  if (!session?.user?.id || session.user.role !== "CONSULTANT") {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
 
@@ -123,7 +123,7 @@ export async function POST(request: Request) {
             sellerId: seller.id,
             amount,
             netAmount,
-            orderCount: availableOrderCount,
+            reservationCount: availableOrderCount,
             commissionRate: payoutFeeRate,
             commissionAmount,
             withholdingTaxAmount,
@@ -143,18 +143,18 @@ export async function POST(request: Request) {
         // 신청 금액을 정산일이 빠른 예약부터 FIFO 배분한다. 기존 미반려 출금이
         // 이미 배분한 몫(allocatedAmount)을 제외한 잔여분에만 배분해,
         // 예약별로 어떤 출금에 얼마가 포함됐는지 추적 가능하게 남긴다.
-        const prevAllocs = await tx.payoutRequestOrder.findMany({
+        const prevAllocs = await tx.payoutRequestReservation.findMany({
           where: {
             payoutRequest: {
               sellerId: seller.id,
               status: { in: ["REQUESTED", "APPROVED", "PAID"] },
             },
           },
-          select: { orderId: true, allocatedAmount: true },
+          select: { reservationId: true, allocatedAmount: true },
         });
         const allocByOrder = new Map<string, number>();
         for (const a of prevAllocs) {
-          allocByOrder.set(a.orderId, (allocByOrder.get(a.orderId) ?? 0) + Number(a.allocatedAmount));
+          allocByOrder.set(a.reservationId, (allocByOrder.get(a.reservationId) ?? 0) + Number(a.allocatedAmount));
         }
 
         const fifoOrders = summary.orders
@@ -165,8 +165,8 @@ export async function POST(request: Request) {
         let remaining = amount;
         const snapshots: {
           payoutRequestId: string;
-          orderId: string;
-          orderNumber: string;
+          reservationId: string;
+          reservationNumber: string;
           settlementAmount: number;
           allocatedAmount: number;
         }[] = [];
@@ -178,14 +178,14 @@ export async function POST(request: Request) {
           remaining -= take;
           snapshots.push({
             payoutRequestId: created.id,
-            orderId: o.orderId,
-            orderNumber: o.orderNumber,
+            reservationId: o.orderId,
+            reservationNumber: o.reservationNumber,
             settlementAmount: o.settlementAmount,
             allocatedAmount: take,
           });
         }
         if (snapshots.length > 0) {
-          await tx.payoutRequestOrder.createMany({ data: snapshots });
+          await tx.payoutRequestReservation.createMany({ data: snapshots });
         }
 
         return created;

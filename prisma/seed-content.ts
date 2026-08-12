@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../src/generated/prisma";
 
 const prisma = new PrismaClient();
 
@@ -194,7 +194,7 @@ async function seedContentPosts() {
 
   // Add dummy comments
   const buyers = await prisma.user.findMany({
-    where: { role: "BUYER" },
+    where: { role: "CUSTOMER" },
     select: { id: true },
     take: 5,
   });

@@ -122,7 +122,7 @@ export async function DELETE(request: Request) {
     if (!session?.user) {
       return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
     }
-    if ((session.user as any).role !== "SELLER") {
+    if ((session.user as any).role !== "CONSULTANT") {
       return NextResponse.json({ error: "상담사만 삭제할 수 있습니다." }, { status: 403 });
     }
 

@@ -34,8 +34,8 @@ function RegisterForm() {
   const sellerRefFromUrl = searchParams?.get("ref") ?? null;
   const refCode = searchParams?.get("code") ?? null;
   const typeParam = searchParams?.get("type") ?? "";
-  // 상담사 소개 페이지(/become-seller)에서 "상담사 신청하기"로 들어오면 ?role=SELLER 로 상담사 가입을 미리 선택.
-  const roleFromUrl = (searchParams?.get("role") ?? "").toUpperCase() === "SELLER" ? "SELLER" : null;
+  // 상담사 소개 페이지(/become-seller)에서 "상담사 신청하기"로 들어오면 ?role=CONSULTANT 로 상담사 가입을 미리 선택.
+  const roleFromUrl = (searchParams?.get("role") ?? "").toUpperCase() === "CONSULTANT" ? "CONSULTANT" : null;
   // 상담사 귀속은 URL ?ref= 로 들어온 경우에만 (쿠키 fallback 제거)
   const sellerRef = sellerRefFromUrl;
   const [autoFilledShopName, setAutoFilledShopName] = useState<string | null>(null);
@@ -50,7 +50,7 @@ function RegisterForm() {
     zipCode: "",
     address1: "",
     address2: "",
-    role: roleFromUrl || ("BUYER" as string),
+    role: roleFromUrl || ("CUSTOMER" as string),
     referralCode: refCode || "",
     sellerReferralCode: "",  // 상담사가입 추천인코드 (멘토-멘티)
   });
@@ -217,7 +217,7 @@ function RegisterForm() {
           role: form.role,
           sellerRef,
           referralCode: form.referralCode || null,
-          sellerReferralCode: form.role === "SELLER" ? (form.sellerReferralCode || null) : null,
+          sellerReferralCode: form.role === "CONSULTANT" ? (form.sellerReferralCode || null) : null,
         }),
       });
       const data = await res.json();
@@ -607,8 +607,8 @@ function RegisterForm() {
                 <label className="block text-xs font-semibold text-gray-600 mb-2">가입 유형</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { value: "BUYER", label: "시청자 회원", desc: "쇼핑 & 단체 상담", badge: "즉시 이용 가능" },
-                    { value: "SELLER", label: "상담사", desc: "점집 운영 & 판매", badge: "관리자 승인 필요" },
+                    { value: "CUSTOMER", label: "시청자 회원", desc: "쇼핑 & 단체 상담", badge: "즉시 이용 가능" },
+                    { value: "CONSULTANT", label: "상담사", desc: "점집 운영 & 판매", badge: "관리자 승인 필요" },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -623,7 +623,7 @@ function RegisterForm() {
                       <p className="text-sm font-medium">{opt.label}</p>
                       <p className="text-[10px] text-gray-400">{opt.desc}</p>
                       <span className={`inline-block mt-1 text-[9px] font-medium px-1.5 py-0.5 rounded-full ${
-                        opt.value === "BUYER"
+                        opt.value === "CUSTOMER"
                           ? "bg-green-50 text-green-600"
                           : "bg-yellow-50 text-yellow-600"
                       }`}>
@@ -635,7 +635,7 @@ function RegisterForm() {
               </div>
             )}
 
-            {form.role === "SELLER" && (
+            {form.role === "CONSULTANT" && (
               <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-3">
                 <div className="flex items-start gap-2">
                   <Icon name="Clock" size={14} className="text-yellow-600 flex-shrink-0 mt-0.5" />
@@ -647,7 +647,7 @@ function RegisterForm() {
               </div>
             )}
 
-            {form.role === "SELLER" && (
+            {form.role === "CONSULTANT" && (
               <div>
                 <label className="flex items-center gap-2 cursor-pointer mb-2">
                   <input

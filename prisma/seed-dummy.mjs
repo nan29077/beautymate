@@ -307,13 +307,13 @@ async function main() {
 
   // 기존 더미 주문(정확히 이 주문번호들)만 삭제 후 재생성 (items 는 cascade)
   const orderNumbers = orderDefs.map((d) => d[0]);
-  await prisma.order.deleteMany({ where: { orderNumber: { in: orderNumbers } } });
+  await prisma.order.deleteMany({ where: { reservationNumber: { in: orderNumbers } } });
 
-  for (const [orderNumber, buyer, seller, product, unitPrice, qty, status, paidAt] of orderDefs) {
+  for (const [reservationNumber, buyer, seller, product, unitPrice, qty, status, paidAt] of orderDefs) {
     const amount = unitPrice * qty;
     await prisma.order.create({
       data: {
-        orderNumber,
+        reservationNumber,
         userId: buyer.id,
         sellerId: seller.id,
         status,
@@ -354,7 +354,7 @@ async function main() {
     prisma.sellerShopProduct.count({
       where: { product: { name: { startsWith: "[TEST]" } } },
     }),
-    prisma.order.count({ where: { orderNumber: { startsWith: "TESTORD-" } } }),
+    prisma.order.count({ where: { reservationNumber: { startsWith: "TESTORD-" } } }),
   ]);
   console.log("\n📊 DB 실측:");
   console.log(`   더미 유저(@dummy-test.com): ${uCnt}`);

@@ -22,13 +22,9 @@ function getDashboardPath(role: string): string {
   switch (role) {
     case "SUPER_ADMIN":
       return "/admin";
-    case "MIDDLE_ADMIN":
-      return "/middle";
-    case "SELLER":
+    case "CONSULTANT":
       return "/seller";
-    case "BRAND_ADMIN":
-      return "/brand";
-    case "BUYER":
+    case "CUSTOMER":
       return "/";
     default:
       return "/";
@@ -81,7 +77,7 @@ function LoginForm() {
     if (callbackUrl) {
       router.push(callbackUrl);
     } else {
-      const role = session?.user?.role || "BUYER";
+      const role = session?.user?.role || "CUSTOMER";
       router.push(getDashboardPath(role));
     }
     router.refresh();

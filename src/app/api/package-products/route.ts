@@ -23,15 +23,7 @@ export async function GET(request: Request) {
   if (role === "SUPER_ADMIN") {
     // 관리자: 전체 조회
     if (status) where.status = status;
-  } else if (role === "MIDDLE_ADMIN") {
-    // 중간관리자: 본인 등록 패키지 + 소속(하위) 브랜드가 등록한 패키지
-    const middleAdminId = (session.user as any).middleAdminId as string | undefined;
-    where.OR = [
-      { creatorId: userId },
-      ...(middleAdminId ? [{ creator: { brandProfile: { middleAdminId } } }] : []),
-    ];
-    if (status) where.status = status;
-  } else if (role === "BRAND_ADMIN" || role === "SELLER") {
+  } else if (role === "CONSULTANT") {
     // 본인이 등록한 패키지만
     where.creatorId = userId;
     if (status) where.status = status;
@@ -51,7 +43,6 @@ export async function GET(request: Request) {
                 id: true,
                 name: true,
                 thumbnail: true,
-                brand: { select: { brandName: true } },
               },
             },
           },
@@ -92,7 +83,7 @@ export async function POST(request: Request) {
   const role = (session.user as any).role as string;
   const userId = session.user.id as string;
 
-  if (!["SUPER_ADMIN", "BRAND_ADMIN", "SELLER", "MIDDLE_ADMIN"].includes(role)) {
+  if (!["SUPER_ADMIN", "CONSULTANT"].includes(role)) {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
 

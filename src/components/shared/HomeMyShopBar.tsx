@@ -38,7 +38,7 @@ export default async function HomeMyShopBar() {
 
   const role = session.user.role;
   // 구매회원 전용 바 (상담사/관리자/브랜드는 각자 대시보드를 쓰므로 비노출)
-  if (role && role !== "BUYER") return null;
+  if (role && role !== "CUSTOMER") return null;
 
   const profile = await prisma.buyerProfile.findUnique({
     where: { userId: session.user.id },

@@ -18,7 +18,7 @@ function safeParse(raw: string): Record<string, unknown> | null {
 
 export default async function SellerGamesPage() {
   const session = await auth();
-  if (session?.user?.role !== "SELLER") redirect("/");
+  if (session?.user?.role !== "CONSULTANT") redirect("/");
 
   const seller = await prisma.sellerProfile.findUnique({
     where: { userId: session!.user!.id },

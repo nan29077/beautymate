@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 // 상담사: "점집에 바로 노출하기" / "상담상품 번호 매기기" 설정 + 상담상품별 번호 저장.
 export async function POST(req: NextRequest) {
   const session = await auth();
-  if (session?.user?.role !== "SELLER") {
+  if (session?.user?.role !== "CONSULTANT") {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
   const seller = await prisma.sellerProfile.findUnique({ where: { userId: session!.user!.id }, select: { id: true } });

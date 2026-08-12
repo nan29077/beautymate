@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> | { id: string } }) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
-  if (session.user?.role !== "SELLER") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+  if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
 
   const { id } = await Promise.resolve(params);
 

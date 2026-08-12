@@ -21,7 +21,6 @@ export default async function AdminPackageProductsPage() {
               thumbnail: true,
               supplyPrice: true,
               basePrice: true,
-              brand: { select: { brandName: true } },
             },
           },
         },

@@ -7,7 +7,7 @@ import { refreshYoutubeToken } from "@/lib/youtubeOAuth";
 
 export async function POST() {
   const session = await auth();
-  if (!session || session.user?.role !== "SELLER") {
+  if (!session || session.user?.role !== "CONSULTANT") {
     return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
   }
   const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });

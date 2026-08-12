@@ -5,7 +5,7 @@
 //
 // 삭제 대상(더미 식별 패턴만):
 //   - 소셜주문서: 더미 셀러(@dummy-test.com) 연결 + address "[TEST]" 마커 (raw 테이블)
-//   - 주문:   orderNumber "TESTORD-" prefix
+//   - 주문:   reservationNumber "TESTORD-" prefix
 //   - 상품:   name "[TEST]" prefix (+ 연결된 SellerShopProduct / OrderItem 등 cascade)
 //   - 유저:   email "@dummy-test.com" 도메인 (+ 프로필/주문 cascade)
 //
@@ -90,7 +90,7 @@ async function main() {
   const delOrders = await prisma.order.deleteMany({
     where: {
       OR: [
-        { orderNumber: { startsWith: "TESTORD-" } },
+        { reservationNumber: { startsWith: "TESTORD-" } },
         { userId: { in: dummyUserIds } },
         { sellerId: { in: dummyShopSellerIds } },
       ],

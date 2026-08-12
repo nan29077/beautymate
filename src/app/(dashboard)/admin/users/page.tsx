@@ -10,21 +10,16 @@ export default async function AdminUsersPage() {
   const session = await auth();
   if (session?.user?.role !== "SUPER_ADMIN") redirect("/");
 
-  const [usersRaw, sellers, middleAdmins] = await Promise.all([
+  const [usersRaw, sellers] = await Promise.all([
     prisma.user.findMany({
       include: {
-        _count: { select: { orders: true, reviews: true } },
+        _count: { select: { reservations: true, reviews: true } },
         sellerProfile: { select: { id: true, commissionRate: true } },
         accounts: { select: { provider: true } }, // 소셜 가입 제공자(카카오·네이버·구글) 판별용
       },
       orderBy: { createdAt: "desc" },
     }),
     getAdminSellers(),
-    prisma.middleAdminProfile.findMany({
-      where: { isActive: true },
-      select: { id: true, name: true },
-      orderBy: { createdAt: "desc" },
-    }),
   ]);
 
   const users = usersRaw.map((u) => ({
@@ -36,7 +31,7 @@ export default async function AdminUsersPage() {
     birthday: u.birthday,
     role: u.role,
     isActive: u.isActive,
-    orderCount: u._count.orders,
+    reservationCount: u._count.reservations,
     reviewCount: u._count.reviews,
     createdAt: u.createdAt.toISOString(),
     sellerId: u.sellerProfile?.id ?? null,
@@ -45,10 +40,7 @@ export default async function AdminUsersPage() {
     authProviders: [...new Set(u.accounts.map((a) => a.provider))],
   }));
 
-  const serializedMiddleAdmins = middleAdmins.map((m) => ({
-    id: m.id,
-    name: m.name,
-  }));
+  const serializedMiddleAdmins: { id: string; name: string }[] = [];
 
   return (
     <AdminUsersTabsClient

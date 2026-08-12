@@ -1,12 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/generated/prisma";
 
 // 예약관리 목록(상담사·브랜드·관리자)에 노출할 예약의 공통 필터.
 // - PENDING(결제 진행 중·미결제) 제외
 // - 결제 흔적이 전혀 없는 CANCELLED 제외: pgTid 가 없으면 PG 승인 이전에 이탈한
 //   예약(결제창만 띄우고 닫음/중단)이므로 목록에 노출하지 않는다.
 //   반대로 pgTid 가 있는 CANCELLED(실제 결제 후 취소·환불, 혹은 복구 대상)는 노출 유지.
-export const VISIBLE_ORDER_FILTER: Prisma.OrderWhereInput = {
+export const VISIBLE_ORDER_FILTER: Prisma.ReservationWhereInput = {
   status: { not: "PENDING" },
   NOT: { status: "CANCELLED", pgTid: null },
 };
@@ -22,8 +22,8 @@ const STALE_MINUTES = 30;
 // 정리 트랜잭션 도중 결제 콜백이 도착해 예약이 완료되었음을 알리는 내부 신호.
 // 이 예외로 트랜잭션을 롤백하되, 상위에서는 '오류'가 아닌 '안전한 건너뜀'으로 처리한다.
 class PaymentCompletedDuringCleanup extends Error {
-  constructor(orderNumber: string) {
-    super(`PAYMENT_COMPLETED_DURING_CLEANUP:${orderNumber}`);
+  constructor(reservationNumber: string) {
+    super(`PAYMENT_COMPLETED_DURING_CLEANUP:${reservationNumber}`);
     this.name = "PaymentCompletedDuringCleanup";
   }
 }
@@ -35,7 +35,7 @@ class PaymentCompletedDuringCleanup extends Error {
 export async function cleanupStalePendingOrders(): Promise<number> {
   const cutoff = new Date(Date.now() - STALE_MINUTES * 60 * 1000);
 
-  const stale = await prisma.order.findMany({
+  const stale = await prisma.reservation.findMany({
     where: {
       status: "PENDING",
       paymentStatus: { not: "COMPLETED" }, // 결제 완료된 건은 절대 건드리지 않음
@@ -48,7 +48,7 @@ export async function cleanupStalePendingOrders(): Promise<number> {
       // 미리 마킹하므로, 그 예약은 정리 대상에서 제외한다.
       NOT: { pgProvider: "ongi" },
     },
-    include: { items: true, referralCommissions: true, middleAdminCommissions: true },
+    include: { items: true, referralCommissions: true },
   });
 
   let deleted = 0;
@@ -102,11 +102,6 @@ export async function cleanupStalePendingOrders(): Promise<number> {
           await tx.referralCommission.delete({ where: { id: c.id } }).catch(() => {});
         }
 
-        // 중간관리자 마진 롤백 (PENDING 적립 레코드 삭제)
-        for (const m of order.middleAdminCommissions) {
-          await tx.middleAdminCommission.delete({ where: { id: m.id } }).catch(() => {});
-        }
-
         // 멘토 커미션 롤백 (PENDING 적립 레코드 삭제)
         const mentorComms = await (prisma as any).mentorCommission.findMany({
           where: { orderId: order.id, status: "PENDING" },
@@ -123,7 +118,7 @@ export async function cleanupStalePendingOrders(): Promise<number> {
         // 방금 결제 완료된 예약까지 지워진다(실 사고 발생). 따라서 아직 '미결제 PENDING'
         // 인 경우에만 삭제되도록 조건부 삭제하고, 0건이면(=그새 결제 완료) throw 하여
         // 트랜잭션 전체(카운터·커미션 롤백 포함)를 원복한다.
-        const del = await tx.order.deleteMany({
+        const del = await tx.reservation.deleteMany({
           where: {
             id: order.id,
             status: "PENDING",
@@ -132,7 +127,7 @@ export async function cleanupStalePendingOrders(): Promise<number> {
           },
         });
         if (del.count === 0) {
-          throw new PaymentCompletedDuringCleanup(order.orderNumber);
+          throw new PaymentCompletedDuringCleanup(order.reservationNumber);
         }
       });
       deleted++;
@@ -142,7 +137,7 @@ export async function cleanupStalePendingOrders(): Promise<number> {
         continue;
       }
       // 한 건 실패가 전체를 막지 않도록 로깅 후 계속
-      console.error(`[orderCleanup] PENDING 예약 정리 실패: ${order.orderNumber}`, e);
+      console.error(`[orderCleanup] PENDING 예약 정리 실패: ${order.reservationNumber}`, e);
     }
   }
 

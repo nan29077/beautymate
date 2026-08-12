@@ -204,7 +204,7 @@ export default async function CampaignDetailPage({
                   className="px-4 py-2 text-sm border border-gray-200 rounded-lg hover:border-black active:bg-gray-50 transition-colors"
                 >
                   {v.name}
-                  {v.stock <= 0 && (
+                  {false && (
                     <span className="text-xs text-gray-400 ml-1">(품절)</span>
                   )}
                 </button>

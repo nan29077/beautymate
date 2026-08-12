@@ -26,7 +26,7 @@ export default async function ProductDetailPage({
     auth(),
   ]);
   // 브랜드 계정: 자신이 등록한 공급가(supplyPrice)만 표시, 중간관리자 마진 포함 가격 비노출
-  const isBrandAdmin = session?.user?.role === "BRAND_ADMIN";
+  const isBrandAdmin = false;
   // Next.js 14.2+ 에서 params는 Promise일 수 있음
   const resolvedParams = await Promise.resolve(params);
   const resolvedSearchParams = searchParams ? await Promise.resolve(searchParams) : {};
@@ -51,7 +51,6 @@ export default async function ProductDetailPage({
     product = await prisma.product.findUnique({
       where: { id },
       include: {
-        brand: true,
         category: true,
         variants: { where: { isActive: true }, orderBy: { sortOrder: "asc" } },
         images: { orderBy: { sortOrder: "asc" } },
@@ -85,10 +84,10 @@ export default async function ProductDetailPage({
   const comparePrice = product.comparePrice ? Number(product.comparePrice) : null;
 
   // 상담 방식 정보
-  const shippingFee = Number(product.shippingFee) || 0;
-  const isFreeShipping = product.freeShipping || shippingFee === 0;
-  const freeShippingThreshold = product.freeShippingThreshold ? Number(product.freeShippingThreshold) : null;
-  const remoteAreaFee = Number(product.remoteAreaFee) || 0;
+  const shippingFee = 0;
+  const isFreeShipping = true;
+  const freeShippingThreshold = null;
+  const remoteAreaFee = 0;
   const shippingLabel = isFreeShipping
     ? "무료배송"
     : freeShippingThreshold
@@ -207,7 +206,7 @@ export default async function ProductDetailPage({
 
       {/* ── Brand & Name ── */}
       <div className="px-4 pt-5 pb-3">
-        {product.brand && (
+        {false && (
           <p className="text-xs text-gray-400 tracking-wide uppercase mb-1">
             {product.brand.brandName}
           </p>

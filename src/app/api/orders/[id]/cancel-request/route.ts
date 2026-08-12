@@ -29,7 +29,7 @@ export async function POST(
       return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
     }
     const role = (session.user as any).role as string;
-    if (role !== "SELLER") {
+    if (role !== "CONSULTANT") {
       return NextResponse.json({ error: "상담사만 결제취소 요청을 할 수 있습니다." }, { status: 403 });
     }
 
@@ -45,7 +45,7 @@ export async function POST(
     }
 
     // 예약 조회
-    const order = await (prisma.order.findUnique as any)({
+    const order = await (prisma.reservation.findUnique as any)({
       where: { id: orderId },
       select: {
         id: true,
@@ -107,7 +107,7 @@ export async function POST(
     }
 
     // 예약 업데이트
-    const updated = await (prisma.order.update as any)({
+    const updated = await (prisma.reservation.update as any)({
       where: { id: orderId },
       data: {
         cancelRequestedAt: now,

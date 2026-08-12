@@ -26,7 +26,7 @@ export async function GET(request: Request) {
   }
 
   const session = await auth();
-  if (!session?.user?.id || session.user.role !== "SELLER") {
+  if (!session?.user?.id || session.user.role !== "CONSULTANT") {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
 
@@ -45,7 +45,7 @@ export async function GET(request: Request) {
 // PATCH: 로그인한 상담사 본인의 계좌 정보 수정
 export async function PATCH(request: Request) {
   const session = await auth();
-  if (!session?.user?.id || session.user.role !== "SELLER") {
+  if (!session?.user?.id || session.user.role !== "CONSULTANT") {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
 

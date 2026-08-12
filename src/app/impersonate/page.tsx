@@ -9,9 +9,7 @@ import { Loader2 } from 'lucide-react';
 function dashPath(r: string): string {
   switch (r) {
     case "SUPER_ADMIN": return "/admin";
-    case "MIDDLE_ADMIN": return "/middle";
-    case "SELLER": return "/seller";
-    case "BRAND_ADMIN": return "/brand";
+    case "CONSULTANT": return "/seller";
     default: return "/";
   }
 }

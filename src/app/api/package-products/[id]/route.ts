@@ -22,7 +22,6 @@ export async function GET(
               thumbnail: true,
               basePrice: true,
               supplyPrice: true,
-              brand: { select: { id: true, brandName: true, userId: true } },
               category: { select: { id: true, name: true } },
             },
           },
@@ -96,24 +95,8 @@ export async function PATCH(
 
   // 중간관리자 마진 설정 (본인 등록 패키지 또는 하위 브랜드가 등록한 패키지)
   if (action === "setMargin") {
-    if (role !== "MIDDLE_ADMIN" && role !== "SUPER_ADMIN") {
+    if (role !== "SUPER_ADMIN") {
       return NextResponse.json({ error: "마진 설정 권한이 없습니다." }, { status: 403 });
-    }
-
-    if (role === "MIDDLE_ADMIN") {
-      const middleAdminId = (session.user as any).middleAdminId as string | undefined;
-      let allowed = pkg.creatorId === userId;
-      if (!allowed && middleAdminId) {
-        // 패키지 등록자가 본인 소속(하위) 브랜드인지 확인
-        const creatorBrand = await prisma.brandProfile.findUnique({
-          where: { userId: pkg.creatorId },
-          select: { middleAdminId: true },
-        });
-        allowed = creatorBrand?.middleAdminId === middleAdminId;
-      }
-      if (!allowed) {
-        return NextResponse.json({ error: "이 패키지에 대한 권한이 없습니다." }, { status: 403 });
-      }
     }
 
     const rawMargin = body.middleAdminMargin;

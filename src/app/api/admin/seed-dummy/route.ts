@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
             email: sd.email,
             name: sd.name,
             password: hashedPw,
-            role: "SELLER",
+            role: "CONSULTANT",
             isActive: true,
             sellerProfile: {
               create: {
@@ -71,18 +71,8 @@ export async function POST(req: NextRequest) {
             email: bd.email,
             name: bd.name,
             password: hashedPw,
-            role: "BRAND_ADMIN",
+            role: "SUPER_ADMIN",
             isActive: true,
-            brandProfile: {
-              create: {
-                brandName: bd.brandName,
-                description: bd.desc,
-                isApproved: true,
-                businessRegistrationNo: `${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 90) + 10}-${String(Math.floor(Math.random() * 90000) + 10000)}`,
-                representativeName: bd.name,
-                contactEmail: bd.email,
-              },
-            },
           },
         });
         brandCount++;
@@ -100,7 +90,7 @@ export async function POST(req: NextRequest) {
       const existing = await prisma.user.findUnique({ where: { email } });
       if (!existing) {
         await prisma.user.create({
-          data: { email, name: buyerData[i], password: hashedPw, role: "BUYER", isActive: true },
+          data: { email, name: buyerData[i], password: hashedPw, role: "CUSTOMER", isActive: true },
         });
         buyerCount++;
       }
@@ -108,13 +98,13 @@ export async function POST(req: NextRequest) {
     results.buyers = buyerCount;
 
     // 4. Create dummy orders if none exist
-    const orderCount = await prisma.order.count();
-    if (orderCount === 0) {
+    const reservationCount = await prisma.reservation.count();
+    if (reservationCount === 0) {
       const sellers = await prisma.sellerProfile.findMany({ take: 5 });
-      const buyers = await prisma.user.findMany({ where: { role: "BUYER" }, take: 10 });
+      const buyers = await prisma.user.findMany({ where: { role: "CUSTOMER" }, take: 10 });
       const products = await prisma.product.findMany({ take: 20 });
 
-      const statuses: any[] = ["PENDING", "PAID", "CONFIRMED", "SHIPPING", "DELIVERED"];
+      const statuses: any[] = ["PENDING", "CONFIRMED", "COMPLETED"];
       let ordersCreated = 0;
 
       if (sellers.length > 0 && buyers.length > 0) {
@@ -128,18 +118,19 @@ export async function POST(req: NextRequest) {
           const qty = Math.floor(Math.random() * 3) + 1;
 
           try {
-            await prisma.order.create({
+            await prisma.reservation.create({
               data: {
-                orderNumber: `ORD-2024-${String(i + 1).padStart(4, "0")}`,
+                reservationNumber: `RSV-2024-${String(i + 1).padStart(4, "0")}`,
                 userId: buyer.id,
                 sellerId: seller.id,
+                reservationDate: new Date(Date.now() + (i % 7) * 86400000),
+                reservationTime: `${String(10 + (i % 6)).padStart(2, "0")}:00`,
                 totalAmount: baseAmount,
                 discountAmount: discountAmount,
                 finalAmount: finalAmount,
                 status: statuses[i % statuses.length],
-                shippingName: buyer.name,
-                shippingPhone: `010-${String(Math.floor(Math.random() * 9000) + 1000)}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
-                shippingAddress: ["서울시 강남구 테헤란로 123", "경기도 성남시 분당구 판교로 256", "서울시 마포구 홍대입구로 45"][i % 3],
+                customerName: buyer.name,
+                customerPhone: `010-${String(Math.floor(Math.random() * 9000) + 1000)}-${String(Math.floor(Math.random() * 9000) + 1000)}`,
                 items: {
                   create: {
                     productId: product?.id || "dummy-product",
@@ -160,7 +151,7 @@ export async function POST(req: NextRequest) {
       }
       results.orders = ordersCreated;
     } else {
-      results.orders_existed = orderCount;
+      results.orders_existed = reservationCount;
     }
 
     // 5. Create dummy settlements if none exist

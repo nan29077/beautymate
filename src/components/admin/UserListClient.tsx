@@ -22,7 +22,7 @@ interface User {
   birthday?: string | null;
   role: string;
   isActive: boolean;
-  orderCount: number;
+  reservationCount: number;
   reviewCount: number;
   createdAt: string;
   // 소셜 가입 제공자(kakao·naver·google). 비어 있으면 이메일 가입.
@@ -33,14 +33,12 @@ interface User {
 }
 
 const dashPath = (r: string) =>
-  r === "SUPER_ADMIN" ? "/admin" : r === "MIDDLE_ADMIN" ? "/middle" : r === "SELLER" ? "/seller" : r === "BRAND_ADMIN" ? "/brand" : "/";
+  r === "SUPER_ADMIN" ? "/admin" : r === "CONSULTANT" ? "/seller" : "/";
 
 const ROLE_MAP: Record<string, { label: string; color: string; order: number }> = {
   SUPER_ADMIN: { label: "관리자", color: "bg-red-50 text-red-600", order: 1 },
-  MIDDLE_ADMIN: { label: "중간관리자", color: "bg-amber-50 text-amber-600", order: 2 },
-  BRAND_ADMIN: { label: "브랜드", color: "bg-purple-50 text-purple-600", order: 3 },
-  SELLER: { label: "상담사", color: "bg-blue-50 text-blue-600", order: 4 },
-  BUYER: { label: "고객", color: "bg-green-50 text-green-600", order: 5 },
+  CONSULTANT: { label: "상담사", color: "bg-blue-50 text-blue-600", order: 4 },
+  CUSTOMER: { label: "고객", color: "bg-green-50 text-green-600", order: 5 },
 };
 
 export default function UserListClient({ users }: { users: User[] }) {
@@ -192,10 +190,8 @@ export default function UserListClient({ users }: { users: User[] }) {
   const roleCounts = useMemo(() => ({
     all: users.length,
     SUPER_ADMIN: users.filter(u => u.role === "SUPER_ADMIN").length,
-    MIDDLE_ADMIN: users.filter(u => u.role === "MIDDLE_ADMIN").length,
-    SELLER: users.filter(u => u.role === "SELLER").length,
-    BRAND_ADMIN: users.filter(u => u.role === "BRAND_ADMIN").length,
-    BUYER: users.filter(u => u.role === "BUYER").length,
+    CONSULTANT: users.filter(u => u.role === "CONSULTANT").length,
+    CUSTOMER: users.filter(u => u.role === "CUSTOMER").length,
   }), [users]);
 
   const sortedUsers = useMemo(() => {
@@ -248,10 +244,8 @@ export default function UserListClient({ users }: { users: User[] }) {
             >
               <option value="all">전체 ({roleCounts.all})</option>
               <option value="SUPER_ADMIN">관리자 ({roleCounts.SUPER_ADMIN})</option>
-              <option value="MIDDLE_ADMIN">중간관리자 ({roleCounts.MIDDLE_ADMIN})</option>
-              <option value="BRAND_ADMIN">브랜드 ({roleCounts.BRAND_ADMIN})</option>
-              <option value="SELLER">상담사 ({roleCounts.SELLER})</option>
-              <option value="BUYER">고객 ({roleCounts.BUYER})</option>
+              <option value="CONSULTANT">상담사 ({roleCounts.CONSULTANT})</option>
+              <option value="CUSTOMER">고객 ({roleCounts.CUSTOMER})</option>
             </select>
           </div>
         </div>
@@ -287,7 +281,7 @@ export default function UserListClient({ users }: { users: User[] }) {
       {/* Mobile Card View */}
       <div className="space-y-2 lg:hidden">
         {pageItems.map((user) => {
-          const role = ROLE_MAP[user.role] || ROLE_MAP.BUYER;
+          const role = ROLE_MAP[user.role] || ROLE_MAP.CUSTOMER;
           return (
             <div key={user.id} className="bg-white rounded-xl border border-gray-100 p-3.5">
               <div className="flex items-center gap-3">
@@ -300,7 +294,7 @@ export default function UserListClient({ users }: { users: User[] }) {
                     <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0 ${role.color}`}>
                       {role.label}
                     </span>
-                    {user.role === "SELLER" && user.sellerId && (
+                    {user.role === "CONSULTANT" && user.sellerId && (
                       <button
                         onClick={() => openCommEdit(user)}
                         className="text-[9px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0 bg-indigo-50 text-indigo-600 flex items-center gap-0.5 hover:bg-indigo-100"
@@ -318,7 +312,7 @@ export default function UserListClient({ users }: { users: User[] }) {
                   <div className="mt-1"><SignupBadges providers={user.authProviders} /></div>
                 </div>
                 <div className="text-right flex-shrink-0">
-                  <p className="text-xs text-gray-500">예약 {user.orderCount}</p>
+                  <p className="text-xs text-gray-500">예약 {user.reservationCount}</p>
                   <p className="text-[10px] text-gray-400">{new Date(user.createdAt).toLocaleDateString("ko-KR")}</p>
                 </div>
               </div>
@@ -366,7 +360,7 @@ export default function UserListClient({ users }: { users: User[] }) {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {pageItems.map((user) => {
-                const role = ROLE_MAP[user.role] || ROLE_MAP.BUYER;
+                const role = ROLE_MAP[user.role] || ROLE_MAP.CUSTOMER;
                 return (
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
@@ -385,7 +379,7 @@ export default function UserListClient({ users }: { users: User[] }) {
                         <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${role.color}`}>
                           {role.label}
                         </span>
-                        {user.role === "SELLER" && user.sellerId && (
+                        {user.role === "CONSULTANT" && user.sellerId && (
                           <button
                             onClick={() => openCommEdit(user)}
                             className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 flex items-center gap-0.5 hover:bg-indigo-100 transition-colors"
@@ -397,7 +391,7 @@ export default function UserListClient({ users }: { users: User[] }) {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-gray-500">{user.orderCount}</td>
+                    <td className="px-4 py-3 text-gray-500">{user.reservationCount}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center gap-1 text-[10px] ${user.isActive ? "text-green-600" : "text-red-500"}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${user.isActive ? "bg-green-500" : "bg-red-500"}`} />
@@ -547,7 +541,7 @@ export default function UserListClient({ users }: { users: User[] }) {
       {/* 회원정보 확인 모달 */}
       {infoTarget && (() => {
         const u = infoTarget;
-        const ur = ROLE_MAP[u.role] || ROLE_MAP.BUYER;
+        const ur = ROLE_MAP[u.role] || ROLE_MAP.CUSTOMER;
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-4" onClick={() => setInfoTarget(null)}>
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-5 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -564,7 +558,7 @@ export default function UserListClient({ users }: { users: User[] }) {
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <p className="text-base font-bold text-gray-900">{u.name}</p>
                     <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full ${ur.color}`}>{ur.label}</span>
-                    {u.role === "SELLER" && u.sellerId && (
+                    {u.role === "CONSULTANT" && u.sellerId && (
                       <button
                         onClick={() => { setInfoTarget(null); openCommEdit(u); }}
                         className="text-[9px] font-medium px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-600 flex items-center gap-0.5 hover:bg-indigo-100"
@@ -588,14 +582,14 @@ export default function UserListClient({ users }: { users: User[] }) {
                 <div className="flex items-center gap-2 text-gray-600"><Icon name="Login" size={13} className="text-gray-400" /> 가입경로 <SignupBadges providers={u.authProviders} /></div>
                 <div className="flex items-center gap-2 text-gray-600"><Icon name="Calendar" size={13} className="text-gray-400" /> 가입 {new Date(u.createdAt).toLocaleDateString("ko-KR")}</div>
                 <div className="flex items-center gap-3 pt-1">
-                  <span className="flex items-center gap-1 text-gray-600"><Icon name="Cart" size={13} className="text-gray-400" /> 예약 {u.orderCount}</span>
+                  <span className="flex items-center gap-1 text-gray-600"><Icon name="Cart" size={13} className="text-gray-400" /> 예약 {u.reservationCount}</span>
                   <span className="flex items-center gap-1 text-gray-600"><Icon name="Star" size={13} className="text-gray-400" /> 후기 {u.reviewCount}</span>
                 </div>
               </div>
 
-              {u.orderCount > 0 && (
+              {u.reservationCount > 0 && (
                 <div className="mt-3">
-                  <FanPurchaseHistory userId={u.id} userName={u.name} orderCount={u.orderCount} />
+                  <FanPurchaseHistory userId={u.id} userName={u.name} reservationCount={u.reservationCount} />
                 </div>
               )}
 

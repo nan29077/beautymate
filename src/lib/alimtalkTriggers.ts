@@ -2,23 +2,16 @@ import { prisma } from "@/lib/prisma";
 import { normalizePhone } from "@/lib/aligo";
 import { sendTemplatedAlimtalk, type TemplatedSendResult } from "@/lib/alimtalkEngine";
 
-// 주소 문자열에서 구/면, 동/리 수준 행정구역만 추출 (예약접수 알림용 — 전체 주소 노출 방지)
-function parseAddressDistrict(address: string | null | undefined): { gu: string; dong: string } {
-  const tokens = (address || "").split(/\s+/).filter(Boolean);
-  const gu = tokens.find((t) => /(구|군|면)$/.test(t)) || tokens[1] || "";
-  const dong = tokens.find((t) => /(동|리|읍|가)\d*$/.test(t) || /(로|길)\d*$/.test(t)) || tokens[2] || "";
-  return { gu: gu || "-", dong: dong || "-" };
-}
-
 /** 결제 완료 시 해당 점집 상담사에게 예약 접수 알림톡 발송. 실패해도 결제 흐름에 영향 없음. */
 export async function notifyOrderPlacedToSeller(orderId: string): Promise<TemplatedSendResult> {
-  const order = await prisma.order.findUnique({
+  const order = await prisma.reservation.findUnique({
     where: { id: orderId },
     select: {
-      orderNumber: true,
+      reservationNumber: true,
       finalAmount: true,
-      shippingName: true,
-      shippingAddress: true,
+      customerName: true,
+      reservationDate: true,
+      reservationTime: true,
       user: { select: { name: true } },
       seller: { select: { id: true, shopName: true, user: { select: { name: true, phone: true } } } },
     },
@@ -28,15 +21,16 @@ export async function notifyOrderPlacedToSeller(orderId: string): Promise<Templa
   const phone = normalizePhone(order.seller.user.phone);
   if (!phone) return { notified: false, reason: "상담사 전화번호 없음" };
 
-  const { gu, dong } = parseAddressDistrict(order.shippingAddress);
+  const kstDate = new Date(order.reservationDate.getTime() + 9 * 3600 * 1000);
+  const reservationYmd = `${kstDate.getUTCFullYear()}-${String(kstDate.getUTCMonth() + 1).padStart(2, "0")}-${String(kstDate.getUTCDate()).padStart(2, "0")}`;
   return sendTemplatedAlimtalk({
     purpose: "ORDER_PLACED",
     variables: {
       "셀러샵명": order.seller.shopName,
-      "주문자명": order.shippingName || order.user.name || "고객",
-      "주문번호": order.orderNumber,
-      "구/면": gu,
-      "동/리": dong,
+      "주문자명": order.customerName || order.user.name || "고객",
+      "예약번호": order.reservationNumber,
+      "예약일": reservationYmd,
+      "예약시간": order.reservationTime,
       "결제금액": Number(order.finalAmount).toLocaleString("ko-KR"),
     },
     recipients: [{ phone, name: order.seller.user.name || "상담사" }],
@@ -44,38 +38,42 @@ export async function notifyOrderPlacedToSeller(orderId: string): Promise<Templa
   });
 }
 
-/** 운송장 입력 시 고객에게 상담 시작 안내 알림톡 발송. */
-export async function notifyShippingStartToBuyer(orderId: string): Promise<TemplatedSendResult> {
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
+/** 예약 확정 시 고객에게 상담 일정 안내 알림톡 발송. */
+export async function notifyReservationConfirmedToCustomer(
+  reservationId: string,
+): Promise<TemplatedSendResult> {
+  const reservation = await prisma.reservation.findUnique({
+    where: { id: reservationId },
     select: {
-      shippingName: true,
-      shippingPhone: true,
-      deliveryTracking: true,
+      customerName: true,
+      customerPhone: true,
+      reservationDate: true,
+      reservationTime: true,
       user: { select: { name: true, phone: true } },
       seller: { select: { id: true, shopName: true } },
     },
   });
-  if (!order) return { notified: false, reason: "예약 없음" };
-  if (!order.deliveryTracking) return { notified: false, reason: "운송장 번호 없음" };
+  if (!reservation) return { notified: false, reason: "예약 없음" };
 
-  const phone = normalizePhone(order.shippingPhone || order.user.phone);
+  const phone = normalizePhone(reservation.customerPhone || reservation.user.phone);
   if (!phone) return { notified: false, reason: "고객 전화번호 없음" };
 
-  // 발송 날짜는 KST 기준
-  const kstNow = new Date(Date.now() + 9 * 3600 * 1000);
-  const dateStr = `${kstNow.getUTCFullYear()}-${String(kstNow.getUTCMonth() + 1).padStart(2, "0")}-${String(kstNow.getUTCDate()).padStart(2, "0")}`;
+  // 예약일은 KST 기준
+  const kstDate = new Date(reservation.reservationDate.getTime() + 9 * 3600 * 1000);
+  const dateStr = `${kstDate.getUTCFullYear()}-${String(kstDate.getUTCMonth() + 1).padStart(2, "0")}-${String(kstDate.getUTCDate()).padStart(2, "0")}`;
 
   return sendTemplatedAlimtalk({
-    purpose: "SHIPPING_START",
+    purpose: "RESERVATION_CONFIRMED",
     variables: {
-      "고객명": order.shippingName || order.user.name || "고객",
-      "셀러샵명": order.seller.shopName,
-      "택배발송 날짜": dateStr,
-      "송장번호": order.deliveryTracking,
+      "고객명": reservation.customerName || reservation.user.name || "고객",
+      "셀러샵명": reservation.seller.shopName,
+      "예약일": dateStr,
+      "예약시간": reservation.reservationTime,
     },
-    recipients: [{ phone, name: order.shippingName || order.user.name || "고객님" }],
-    sellerId: order.seller.id,
+    recipients: [
+      { phone, name: reservation.customerName || reservation.user.name || "고객님" },
+    ],
+    sellerId: reservation.seller.id,
   });
 }
 

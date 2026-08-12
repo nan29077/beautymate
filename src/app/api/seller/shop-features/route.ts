@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
-  if (session.user?.role !== "SELLER") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+  if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
 
   const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
   if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
-  if (session.user?.role !== "SELLER") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+  if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
 
   const seller = await prisma.sellerProfile.findUnique({
     where: { userId: session.user!.id },

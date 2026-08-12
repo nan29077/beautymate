@@ -11,7 +11,7 @@ import { generateUniqueSellerReferralCode } from "@/lib/mentorReferral";
 export async function GET() {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
-  if ((session.user as any).role !== "SELLER")
+  if ((session.user as any).role !== "CONSULTANT")
     return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
 
   const user = await (prisma as any).user.findUnique({
@@ -32,7 +32,7 @@ export async function GET() {
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "";
-  const referralLink = `${siteUrl}/auth/register?role=SELLER&sellerRef=${code}`;
+  const referralLink = `${siteUrl}/auth/register?role=CONSULTANT&sellerRef=${code}`;
 
   return NextResponse.json({ code, referralLink });
 }

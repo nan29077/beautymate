@@ -34,7 +34,7 @@ export async function GET() {
           },
         },
       },
-      orders: {
+      reservations: {
         include: { seller: true, items: true },
         orderBy: { createdAt: "desc" },
         take: 3,
@@ -43,7 +43,6 @@ export async function GET() {
         include: {
           product: {
             include: {
-              brand: true,
               sellerProducts: {
                 where: { isActive: true },
                 include: { seller: true },
@@ -56,7 +55,7 @@ export async function GET() {
         take: 6,
       },
       sellerProfile: { select: { id: true, isApproved: true } },
-      _count: { select: { orders: true, reviews: true, cartItems: true, wishlists: true } },
+      _count: { select: { reservations: true, reviews: true, cartItems: true, wishlists: true } },
     },
   });
 
@@ -78,7 +77,7 @@ export async function GET() {
     },
   }));
 
-  const orders = user.orders.map((o) => ({
+  const orders = user.reservations.map((o) => ({
     ...o,
     finalAmount: Number(o.finalAmount),
     discountAmount: o.discountAmount ? Number(o.discountAmount) : null,

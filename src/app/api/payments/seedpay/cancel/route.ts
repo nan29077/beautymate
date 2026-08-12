@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "orderId가 필요합니다." }, { status: 400 });
   }
 
-  const order = await prisma.order.findUnique({ where: { id: orderId } });
+  const order = await prisma.reservation.findUnique({ where: { id: orderId } });
   if (!order) {
     return NextResponse.json({ error: "예약을 찾을 수 없습니다." }, { status: 404 });
   }
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
       );
     }
 
-    await prisma.order.update({
+    await prisma.reservation.update({
       where: { id: order.id },
       data: {
         status: partCanFlg === "0" ? "CANCELLED" : order.status,

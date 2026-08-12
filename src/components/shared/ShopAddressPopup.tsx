@@ -37,7 +37,7 @@ export default function ShopAddressPopup({ sellerSlug }: { sellerSlug: string })
   useEffect(() => {
     if (status !== "authenticated") return;
     const role = (session?.user as any)?.role;
-    if (role !== "BUYER") return;
+    if (role !== "CUSTOMER") return;
 
     try {
       if (sessionStorage.getItem(storageKey)) return;

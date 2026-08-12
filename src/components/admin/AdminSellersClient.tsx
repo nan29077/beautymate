@@ -142,7 +142,7 @@ export default function AdminSellersClient({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          recipientType: "SELLER",
+          recipientType: "CONSULTANT",
           userId: adjustTarget.seller.userId,
           amount: finalAmount,
           memo: adjustMemo || null,

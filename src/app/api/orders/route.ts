@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { computeSellerMargin } from "@/lib/margin";
-import { computeOrderShipping } from "@/lib/shipping";
 import { getPlatformFees, productSettlementRecipient } from "@/lib/settlement";
 
 
@@ -21,39 +19,18 @@ export async function GET() {
   const role = session.user.role;
   const where: any = {};
 
-  if (role === "BUYER") {
+  if (role === "CUSTOMER") {
     where.userId = session.user!.id;
-  } else if (role === "SELLER") {
+  } else if (role === "CONSULTANT") {
     // 상담사: 자신의 점집(자신이 등록·판매한 상담상품)의 예약만
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });
     where.sellerId = seller?.id ?? "__none__";
-  } else if (role === "BRAND_ADMIN") {
-    // 브랜드사: 자사 상담상품이 포함된 예약만
-    const brand = await prisma.brandProfile.findUnique({
-      where: { userId: session.user!.id },
-      include: { products: { select: { id: true } } },
-    });
-    const productIds = brand?.products.map((p) => p.id) ?? [];
-    where.items = { some: { productId: { in: productIds.length ? productIds : ["__none__"] } } };
-  } else if (role === "MIDDLE_ADMIN") {
-    // 중간관리자: 소속 상담사의 예약 + 소속 브랜드 상담상품이 포함된 예약
-    const middle = await prisma.middleAdminProfile.findUnique({
-      where: { userId: session.user!.id },
-      include: { sellers: { select: { id: true } }, brands: { select: { products: { select: { id: true } } } } },
-    });
-    const sellerIds = middle?.sellers.map((s) => s.id) ?? [];
-    const brandProductIds = middle?.brands.flatMap((b) => b.products.map((p) => p.id)) ?? [];
-    where.OR = [
-      ...(sellerIds.length ? [{ sellerId: { in: sellerIds } }] : []),
-      ...(brandProductIds.length ? [{ items: { some: { productId: { in: brandProductIds } } } }] : []),
-      ...(!sellerIds.length && !brandProductIds.length ? [{ id: "__none__" }] : []),
-    ];
   }
   // SUPER_ADMIN: where 비움 = 전체 예약
 
-  const orders = await prisma.order.findMany({
+  const orders = await prisma.reservation.findMany({
     where,
     include: {
       user: { select: { name: true, email: true } },
@@ -68,7 +45,6 @@ export async function GET() {
     orders: orders.map((o) => ({
       ...o,
       totalAmount: Number(o.totalAmount),
-      shippingFee: Number(o.shippingFee),
       discountAmount: Number(o.discountAmount),
       finalAmount: Number(o.finalAmount),
       items: o.items.map((item) => ({
@@ -92,10 +68,14 @@ export async function POST(request: Request) {
     sellerId,
     campaignId,
     items,
-    shippingName,
-    shippingPhone,
-    shippingAddress,
-    shippingMemo,
+    customerName,
+    customerPhone,
+    reservationDate,
+    reservationTime,
+    birthDate,
+    birthTime,
+    gender,
+    consultingContent,
     snsAccounts,
     couponCode,
   } = body;
@@ -114,6 +94,21 @@ export async function POST(request: Request) {
 
   if (!sellerId || !Array.isArray(items) || items.length === 0) {
     return NextResponse.json({ error: "예약 정보가 올바르지 않습니다." }, { status: 400 });
+  }
+
+  // 예약 필수 정보 — 날짜/시간/신청자
+  const reservationDateValue = reservationDate ? new Date(reservationDate) : null;
+  if (!reservationDateValue || Number.isNaN(reservationDateValue.getTime())) {
+    return NextResponse.json({ error: "예약 날짜가 올바르지 않습니다." }, { status: 400 });
+  }
+  if (typeof reservationTime !== "string" || !/^\d{2}:\d{2}$/.test(reservationTime)) {
+    return NextResponse.json({ error: "예약 시간이 올바르지 않습니다." }, { status: 400 });
+  }
+  if (typeof customerName !== "string" || !customerName.trim()) {
+    return NextResponse.json({ error: "예약자 이름을 입력해 주세요." }, { status: 400 });
+  }
+  if (typeof customerPhone !== "string" || !customerPhone.trim()) {
+    return NextResponse.json({ error: "연락처를 입력해 주세요." }, { status: 400 });
   }
 
   // 상담사 존재 확인 (할인/커미션 계산에도 재사용)
@@ -145,7 +140,7 @@ export async function POST(request: Request) {
 
   // 예약번호 생성
   const now = new Date();
-  const orderNumber = `SB${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+  const reservationNumber = `SB${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
   // ─── 정산 스냅샷용 요율 (예약 시점 고정) ───
   // 상담사 개별 요율이 있으면 우선, 없으면 전역 플랫폼 요율. settlement.ts 의 판정과 동일하게 맞춘다.
@@ -156,16 +151,6 @@ export async function POST(request: Request) {
   // ─── 금액 계산: 가격·상담상품명은 전부 서버 DB 기준. 클라이언트 price/productName 무시. ───
   let totalAmount = 0;
   const orderItems: any[] = [];
-  // 중간관리자 브랜드 마진 적립용 — 상담상품별 브랜드/마진 스냅샷 (OrderItem 에는 저장하지 않음)
-  const marginItems: {
-    brandId: string | null;
-    brandMiddleAdminId: string | null;
-    unitMargin: number; // product.middleAdminMargin (단가 기준 스냅샷)
-    quantity: number;
-    saleAmount: number; // 판매가 × 수량
-  }[] = [];
-  // 배송비 계산용 — 예약에 포함된 상담상품들의 상담 방식 설정
-  const shippingConfigs: { shippingFee: number; freeShipping: boolean; freeShippingThreshold: number | null }[] = [];
   // 일반상담상품(DirectProduct) 재고 차감 대상 — 예약 생성 트랜잭션 안에서 원자적으로 차감한다.
   const directStockOps: { id: string; quantity: number }[] = [];
 
@@ -185,7 +170,7 @@ export async function POST(request: Request) {
     if (item.itemType === "DIRECT") {
       const direct = await prisma.directProduct.findUnique({
         where: { id: item.productId },
-        select: { id: true, name: true, price: true, shippingFee: true, stock: true, isActive: true, sellerId: true },
+        select: { id: true, name: true, price: true, stock: true, isActive: true, sellerId: true },
       });
       if (!direct || !direct.isActive) {
         return NextResponse.json({ error: "판매 중이 아닌 상담상품이 포함되어 있습니다." }, { status: 400 });
@@ -222,19 +207,12 @@ export async function POST(request: Request) {
         sellerFeeRateSnap,
         supplierFeeRateSnap: null,
         isSellerProductSnap: true,
-        recipientRole: "SELLER",
+        recipientRole: "CONSULTANT",
         recipientId: sellerId,
       });
 
       directStockOps.push({ id: direct.id, quantity });
 
-      // DirectProduct 에는 무료배송 기준금액 개념이 없다 — 배송비 0원이면 무료배송.
-      const directShippingFee = Number(direct.shippingFee);
-      shippingConfigs.push({
-        shippingFee: directShippingFee,
-        freeShipping: directShippingFee === 0,
-        freeShippingThreshold: null,
-      });
 
       // 공급자·브랜드가 없으므로 중간관리자 브랜드 마진 적립 대상이 아니다.
       continue;
@@ -247,21 +225,12 @@ export async function POST(request: Request) {
         name: true,
         basePrice: true,
         isActive: true,
-        totalStock: true,
-        // ─── 배송비 계산용 ───
-        shippingFee: true,
-        freeShipping: true,
-        freeShippingThreshold: true,
-        // ─── 중간관리자 브랜드 마진 적립용 ───
-        brandId: true,
-        middleAdminMargin: true,
-        brand: { select: { middleAdminId: true } },
+        maxDailySlots: true,
         // ─── 정산 스냅샷용 ───
         supplyPrice: true,
         priceModel: true,
         commissionRate: true,
         sellerId: true,
-        middleAdminId: true,
       },
     });
     if (!product || !product.isActive) {
@@ -269,11 +238,11 @@ export async function POST(request: Request) {
     }
 
     // variant 검증 — 존재 + 해당 상담상품 소속 + 재고
-    let variant: { id: string; name: string; price: any; stock: number; isActive: boolean } | null = null;
+    let variant: { id: string; name: string; price: any; isActive: boolean } | null = null;
     if (item.variantId) {
       const v = await prisma.productVariant.findUnique({
         where: { id: item.variantId },
-        select: { id: true, name: true, price: true, stock: true, isActive: true, productId: true },
+        select: { id: true, name: true, price: true, isActive: true, productId: true },
       });
       if (!v || v.productId !== product.id || !v.isActive) {
         return NextResponse.json({ error: "선택한 옵션을 찾을 수 없습니다." }, { status: 400 });
@@ -286,10 +255,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "단체 상담 상담상품 정보가 올바르지 않습니다." }, { status: 400 });
     }
 
-    // 재고 검증 — variant 가 있으면 variant.stock, 없으면 product.totalStock
-    const availableStock = variant ? variant.stock : product.totalStock;
-    if (availableStock < quantity) {
-      return NextResponse.json({ error: `재고가 부족합니다. (남은 수량: ${availableStock})` }, { status: 400 });
+    // 하루 예약 정원 검증 — 같은 날짜에 이미 잡힌 예약 수가 maxDailySlots 를 넘지 못한다.
+    const dayStart = new Date(reservationDateValue);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+    const bookedCount = await prisma.reservation.count({
+      where: {
+        sellerId,
+        reservationDate: { gte: dayStart, lt: dayEnd },
+        status: { notIn: ["CANCELLED", "NO_SHOW"] },
+      },
+    });
+    if (bookedCount + quantity > product.maxDailySlots) {
+      return NextResponse.json(
+        { error: `해당 날짜의 예약이 마감되었습니다. (하루 최대 ${product.maxDailySlots}건)` },
+        { status: 400 },
+      );
     }
 
     // 가격 우선순위: 캠페인가 > variant가 > 기본가 (checkout/page.tsx 와 동일, 전부 서버 값)
@@ -318,29 +300,12 @@ export async function POST(request: Request) {
       productCommissionRateSnap:
         product.commissionRate != null ? Number(product.commissionRate) : null,
       sellerFeeRateSnap,
-      supplierFeeRateSnap: product.middleAdminId
-        ? platformFees.middleAdminFeeRate
-        : platformFees.brandFeeRate,
+      supplierFeeRateSnap: platformFees.sellerFeeRate,
       isSellerProductSnap: product.sellerId === sellerId,
       recipientRole: recipient?.role ?? null,
       recipientId: recipient?.id ?? null,
     });
 
-    // 상담 방식 설정 누적 (묶음배송: 상담상품별 배송비 최댓값을 한 번만 부과)
-    shippingConfigs.push({
-      shippingFee: Number(product.shippingFee),
-      freeShipping: product.freeShipping,
-      freeShippingThreshold: product.freeShippingThreshold != null ? Number(product.freeShippingThreshold) : null,
-    });
-
-    // 중간관리자 브랜드 마진 스냅샷 누적
-    marginItems.push({
-      brandId: product.brandId,
-      brandMiddleAdminId: product.brand?.middleAdminId ?? null,
-      unitMargin: Number(product.middleAdminMargin ?? 0),
-      quantity,
-      saleAmount: itemTotal,
-    });
   }
 
   // ─── 할인 계산 ───
@@ -437,10 +402,8 @@ export async function POST(request: Request) {
   }
   const anyCouponApplied = !!appliedCouponId || !!appliedGameCouponRowId;
 
-  // 배송비: 상담상품 상담 방식 설정 기준 (무료배송/기준금액 반영). 소계는 할인 전 금액 기준.
-  const shippingFee = computeOrderShipping(shippingConfigs, totalAmount);
   const totalDiscountAmount = discountAmount + couponDiscountAmount;
-  const finalAmount = totalAmount - totalDiscountAmount - cartDiscountAmount + shippingFee;
+  const finalAmount = totalAmount - totalDiscountAmount - cartDiscountAmount;
   const totalQty = orderItems.reduce((acc: number, i: any) => acc + i.quantity, 0);
 
   // 상담사의 멘토 정보 조회 (멘토-멘티 추천인 커미션)
@@ -494,70 +457,6 @@ export async function POST(request: Request) {
     }
   }
 
-  // ─── 중간관리자 마진 적립 레코드 사전 산정 (읽기는 트랜잭션 밖, 쓰기는 안에서) ───
-  // 경로 1) 브랜드 마진: 브랜드의 중간관리자별로 (middleAdminId, brandId) 합산.
-  //   marginAmount = Σ(product.middleAdminMargin × quantity), orderAmount = Σ(판매매출)
-  // 경로 2) 상담사 마진: 상담사의 중간관리자에게 computeSellerMargin(예약 판매매출, rate) 1건.
-  const middleAdminCommissions: {
-    middleAdminId: string;
-    source: "brand" | "seller";
-    brandId: string | null;
-    sellerId: string | null;
-    orderAmount: number;
-    marginAmount: number;
-  }[] = [];
-
-  try {
-    // 경로 1) 브랜드 마진 — (middleAdminId|brandId) 키로 합산
-    const brandAgg = new Map<
-      string,
-      { middleAdminId: string; brandId: string; orderAmount: number; marginAmount: number }
-    >();
-    for (const mi of marginItems) {
-      if (!mi.brandMiddleAdminId || !mi.brandId) continue;
-      if (mi.unitMargin <= 0) continue;
-      const key = `${mi.brandMiddleAdminId}|${mi.brandId}`;
-      const cur =
-        brandAgg.get(key) ??
-        { middleAdminId: mi.brandMiddleAdminId, brandId: mi.brandId, orderAmount: 0, marginAmount: 0 };
-      cur.orderAmount += mi.saleAmount;
-      cur.marginAmount += mi.unitMargin * mi.quantity;
-      brandAgg.set(key, cur);
-    }
-    for (const v of brandAgg.values()) {
-      if (v.marginAmount <= 0) continue; // 0 이면 skip
-      middleAdminCommissions.push({
-        middleAdminId: v.middleAdminId,
-        source: "brand",
-        brandId: v.brandId,
-        sellerId: null,
-        orderAmount: Math.round(v.orderAmount),
-        marginAmount: Math.round(v.marginAmount),
-      });
-    }
-
-    // 경로 2) 상담사 마진 — 상담사에 중간관리자가 있고 요율 > 0 이면 1건
-    const sellerMiddleAdminId = (seller as any).middleAdminId as string | null;
-    const sellerMarginRate = Number((seller as any).middleAdminMarginRate ?? 0);
-    if (sellerMiddleAdminId && sellerMarginRate > 0) {
-      const sellerMargin = computeSellerMargin(totalAmount, sellerMarginRate);
-      if (sellerMargin > 0) {
-        middleAdminCommissions.push({
-          middleAdminId: sellerMiddleAdminId,
-          source: "seller",
-          brandId: null,
-          sellerId: seller.id,
-          orderAmount: Math.round(totalAmount),
-          marginAmount: sellerMargin,
-        });
-      }
-    }
-  } catch (e) {
-    // 적립 산정 실패가 예약을 막아서는 안 됨 — 로깅 후 적립 없이 진행
-    console.error("[orders] 중간관리자 마진 산정 실패:", e);
-    middleAdminCommissions.length = 0;
-  }
-
   // ─── 예약 생성 + 캠페인 카운터 + 커미션 + 장바구니 정리를 원자적으로 ───
   const runOrderTransaction = () => prisma.$transaction(async (tx) => {
     // 일반상담상품 재고 차감 — 조건부 update 로 경합을 막는다.
@@ -571,14 +470,13 @@ export async function POST(request: Request) {
       if (updated.count !== 1) throw new DirectStockError();
     }
 
-    const created = await tx.order.create({
+    const created = await tx.reservation.create({
       data: {
-        orderNumber,
+        reservationNumber,
         userId: session.user!.id,
         sellerId,
         campaignId: campaignId || null,
         totalAmount,
-        shippingFee,
         // discountAmount 는 표시용 총할인(추천인/픽 + 쿠폰 + 장바구니).
         // cartDiscountAmount 는 그중 상담사 부담분만 별도 기록 — 정산 차감(lib/settlement.ts)에 사용.
         discountAmount: totalDiscountAmount + cartDiscountAmount,
@@ -587,10 +485,17 @@ export async function POST(request: Request) {
           : discountType,
         cartDiscountAmount,
         finalAmount,
-        shippingName,
-        shippingPhone,
-        shippingAddress,
-        shippingMemo,
+        reservationDate: reservationDateValue,
+        reservationTime,
+        customerName: customerName.trim(),
+        customerPhone: customerPhone.trim(),
+        birthDate: typeof birthDate === "string" && birthDate.trim() ? birthDate.trim() : null,
+        birthTime: typeof birthTime === "string" && birthTime.trim() ? birthTime.trim() : null,
+        gender: typeof gender === "string" && gender.trim() ? gender.trim() : null,
+        consultingContent:
+          typeof consultingContent === "string" && consultingContent.trim()
+            ? consultingContent.trim()
+            : null,
         snsAccounts: snsAccountsJson,
         sellerFeeRateSnap,
         items: { create: orderItems },
@@ -613,7 +518,7 @@ export async function POST(request: Request) {
       await tx.referralCommission.create({
         data: {
           sellerId: commission.sellerId,
-          orderId: created.id,
+          reservationId: created.id,
           buyerUserId: session.user!.id,
           orderAmount: totalAmount,
           commissionRate: commission.commRate,
@@ -625,22 +530,6 @@ export async function POST(request: Request) {
       await tx.sellerProfile.update({
         where: { id: commission.sellerId },
         data: { totalReferralEarnings: { increment: commission.commAmount } },
-      });
-    }
-
-    // 중간관리자 마진 적립 (브랜드/상담사 경로별 별도 레코드)
-    for (const mc of middleAdminCommissions) {
-      await tx.middleAdminCommission.create({
-        data: {
-          middleAdminId: mc.middleAdminId,
-          orderId: created.id,
-          source: mc.source,
-          brandId: mc.brandId,
-          sellerId: mc.sellerId,
-          orderAmount: mc.orderAmount,
-          marginAmount: mc.marginAmount,
-          status: "PENDING",
-        },
       });
     }
 
@@ -717,7 +606,6 @@ export async function POST(request: Request) {
     order: {
       ...order,
       totalAmount: Number(order.totalAmount),
-      shippingFee: Number(order.shippingFee),
       discountAmount: Number(order.discountAmount),
       finalAmount: Number(order.finalAmount),
     },

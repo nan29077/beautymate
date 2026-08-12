@@ -43,7 +43,7 @@ export default async function MyPage() {
           },
         },
       },
-      orders: {
+      reservations: {
         include: { seller: true, items: true },
         orderBy: { createdAt: "desc" },
         take: 5,
@@ -53,7 +53,6 @@ export default async function MyPage() {
         include: {
           product: {
             include: {
-              brand: true,
               sellerProducts: {
                 where: { isActive: true },
                 include: { seller: true },
@@ -66,7 +65,7 @@ export default async function MyPage() {
         take: 6,
       },
       sellerProfile: { select: { id: true, isApproved: true } },
-      _count: { select: { orders: true, reviews: true, cartItems: true, wishlists: true } },
+      _count: { select: { reservations: true, reviews: true, cartItems: true, wishlists: true } },
     },
   });
 
@@ -85,7 +84,7 @@ export default async function MyPage() {
   const pickedSellers = user.buyerProfile?.follows || [];
 
   const menuItems = [
-    { href: "/my/orders", icon: "OrderHistory", label: "예약 내역", count: user._count.orders, color: "bg-blue-50" },
+    { href: "/my/orders", icon: "OrderHistory", label: "예약 내역", count: user._count.reservations, color: "bg-blue-50" },
     { href: "/cart", icon: "Cart", label: "장바구니", count: user._count.cartItems, color: "bg-brand-50" },
     { href: "/my/reviews", icon: "WriteReview", label: "내 후기", count: user._count.reviews, color: "bg-yellow-50" },
     { href: "/my/wishlist", icon: "Wishlist", label: "찜한 상담상품", count: user._count.wishlists, color: "bg-rose-50" },
@@ -140,7 +139,7 @@ export default async function MyPage() {
             <p className="text-[10px] text-gray-400">포인트</p>
           </Link>
           <Link href="/my/orders" className="text-center py-1">
-            <p className="text-lg font-bold text-gray-900">{user._count.orders}</p>
+            <p className="text-lg font-bold text-gray-900">{user._count.reservations}</p>
             <p className="text-[10px] text-gray-400">예약</p>
           </Link>
           <Link href="/my/reviews" className="text-center py-1">
@@ -303,7 +302,7 @@ export default async function MyPage() {
                         )}
                       </div>
                       <p className="text-[10px] text-gray-400 truncate">
-                        {p.sellerProducts[0]?.seller?.shopName || p.brand?.brandName || ""}
+                        {p.sellerProducts[0]?.seller?.shopName || ""}
                       </p>
                       <p className="text-xs font-medium text-gray-900 truncate">{p.name}</p>
                       <p className="text-xs font-bold text-gray-900">{formatPrice(Number(p.basePrice))}</p>
@@ -330,9 +329,9 @@ export default async function MyPage() {
               전체보기
             </Link>
           </div>
-          {user.orders.length > 0 ? (
+          {user.reservations.length > 0 ? (
             <div className="px-4 pb-3">
-              {user.orders.slice(0, 3).map((order) => (
+              {user.reservations.slice(0, 3).map((order) => (
                 <div
                   key={order.id}
                   className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0"
@@ -347,7 +346,7 @@ export default async function MyPage() {
                     </p>
                     <p className="text-[12px] font-semibold text-gray-700 mt-0.5">{user.name}</p>
                     <p className="text-[10px] text-gray-400 mt-0.5">
-                      {order.seller.shopName} · {new Date(order.createdAt).toLocaleDateString("ko-KR")} · 예약 {order.orderNumber}
+                      {order.seller.shopName} · {new Date(order.createdAt).toLocaleDateString("ko-KR")} · 예약 {order.reservationNumber}
                     </p>
                     {order.discountType && Number(order.discountAmount) > 0 && (
                       <span className="text-[9px] text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded-full mt-0.5 inline-block">
@@ -366,19 +365,19 @@ export default async function MyPage() {
                       {formatPrice(Number(order.finalAmount))}
                     </p>
                     <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                      order.status === "DELIVERED" ? "bg-green-50 text-green-600"
-                        : order.status === "SHIPPING" ? "bg-blue-50 text-blue-600"
+                      order.status === "COMPLETED" ? "bg-green-50 text-green-600"
+                        : order.status === "CONFIRMED" ? "bg-blue-50 text-blue-600"
                         : order.status === "CANCELLED" ? "bg-red-50 text-red-600"
                         : "bg-gray-50 text-gray-600"
                     }`}>
                       {order.status === "PENDING" && "결제대기"}
-                      {order.status === "PAID" && "결제완료"}
+                      {order.status === "PENDING" && "예약신청"}
                       {order.status === "CONFIRMED" && "확인됨"}
-                      {order.status === "SHIPPING" && "상담 진행중"}
-                      {order.status === "DELIVERED" && "상담 완료"}
+                      {order.status === "CONFIRMED" && "예약확정"}
+                      {order.status === "COMPLETED" && "상담완료"}
                       {order.status === "CANCELLED" && "취소됨"}
-                      {order.status === "REFUND_REQUESTED" && "환불요청"}
-                      {order.status === "REFUNDED" && "환불완료"}
+                      {order.status === "NO_SHOW" && "노쇼"}
+                      
                     </span>
                   </div>
                 </div>

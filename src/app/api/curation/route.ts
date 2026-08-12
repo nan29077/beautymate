@@ -21,14 +21,14 @@ export async function GET() {
       // 1. 실시간 인기 상담상품 (판매량 기준)
       prisma.product.findMany({
         where: { isActive: true, isApproved: true },
-        include: { brand: true, category: true },
+        include: { category: true },
         orderBy: { soldCount: "desc" },
         take: 10,
       }),
       // 2. 신상담상품 (최근 등록 + 승인)
       prisma.product.findMany({
         where: { isActive: true, isApproved: true },
-        include: { brand: true, category: true },
+        include: { category: true },
         orderBy: { createdAt: "desc" },
         take: 8,
       }),
@@ -56,7 +56,7 @@ export async function GET() {
             where: { isActive: true, isApproved: true },
             orderBy: { soldCount: "desc" },
             take: 4,
-            include: { brand: true },
+            include: {},
           },
         },
         orderBy: { sortOrder: "asc" },

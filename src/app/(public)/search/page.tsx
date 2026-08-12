@@ -54,7 +54,6 @@ export default async function SearchPage({
     },
     include: {
       category: true,
-      brand: true,
       sellerProducts: {
         include: { seller: { select: { shopName: true, slug: true } } },
         take: 1,
@@ -165,8 +164,7 @@ export default async function SearchPage({
                   <div className="p-2.5 flex-1 flex flex-col">
                     <Link href={`/products/${product.id}`} className="flex-1">
                       {seller && <p className="text-[9px] text-gray-400 truncate">{seller.shopName}</p>}
-                      {product.brand && !seller && <p className="text-[9px] text-gray-400 truncate">{product.brand.brandName}</p>}
-                      <h3 className="text-[12px] text-gray-800 line-clamp-2 leading-tight mt-0.5">{product.name}</h3>
+                                            <h3 className="text-[12px] text-gray-800 line-clamp-2 leading-tight mt-0.5">{product.name}</h3>
                       <div className="flex items-baseline gap-1 mt-1.5">
                         {discount > 0 && <span className="text-xs font-bold text-red-500">{discount}%</span>}
                         <p className="text-[13px] font-bold text-gray-900">{formatPrice(Number(product.basePrice))}</p>

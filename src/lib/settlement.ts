@@ -8,32 +8,27 @@
 // prisma 를 사용하므로 서버 컴포넌트 / route handler 에서만 사용하세요.
 
 import { prisma } from "@/lib/prisma";
-import { getSettlementBusinessDays, getMiddleSettleDays } from "@/lib/settings";
+import { getSettlementBusinessDays } from "@/lib/settings";
 import { getSettlementDate, startOfDay, toYmd } from "@/lib/businessDays";
 import { withVatRate } from "@/lib/utils";
 
 // ───── 정산 수취인 판정 ─────
-// A. 브랜드 직접 등록 (brandId 有, middleAdminId 無) → 브랜드사 (supplyPrice 기준)
-// B. 중간관리자 영업 브랜드 (middleAdminId 有)      → 중간관리자만 (supplyPrice 기준)
-// C. 상담사 본인 등록 (sellerId 有)                   → 상담사 (기존 상담사 정산)
-export type SettlementRole = "SELLER" | "MIDDLE_ADMIN" | "BRAND";
+// A. 상담사 본인 등록 (sellerId 有) → 상담사
+// B. 최고관리자 등록 (sellerId 無)  → 플랫폼(수취인 없음)
+export type SettlementRole = "CONSULTANT" | "SUPER_ADMIN";
 export type SettlementRecipient = { role: SettlementRole; id: string } | null;
 
 export function productSettlementRecipient(p: {
   sellerId?: string | null;
-  middleAdminId?: string | null;
-  brandId?: string | null;
 }): SettlementRecipient {
-  if (p.sellerId) return { role: "SELLER", id: p.sellerId };
-  if (p.middleAdminId) return { role: "MIDDLE_ADMIN", id: p.middleAdminId };
-  if (p.brandId) return { role: "BRAND", id: p.brandId };
+  if (p.sellerId) return { role: "CONSULTANT", id: p.sellerId };
   return null;
 }
 
 // 정산 대상 예약 1건의 계산 결과
 export interface SettlementOrder {
   orderId: string;
-  orderNumber: string;
+  reservationNumber: string;
   saleDate: string; // 판매(결제완료) 기준일 ISO
   settlementDate: string; // 정산 가능 전환일 ISO (영업일+N)
   settlementYmd: string; // 정산일 YYYY-MM-DD
@@ -56,7 +51,7 @@ export interface PayoutSummary {
   id: string;
   amount: number;
   netAmount: number;
-  orderCount: number;
+  reservationCount: number;
   status: string;
   isBusiness: boolean;
   bankName: string | null;
@@ -86,49 +81,31 @@ export interface SellerSettlementSummary {
 // 결제완료(paymentStatus=COMPLETED) & 취소/환불이 아닌 예약.
 function isSettleableOrder(paymentStatus: string, status: string): boolean {
   if (paymentStatus !== "COMPLETED") return false;
-  if (["CANCELLED", "REFUNDED", "REFUND_REQUESTED"].includes(status)) return false;
+  if (["CANCELLED", "NO_SHOW"].includes(status)) return false;
   return true;
 }
 
 const round = (n: number) => Math.round(n);
 
 // ───── 역할별 플랫폼 수수료율 ─────
-// PlatformFeeSettings(단일 레코드)에서 상담사/중간관리자/브랜드 수수료율(%)을 읽어 정산 계산에 사용한다.
+// PlatformFeeSettings(단일 레코드)에서 상담사 수수료율(%)을 읽어 정산 계산에 사용한다.
 export interface PlatformFees {
   sellerFeeRate: number; // % 단위 (예: 5.0)
-  middleAdminFeeRate: number;
-  brandFeeRate: number;
 }
 
 export const DEFAULT_PLATFORM_FEES: PlatformFees = {
   sellerFeeRate: 5,
-  middleAdminFeeRate: 5,
-  brandFeeRate: 5,
 };
 
-// PlatformFeeSettings 조회 (없거나 오류 시 기본값 5/5/5)
+// PlatformFeeSettings 조회 (없거나 오류 시 기본값 5)
 export async function getPlatformFees(): Promise<PlatformFees> {
   try {
     const row = await (prisma as any).platformFeeSettings.findFirst({ orderBy: { id: "asc" } });
     if (!row) return { ...DEFAULT_PLATFORM_FEES };
-    return {
-      sellerFeeRate: Number(row.sellerFeeRate),
-      middleAdminFeeRate: Number(row.middleAdminFeeRate),
-      brandFeeRate: Number(row.brandFeeRate),
-    };
+    return { sellerFeeRate: Number(row.sellerFeeRate) };
   } catch {
     return { ...DEFAULT_PLATFORM_FEES };
   }
-}
-
-// 공급자(브랜드/중간관리자) 수수료율 결정 — 중간관리자 영업 상담상품이면 중간관리자율, 그 외 브랜드율
-function resolveSupplierFeeRate(
-  product: { middleAdminId?: string | null; brandId?: string | null },
-  fees: PlatformFees,
-): number {
-  if (product.middleAdminId) return fees.middleAdminFeeRate;
-  if (product.brandId) return fees.brandFeeRate;
-  return fees.brandFeeRate; // 최고관리자 등록 상담상품도 brandFeeRate 적용
 }
 
 // 수수료율(%) → 정산 잔여 비율. 부가세 포함 실효율(rate × 1.1)을 차감한 비율.
@@ -153,15 +130,15 @@ export async function getSellerSettlementSummary(
   const sellerFeeMul = feeMultiplier(sellerRate);
 
   const [rawOrders, payoutRows] = await Promise.all([
-    prisma.order.findMany({
+    prisma.reservation.findMany({
       where: {
         sellerId,
         paymentStatus: "COMPLETED",
-        status: { notIn: ["CANCELLED", "REFUNDED", "REFUND_REQUESTED"] },
+        status: { notIn: ["CANCELLED", "NO_SHOW"] },
       },
       select: {
         id: true,
-        orderNumber: true,
+        reservationNumber: true,
         finalAmount: true,
         cartDiscountAmount: true,
         paidAt: true,
@@ -336,7 +313,7 @@ export async function getSellerSettlementSummary(
 
     orders.push({
       orderId: o.id,
-      orderNumber: o.orderNumber,
+      reservationNumber: o.reservationNumber,
       saleDate: saleDate.toISOString(),
       settlementDate: settlementDate.toISOString(),
       settlementYmd: toYmd(settlementDate),
@@ -374,7 +351,7 @@ export async function getSellerSettlementSummary(
     id: p.id,
     amount: Number(p.amount),
     netAmount: Number(p.netAmount),
-    orderCount: p.orderCount,
+    reservationCount: p.reservationCount,
     status: p.status,
     isBusiness: p.isBusiness,
     bankName: p.bankName,
@@ -401,229 +378,3 @@ export async function getSellerSettlementSummary(
   };
 }
 
-// ───── 브랜드/중간관리자 정산 집계 (상담사 정산과 동일한 요약 구조, 공급가 기준, 수수료 차감) ─────
-// 상담사 정산 UI(SellerSettlementClient)를 그대로 재사용할 수 있도록 SellerSettlementSummary 형태로 반환.
-// 출금(payout)은 브랜드/중간관리자에 없으므로 payouts=[], withdrawable=availableTotal 로 채운다.
-export async function getRecipientSettlementSummary(opts: {
-  role: "BRAND" | "MIDDLE_ADMIN";
-  recipientId: string;
-  fees: PlatformFees;
-  settleDays: number;
-}): Promise<SellerSettlementSummary> {
-  const today = startOfDay(new Date());
-  const productWhere =
-    opts.role === "BRAND"
-      ? { brandId: opts.recipientId, middleAdminId: null }
-      : { middleAdminId: opts.recipientId };
-
-  // 공급자 플랫폼 수수료율(%) — 브랜드/중간관리자 역할에 따라 결정, 부가세 포함 실효율 차감
-  const supplierFeeRate = opts.role === "BRAND" ? opts.fees.brandFeeRate : opts.fees.middleAdminFeeRate;
-  const vatSupplierRate = withVatRate(supplierFeeRate);
-  const supplierFeeMul = feeMultiplier(supplierFeeRate);
-
-  const products = await prisma.product.findMany({
-    where: productWhere,
-    select: { id: true, supplyPrice: true, name: true, priceModel: true, commissionRate: true },
-  });
-  const productMap = new Map(
-    products.map((p) => [
-      p.id,
-      {
-        supply: p.supplyPrice != null ? Number(p.supplyPrice) : 0,
-        name: p.name,
-        priceModel: String(p.priceModel),
-        commissionRate: p.commissionRate != null ? Number(p.commissionRate) : null,
-      },
-    ]),
-  );
-
-  const orders: SettlementOrder[] = [];
-  let availableTotal = 0;
-  let scheduledTotal = 0;
-
-  {
-    // 스냅샷이 있는 예약은 recipientRole/recipientId 로 직접 찾는다 — 이후 상담상품 소유자가
-    // 바뀌어도 과거 예약의 정산 귀속이 흔들리지 않는다.
-    // 스냅샷 이전 예약(recipientRole=null)만 현재 상담상품 소유 관계로 폴백한다.
-    const items = await prisma.orderItem.findMany({
-      where: {
-        order: { paymentStatus: "COMPLETED", status: { notIn: ["CANCELLED", "REFUNDED", "REFUND_REQUESTED"] } },
-        OR: [
-          { recipientRole: opts.role, recipientId: opts.recipientId },
-          ...(products.length > 0
-            ? [{ recipientRole: null, productId: { in: products.map((p) => p.id) } }]
-            : []),
-        ],
-      },
-      select: {
-        productId: true,
-        quantity: true,
-        totalPrice: true,
-        productName: true,
-        supplyPriceSnap: true,
-        priceModelSnap: true,
-        productCommissionRateSnap: true,
-        supplierFeeRateSnap: true,
-        recipientRole: true,
-        order: { select: { id: true, orderNumber: true, paidAt: true, createdAt: true, campaignId: true, campaign: { select: { title: true } } } },
-      },
-    });
-
-    // 예약 단위로 공급자 정산 기준액 합산 + 상담상품명 수집
-    // - SUPPLY(공급가) 상담상품: 공급가 × 수량
-    // - COMMISSION(수수료) 상담상품: 판매가 × (1 - 상담사 커미션율/100) = 공급자 몫
-    const byOrder = new Map<
-      string,
-      { gross: number; settle: number; order: (typeof items)[number]["order"]; names: string[] }
-    >();
-    for (const it of items) {
-      const hasSnap = it.recipientRole != null;
-      const live = productMap.get(it.productId);
-      const info = hasSnap
-        ? {
-            supply: it.supplyPriceSnap != null ? Number(it.supplyPriceSnap) : 0,
-            name: it.productName,
-            priceModel: it.priceModelSnap ?? "SUPPLY",
-            commissionRate:
-              it.productCommissionRateSnap != null ? Number(it.productCommissionRateSnap) : null,
-          }
-        : live;
-      if (!info) continue;
-
-      // 공급자 수수료율도 스냅샷 우선
-      const itemFeeMul =
-        hasSnap && it.supplierFeeRateSnap != null
-          ? feeMultiplier(Number(it.supplierFeeRateSnap))
-          : supplierFeeMul;
-
-      const itemSale = Number(it.totalPrice);
-      const base =
-        info.priceModel === "COMMISSION" && info.commissionRate != null
-          ? itemSale * (1 - info.commissionRate / 100)
-          : info.supply * it.quantity;
-      const ex = byOrder.get(it.order.id);
-      if (ex) {
-        ex.gross += base;
-        ex.settle += base * itemFeeMul;
-        if (info.name && !ex.names.includes(info.name)) ex.names.push(info.name);
-      } else {
-        byOrder.set(it.order.id, {
-          gross: base,
-          settle: base * itemFeeMul,
-          order: it.order,
-          names: info.name ? [info.name] : [],
-        });
-      }
-    }
-
-    for (const { gross: grossRaw, settle: settleRaw, order: o, names } of byOrder.values()) {
-      const saleDate = o.paidAt ?? o.createdAt;
-      const settlementDate = getSettlementDate(saleDate, opts.settleDays);
-      const gross = round(grossRaw); // 공급자 정산 기준액(공급가/커미션 기준)
-      // 공급자 정산액 = 공급가 × (1 - supplierFeeRate × 1.1 / 100)
-      const settlementAmount = round(settleRaw);
-      const commissionAmount = Math.max(0, gross - settlementAmount);
-      const available = settlementDate.getTime() <= today.getTime();
-      if (available) availableTotal += settlementAmount;
-      else scheduledTotal += settlementAmount;
-      orders.push({
-        orderId: o.id,
-        orderNumber: o.orderNumber,
-        saleDate: saleDate.toISOString(),
-        settlementDate: settlementDate.toISOString(),
-        settlementYmd: toYmd(settlementDate),
-        saleYmd: toYmd(startOfDay(saleDate)),
-        grossAmount: gross,
-        supplyAmount: gross, // 브랜드/중간관리자 정산은 공급가 기준 = grossAmount
-        effectiveAmount: gross, // 수수료 산정 기준(공급가)
-        commissionRate: vatSupplierRate,
-        commissionAmount,
-        settlementAmount,
-        cartDiscountAmount: 0, // 장바구니 할인은 상담사 부담 — 공급자 정산에는 영향 없음
-        available,
-        campaignTitle: o.campaign?.title ?? null,
-        type: o.campaignId ? "groupbuy" : "normal",
-        productType: "supply",
-        productNames: names,
-      });
-    }
-  }
-
-  orders.sort((a, b) => new Date(b.saleDate).getTime() - new Date(a.saleDate).getTime());
-
-  const totalSupplyAmount = orders.reduce((s, o) => s + o.supplyAmount, 0);
-  const totalCommissionAmount = orders.reduce((s, o) => s + o.commissionAmount, 0);
-
-  // ── 이미 지급한 공급자 정산 차감 (이중 지급 방지) ──
-  // 상담사는 PayoutRequest 로 지급분을 차감하지만 브랜드/중간관리자는 그 장치가 없어
-  // 지급해도 "정산 가능액"이 그대로 남아 같은 금액을 반복 지급할 수 있었다.
-  // 지급 기록: 브랜드=BrandSettlement, 중간관리자(공급분)=MiddleManagerSettlement.
-  // (중간관리자의 영업 커미션(MiddleAdminCommission)은 별개 재원이라 여기서 차감하지 않는다)
-  const paid = await getSupplierPaidAmounts(opts.role, opts.recipientId);
-  const withdrawableAmount = Math.max(0, availableTotal - paid.reserved - paid.inProgress);
-
-  return {
-    businessDays: opts.settleDays,
-    commissionRate: vatSupplierRate,
-    orders,
-    availableTotal,
-    scheduledTotal,
-    totalGrossAmount: totalSupplyAmount,
-    totalSupplyAmount,
-    totalCommissionAmount,
-    reservedAmount: paid.reserved,
-    inProgressAmount: paid.inProgress,
-    withdrawableAmount,
-    payouts: [],
-  };
-}
-
-// 공급자(브랜드/중간관리자)에게 이미 나갔거나 예약된 정산 금액.
-// reserved   = 지급 완료된 금액
-// inProgress = 정산 레코드는 생성됐으나 아직 지급 전인 금액
-export async function getSupplierPaidAmounts(
-  role: "BRAND" | "MIDDLE_ADMIN",
-  recipientId: string,
-): Promise<{ reserved: number; inProgress: number }> {
-  if (role === "BRAND") {
-    const rows = await prisma.brandSettlement.findMany({
-      where: { brandId: recipientId },
-      select: { settlementAmount: true, totalSupply: true, isPaid: true },
-    });
-    // settlementAmount(수수료 차감 후 실지급액)가 기준. 이 컬럼 도입 이전 레코드는
-    // totalSupply(수수료 차감 전)밖에 없으므로 차선책으로 그 값을 쓴다(과소 차감보다 안전).
-    const amountOf = (r: (typeof rows)[number]) =>
-      r.settlementAmount != null ? Number(r.settlementAmount) : Number(r.totalSupply);
-    return {
-      reserved: rows.filter((r) => r.isPaid).reduce((s, r) => s + amountOf(r), 0),
-      inProgress: rows.filter((r) => !r.isPaid).reduce((s, r) => s + amountOf(r), 0),
-    };
-  }
-
-  const rows = await prisma.middleManagerSettlement.findMany({
-    where: { middleAdminId: recipientId },
-    select: { totalAmount: true, status: true },
-  });
-  return {
-    reserved: rows
-      .filter((r) => r.status === "PAID")
-      .reduce((s, r) => s + Number(r.totalAmount), 0),
-    inProgress: rows
-      .filter((r) => r.status !== "PAID" && r.status !== "REJECTED")
-      .reduce((s, r) => s + Number(r.totalAmount), 0),
-  };
-}
-
-// ───── 중간관리자 정산 집계 (상담상품 단위, 공급가 기준, 읽기 전용) ─────
-export interface MiddleSettlementLine {
-  orderId: string;
-  orderNumber: string;
-  orderDate: string; // 예약(결제)일 ISO
-  productName: string;
-  brandName: string;
-  supplyPrice: number; // 공급가(단가)
-  quantity: number;
-  amount: number; // 정산 예정액 = 공급가 × 수량
-  settlementYmd: string; // 정산 예정일 YYYY-MM-DD
-  available: boolean; // 정산일 도래 여부
-}

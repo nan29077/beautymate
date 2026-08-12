@@ -69,7 +69,7 @@ export default async function OrderDetailPage({
   if (!session?.user) redirect(getShopAwareLoginPath());
   const { id } = await Promise.resolve(params);
 
-  const order = await prisma.order.findUnique({
+  const order = await prisma.reservation.findUnique({
     where: { id },
     include: {
       seller: { select: { shopName: true, slug: true, shopLogo: true } },
@@ -116,19 +116,13 @@ export default async function OrderDetailPage({
     label: order.status,
     color: "bg-gray-100 text-gray-600",
   };
-  const isCancelled =
-    order.status === "CANCELLED" ||
-    order.status === "REFUNDED" ||
-    order.status === "REFUND_REQUESTED";
+  const isCancelled = order.status === "CANCELLED";
 
-  // 상담 방식 현황 데이터
-  // 미결제 예약은 deliveryStatus 를 신뢰하지 않는다 — 배지와 상담 방식 타임라인 모두 숨긴다.
-  // (기본값이 PAYMENT_COMPLETED 였던 과거 예약이 남아 있어, 결제 안 한 예약이
-  //  "결제 완료"로 표시되고 타임라인 1단계가 점등되던 버그가 있었다.)
+  // 예약 진행 현황 — 미결제 예약은 진행 상태를 표시하지 않는다.
   const isPaid = order.paymentStatus === "COMPLETED";
-  const ds = isPaid ? order.deliveryStatus : null;
-  const isCancelRequested = ds === "CANCEL_REQUESTED";
-  const isCancelCompleted = ds === "CANCEL_COMPLETED";
+  const ds = isPaid ? order.status : null;
+  const isCancelRequested = !!order.cancelRequestedAt && order.status !== "CANCELLED";
+  const isCancelCompleted = order.status === "CANCELLED";
 
   const discountLabel =
     order.discountType === "referral"
@@ -139,9 +133,9 @@ export default async function OrderDetailPage({
           ? "장바구니 할인"
           : "할인";
 
-  const deliveryCourier = order.deliveryCourier;
-  const deliveryTracking = order.deliveryTracking;
-  const deliveryUpdatedAt = order.deliveryUpdatedAt;
+  const deliveryCourier = null;
+  const deliveryTracking = null;
+  const deliveryUpdatedAt = null;
   const dsInfo = ds
     ? (DELIVERY_STATUS_MAP[ds] ?? {
         label: ds,
@@ -179,7 +173,7 @@ export default async function OrderDetailPage({
             <div>
               <p className="text-[11px] text-gray-400">예약번호</p>
               <p className="text-sm font-bold text-gray-900">
-                {order.orderNumber}
+                {order.reservationNumber}
               </p>
             </div>
             <span
@@ -344,24 +338,25 @@ export default async function OrderDetailPage({
         </div>
 
         {/* 배송지 */}
-        {(order.shippingName || order.shippingAddress) && (
+        {order.customerName && (
           <div className="bg-white rounded-xl border border-gray-100 p-4">
             <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5 mb-3">
               <Icon name="Location" size={14} className="text-gray-400" />{" "}
               배송지
             </h2>
             <div className="space-y-1.5">
-              {order.shippingName && (
-                <InfoRow label="받는분" value={order.shippingName} />
+              {order.customerName && (
+                <InfoRow label="받는분" value={order.customerName} />
               )}
-              {order.shippingPhone && (
-                <InfoRow label="연락처" value={order.shippingPhone} />
+              {order.customerPhone && (
+                <InfoRow label="연락처" value={order.customerPhone} />
               )}
-              {order.shippingAddress && (
-                <InfoRow label="주소" value={order.shippingAddress} />
-              )}
-              {order.shippingMemo && (
-                <InfoRow label="배송메모" value={order.shippingMemo} />
+              <InfoRow
+                label="예약일시"
+                value={`${new Date(order.reservationDate).toLocaleDateString("ko-KR")} ${order.reservationTime}`}
+              />
+              {order.consultingContent && (
+                <InfoRow label="상담 내용" value={order.consultingContent} />
               )}
             </div>
           </div>
@@ -377,14 +372,6 @@ export default async function OrderDetailPage({
             <PayRow
               label="상담상품금액"
               value={formatPrice(Number(order.totalAmount))}
-            />
-            <PayRow
-              label="배송비"
-              value={
-                Number(order.shippingFee) > 0
-                  ? formatPrice(Number(order.shippingFee))
-                  : "무료"
-              }
             />
             {Number(order.discountAmount) > 0 && (
               <PayRow

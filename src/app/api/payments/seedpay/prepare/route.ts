@@ -39,7 +39,7 @@ export async function POST(request: Request) {
   };
   const method = METHOD_MAP[String(payMethod || "").toUpperCase()] ?? "CARD";
 
-  const order = await prisma.order.findUnique({
+  const order = await prisma.reservation.findUnique({
     where: { id: orderId },
     include: { items: true, user: { select: { email: true, name: true, phone: true } } },
   });
@@ -81,11 +81,11 @@ export async function POST(request: Request) {
       mid: seedpayConfig.mid,
       method,
       goodsNm,
-      ordNo: order.orderNumber,
+      ordNo: order.reservationNumber,
       goodsAmt: String(goodsAmt),
-      ordNm: order.shippingName || order.user.name || "고객",
+      ordNm: order.customerName || order.user.name || "고객",
       ordEmail: order.user.email || "",
-      ordTel: (order.shippingPhone || order.user.phone || "").replace(/[^0-9]/g, ""),
+      ordTel: (order.customerPhone || order.user.phone || "").replace(/[^0-9]/g, ""),
       ordIp: "",
       mbsUsrId: order.userId,
       mbsReserved: order.id,

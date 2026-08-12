@@ -17,7 +17,7 @@ function redirectWith(param: string) {
 
 export async function GET(req: NextRequest) {
   const session = await auth();
-  if (!session || session.user?.role !== "SELLER") {
+  if (!session || session.user?.role !== "CONSULTANT") {
     return NextResponse.redirect(absoluteUrl("/auth/login"));
   }
   const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });

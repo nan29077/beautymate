@@ -57,7 +57,7 @@ const HOW_IT_WORKS = [
 //   유일한 예외: 내가 PICK한 상담사가 "지금 라이브 방송 중"인 상담상품을 상담사별로 묶어 보여준다.
 async function getHomeData(featureLive: boolean) {
   const session = await auth();
-  const isBuyer = !!(session?.user && session.user.role === "BUYER");
+  const isBuyer = !!(session?.user && session.user.role === "CUSTOMER");
 
   let liveSellers: {
     id: string;
@@ -186,13 +186,10 @@ async function getHomeData(featureLive: boolean) {
 
 const SELLER_CTA_BG_DEFAULT = "/banners/banner5.jpg";
 
-// 구매회원(BUYER) 외 계정은 메인 페이지 진입 시 각자 대시보드로 리다이렉트
+// 구매회원(CUSTOMER) 외 계정은 메인 페이지 진입 시 각자 대시보드로 리다이렉트
 const ROLE_DASHBOARD: Record<string, string> = {
-  SELLER: "/seller",
-  BRAND_ADMIN: "/brand",
+  CONSULTANT: "/seller",
   SUPER_ADMIN: "/admin",
-  MIDDLE_ADMIN: "/middle",
-  NODE: "/node",
 };
 
 export default async function HomePage({
@@ -205,7 +202,7 @@ export default async function HomePage({
   // 대시보드의 "메인으로"/"홈" 버튼은 ?main=1 로 진입한다.
   // 이 경우 비구매 계정도 대시보드로 튕기지 않고 메인 페이지를 그대로 본다.
   const forceHome = searchParams?.main === "1";
-  if (!forceHome && role && role !== "BUYER" && ROLE_DASHBOARD[role]) {
+  if (!forceHome && role && role !== "CUSTOMER" && ROLE_DASHBOARD[role]) {
     redirect(ROLE_DASHBOARD[role]);
   }
 

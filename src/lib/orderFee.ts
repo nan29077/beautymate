@@ -2,7 +2,7 @@
 // - lib/settlement.ts 의 정산 규칙(상담상품 유형별 Case 1/2A/2B, 부가세 포함 수수료 차감)을
 //   예약 1건 단위로 재구성해, 상세 모달/펼침 영역에 표시할 display 구조를 생성한다.
 // - 역할별 관점(viewpoint):
-//   · SELLER   — 상담사 정산 기준 (아이템별 Case 1/2A/2B)
+//   · CONSULTANT   — 상담사 정산 기준 (아이템별 Case 1/2A/2B)
 //   · SUPPLIER — 브랜드/중간관리자 공급 정산 기준 (본인 공급 상담상품만)
 //   · ADMIN    — 전체 수익 구조 (상담사/공급자/플랫폼)
 // prisma 를 사용하므로 서버 컴포넌트 / route handler 에서만 사용하세요.
@@ -52,11 +52,9 @@ export interface FeeOrderInput {
   items: FeeOrderItemInput[];
 }
 export interface BuildOrderFeeOpts {
-  viewpoint: "SELLER" | "SUPPLIER" | "ADMIN";
+  viewpoint: "CONSULTANT" | "SUPPLIER" | "ADMIN";
   orders: FeeOrderInput[];
-  contextSellerId?: string; // SELLER 관점: 직접등록 판정 기준 상담사
-  supplierBrandId?: string; // SUPPLIER 관점: 브랜드 공급자
-  supplierMiddleId?: string; // SUPPLIER 관점: 중간관리자 공급자
+  contextSellerId?: string; // CONSULTANT 관점: 직접등록 판정 기준 상담사
 }
 
 // ───── 포맷 헬퍼 ─────
@@ -74,8 +72,6 @@ const TYPE_LABEL: Record<ItemType, string> = {
 // ───── 상담상품 정보 ─────
 interface ProdInfo {
   sellerId: string | null;
-  brandId: string | null;
-  middleAdminId: string | null;
   priceModel: string;
   supplyPrice: number | null;
   commissionRate: number | null;
@@ -116,7 +112,8 @@ function computeEcon(
   const sale = Number(item.totalPrice);
   const sellerFeeRate = fees.sellerFeeRate;
   const sellerMul = 1 - (sellerFeeRate * 1.1) / 100;
-  const supplierFeeRate = info.middleAdminId ? fees.middleAdminFeeRate : fees.brandFeeRate;
+  // 2자 구조에서 공급자는 플랫폼(최고관리자) 하나뿐이라 상담사 수수료율을 그대로 쓴다.
+  const supplierFeeRate = fees.sellerFeeRate;
   const supplierMul = 1 - (supplierFeeRate * 1.1) / 100;
   const type = classify(info, contextSellerId);
 
@@ -167,7 +164,7 @@ function computeEcon(
 
 // ───── 정산 상태 표시 ─────
 function statusOf(order: FeeOrderInput): { label: string; tone: FeeStatusTone } {
-  const excluded = ["CANCELLED", "REFUNDED", "REFUND_REQUESTED"].includes(order.status);
+  const excluded = ["CANCELLED", "NO_SHOW"].includes(order.status);
   const settleable = order.paymentStatus === "COMPLETED" && !excluded;
   if (!settleable) {
     if (excluded) return { label: "정산 대상 아님 (취소·환불)", tone: "excluded" };
@@ -177,12 +174,10 @@ function statusOf(order: FeeOrderInput): { label: string; tone: FeeStatusTone } 
   return { label: "구매확정 후 정산 확정", tone: "pending" };
 }
 
-// SUPPLIER 관점에서 이 상담상품이 본인 공급 상담상품인지 판정
-function supplierIncludes(info: ProdInfo, opts: BuildOrderFeeOpts): boolean {
-  if (opts.viewpoint !== "SUPPLIER") return true;
-  if (opts.supplierMiddleId) return info.middleAdminId === opts.supplierMiddleId;
-  if (opts.supplierBrandId) return info.brandId === opts.supplierBrandId && info.middleAdminId == null;
-  return false;
+// SUPPLIER 관점에서 이 상담상품이 본인 공급 상담상품인지 판정.
+// 브랜드/중간관리자가 사라져 공급자는 플랫폼 하나뿐이므로 항상 포함한다.
+function supplierIncludes(_info: ProdInfo, _opts: BuildOrderFeeOpts): boolean {
+  return true;
 }
 
 function buildOne(
@@ -206,7 +201,7 @@ function buildOne(
 
     const lines: OrderFeeLine[] = [{ label: "판매가", value: won(e.sale) }];
 
-    if (opts.viewpoint === "SELLER") {
+    if (opts.viewpoint === "CONSULTANT") {
       if (e.type === "supply") {
         lines.push({ label: "공급가", value: won(e.supply) });
         lines.push({ label: "상담사 마진 (판매가 − 공급가)", value: won(e.sellerMargin) });
@@ -251,15 +246,13 @@ function buildOne(
 
   let viewpointLabel: string;
   let summary: OrderFeeLine[];
-  if (opts.viewpoint === "SELLER") {
+  if (opts.viewpoint === "CONSULTANT") {
     viewpointLabel = "상담사 정산 기준 · 플랫폼 수수료(부가세 포함) 차감";
     summary = [
       { label: "상담사 정산 예정액 합계", value: won(sumSellerSettle), tone: "settle", strong: true },
     ];
   } else if (opts.viewpoint === "SUPPLIER") {
-    viewpointLabel = opts.supplierMiddleId
-      ? "중간관리자 공급 정산 기준 · 공급가 기준"
-      : "브랜드 공급 정산 기준 · 공급가 기준";
+    viewpointLabel = "플랫폼 공급 정산 기준 · 공급가 기준";
     summary = [
       { label: "공급자 정산 예정액 합계", value: won(sumSupplierSettle), tone: "settle", strong: true },
     ];
@@ -298,8 +291,6 @@ export async function buildOrderFeeInfoMap(
         select: {
           id: true,
           sellerId: true,
-          brandId: true,
-          middleAdminId: true,
           priceModel: true,
           supplyPrice: true,
           commissionRate: true,
@@ -311,8 +302,6 @@ export async function buildOrderFeeInfoMap(
   for (const p of prods) {
     pmap.set(p.id, {
       sellerId: p.sellerId,
-      brandId: p.brandId,
-      middleAdminId: p.middleAdminId,
       priceModel: String(p.priceModel),
       supplyPrice: p.supplyPrice != null ? Number(p.supplyPrice) : null,
       commissionRate: p.commissionRate != null ? Number(p.commissionRate) : null,

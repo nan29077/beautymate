@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
     const role = session.user.role;
-    if (!["SUPER_ADMIN", "BRAND_ADMIN", "SELLER"].includes(role)) {
+    if (!["SUPER_ADMIN", "CONSULTANT"].includes(role)) {
       return NextResponse.json({ error: "권한 없음" }, { status: 403 });
     }
 
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
           data: updateData,
         });
       } else {
-        if (role === "SELLER") {
+        if (role === "CONSULTANT") {
           const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
           if (seller) {
             const updateData: any = { isActive: newActive };
@@ -62,23 +62,14 @@ export async function POST(req: NextRequest) {
     // Verify the product exists
     const product = await prisma.product.findUnique({
       where: { id: productId },
-      include: { brand: true },
+      include: {},
     });
     if (!product) {
       return NextResponse.json({ error: "상담상품을 찾을 수 없습니다" }, { status: 404 });
     }
 
     // Check permissions
-    if (role === "BRAND_ADMIN") {
-      const brand = await prisma.brandProfile.findUnique({
-        where: { userId: session.user!.id },
-      });
-      if (!brand || product.brandId !== brand.id) {
-        return NextResponse.json({ error: "이 상담상품에 대한 권한이 없습니다" }, { status: 403 });
-      }
-    }
-
-    if (role === "SELLER") {
+    if (role === "CONSULTANT") {
       const seller = await prisma.sellerProfile.findUnique({
         where: { userId: session.user!.id },
       });
@@ -110,7 +101,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true, message: "상담상품이 공개되었습니다" });
 
       case "enableGroupBuy":
-        if (!["SUPER_ADMIN", "BRAND_ADMIN"].includes(role)) {
+        if (!["SUPER_ADMIN"].includes(role)) {
           return NextResponse.json({ error: "관리자/브랜드만 설정 가능합니다" }, { status: 403 });
         }
         await prisma.product.update({
@@ -120,7 +111,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true, message: "단체 상담 상담상품으로 등록되었습니다" });
 
       case "disableGroupBuy":
-        if (!["SUPER_ADMIN", "BRAND_ADMIN"].includes(role)) {
+        if (!["SUPER_ADMIN"].includes(role)) {
           return NextResponse.json({ error: "관리자/브랜드만 설정 가능합니다" }, { status: 403 });
         }
         await prisma.product.update({
@@ -130,7 +121,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true, message: "단체 상담 상담상품에서 제외되었습니다" });
 
       case "enableLiveCommerce":
-        if (!["SUPER_ADMIN", "BRAND_ADMIN"].includes(role)) {
+        if (!["SUPER_ADMIN"].includes(role)) {
           return NextResponse.json({ error: "관리자/브랜드만 설정 가능합니다" }, { status: 403 });
         }
         await prisma.product.update({
@@ -140,7 +131,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true, message: "라이브 상담 상담상품으로 등록되었습니다" });
 
       case "disableLiveCommerce":
-        if (!["SUPER_ADMIN", "BRAND_ADMIN"].includes(role)) {
+        if (!["SUPER_ADMIN"].includes(role)) {
           return NextResponse.json({ error: "관리자/브랜드만 설정 가능합니다" }, { status: 403 });
         }
         await prisma.product.update({
@@ -160,7 +151,7 @@ export async function POST(req: NextRequest) {
           prisma.sellerShopProduct.deleteMany({ where: { productId } }),
           prisma.groupBuyCampaign.deleteMany({ where: { productId } }),
           prisma.review.deleteMany({ where: { productId } }),
-          prisma.orderItem.deleteMany({ where: { productId } }),
+          prisma.reservationItem.deleteMany({ where: { productId } }),
           prisma.product.delete({ where: { id: productId } }),
         ]);
         return NextResponse.json({ success: true, message: "상담상품이 삭제되었습니다" });

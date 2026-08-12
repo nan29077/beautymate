@@ -6,7 +6,7 @@ async function getSeller() {
   const session = await auth();
   if (!session) return { error: NextResponse.json({ error: "인증 필요" }, { status: 401 }) };
   const role = (session.user as any)?.role;
-  if (role !== "SELLER") return { error: NextResponse.json({ error: "상담사만 가능합니다" }, { status: 403 }) };
+  if (role !== "CONSULTANT") return { error: NextResponse.json({ error: "상담사만 가능합니다" }, { status: 403 }) };
   const seller = await prisma.sellerProfile.findUnique({
     where: { userId: session.user!.id },
     select: { id: true },

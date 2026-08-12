@@ -21,7 +21,7 @@ export const dynamic = "force-dynamic";
 
 export default async function SellerShopPage() {
   const session = await auth();
-  if (session?.user?.role !== "SELLER") redirect("/");
+  if (session?.user?.role !== "CONSULTANT") redirect("/");
 
   const flags = await getFeatureFlags();
 

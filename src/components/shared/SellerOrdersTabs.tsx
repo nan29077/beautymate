@@ -163,10 +163,9 @@ export default function SellerOrdersTabs({ orders, sellerId, sellerName, cartIte
       {tab === "orders" ? (
         <OrderManagementClient
           orders={orders}
-          role="SELLER"
+          role="CONSULTANT"
           sellers={[{ id: sellerId, name: sellerName }]}
-          brands={[]}
-          canManageDelivery={true}
+            canManageStatus={true}
         />
       ) : tab === "cart" ? (
         <CartPanel

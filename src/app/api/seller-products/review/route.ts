@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
     const role = session.user.role;
-    if (!["SUPER_ADMIN", "MIDDLE_ADMIN", "BRAND_ADMIN"].includes(role)) {
+    if (!["SUPER_ADMIN"].includes(role)) {
       return NextResponse.json({ error: "권한 없음" }, { status: 403 });
     }
 
@@ -22,38 +22,16 @@ export async function POST(req: NextRequest) {
 
     const shopProduct = await prisma.sellerShopProduct.findUnique({
       where: { id: shopProductId },
-      include: {
-        product: {
-          select: {
-            brandId: true,
-            middleAdminId: true,
-            brand: { select: { middleAdminId: true } },
-          },
-        },
-      },
+      include: { product: { select: { id: true, sellerId: true } } },
     });
     if (!shopProduct || !shopProduct.product) {
       return NextResponse.json({ error: "신청을 찾을 수 없습니다" }, { status: 404 });
     }
 
-    // 승인 주체를 상담상품 관계로부터 다시 판단 (레거시 데이터 대응 — 저장값이 없어도 동작)
-    const { approverType, approverId } = resolveApprover({
-      productMiddleAdminId: shopProduct.product.middleAdminId,
-      productBrandId: shopProduct.product.brandId,
-      brandMiddleAdminId: shopProduct.product.brand?.middleAdminId ?? null,
-    });
+    // 승인 주체는 2자 구조에서 언제나 최고관리자
+    const { approverType } = resolveApprover();
 
-    // 요청자가 이 신청의 승인 주체가 맞는지 검증
-    let authorized = false;
-    if (role === "SUPER_ADMIN") {
-      authorized = approverType === "SUPER_ADMIN";
-    } else if (role === "BRAND_ADMIN") {
-      const brand = await prisma.brandProfile.findUnique({ where: { userId: session.user!.id } });
-      authorized = approverType === "BRAND_ADMIN" && !!brand && approverId === brand.id;
-    } else if (role === "MIDDLE_ADMIN") {
-      const middleAdminId = session.user.middleAdminId as string | undefined;
-      authorized = approverType === "MIDDLE_ADMIN" && !!middleAdminId && approverId === middleAdminId;
-    }
+    const authorized = role === "SUPER_ADMIN" && approverType === "SUPER_ADMIN";
     if (!authorized) {
       return NextResponse.json({ error: "이 신청에 대한 승인 권한이 없습니다" }, { status: 403 });
     }

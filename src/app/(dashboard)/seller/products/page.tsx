@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/utils";
-import { formatProductNameForSeller } from "@/lib/productName";
 import { Star, Plus, Search, Clock, CheckCircle2, BookOpen, Radio, EyeOff, Eye, Trash2, Edit3, MoreVertical } from "lucide-react";
 import SafeImage from "@/components/shared/SafeImage";
 import ProductRegisterForm from "@/components/shared/ProductRegisterForm";
@@ -16,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 export default async function SellerProductsPage() {
   const session = await auth();
-  if (session?.user?.role !== "SELLER") redirect("/");
+  if (session?.user?.role !== "CONSULTANT") redirect("/");
 
   const seller = await prisma.sellerProfile.findUnique({
     where: { userId: session!.user!.id },
@@ -26,7 +25,6 @@ export default async function SellerProductsPage() {
           product: {
             include: {
               category: true,
-              brand: true,
               _count: { select: { reviews: true } },
             },
           },
@@ -45,7 +43,6 @@ export default async function SellerProductsPage() {
       product: {
         include: {
           category: true,
-          brand: true,
           _count: { select: { reviews: true } },
         },
       },
@@ -62,7 +59,6 @@ export default async function SellerProductsPage() {
           product: {
             include: {
               category: true,
-              brand: true,
               _count: { select: { reviews: true } },
             },
           },
@@ -91,18 +87,12 @@ export default async function SellerProductsPage() {
     prisma.directProduct.count({ where: { sellerId: seller.id } }),
   ]);
 
-  // 상담상품신청 브랜드별 필터용 — 등록된 전체 브랜드 목록
-  const allBrands = await prisma.brandProfile.findMany({
-    select: { id: true, brandName: true },
-    orderBy: { brandName: "asc" },
-  });
+  // 브랜드 개념이 사라져 상담상품신청 브랜드 필터는 빈 목록으로 유지한다.
+  const allBrands: { id: string; brandName: string }[] = [];
 
   const activeProducts = seller.shopProducts.filter((sp) => sp.isActive);
   const pausedProducts = seller.shopProducts.filter((sp) => !sp.isActive && sp.isApproved);
   const pendingProducts = seller.shopProducts.filter((sp) => !sp.isActive && !sp.isApproved && !sp.rejectionReason);
-
-  // 상담사 화면: 상담상품명 포맷 변환 (lib/productName)
-  const formatProductName = formatProductNameForSeller;
 
   // Serialize data for client component
   const tabData: any = {
@@ -118,13 +108,12 @@ export default async function SellerProductsPage() {
       commissionRate: [10, 12, 8, 15, 10, 7, 13, 9, 11, 14][idx % 10],
       product: {
         id: sp.product.id,
-        name: formatProductName(sp.product.name, sp.product.middleAdminId),
+        name: sp.product.name,
         thumbnail: sp.product.thumbnail,
         basePrice: Number(sp.product.basePrice),
         isActive: sp.product.isActive,
         // 상담사 본인 등록 상담상품이면 등록 상담사 id, 브랜드/관리자 상담상품이면 null
         sellerId: sp.product.sellerId,
-        brand: sp.product.brand ? { brandName: sp.product.brand.brandName } : null,
         category: sp.product.category ? { name: sp.product.category.name } : null,
         reviewCount: sp.product._count.reviews,
       },
@@ -142,10 +131,9 @@ export default async function SellerProductsPage() {
       endDate: new Date(c.endDate).toISOString(),
       product: {
         id: c.product.id,
-        name: formatProductName(c.product.name, c.product.middleAdminId),
+        name: c.product.name,
         thumbnail: c.product.thumbnail,
         basePrice: Number(c.product.basePrice),
-        brand: c.product.brand ? { brandName: c.product.brand.brandName } : null,
         category: c.product.category ? { name: c.product.category.name } : null,
         reviewCount: c.product._count.reviews,
       },
@@ -164,10 +152,9 @@ export default async function SellerProductsPage() {
         sortOrder: lp.sortOrder,
         product: {
           id: lp.product.id,
-          name: formatProductName(lp.product.name, lp.product.middleAdminId),
+          name: lp.product.name,
           thumbnail: lp.product.thumbnail,
           basePrice: Number(lp.product.basePrice),
-          brand: lp.product.brand ? { brandName: lp.product.brand.brandName } : null,
           category: lp.product.category ? { name: lp.product.category.name } : null,
           reviewCount: lp.product._count.reviews,
         },

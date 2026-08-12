@@ -13,7 +13,7 @@ export default async function ContentEditPage({
 }) {
   const resolvedParams = await Promise.resolve(params);
   const session = await auth();
-  if (session?.user?.role !== "SELLER") redirect("/");
+  if (session?.user?.role !== "CONSULTANT") redirect("/");
 
   const seller = await prisma.sellerProfile.findUnique({
     where: { userId: session!.user!.id },

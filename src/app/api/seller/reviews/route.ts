@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 // GET /api/seller/reviews?page=1&limit=10
 export async function GET(req: NextRequest) {
   const session = await auth();
-  if ((session?.user as any)?.role !== "SELLER") {
+  if ((session?.user as any)?.role !== "CONSULTANT") {
     return NextResponse.json({ error: "권한 없음" }, { status: 403 });
   }
 
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
 // PATCH /api/seller/reviews  { reviewId, sellerComment?, isHidden? }
 export async function PATCH(req: NextRequest) {
   const session = await auth();
-  if ((session?.user as any)?.role !== "SELLER") {
+  if ((session?.user as any)?.role !== "CONSULTANT") {
     return NextResponse.json({ error: "권한 없음" }, { status: 403 });
   }
 

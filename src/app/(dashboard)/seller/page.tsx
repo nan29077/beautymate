@@ -19,7 +19,7 @@ export default async function SellerDashboard() {
     const { beeDecoration: SHOW_BEES } = await getFeatureFlags();
   const session = await auth();
   if (!session) redirect("/auth/login");
-  if (session.user?.role !== "SELLER") redirect("/");
+  if (session.user?.role !== "CONSULTANT") redirect("/");
 
   const seller = await prisma.sellerProfile.findUnique({
     where: { userId: session!.user!.id },
@@ -30,7 +30,7 @@ export default async function SellerDashboard() {
         orderBy: { endDate: "asc" },
       },
       _count: {
-        select: { fans: true, shopProducts: true, campaigns: true, orders: true },
+        select: { fans: true, shopProducts: true, campaigns: true, reservations: true },
       },
     },
   });
@@ -51,7 +51,7 @@ export default async function SellerDashboard() {
   }
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "";
   const sellerReferralLink = sellerReferralCode
-    ? `${siteUrl}/auth/register?role=SELLER&sellerRef=${sellerReferralCode}`
+    ? `${siteUrl}/auth/register?role=CONSULTANT&sellerRef=${sellerReferralCode}`
     : null;
 
   // 기간 경계 (오늘/이번주(월요일 시작)/이번달)
@@ -63,11 +63,11 @@ export default async function SellerDashboard() {
 
   const [allOrders, recentOrders, recentReviews, topProducts, pendingOrders] = await Promise.all([
     // 예약 수/매출 집계용 (실데이터 기반)
-    prisma.order.findMany({
+    prisma.reservation.findMany({
       where: { sellerId: seller.id },
       select: { createdAt: true, paidAt: true, finalAmount: true, paymentStatus: true, status: true },
     }),
-    prisma.order.findMany({
+    prisma.reservation.findMany({
       where: { sellerId: seller.id },
       include: { user: { select: { name: true } }, items: { select: { productName: true } } },
       orderBy: { createdAt: "desc" },
@@ -85,7 +85,7 @@ export default async function SellerDashboard() {
       orderBy: { product: { soldCount: "desc" } },
       take: 5,
     }),
-    prisma.order.count({ where: { sellerId: seller.id, status: "PENDING" } }),
+    prisma.reservation.count({ where: { sellerId: seller.id, status: "PENDING" } }),
   ]);
 
   // 예약 수(생성 기준) & 매출(결제완료 기준) 기간별 집계
@@ -199,7 +199,7 @@ export default async function SellerDashboard() {
         {[
           { label: "내 상담상품", value: seller._count.shopProducts, icon: "ProductManagement_icon", color: "text-blue-500" },
           { label: "팬 수", value: seller.totalFans, icon: "Users_icon", color: "text-pink-500" },
-          { label: "총 예약", value: seller._count.orders, icon: "OrderManagement_icon", color: "text-orange-500" },
+          { label: "총 예약", value: seller._count.reservations, icon: "OrderManagement_icon", color: "text-orange-500" },
         ].map((kpi) => (
           <div key={kpi.label} className="bg-white rounded-xl p-3 sm:p-4 border border-gray-100">
             <Icon name={kpi.icon} size={16} className={`${kpi.color} mb-1.5 sm:mb-2`} />
@@ -232,7 +232,7 @@ export default async function SellerDashboard() {
                         {order.items.length > 1 && <span className="text-[11px] font-normal text-gray-400"> 외 {order.items.length - 1}건</span>}
                       </p>
                       <p className="text-[12px] font-semibold text-gray-700">{order.user.name}</p>
-                      <p className="text-[10px] text-gray-300">예약 {order.orderNumber}</p>
+                      <p className="text-[10px] text-gray-300">예약 {order.reservationNumber}</p>
                     </div>
                     <div className="text-right flex-shrink-0 ml-3">
                       <p className="text-[13px] font-bold text-gray-900">{formatPrice(Number(order.finalAmount))}</p>

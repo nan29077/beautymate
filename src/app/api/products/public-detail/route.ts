@@ -17,7 +17,6 @@ export async function GET(req: NextRequest) {
     const product = await prisma.product.findUnique({
       where: { id, isActive: true, isApproved: true },
       include: {
-        brand: { select: { brandName: true } },
         category: { select: { name: true } },
         variants: { where: { isActive: true }, orderBy: { sortOrder: "asc" } },
         images: { orderBy: { sortOrder: "asc" } },
@@ -69,13 +68,10 @@ export async function GET(req: NextRequest) {
       comparePrice,
       thumbnail: product.thumbnail,
       images: allImages,
-      shippingFee: Number(product.shippingFee),
-      freeShipping: product.freeShipping,
-      freeShippingThreshold: product.freeShippingThreshold
-        ? Number(product.freeShippingThreshold)
-        : null,
-      remoteAreaFee: Number(product.remoteAreaFee),
-      brandName: product.brand?.brandName || null,
+      consultingType: product.consultingType,
+      consultingMethod: product.consultingMethod,
+      durationMinutes: product.durationMinutes,
+      maxDailySlots: product.maxDailySlots,
       categoryName: product.category?.name || null,
       avgRating: Math.round(avgRating * 10) / 10,
       reviewCount: product.reviews.length,

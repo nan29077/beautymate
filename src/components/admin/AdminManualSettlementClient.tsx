@@ -28,12 +28,10 @@ type Props = {
   settlements: Settlement[];
 };
 
-type TabKey = "NODE" | "MIDDLE_ADMIN" | "BRAND_ADMIN";
+type TabKey = "CONSULTANT";
 
 const TAB_LABELS: Record<TabKey, string> = {
-  NODE: "노드",
-  MIDDLE_ADMIN: "중간관리자",
-  BRAND_ADMIN: "브랜드",
+  CONSULTANT: "상담사",
 };
 
 function fmt(n: number) {
@@ -54,7 +52,7 @@ export default function AdminManualSettlementClient({
   brandAdminUsers,
   settlements: initialSettlements,
 }: Props) {
-  const [activeTab, setActiveTab] = useState<TabKey>("NODE");
+  const [activeTab, setActiveTab] = useState<TabKey>("CONSULTANT");
   const [settlements, setSettlements] = useState<Settlement[]>(initialSettlements);
   const [recipientId, setRecipientId] = useState("");
   const [amount, setAmount] = useState("");
@@ -64,9 +62,7 @@ export default function AdminManualSettlementClient({
   const [success, setSuccess] = useState("");
 
   const userOptions: Record<TabKey, UserOption[]> = {
-    NODE: nodeUsers,
-    MIDDLE_ADMIN: middleAdminUsers,
-    BRAND_ADMIN: brandAdminUsers,
+    CONSULTANT: nodeUsers,
   };
 
   function resetForm() {

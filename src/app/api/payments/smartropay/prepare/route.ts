@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     String(payMethod || "").toUpperCase() === "EASYPAY" ? "CARD" : payMethod,
   );
 
-  const order = await prisma.order.findUnique({
+  const order = await prisma.reservation.findUnique({
     where: { id: orderId },
     include: { items: true, user: { select: { email: true, name: true, phone: true } } },
   });
@@ -86,10 +86,10 @@ export async function POST(request: Request) {
     ),
     // Moid 는 영문/숫자만, MallUserId 는 20자 이하 (스마트로 PG 제약).
     // 예약 매핑은 MallReserved(전체 order.id) 로 하므로 truncate 영향 없음.
-    Moid: order.orderNumber.replace(/[^A-Za-z0-9]/g, ""),
+    Moid: order.reservationNumber.replace(/[^A-Za-z0-9]/g, ""),
     MallUserId: order.userId.slice(0, 20),
-    BuyerName: order.shippingName || order.user.name || "고객",
-    BuyerTel: (order.shippingPhone || order.user.phone || "")
+    BuyerName: order.customerName || order.user.name || "고객",
+    BuyerTel: (order.customerPhone || order.user.phone || "")
       .replace(/[^0-9]/g, "")
       .slice(0, 11),
     BuyerEmail: order.user.email || "",

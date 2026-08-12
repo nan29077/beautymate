@@ -5,14 +5,14 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 // 고객이 "상담사로 입점 신청" — 현재 계정에 승인 대기(SellerProfile.isApproved=false) 상담사 신청을 생성.
-// 최고관리자 상담사 관리에서 승인하면 role 이 SELLER 로 전환된다.
+// 최고관리자 상담사 관리에서 승인하면 role 이 CONSULTANT 로 전환된다.
 export async function POST() {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
   }
   const role = session.user.role;
-  if (role !== "BUYER") {
+  if (role !== "CUSTOMER") {
     return NextResponse.json({ error: "시청자 회원만 상담사 입점 신청이 가능합니다." }, { status: 400 });
   }
 

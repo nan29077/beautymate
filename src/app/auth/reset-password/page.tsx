@@ -9,10 +9,8 @@ import { useSession } from "next-auth/react";
 function getDashboardPath(role: string): string {
   switch (role) {
     case "SUPER_ADMIN": return "/admin";
-    case "MIDDLE_ADMIN": return "/middle";
-    case "SELLER": return "/seller";
-    case "BRAND_ADMIN": return "/brand";
-    case "BUYER": return "/";
+    case "CONSULTANT": return "/seller";
+    case "CUSTOMER": return "/";
     default: return "/";
   }
 }
@@ -27,7 +25,7 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const role = session?.user?.role || "BUYER";
+  const role = session?.user?.role || "CUSTOMER";
 
   // 인증되지 않았거나 강제 재설정 대상이 아니면 접근 차단
   useEffect(() => {

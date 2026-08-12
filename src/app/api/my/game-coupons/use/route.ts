@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     // 예약 검증 — 본인 예약 + 쿠폰 발급 상담사 점집과 동일해야 함
     if (orderId) {
-      const order = await prisma.order.findUnique({
+      const order = await prisma.reservation.findUnique({
         where: { id: orderId },
         select: { userId: true, sellerId: true },
       });

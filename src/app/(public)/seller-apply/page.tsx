@@ -26,8 +26,7 @@ export default async function SellerApplyPage() {
   const role = session.user.role;
 
   // 이미 상담사/브랜드/관리자인 경우 대시보드로
-  if (role === "SELLER") redirect("/seller");
-  if (role === "BRAND_ADMIN") redirect("/brand");
+  if (role === "CONSULTANT") redirect("/seller");
   if (role === "SUPER_ADMIN") redirect("/admin");
 
   // 고객: 기존 신청 여부 확인

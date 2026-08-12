@@ -634,7 +634,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                         ))}
                       </select>
                     </div>
-                    {/* 브랜드 선택 — 관리자만 표시. 브랜드 계정(BRAND_ADMIN)은 본인이 브랜드이므로 숨기고 서버에서 세션 brandId를 자동 사용 */}
+                    {/* 브랜드 개념 제거 — 선택 UI 비활성 */}
                     {mode === "admin" && (
                       <div>
                         <label className="text-xs font-semibold text-gray-700 mb-1.5 block">브랜드</label>

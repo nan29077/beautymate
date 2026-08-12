@@ -135,7 +135,7 @@ interface Notice {
 }
 interface ChannelOrder {
   id: string;
-  orderNumber: string;
+  reservationNumber: string;
   status: string;
   paymentStatus: string;
   finalAmount: number;
@@ -914,7 +914,7 @@ export default function LiveChannelPage() {
             {orders.map(o => (
               <Link key={o.id} href={`/my/orders`} className="block p-3.5 rounded-xl border border-amber-100 bg-white hover:bg-amber-50/50 transition-colors">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-gray-400">{new Date(o.createdAt).toLocaleDateString("ko-KR")} · {o.orderNumber}</span>
+                  <span className="text-[10px] text-gray-400">{new Date(o.createdAt).toLocaleDateString("ko-KR")} · {o.reservationNumber}</span>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50" style={{ color: GOLD }}>
                     {ORDER_STATUS_LABEL[o.status] || o.status}
                   </span>

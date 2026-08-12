@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
     const role = session.user.role;
-    if (role !== "SELLER") {
+    if (role !== "CONSULTANT") {
       return NextResponse.json({ error: "상담사 전용" }, { status: 403 });
     }
 
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
     const role = session.user.role;
-    if (role !== "SELLER") {
+    if (role !== "CONSULTANT") {
       return NextResponse.json({ error: "상담사 전용" }, { status: 403 });
     }
 

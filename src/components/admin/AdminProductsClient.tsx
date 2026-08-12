@@ -16,7 +16,7 @@ import { useAppDialog } from "@/components/shared/AppDialog";
 import SafeImage from "@/components/shared/SafeImage";
 import { pickSellerAvatar } from "@/lib/defaults";
 
-type RegistrarType = "SELLER" | "BRAND" | "MIDDLE_ADMIN" | "ADMIN";
+type RegistrarType = "CONSULTANT" | "BRAND" | "ADMIN";
 
 interface Product {
   id: string; name: string; basePrice: number;
@@ -69,7 +69,6 @@ interface PendingPackageItem {
       thumbnail: string | null;
       supplyPrice?: number | null;
       basePrice?: number | null;
-      brand: { brandName: string } | null;
     };
   }[];
   _count: { packageOrderItems: number };
@@ -77,9 +76,7 @@ interface PendingPackageItem {
 
 const ROLE_LABEL: Record<string, string> = {
   SUPER_ADMIN: "최고관리자",
-  BRAND_ADMIN: "브랜드",
-  SELLER: "상담사",
-  MIDDLE_ADMIN: "중간관리자",
+  CONSULTANT: "상담사",
 };
 
 export default function AdminProductsClient({ products, pendingShopProducts, soldSellerProducts = [], brands, middleAdmins = [], sellers = [], currentUserId, pendingPackages = [] }: { products: Product[]; pendingShopProducts: PendingShop[]; soldSellerProducts?: any[]; brands: Brand[]; middleAdmins?: { id: string; name: string }[]; sellers?: { id: string; shopName: string }[]; currentUserId?: string; pendingPackages?: PendingPackageItem[] }) {
@@ -177,7 +174,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
 
   // 등록자 유형별 카운트 (탭 배지)
   const typeCounts = useMemo(() => {
-    const c = { ALL: products.length, MIDDLE_ADMIN: 0, BRAND: 0, SELLER: 0, ADMIN: 0, SELLING: 0 } as Record<string, number>;
+    const c = { ALL: products.length, BRAND: 0, CONSULTANT: 0, ADMIN: 0, SELLING: 0 } as Record<string, number>;
     for (const p of products) {
       c[p.registrarType || "ADMIN"]++;
       if (p.isSelling) c["SELLING"]++;
@@ -449,8 +446,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <p className="text-xs font-medium text-gray-800 truncate">{item.product.name}</p>
-                                      <p className="text-[10px] text-gray-400">{item.product.brand?.brandName || "브랜드 미지정"}</p>
-                                    </div>
+                                                                          </div>
                                     <div className="text-right">
                                       <p className="text-xs font-bold text-gray-700">{formatPrice(item.unitPrice)}원 × {item.quantity}</p>
                                       {(item.product.supplyPrice != null || item.product.basePrice != null) && (
@@ -544,9 +540,8 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
           {([
             { v: "ALL", l: "전체" },
             { v: "SELLING", l: "판매중" },
-            { v: "MIDDLE_ADMIN", l: "중간관리자" },
             { v: "BRAND", l: "브랜드" },
-            { v: "SELLER", l: "상담사" },
+            { v: "CONSULTANT", l: "상담사" },
             { v: "ADMIN", l: "관리자" },
           ] as const).map((t) => (
             <button
@@ -603,7 +598,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                     {/* 등록자 구분 배지 */}
                     {typeTab !== "SELLING" && (
                       <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium inline-flex items-center gap-0.5 ${rt.cls}`}>
-                        <rt.icon size={9} /> {product.registrarType === "BRAND" && product.brandName ? product.brandName : product.registrarType === "SELLER" && product.sellerNames.length > 0 ? product.sellerNames[0] : rt.label}
+                        <rt.icon size={9} /> {product.registrarType === "BRAND" && product.brandName ? product.brandName : product.registrarType === "CONSULTANT" && product.sellerNames.length > 0 ? product.sellerNames[0] : rt.label}
                       </span>
                     )}
                     {product.categoryName && <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">{product.categoryName}</span>}
@@ -754,8 +749,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
 
 // 등록자 유형 배지 스타일
 const REGISTRAR_BADGE: Record<RegistrarType, { label: string; cls: string; icon: any }> = {
-  MIDDLE_ADMIN: { label: "중간관리자", cls: "text-amber-600 bg-amber-50", icon: Shield },
   BRAND: { label: "브랜드", cls: "text-purple-600 bg-purple-50", icon: Crown },
-  SELLER: { label: "상담사", cls: "text-blue-600 bg-blue-50", icon: Building2 },
+  CONSULTANT: { label: "상담사", cls: "text-blue-600 bg-blue-50", icon: Building2 },
   ADMIN: { label: "관리자", cls: "text-gray-600 bg-gray-100", icon: Shield },
 };

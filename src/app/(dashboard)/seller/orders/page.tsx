@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function SellerOrdersPage() {
   const session = await auth();
-  if (session?.user?.role !== "SELLER") redirect("/");
+  if (session?.user?.role !== "CONSULTANT") redirect("/");
 
   const seller = await prisma.sellerProfile.findUnique({
     where: { userId: session!.user!.id },
@@ -20,7 +20,7 @@ export default async function SellerOrdersPage() {
   // 방치된 미결제 예약 정리 (이탈 PENDING 이 목록·DB 에 남지 않도록)
   await cleanupStalePendingOrders().catch(() => {});
 
-  const orders = await prisma.order.findMany({
+  const orders = await prisma.reservation.findMany({
     // 미결제 PENDING + 결제 전 이탈한 CANCELLED(pgTid 없음) 제외 — 실제 결제 흔적 있는 건만 노출
     where: { ...VISIBLE_ORDER_FILTER, sellerId: seller.id },
     include: {
@@ -57,7 +57,7 @@ export default async function SellerOrdersPage() {
 
   // 예약별 정산 수수료 안내(상담사 관점) 계산
   const feeMap = await buildOrderFeeInfoMap({
-    viewpoint: "SELLER",
+    viewpoint: "CONSULTANT",
     contextSellerId: seller.id,
     orders: orders.map((o) => ({
       id: o.id,
@@ -88,7 +88,7 @@ export default async function SellerOrdersPage() {
 
   const serialized = orders.map((o) => ({
     id: o.id,
-    orderNumber: o.orderNumber,
+    reservationNumber: o.reservationNumber,
     userName: o.user.name || "",
     userEmail: o.user.email,
     sellerName: seller.shopName,
@@ -97,22 +97,19 @@ export default async function SellerOrdersPage() {
     brandId: null as string | null,
     finalAmount: Number(o.finalAmount),
     totalAmount: Number(o.totalAmount),
-    shippingFee: Number(o.shippingFee),
     discountAmount: Number(o.discountAmount),
     discountType: o.discountType,
     status: o.status,
     paymentMethod: o.paymentMethod,
     campaignId: o.campaignId,
     campaignTitle: o.campaign?.title || null,
-    shippingName: o.shippingName,
-    shippingPhone: o.shippingPhone,
-    shippingAddress: o.shippingAddress,
-    shippingMemo: o.shippingMemo,
+    customerName: o.customerName,
+    customerPhone: o.customerPhone,
     snsAccounts: parseSnsAccounts((o as any).snsAccounts),
     createdAt: o.createdAt.toISOString(),
     paidAt: o.paidAt?.toISOString() || null,
-    shippedAt: o.shippedAt?.toISOString() || null,
-    deliveredAt: o.deliveredAt?.toISOString() || null,
+    confirmedAt: o.confirmedAt?.toISOString() || null,
+    completedAt: o.completedAt?.toISOString() || null,
     thumbnail: null as string | null,
     items: o.items.map((i) => ({
       id: i.id,

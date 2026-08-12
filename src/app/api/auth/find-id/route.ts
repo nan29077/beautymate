@@ -10,7 +10,7 @@ function maskEmail(email: string): string {
   return `${visible}${"*".repeat(Math.max(local.length - visible.length, 1))}@${domain}`;
 }
 
-// 아이디 찾기 — 이름 + 전화번호로 BUYER 계정 조회
+// 아이디 찾기 — 이름 + 전화번호로 CUSTOMER 계정 조회
 // 상담사/관리자 계정은 보안상 고객센터를 통해서만 안내한다.
 export async function POST(request: NextRequest) {
   try {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 상담사/관리자 계정만 있는 경우 고객센터 안내
-    const buyers = matched.filter((u) => u.role === "BUYER");
+    const buyers = matched.filter((u) => u.role === "CUSTOMER");
     if (buyers.length === 0) {
       return NextResponse.json(
         {

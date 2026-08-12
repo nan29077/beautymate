@@ -20,9 +20,6 @@ export default async function CartPage() {
               name: true,
               thumbnail: true,
               basePrice: true,
-              shippingFee: true,
-              freeShipping: true,
-              freeShippingThreshold: true,
             },
           },
         },
@@ -40,9 +37,6 @@ export default async function CartPage() {
       name: true,
       thumbnail: true,
       basePrice: true,
-      shippingFee: true,
-      freeShipping: true,
-      freeShippingThreshold: true,
     },
   });
   const productMap = Object.fromEntries(products.map((p) => [p.id, p]));
@@ -77,12 +71,9 @@ export default async function CartPage() {
         campaignPrice || Number(item.variant?.price || product?.basePrice || 0),
       quantity: item.quantity,
       isCampaign: !!item.campaignId,
-      shippingFee: product ? Number(product.shippingFee) : 0,
-      freeShipping: product ? product.freeShipping : false,
-      freeShippingThreshold:
-        product?.freeShippingThreshold != null
-          ? Number(product.freeShippingThreshold)
-          : null,
+      shippingFee: 0,
+      freeShipping: true,
+      freeShippingThreshold: null,
     };
   });
 

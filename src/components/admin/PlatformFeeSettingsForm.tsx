@@ -9,14 +9,10 @@ import SavedPopup from "@/components/shared/SavedPopup";
 
 interface Fees {
   sellerFeeRate: number;
-  middleAdminFeeRate: number;
-  brandFeeRate: number;
 }
 
 const FIELDS: { key: keyof Fees; label: string; desc: string; icon: typeof User }[] = [
   { key: "sellerFeeRate", label: "상담사 플랫폼 수수료율", desc: "상담사 정산액에서 차감", icon: User },
-  { key: "middleAdminFeeRate", label: "중간관리자 플랫폼 수수료율", desc: "중간관리자 공급 정산액에서 차감", icon: Users },
-  { key: "brandFeeRate", label: "브랜드사 플랫폼 수수료율", desc: "브랜드 공급 정산액에서 차감", icon: Building2 },
 ];
 
 // 부가세 포함 실효율 (rate × 1.1), 소수 둘째자리까지

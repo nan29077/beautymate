@@ -19,10 +19,10 @@ export async function POST(request: Request) {
     select: { id: true, userId: true },
   });
 
-  // 고객이 상담사 역할로 전환되도록 user.role 도 SELLER 로 변경
+  // 고객이 상담사 역할로 전환되도록 user.role 도 CONSULTANT 로 변경
   await prisma.user.update({
     where: { id: seller.userId },
-    data: { role: "SELLER" },
+    data: { role: "CONSULTANT" },
   });
 
   return NextResponse.json({ success: true, seller });

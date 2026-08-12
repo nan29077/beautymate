@@ -12,7 +12,7 @@ export async function POST(_request: Request, { params }: { params: { id: string
     return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
   }
 
-  const order = await prisma.order.findUnique({
+  const order = await prisma.reservation.findUnique({
     where: { id: params.id },
     include: { items: true, referralCommissions: true },
   });
@@ -72,7 +72,7 @@ export async function POST(_request: Request, { params }: { params: { id: string
       await (tx as any).mentorCommission.delete({ where: { id: mc.id } }).catch(() => {});
     }
 
-    await tx.order.update({
+    await tx.reservation.update({
       where: { id: order.id },
       data: {
         status: "CANCELLED",

@@ -15,10 +15,10 @@ export default async function AdminSettlementsPage() {
   const businessDays = await getSettlementBusinessDays();
 
   // 총 매출(gross)은 예약관리 판매금액과 일치하도록 결제완료 예약 합계로 산출
-  const orders = await prisma.order.findMany({
+  const orders = await prisma.reservation.findMany({
     where: {
       paymentStatus: "COMPLETED",
-      status: { notIn: ["CANCELLED", "REFUNDED", "REFUND_REQUESTED"] },
+      status: { notIn: ["CANCELLED", "NO_SHOW"] },
     },
     select: { finalAmount: true },
   });
@@ -57,7 +57,7 @@ export default async function AdminSettlementsPage() {
     sellerName: p.seller?.shopName || "상담사",
     amount: Number(p.amount),
     netAmount: Number(p.netAmount),
-    orderCount: p.orderCount,
+    reservationCount: p.reservationCount,
     status: p.status,
     isBusiness: p.isBusiness,
     bizNumber: p.bizNumber,

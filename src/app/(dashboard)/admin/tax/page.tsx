@@ -51,13 +51,6 @@ export default async function AdminTaxPage() {
     const rows = await (prisma as any).brandSettlement.findMany({
       where: { isPaid: true },
       include: {
-        brand: {
-          select: {
-            brandName: true,
-            representativeName: true,
-            businessRegistrationNo: true,
-          },
-        },
       },
       orderBy: { paidAt: "desc" },
     });
@@ -79,9 +72,6 @@ export default async function AdminTaxPage() {
     const rows = await (prisma as any).middleAdminSettlement.findMany({
       where: { status: "PAID" },
       include: {
-        middleAdmin: {
-          select: { name: true, companyName: true, bizNumber: true },
-        },
       },
       orderBy: { paidAt: "desc" },
     });

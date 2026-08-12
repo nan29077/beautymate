@@ -17,7 +17,7 @@ interface FanItem {
   birthday: string | null;
   avatar: string | null;
   joinedAt: string;
-  orderCount: number;
+  reservationCount: number;
   authProviders?: string[];
   isPick: boolean;
   isVerified: boolean;
@@ -61,7 +61,7 @@ export default function PaginatedFansList({ items }: { items: FanItem[] }) {
             <div className="text-right flex flex-col items-end gap-1 flex-shrink-0">
               <p className="text-[10px] text-gray-400">{new Date(fan.joinedAt).toLocaleDateString("ko-KR")} 가입</p>
               <div className="flex items-center gap-1.5">
-                <FanPurchaseHistory userId={fan.userId} userName={fan.name} orderCount={fan.orderCount} variant="compact" />
+                <FanPurchaseHistory userId={fan.userId} userName={fan.name} reservationCount={fan.reservationCount} variant="compact" />
                 <FanMemberInfo
                   userId={fan.userId}
                   name={fan.name}
