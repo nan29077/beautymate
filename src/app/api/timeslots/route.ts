@@ -6,6 +6,7 @@ import { safeQuery, isMissingSchemaError } from "@/lib/safeDb";
 export const dynamic = "force-dynamic";
 
 // GET /api/timeslots?consultantId=&date=YYYY-MM-DD — 가용 슬롯 조회 (공개)
+// 단, all=true(예약자 정보 포함 전체 슬롯)는 해당 상담사 본인·관리자만 허용
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const consultantId = url.searchParams.get("consultantId"); // User.id
@@ -17,9 +18,22 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "consultantId가 필요합니다." }, { status: 400 });
   }
 
+  // all=true 응답에는 예약 고객명이 포함되므로 본인(상담사)·관리자 외에는 거부
+  if (allSlots) {
+    const session = await auth();
+    const role = session?.user?.role;
+    const isOwner = !!session?.user && session.user.id === consultantId && role === "CONSULTANT";
+    if (!isOwner && role !== "SUPER_ADMIN") {
+      return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
+    }
+  }
+
   if (month) {
     // 해당 월의 슬롯 있는 날짜 목록
     const [year, mon] = month.split("-").map(Number);
+    if (!Number.isInteger(year) || !Number.isInteger(mon) || mon < 1 || mon > 12) {
+      return NextResponse.json({ error: "month 형식이 올바르지 않습니다. (YYYY-MM)" }, { status: 400 });
+    }
     const start = new Date(year, mon - 1, 1);
     const end = new Date(year, mon, 0, 23, 59, 59);
 

@@ -107,7 +107,8 @@ export async function GET(req: NextRequest) {
     const lives = await prisma.liveStream.findMany({
       where: searchWhere,
       include: {
-        seller: { select: { shopName: true, shopLogo: true, user: { select: { avatar: true } }, slug: true } },
+        // id 는 sellerProfileImage() 의 동물 캐릭터 해시 시드 — 누락 시 전 상담사가 동일 캐릭터로 표시됨
+        seller: { select: { id: true, shopName: true, shopLogo: true, user: { select: { avatar: true } }, slug: true } },
         products: { include: { product: { select: { name: true, thumbnail: true, basePrice: true } } }, take: 3 },
         _count: { select: { products: true } },
       },
@@ -163,6 +164,23 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const { action } = body;
+
+  // liveId 를 대상으로 하는 조작성 액션은 라이브 소유 상담사 본인(또는 관리자)만 허용.
+  // (기존에는 세션 체크만 있어 로그인한 고객이 타 상담사 라이브를 시작/종료/삭제할 수 있었다)
+  const OWNER_ONLY_ACTIONS = ["start", "end", "update_products", "switch_product", "kakao_notify", "delete", "update"];
+  if (OWNER_ONLY_ACTIONS.includes(action)) {
+    if (!body.liveId) return NextResponse.json({ error: "liveId가 필요합니다." }, { status: 400 });
+    const role = session.user?.role;
+    if (role !== "SUPER_ADMIN") {
+      if (role !== "CONSULTANT") return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
+      const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
+      if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+      const target = await prisma.liveStream.findUnique({ where: { id: body.liveId }, select: { sellerId: true } });
+      if (!target || target.sellerId !== seller.id) {
+        return NextResponse.json({ error: "본인 라이브만 조작할 수 있습니다." }, { status: 403 });
+      }
+    }
+  }
 
   if (action === "create") {
     const role = session.user?.role;
@@ -372,14 +390,33 @@ export async function POST(req: NextRequest) {
   }
 
   if (action === "chat") {
+    // isManager/isSystem 은 body 값을 신뢰하지 않는다 — 라이브 소유 상담사·관리자만 부여 가능
+    let isManager = false;
+    let isSystem = false;
+    if (body.isManager || body.isSystem) {
+      const role = session.user?.role;
+      if (role === "SUPER_ADMIN") {
+        isManager = !!body.isManager;
+        isSystem = !!body.isSystem;
+      } else if (role === "CONSULTANT") {
+        const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
+        const target = seller
+          ? await prisma.liveStream.findUnique({ where: { id: body.liveId }, select: { sellerId: true } })
+          : null;
+        if (seller && target && target.sellerId === seller.id) {
+          isManager = !!body.isManager;
+          isSystem = !!body.isSystem;
+        }
+      }
+    }
     const msg = await prisma.liveChatMessage.create({
       data: {
         liveStreamId: body.liveId,
         userId: session.user!.id,
         nickname: body.nickname || session.user!.name || "익명",
         message: body.message,
-        isManager: body.isManager || false,
-        isSystem: body.isSystem || false,
+        isManager,
+        isSystem,
       },
     });
     // 사이트 채팅 → YouTube 라이브 채팅 전달 (시스템 메시지 제외, 실패해도 채팅 저장에 영향 없음)

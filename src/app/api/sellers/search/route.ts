@@ -25,6 +25,8 @@ export async function GET(request: Request) {
       ],
     },
     select: {
+      // id 는 sellerProfileImage() 의 동물 캐릭터 해시 시드 — 누락 시 전 상담사가 동일 캐릭터로 표시됨
+      id: true,
       slug: true,
       shopName: true,
       shopLogo: true,

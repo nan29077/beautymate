@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isMissingSchemaError } from "@/lib/safeDb";
 
 export const dynamic = "force-dynamic";
+
+// 운영 DB에 reservations/time_slots 테이블이 아직 없는 환경(P2021)에서는
+// 500 대신 명확한 503을 반환한다 (DB 스키마 드리프트 안전망).
+const schemaDriftResponse = () =>
+  NextResponse.json({ error: "예약 기능이 아직 준비 중입니다. 잠시 후 다시 시도해 주세요." }, { status: 503 });
 
 // PATCH /api/reservations/[id] — 상태 변경
 export async function PATCH(
@@ -22,10 +28,16 @@ export async function PATCH(
     return NextResponse.json({ error: "상태 값이 필요합니다." }, { status: 400 });
   }
 
-  const reservation = await prisma.reservation.findUnique({
-    where: { id },
-    include: { seller: true },
-  });
+  let reservation;
+  try {
+    reservation = await prisma.reservation.findUnique({
+      where: { id },
+      include: { seller: true },
+    });
+  } catch (e) {
+    if (isMissingSchemaError(e)) return schemaDriftResponse();
+    throw e;
+  }
 
   if (!reservation) {
     return NextResponse.json({ error: "예약을 찾을 수 없습니다." }, { status: 404 });
@@ -98,15 +110,21 @@ export async function GET(
 
   const { id } = await Promise.resolve(params);
 
-  const reservation = await prisma.reservation.findUnique({
-    where: { id },
-    include: {
-      user: { select: { id: true, name: true, email: true, phone: true } },
-      seller: { select: { id: true, shopName: true, slug: true, user: { select: { name: true, avatar: true } } } },
-      items: { include: { variant: { select: { name: true } } } },
-      timeSlot: { select: { id: true, startTime: true, endTime: true } },
-    },
-  });
+  let reservation;
+  try {
+    reservation = await prisma.reservation.findUnique({
+      where: { id },
+      include: {
+        user: { select: { id: true, name: true, email: true, phone: true } },
+        seller: { select: { id: true, shopName: true, slug: true, user: { select: { name: true, avatar: true } } } },
+        items: { include: { variant: { select: { name: true } } } },
+        timeSlot: { select: { id: true, startTime: true, endTime: true } },
+      },
+    });
+  } catch (e) {
+    if (isMissingSchemaError(e)) return schemaDriftResponse();
+    throw e;
+  }
 
   if (!reservation) {
     return NextResponse.json({ error: "예약을 찾을 수 없습니다." }, { status: 404 });
@@ -117,7 +135,8 @@ export async function GET(
   if (role === "CUSTOMER" && reservation.userId !== session.user.id) {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
-  if (role === "CONSULTANT" && reservation.seller.user.name) {
+  // 상담사는 본인 점집 예약만 열람 가능 (조건 없이 항상 소유권 검사)
+  if (role === "CONSULTANT") {
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user.id } });
     if (!seller || seller.id !== reservation.sellerId) {
       return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isMissingSchemaError } from "@/lib/safeDb";
 
 // 금액(배송비 등) 파싱: 음수/NaN은 기본값으로 보정
 function toMoney(value: any, fallback = 0): number {
@@ -147,55 +148,65 @@ export async function POST(req: NextRequest) {
     const isApproved = true;
 
     // Create product
-    const product = await prisma.product.create({
-      data: {
-        name,
-        slug,
-        description: description || null,
-        detailContent: detailContent || null,
-        basePrice: parsedBasePrice,
-        comparePrice: comparePrice ? parseFloat(String(comparePrice)) : null,
-        supplyPrice: resolvedPriceModel === "COMMISSION" ? null : parsedSupplyPrice,
-        // 제공 방식 (공급가 제공 / 수수료 제공)
-        priceModel: resolvedPriceModel,
-        commissionRate: resolvedCommissionRate,
-        sellerCommissionAmount: resolvedSellerCommissionAmount,
-        categoryId: categoryId || null,
-        // ── 상담 상품 속성 ──
-        consultingType: consultingType ? String(consultingType) : "사주",
-        consultingMethod: consultingMethod ? String(consultingMethod) : "영상통화",
-        durationMinutes: Math.max(1, parseInt(String(durationMinutes ?? 30), 10) || 30),
-        maxDailySlots: Math.max(1, parseInt(String(maxDailySlots ?? 5), 10) || 5),
-        // 상담사 직접 등록 상담상품은 등록 상담사를 기록 → 다른 상담사의 '상담상품 신청' 목록에서 제외됨
-        sellerId: role === "CONSULTANT" && sellerProfile ? sellerProfile.id : null,
-        thumbnail: thumbnail || (images && images.length > 0 ? images[0] : null),
-        isActive: true,
-        isApproved,
-        allowGroupBuy: isGroupBuy ? true : false,
-        badges: badges && Array.isArray(badges) && badges.length > 0 ? JSON.stringify(badges) : null,
-        ...((optionGroups && Array.isArray(optionGroups) && optionGroups.length > 0)
-          ? { optionGroups: JSON.stringify(optionGroups) } as any
-          : {}),
-        ...(variants && Array.isArray(variants) && variants.length > 0 ? {
-          variants: {
-            create: variants.filter((v: any) => v.name).map((v: any, i: number) => ({
-              name: v.name,
-              price: parseFloat(String(v.price || basePrice)),
-              sortOrder: i,
-            })),
-          },
-        } : {}),
-        ...(images && Array.isArray(images) && images.length > 0 ? {
-          images: {
-            create: images.filter(Boolean).map((url: string, i: number) => ({
-              url,
-              alt: `${name} 이미지 ${i + 1}`,
-              sortOrder: i,
-            })),
-          },
-        } : {}),
-      },
-    });
+    const productData = {
+      name,
+      slug,
+      description: description || null,
+      detailContent: detailContent || null,
+      basePrice: parsedBasePrice,
+      comparePrice: comparePrice ? parseFloat(String(comparePrice)) : null,
+      supplyPrice: resolvedPriceModel === "COMMISSION" ? null : parsedSupplyPrice,
+      // 제공 방식 (공급가 제공 / 수수료 제공)
+      priceModel: resolvedPriceModel,
+      commissionRate: resolvedCommissionRate,
+      sellerCommissionAmount: resolvedSellerCommissionAmount,
+      categoryId: categoryId || null,
+      // 상담사 직접 등록 상담상품은 등록 상담사를 기록 → 다른 상담사의 '상담상품 신청' 목록에서 제외됨
+      sellerId: role === "CONSULTANT" && sellerProfile ? sellerProfile.id : null,
+      thumbnail: thumbnail || (images && images.length > 0 ? images[0] : null),
+      isActive: true,
+      isApproved,
+      allowGroupBuy: isGroupBuy ? true : false,
+      badges: badges && Array.isArray(badges) && badges.length > 0 ? JSON.stringify(badges) : null,
+      ...((optionGroups && Array.isArray(optionGroups) && optionGroups.length > 0)
+        ? { optionGroups: JSON.stringify(optionGroups) } as any
+        : {}),
+      ...(variants && Array.isArray(variants) && variants.length > 0 ? {
+        variants: {
+          create: variants.filter((v: any) => v.name).map((v: any, i: number) => ({
+            name: v.name,
+            price: parseFloat(String(v.price || basePrice)),
+            sortOrder: i,
+          })),
+        },
+      } : {}),
+      ...(images && Array.isArray(images) && images.length > 0 ? {
+        images: {
+          create: images.filter(Boolean).map((url: string, i: number) => ({
+            url,
+            alt: `${name} 이미지 ${i + 1}`,
+            sortOrder: i,
+          })),
+        },
+      } : {}),
+    };
+
+    // ── 상담 상품 속성 ── 운영 DB에 아직 없는 컬럼(P2022)일 수 있어 실패 시 제외하고 재시도
+    const consultingAttrs = {
+      consultingType: consultingType ? String(consultingType) : "사주",
+      consultingMethod: consultingMethod ? String(consultingMethod) : "영상통화",
+      durationMinutes: Math.max(1, parseInt(String(durationMinutes ?? 30), 10) || 30),
+      maxDailySlots: Math.max(1, parseInt(String(maxDailySlots ?? 5), 10) || 5),
+    };
+
+    let product;
+    try {
+      product = await prisma.product.create({ data: { ...productData, ...consultingAttrs } });
+    } catch (e) {
+      if (!isMissingSchemaError(e)) throw e;
+      console.warn("[products/register] 상담 컬럼 미반영(P2022) — 상담 속성 제외 후 재시도");
+      product = await prisma.product.create({ data: productData });
+    }
 
     // If seller, also add to their shop products (active + 승인완료 → 즉시 판매중)
     // 이미 점집상담상품이 있으면 그대로 두고, 없으면 승인완료 상태로 생성(관리자 승인 불필요)

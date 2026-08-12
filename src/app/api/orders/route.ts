@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getPlatformFees, productSettlementRecipient } from "@/lib/settlement";
+import { isMissingSchemaError } from "@/lib/safeDb";
 
 
 export const dynamic = "force-dynamic";
@@ -209,21 +210,32 @@ export async function POST(request: Request) {
       continue;
     }
 
-    const product = await prisma.product.findUnique({
-      where: { id: item.productId },
-      select: {
-        id: true,
-        name: true,
-        basePrice: true,
-        isActive: true,
-        maxDailySlots: true,
-        // ─── 정산 스냅샷용 ───
-        supplyPrice: true,
-        priceModel: true,
-        commissionRate: true,
-        sellerId: true,
-      },
-    });
+    // maxDailySlots 는 운영 DB 미반영 컬럼(P2022)일 수 있어 실패 시 기본 정원으로 폴백 조회
+    const PRODUCT_BASE_SELECT = {
+      id: true,
+      name: true,
+      basePrice: true,
+      isActive: true,
+      // ─── 정산 스냅샷용 ───
+      supplyPrice: true,
+      priceModel: true,
+      commissionRate: true,
+      sellerId: true,
+    } as const;
+    let product;
+    try {
+      product = await prisma.product.findUnique({
+        where: { id: item.productId },
+        select: { ...PRODUCT_BASE_SELECT, maxDailySlots: true },
+      });
+    } catch (e) {
+      if (!isMissingSchemaError(e)) throw e;
+      const base = await prisma.product.findUnique({
+        where: { id: item.productId },
+        select: PRODUCT_BASE_SELECT,
+      });
+      product = base ? { ...base, maxDailySlots: 5 } : null;
+    }
     if (!product || !product.isActive) {
       return NextResponse.json({ error: "판매 중이 아닌 상담상품이 포함되어 있습니다." }, { status: 400 });
     }
@@ -464,18 +476,24 @@ export async function POST(request: Request) {
     }
 
     if (commission) {
-      await tx.referralCommission.create({
-        data: {
-          sellerId: commission.sellerId,
-          reservationId: created.id,
-          buyerUserId: session.user!.id,
-          orderAmount: totalAmount,
-          commissionRate: commission.commRate,
-          commissionAmount: commission.commAmount,
-          source: "referral",
-          status: "PENDING",
-        },
-      });
+      const commissionData = {
+        sellerId: commission.sellerId,
+        buyerUserId: session.user!.id,
+        orderAmount: totalAmount,
+        commissionRate: commission.commRate,
+        commissionAmount: commission.commAmount,
+        source: "referral",
+        status: "PENDING",
+      } as const;
+      try {
+        await tx.referralCommission.create({ data: { ...commissionData, reservationId: created.id } });
+      } catch (e) {
+        // reservationId 는 운영 DB 미반영 컬럼(P2022)일 수 있어 제외 후 재시도
+        // (스키마 타입상 필수 컬럼이라 캐스팅 필요 — DB 반영 후 이 폴백 제거)
+        if (!isMissingSchemaError(e)) throw e;
+        console.warn("[orders] referral_commissions.reservationId 미반영(P2022) — 컬럼 제외 후 재시도");
+        await tx.referralCommission.create({ data: commissionData as any });
+      }
       await tx.sellerProfile.update({
         where: { id: commission.sellerId },
         data: { totalReferralEarnings: { increment: commission.commAmount } },

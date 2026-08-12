@@ -22,6 +22,17 @@ export async function POST(req: NextRequest) {
     if (action === "startSale" || action === "stopSale" || action === "pauseSale") {
       const newActive = action === "startSale";
       if (shopProductId) {
+        // 소유권 검사 — 상담사는 본인 점집의 상담상품만 판매 상태 변경 가능 (IDOR 방지)
+        if (role === "CONSULTANT") {
+          const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
+          const shopProduct = await prisma.sellerShopProduct.findUnique({
+            where: { id: shopProductId },
+            select: { sellerId: true },
+          });
+          if (!seller || !shopProduct || shopProduct.sellerId !== seller.id) {
+            return NextResponse.json({ error: "본인 점집의 상담상품만 변경할 수 있습니다" }, { status: 403 });
+          }
+        }
         // 승인 시 isApproved도 함께 설정
         const updateData: any = { isActive: newActive };
         if (action === "startSale") {
@@ -69,6 +80,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Check permissions
+    // hide/show/delete 는 마스터 상품 자체를 바꾸는 전역 조작 — 상담사는 "본인이 등록한" 상품만 가능.
+    // (기존에는 점집에 담기만 해도 통과되어 타인 등록 상품을 전역 숨김/삭제할 수 있었다)
     if (role === "CONSULTANT") {
       const seller = await prisma.sellerProfile.findUnique({
         where: { userId: session.user!.id },
@@ -76,12 +89,8 @@ export async function POST(req: NextRequest) {
       if (!seller) {
         return NextResponse.json({ error: "상담사 프로필이 없습니다" }, { status: 403 });
       }
-      // For seller, check if the product is in their shop
-      const shopProduct = await prisma.sellerShopProduct.findFirst({
-        where: { sellerId: seller.id, productId },
-      });
-      if (!shopProduct) {
-        return NextResponse.json({ error: "이 상담상품에 대한 권한이 없습니다" }, { status: 403 });
+      if (product.sellerId !== seller.id) {
+        return NextResponse.json({ error: "본인이 등록한 상담상품만 변경할 수 있습니다" }, { status: 403 });
       }
     }
 

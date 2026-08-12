@@ -23,11 +23,20 @@ export async function POST(
 
     const order = await prisma.socialOrder.findUnique({
       where: { id: orderId },
-      select: { id: true, productId: true, quantity: true, status: true },
+      select: { id: true, productId: true, quantity: true, status: true, sellerId: true },
     });
 
     if (!order) {
       return NextResponse.json({ error: "소셜예약서를 찾을 수 없습니다." }, { status: 404 });
+    }
+
+    // 소유권 검사 — 본인 점집의 예약서만 입금 확인 가능
+    const myProfile = await prisma.sellerProfile.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true },
+    });
+    if (!myProfile || myProfile.id !== order.sellerId) {
+      return NextResponse.json({ error: "본인 점집의 예약서만 처리할 수 있습니다." }, { status: 403 });
     }
 
     if (order.status === "CONFIRMED") {

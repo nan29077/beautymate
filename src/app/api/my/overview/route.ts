@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getFeatureFlags } from "@/lib/settings";
+import { safeQuery } from "@/lib/safeDb";
 
 export const dynamic = "force-dynamic";
 
@@ -34,11 +35,6 @@ export async function GET() {
           },
         },
       },
-      reservations: {
-        include: { seller: true, items: true },
-        orderBy: { createdAt: "desc" },
-        take: 3,
-      },
       wishlists: {
         include: {
           product: {
@@ -55,11 +51,28 @@ export async function GET() {
         take: 6,
       },
       sellerProfile: { select: { id: true, isApproved: true } },
-      _count: { select: { reservations: true, reviews: true, cartItems: true, wishlists: true } },
+      _count: { select: { reviews: true, cartItems: true, wishlists: true } },
     },
   });
 
   if (!user) return NextResponse.json({ error: "유저 없음" }, { status: 404 });
+
+  // 예약 조회는 운영 DB에 reservations 테이블이 아직 없을 수 있어(P2021)
+  // 메인 include에서 분리해 safeQuery 폴백으로 감싼다.
+  const [reservations, reservationCount] = await Promise.all([
+    safeQuery(
+      "my overview reservations",
+      () =>
+        prisma.reservation.findMany({
+          where: { userId },
+          include: { seller: true, items: true },
+          orderBy: { createdAt: "desc" },
+          take: 3,
+        }),
+      [],
+    ),
+    safeQuery("my overview reservation count", () => prisma.reservation.count({ where: { userId } }), 0),
+  ]);
 
   const gameCouponCount = await prisma.userGameCoupon.count({
     where: { userId, usedAt: null, expiresAt: { gt: new Date() } },
@@ -77,7 +90,7 @@ export async function GET() {
     },
   }));
 
-  const orders = user.reservations.map((o) => ({
+  const orders = reservations.map((o) => ({
     ...o,
     finalAmount: Number(o.finalAmount),
     discountAmount: o.discountAmount ? Number(o.discountAmount) : null,
@@ -94,7 +107,7 @@ export async function GET() {
       email: user.email,
       avatar: user.avatar,
     },
-    counts: user._count,
+    counts: { ...user._count, reservations: reservationCount },
     orders,
     wishlists,
     pickedSellers: pickedSellers.map((f) => ({

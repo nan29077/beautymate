@@ -108,11 +108,22 @@ export async function POST(request: Request) {
 
   try {
     const result = await prisma.$transaction(async (tx) => {
+      // 대상 상담사 확인 — body의 sellerId 는 신뢰하지 않고 슬롯·상품과의 정합성을 검증한다
+      const sellerProfile = await tx.sellerProfile.findUnique({
+        where: { id: sellerId },
+        select: { id: true, userId: true },
+      });
+      if (!sellerProfile) throw new Error("상담사를 찾을 수 없습니다.");
+
       // 슬롯 가용 여부 확인 (비관적 잠금 대신 트랜잭션 내 재확인)
       const slot = await tx.timeSlot.findUnique({
         where: { id: timeSlotId },
       });
       if (!slot) throw new Error("존재하지 않는 시간 슬롯입니다.");
+      // 슬롯 소유자(consultantId=User.id)와 예약 대상 상담사가 일치해야 한다
+      if (slot.consultantId !== sellerProfile.userId) {
+        throw new Error("해당 상담사의 시간 슬롯이 아닙니다.");
+      }
       if (!slot.isAvailable || slot.reservationId) {
         throw new Error("SLOT_TAKEN");
       }
@@ -122,6 +133,14 @@ export async function POST(request: Request) {
         where: { id: productId },
       });
       if (!product || !product.isActive) throw new Error("상담 상품을 찾을 수 없습니다.");
+      // 상품 ↔ 상담사 정합성: 상담사 직접 등록 상품이거나, 해당 점집에 담긴 상품이어야 한다
+      if (product.sellerId !== sellerId) {
+        const shopProduct = await tx.sellerShopProduct.findFirst({
+          where: { sellerId, productId, isActive: true },
+          select: { id: true },
+        });
+        if (!shopProduct) throw new Error("해당 상담사의 상담 상품이 아닙니다.");
+      }
 
       const amount = Number(product.basePrice);
       const reservationNumber = generateOrderNumber();

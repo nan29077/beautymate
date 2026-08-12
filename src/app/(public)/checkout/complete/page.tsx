@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getShopAwareLoginPath } from "@/lib/shopLoginRedirect";
+import { safeQuery } from "@/lib/safeDb";
 import CheckoutCompleteClient from "./CheckoutCompleteClient";
 
 export const dynamic = "force-dynamic";
@@ -17,18 +18,24 @@ export default async function CheckoutCompletePage({
   const { orderId, status, msg } = searchParams;
   if (!orderId) redirect("/");
 
-  const order = await prisma.reservation.findUnique({
-    where: { id: orderId },
-    select: {
-      id: true,
-      reservationNumber: true,
-      finalAmount: true,
-      discountAmount: true,
-      paymentStatus: true,
-      userId: true,
-      pgTid: true,
-    },
-  });
+  // 운영 DB에 reservations 테이블이 아직 없을 수 있어(P2021) safeQuery 폴백 적용
+  const order = await safeQuery(
+    "checkout complete reservation",
+    () =>
+      prisma.reservation.findUnique({
+        where: { id: orderId },
+        select: {
+          id: true,
+          reservationNumber: true,
+          finalAmount: true,
+          discountAmount: true,
+          paymentStatus: true,
+          userId: true,
+          pgTid: true,
+        },
+      }),
+    null,
+  );
 
   if (!order || order.userId !== session.user!.id) redirect("/");
 

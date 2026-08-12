@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getShopAwareLoginPath } from "@/lib/shopLoginRedirect";
 import { formatPrice, parseJsonArray } from "@/lib/utils";
+import { safeQuery } from "@/lib/safeDb";
 import SafeImage from "@/components/shared/SafeImage";
 import { NO_IMAGE } from "@/lib/defaults";
 import { Navigation } from "lucide-react";
@@ -69,14 +70,20 @@ export default async function OrderDetailPage({
   if (!session?.user) redirect(getShopAwareLoginPath());
   const { id } = await Promise.resolve(params);
 
-  const order = await prisma.reservation.findUnique({
-    where: { id },
-    include: {
-      seller: { select: { shopName: true, slug: true, shopLogo: true } },
-      items: { include: { variant: true } },
-      campaign: { select: { title: true } },
-    },
-  });
+  // 운영 DB에 reservations 테이블이 아직 없을 수 있어(P2021) safeQuery 폴백 적용
+  const order = await safeQuery(
+    "my order detail",
+    () =>
+      prisma.reservation.findUnique({
+        where: { id },
+        include: {
+          seller: { select: { shopName: true, slug: true, shopLogo: true } },
+          items: { include: { variant: true } },
+          campaign: { select: { title: true } },
+        },
+      }),
+    null,
+  );
 
   // 본인 예약만 열람 가능
   if (!order || order.userId !== session.user!.id) notFound();

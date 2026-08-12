@@ -9,6 +9,7 @@ import MyPageBottomMenu from "@/components/shared/MyPageBottomMenu";
 import ApplySellerButton from "@/components/shared/ApplySellerButton";
 import { getFeatureFlags } from "@/lib/settings";
 import { requireBuyerSession } from "@/lib/buyerGuard";
+import { safeQuery } from "@/lib/safeDb";
 import { NO_IMAGE, pickBuyerAvatar, pickSajuAvatar } from "@/lib/defaults";
 import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
 import LiveBadge, { LIVE_RING_CLASS } from "@/components/shared/LiveBadge";
@@ -43,11 +44,6 @@ export default async function MyPage() {
           },
         },
       },
-      reservations: {
-        include: { seller: true, items: true },
-        orderBy: { createdAt: "desc" },
-        take: 5,
-      },
       reviews: { orderBy: { createdAt: "desc" }, take: 3 },
       wishlists: {
         include: {
@@ -65,12 +61,29 @@ export default async function MyPage() {
         take: 6,
       },
       sellerProfile: { select: { id: true, isApproved: true } },
-      _count: { select: { reservations: true, reviews: true, cartItems: true, wishlists: true } },
+      _count: { select: { reviews: true, cartItems: true, wishlists: true } },
     },
   });
 
   if (!user) redirect("/auth/login");
   const sellerApplied = !!user.sellerProfile;
+
+  // 예약 조회는 운영 DB에 reservations 테이블이 아직 없을 수 있어(P2021)
+  // 메인 include에서 분리해 safeQuery 폴백으로 감싼다. 통합 조회 시 페이지 전체가 500.
+  const [reservations, reservationCount] = await Promise.all([
+    safeQuery(
+      "my page reservations",
+      () =>
+        prisma.reservation.findMany({
+          where: { userId: session.user!.id },
+          include: { seller: true, items: true },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+        }),
+      [],
+    ),
+    safeQuery("my page reservation count", () => prisma.reservation.count({ where: { userId: session.user!.id } }), 0),
+  ]);
 
   // 사용 가능한 게임 당첨 쿠폰 수
   const gameCouponCount = await prisma.userGameCoupon.count({
@@ -84,7 +97,7 @@ export default async function MyPage() {
   const pickedSellers = user.buyerProfile?.follows || [];
 
   const menuItems = [
-    { href: "/my/orders", icon: "OrderHistory", label: "예약 내역", count: user._count.reservations, color: "bg-blue-50" },
+    { href: "/my/orders", icon: "OrderHistory", label: "예약 내역", count: reservationCount, color: "bg-blue-50" },
     { href: "/cart", icon: "Cart", label: "장바구니", count: user._count.cartItems, color: "bg-brand-50" },
     { href: "/my/reviews", icon: "WriteReview", label: "내 후기", count: user._count.reviews, color: "bg-yellow-50" },
     { href: "/my/wishlist", icon: "Wishlist", label: "찜한 상담상품", count: user._count.wishlists, color: "bg-rose-50" },
@@ -139,7 +152,7 @@ export default async function MyPage() {
             <p className="text-[10px] text-gray-400">포인트</p>
           </Link>
           <Link href="/my/orders" className="text-center py-1">
-            <p className="text-lg font-bold text-gray-900">{user._count.reservations}</p>
+            <p className="text-lg font-bold text-gray-900">{reservationCount}</p>
             <p className="text-[10px] text-gray-400">예약</p>
           </Link>
           <Link href="/my/reviews" className="text-center py-1">
@@ -329,9 +342,9 @@ export default async function MyPage() {
               전체보기
             </Link>
           </div>
-          {user.reservations.length > 0 ? (
+          {reservations.length > 0 ? (
             <div className="px-4 pb-3">
-              {user.reservations.slice(0, 3).map((order) => (
+              {reservations.slice(0, 3).map((order) => (
                 <div
                   key={order.id}
                   className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0"
@@ -370,14 +383,11 @@ export default async function MyPage() {
                         : order.status === "CANCELLED" ? "bg-red-50 text-red-600"
                         : "bg-gray-50 text-gray-600"
                     }`}>
-                      {order.status === "PENDING" && "결제대기"}
                       {order.status === "PENDING" && "예약신청"}
-                      {order.status === "CONFIRMED" && "확인됨"}
                       {order.status === "CONFIRMED" && "예약확정"}
                       {order.status === "COMPLETED" && "상담완료"}
                       {order.status === "CANCELLED" && "취소됨"}
                       {order.status === "NO_SHOW" && "노쇼"}
-                      
                     </span>
                   </div>
                 </div>

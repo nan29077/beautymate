@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isMissingSchemaError } from "@/lib/safeDb";
 
 // 금액(배송비 등) 파싱: 음수/NaN은 기본값으로 보정
 function toMoney(value: any, fallback = 0): number {
@@ -151,6 +152,9 @@ export async function PUT(
       categoryId: categoryId || null,
       thumbnail: thumbnail || null,
       isActive: isActive !== undefined ? !!isActive : undefined,
+    };
+    // 상담 속성 4종은 운영 DB 미반영 컬럼(P2022)일 수 있어 별도 객체로 분리 — 실패 시 제외하고 재시도
+    const consultingUpdate: any = {
       consultingType: consultingType !== undefined ? String(consultingType) : undefined,
       consultingMethod: consultingMethod !== undefined ? String(consultingMethod) : undefined,
       durationMinutes:
@@ -158,6 +162,7 @@ export async function PUT(
       maxDailySlots:
         maxDailySlots !== undefined ? Math.max(1, parseInt(String(maxDailySlots), 10) || 5) : undefined,
     };
+    Object.keys(consultingUpdate).forEach(k => { if (consultingUpdate[k] === undefined) delete consultingUpdate[k]; });
 
     if (parsedBasePrice !== undefined) {
       updateData.basePrice = parsedBasePrice;
@@ -180,10 +185,20 @@ export async function PUT(
     // undefined 값 제거 (기존값 유지)
     Object.keys(updateData).forEach(k => { if (updateData[k] === undefined) delete updateData[k]; });
 
-    const updated = await prisma.product.update({
-      where: { id: params.id },
-      data: updateData,
-    });
+    let updated;
+    try {
+      updated = await prisma.product.update({
+        where: { id: params.id },
+        data: { ...updateData, ...consultingUpdate },
+      });
+    } catch (e) {
+      if (!isMissingSchemaError(e)) throw e;
+      console.warn("[products/[id]] 상담 컬럼 미반영(P2022) — 상담 속성 제외 후 재시도");
+      updated = await prisma.product.update({
+        where: { id: params.id },
+        data: updateData,
+      });
+    }
 
     // variants 업데이트: 기존 삭제 후 재생성
     if (variantList !== null) {

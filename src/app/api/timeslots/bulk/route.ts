@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isMissingSchemaError } from "@/lib/safeDb";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,16 @@ export async function POST(request: Request) {
   }
   if (dates.length > 31) {
     return NextResponse.json({ error: "최대 31일까지 일괄 생성 가능합니다." }, { status: 400 });
+  }
+  // 시간 파라미터 검증 — 0/음수 간격은 무한 루프, 과대 범위는 대량 행 생성으로 이어짐
+  if (
+    !Number.isInteger(startHour) || !Number.isInteger(endHour) ||
+    !Number.isInteger(intervalMinutes) || !Number.isInteger(durationMinutes) ||
+    startHour < 0 || startHour > 23 || endHour < 1 || endHour > 24 || startHour >= endHour ||
+    intervalMinutes < 5 || intervalMinutes > 24 * 60 ||
+    durationMinutes < 5 || durationMinutes > 24 * 60
+  ) {
+    return NextResponse.json({ error: "시간 설정 값이 올바르지 않습니다." }, { status: 400 });
   }
 
   const slotData: {
@@ -66,10 +77,19 @@ export async function POST(request: Request) {
   }
 
   // createMany + skipDuplicates
-  const result = await prisma.timeSlot.createMany({
-    data: slotData,
-    skipDuplicates: true,
-  });
-
-  return NextResponse.json({ created: result.count }, { status: 201 });
+  try {
+    const result = await prisma.timeSlot.createMany({
+      data: slotData,
+      skipDuplicates: true,
+    });
+    return NextResponse.json({ created: result.count }, { status: 201 });
+  } catch (err) {
+    if (isMissingSchemaError(err)) {
+      return NextResponse.json(
+        { error: "시간슬롯 저장소가 아직 준비되지 않았습니다. 관리자에게 문의해 주세요." },
+        { status: 503 },
+      );
+    }
+    throw err;
+  }
 }

@@ -135,12 +135,14 @@ export default function SafeImage({
 
   return (
     <img
+      // 재시도/폴백 단계가 바뀔 때 강제 리마운트해서 onError 가 단계마다 다시 발화하게 한다
+      key={`${imgSrc}-${retryCount}-${usePlaceholder ? 1 : 0}`}
       src={imgSrc}
       alt={alt}
       width={width}
       height={height}
       className={className}
-      onError={() => setError(true)}
+      onError={handleError}
       style={{ minWidth: 0, minHeight: 0 }}
     />
   );

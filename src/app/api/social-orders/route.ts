@@ -59,14 +59,34 @@ export async function POST(request: Request) {
 }
 
 // 소셜예약서 조회 (?sellerId=xxx [&productId=xxx])
+// 이름·주소·연락처 등 PII가 포함되므로 해당 점집 상담사 본인 또는 관리자만 조회 가능
 export async function GET(request: Request) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const sellerId = searchParams.get("sellerId");
     const productId = searchParams.get("productId");
 
     if (!sellerId) {
       return NextResponse.json({ error: "sellerId가 필요합니다." }, { status: 400 });
+    }
+
+    const role = (session.user as any).role;
+    if (role !== "SUPER_ADMIN") {
+      if (role !== "CONSULTANT") {
+        return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
+      }
+      const myProfile = await prisma.sellerProfile.findUnique({
+        where: { userId: session.user.id },
+        select: { id: true },
+      });
+      if (!myProfile || myProfile.id !== sellerId) {
+        return NextResponse.json({ error: "본인 점집의 예약서만 조회할 수 있습니다." }, { status: 403 });
+      }
     }
 
     const rows = await prisma.socialOrder.findMany({

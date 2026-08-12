@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getShopAwareLoginPath } from "@/lib/shopLoginRedirect";
 import { formatPrice } from "@/lib/utils";
-import {  } from "lucide-react";
+import { safeQuery } from "@/lib/safeDb";
 
 export const dynamic = "force-dynamic";
 
@@ -44,17 +44,23 @@ export default async function MyOrdersPage() {
   const session = await auth();
   if (!session?.user) redirect(getShopAwareLoginPath());
 
-  const orders = await prisma.reservation.findMany({
-    where: { userId: session.user!.id },
-    include: {
-      seller: true,
-      items: {
-        include: { variant: true },
-      },
-      campaign: { select: { title: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  // 운영 DB에 reservations 테이블이 아직 없을 수 있어(P2021) safeQuery 폴백 적용
+  const orders = await safeQuery(
+    "my orders list",
+    () =>
+      prisma.reservation.findMany({
+        where: { userId: session.user!.id },
+        include: {
+          seller: true,
+          items: {
+            include: { variant: true },
+          },
+          campaign: { select: { title: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      }),
+    [],
+  );
 
   return (
     <div className="animate-fade-in pb-4">
