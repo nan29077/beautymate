@@ -31,6 +31,15 @@ function getDashboardPath(role: string): string {
   }
 }
 
+// 개발 환경 전용 테스트 계정 (prisma/seed.ts 기준, 공통 비밀번호 password123)
+const TEST_ACCOUNTS = [
+  { key: "admin", label: "관리자로 로그인", email: "admin@sajumate.com", password: "password123" },
+  { key: "consultant", label: "상담사로 로그인", email: "consultant1@sajumate.com", password: "password123" },
+] as const;
+
+// process.env.NODE_ENV 는 빌드 시 인라인되므로 프로덕션 번들에는 이 블록이 남지 않는다.
+const IS_DEV = process.env.NODE_ENV === "development";
+
 function normalizeInternalCallbackUrl(value: string | null): string | null {
   if (!value || !value.startsWith("/") || value.startsWith("//")) return null;
   return value;
@@ -61,6 +70,8 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [findIdOpen, setFindIdOpen] = useState(false);
   const [forgotPwOpen, setForgotPwOpen] = useState(false);
+  // 어떤 테스트 계정 버튼이 진행 중인지 (개발 환경 전용)
+  const [testLoading, setTestLoading] = useState<string | null>(null);
 
   useEffect(() => {
     setShopFallbackUrl(readShopCallbackUrl());
@@ -118,6 +129,31 @@ function LoginForm() {
       setError("로그인 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 개발 환경 테스트 계정 즉시 로그인 (시드 계정이 없으면 로그인 실패 메시지 노출)
+  const handleTestLogin = async (account: (typeof TEST_ACCOUNTS)[number]) => {
+    setError("");
+    setSellerPending(false);
+    setTestLoading(account.key);
+    try {
+      const result = await signIn("credentials", {
+        email: account.email,
+        password: account.password,
+        redirect: false,
+      });
+      if (result?.error) {
+        setError(
+          `테스트 계정(${account.email}) 로그인에 실패했습니다. 시드 데이터가 투입되었는지 확인해주세요.`,
+        );
+      } else {
+        await redirectAfterLogin();
+      }
+    } catch {
+      setError("로그인 중 오류가 발생했습니다.");
+    } finally {
+      setTestLoading(null);
     }
   };
 
@@ -364,6 +400,47 @@ function LoginForm() {
             </button>
           </form>
         </div>
+
+        {/* ───── 개발 환경 전용 테스트 로그인 ───── */}
+        {IS_DEV && (
+          <div className="mt-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex-1 h-px bg-gray-200" />
+              <span className="text-[11px] text-gray-400 font-medium">
+                개발용 테스트 로그인
+              </span>
+              <div className="flex-1 h-px bg-gray-200" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {TEST_ACCOUNTS.map((account) => (
+                <button
+                  key={account.key}
+                  type="button"
+                  onClick={() => handleTestLogin(account)}
+                  disabled={loading || testLoading !== null}
+                  className="flex flex-col items-center gap-0.5 py-2.5 px-2 rounded-xl border border-dashed border-gray-300 bg-white text-gray-600 hover:border-amber-300 hover:bg-amber-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {testLoading === account.key ? (
+                    <span className="flex items-center gap-1.5 text-xs font-semibold py-0.5">
+                      <span className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      로그인 중...
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-xs font-semibold">{account.label}</span>
+                      <span className="text-[10px] text-gray-400">{account.email}</span>
+                    </>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            <p className="mt-2 text-center text-[10px] text-gray-400">
+              시드 계정(비밀번호 password123) 기준 · 개발 환경에서만 표시됩니다
+            </p>
+          </div>
+        )}
 
         <div className="mt-4 flex items-center justify-center gap-3 text-xs text-gray-400">
           <button
