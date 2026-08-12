@@ -4,9 +4,20 @@
 
 import { getSettingsMap, setSettings } from "@/lib/settings";
 
-export const HOME_STATS_KEY = "home.stats";
+// ⚠️ 키를 v2 로 올린 이유 (2026-08-12)
+// 운영 DB Setting 테이블에 셀러브릭스 시절 값이 남아 코드 기본값을 덮어쓰고 있었다.
+//   home.stats    → "30억+ 누적 거래액", "50+ 활동 라이브 셀러", "98% 배송 만족도"
+//   home.benefits → "68% 단골 재구매율", "3.2x 라이브 평균 체류", "정산·배송 걱정 없이"
+// DB 값이 코드 기본값보다 우선하는 구조라 기본값만 고쳐서는 화면이 바뀌지 않는다.
+// 키를 바꿔 구 행을 아예 읽지 않게 한다. (배너 FOUC 와 동일한 DB 드리프트 유형)
+// 구 행(LEGACY_*)은 노출되지 않지만 DB 에는 남아 있다 — 관리자 화면에서 정리 권장.
+export const HOME_STATS_KEY = "home.stats.v2";
 export const HOME_STORIES_KEY = "home.stories";
-export const HOME_BENEFITS_KEY = "home.benefits";
+export const HOME_BENEFITS_KEY = "home.benefits.v2";
+
+// 더 이상 읽지 않는 구 키 (정리용 참조)
+export const LEGACY_HOME_STATS_KEY = "home.stats";
+export const LEGACY_HOME_BENEFITS_KEY = "home.benefits";
 
 export type HomeStat = { value: string; label: string };
 export type HomeStory = { name: string; quote: string; metric: string; avatar: string };
@@ -30,18 +41,23 @@ export const DEFAULT_HOME_STORIES: HomeStory[] = [
   { name: "청아 · 궁합 상담사", quote: "유튜브 채팅과 예약 화면이 이어지니 시청자가 방송을 보다가 자연스럽게 원하는 시간을 선택합니다.", metric: "유튜브 LIVE 연동", avatar: "/avatars/saju/saju-avatar-25.png" },
 ];
 
-// "사주메이트로 얻는 것" 기본값
+// "상담사가 사주메이트를 선택하는 이유" 기본값 — 상담사 관점
+//
+// ⚠️ 수치 표기 원칙: 여기 값은 "플랫폼이 제공하는 것"을 나타내는 기능형 수치다.
+// 재구매율·전환율 같은 성과 지표는 실측 데이터 없이 쓰지 않는다. (셀러브릭스 시절
+// "68% 단골 재구매율", "3.2x 라이브 평균 체류" 는 근거 없는 수치였다.)
+// 실제 성과 수치가 필요하면 Reservation 집계로 계산해 주입할 것 — docs 참고.
 export const DEFAULT_HOME_BENEFITS: HomeBenefits = {
   stats: [
-    { value: "LIVE", label: "방송 연동", sub: "유튜브·SNS" },
-    { value: "24H", label: "예약 접수", sub: "방송 후에도" },
-    { value: "PICK", label: "단골 관리", sub: "알림과 재상담" },
-    { value: "ONE", label: "예약·결제", sub: "한 흐름으로" },
+    { value: "24시간", label: "쉬는 동안에도 예약", sub: "방송이 끝난 뒤에도" },
+    { value: "LIVE", label: "방송 중 실시간 예약", sub: "유튜브·SNS 연동" },
+    { value: "PICK", label: "다시 찾는 단골 고객", sub: "재상담 이력까지" },
+    { value: "0건", label: "입금 확인 수작업", sub: "예약·정산 자동화" },
   ],
   items: [
-    { iconType: "heart", title: "PICK으로 이어지는 단골 상담", desc: "한 번 만난 상담사와 다시 연결되는 관계 중심의 상담 경험." },
-    { iconType: "radio", title: "라이브에서 바로 예약", desc: "방송 중 남은 상담 시간을 확인하고 예약과 결제를 한 번에." },
-    { iconType: "shield", title: "입금 확인과 일정 조율을 간편하게", desc: "복잡한 운영은 플랫폼이 맡고 상담사는 상담과 방송에 집중." },
+    { iconType: "radio", title: "방송하는 동안 예약이 쌓입니다", desc: "시청자가 채팅으로 묻고 기다릴 필요 없이, 남은 상담 시간을 보고 그 자리에서 예약합니다." },
+    { iconType: "heart", title: "한 번 만난 분이 다시 찾아옵니다", desc: "나를 PICK한 고객에게 방송 소식을 전하고, 지난 상담 기록을 보며 이어서 상담합니다." },
+    { iconType: "shield", title: "상담에만 집중하시면 됩니다", desc: "예약 접수와 시간 조율, 입금 확인과 정산까지 플랫폼이 대신 처리합니다." },
   ],
 };
 

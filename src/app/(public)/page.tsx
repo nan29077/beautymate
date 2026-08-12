@@ -377,10 +377,10 @@ export default async function HomePage({
         <SellerMarquee />
       </section>
 
-      {/* ───── 사주메이트로 얻는 것 (통계·효과·혜택) ───── */}
+      {/* ───── 상담사가 사주메이트를 선택하는 이유 (수치·혜택) ───── */}
       <section className="px-5 pt-7 pb-2">
-        <h2 className="text-[17px] font-extrabold text-gray-900">사주메이트로 얻는 것</h2>
-        <p className="mt-1 text-[12px] text-gray-500">단골 중심 상담이 만드는 차이</p>
+        <h2 className="text-[17px] font-extrabold text-gray-900">상담사가 사주메이트를 선택하는 이유</h2>
+        <p className="mt-1 text-[12px] text-gray-500">방송부터 예약, 단골 관리까지 한 곳에서</p>
         <div className="mt-4 grid grid-cols-2 gap-2.5">
           {homeBenefits.stats.map((s, i) => (
             <StatTile key={i} value={s.value} label={s.label} sub={s.sub} />
