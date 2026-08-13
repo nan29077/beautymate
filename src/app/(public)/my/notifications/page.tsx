@@ -56,7 +56,7 @@ export default async function NotificationsPage() {
           <Icon name="Notification" size={40} strokeWidth={1.5} className="mx-auto mb-3 opacity-30" />
           <p className="text-sm">아직 받은 알림이 없어요</p>
           <p className="text-[11px] mt-1 text-gray-400">
-            PICK한 상담사의 라이브와 예약 소식을 여기서 받아볼 수 있어요.
+            단골 상담사의 라이브와 예약 소식을 여기서 받아볼 수 있어요.
           </p>
         </div>
       ) : (

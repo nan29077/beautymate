@@ -53,7 +53,7 @@ export default function HomeStartTabs() {
           {tab === "signup" ? (
             <div className="mt-5">
               <p className="text-[12px] text-gray-400 mb-3">
-                고객으로 가입하고 좋아하는 상담사를 PICK하세요.
+                고객으로 가입하고 좋아하는 상담사를 단골로 설정하세요.
               </p>
               <Link
                 href="/auth/register"

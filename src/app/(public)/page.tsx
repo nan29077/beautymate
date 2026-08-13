@@ -23,18 +23,18 @@ export const dynamic = "force-dynamic";
 // 서비스 차별점 (왜 사주메이트인가)
 const DIFFERENTIATORS = [
   { icon: Radio, color: "text-rose-500", bg: "bg-rose-50", title: "내 방송이 곧 예약창구", desc: "검색 마켓플레이스가 아니라, 상담사가 자신의 시청자를 그대로 데려오는 구조예요." },
-  { icon: Heart, color: "text-pink-500", bg: "bg-pink-50", title: "단골 중심 구조", desc: "내가 PICK한 상담사와 깊게 연결돼요. 상담사는 팬을 고객으로 만들 수 있어요." },
+  { icon: Heart, color: "text-pink-500", bg: "bg-pink-50", title: "단골 중심 구조", desc: "내가 단골로 등록한 상담사와 깊게 연결돼요. 상담사는 팬을 고객으로 만들 수 있어요." },
   { icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-50", title: "안심 거래·정산", desc: "통신판매중개 보호와 투명한 정산으로 안전하게." },
   { icon: Gift, color: "text-brand-600", bg: "bg-brand-50", title: "5분이면 시작", desc: "상담 상품과 가능한 시간만 등록하면 오늘 방송부터 예약을 받아요." },
 ];
 
 // 라이브 상담 진행 방법 (고객 / 상담사)
-const BUYER_STEPS = ["좋아하는 상담사를 PICK해요", "방송 시작 알림을 받아요", "라이브에 입장해 소통해요", "원하는 시간에 바로 예약·결제해요"];
+const BUYER_STEPS = ["좋아하는 상담사를 단골로 설정해요", "방송 시작 알림을 받아요", "라이브에 입장해 소통해요", "원하는 시간에 바로 예약·결제해요"];
 const SELLER_STEPS = ["상담 상품과 가능한 시간을 등록해요", "평소처럼 라이브 방송을 켜요", "예약 URL·QR을 설명란에 걸어둬요", "방송이 끝나면 예약이 쌓여 있어요"];
 
-// 메인 페이지 = "사주메이트 브랜드 소개 + 상담사 진입(이름검색/PICK) + 상담사 신청 유도" 화면.
+// 메인 페이지 = "사주메이트 브랜드 소개 + 상담사 진입(이름검색/단골) + 상담사 신청 유도" 화면.
 // ※ 상담상품 판매/구매 리스트(인기상담상품·공구·상담상품 그리드 등)는 두지 않는다.
-//   유일한 예외: 내가 PICK한 상담사가 "지금 라이브 방송 중"인 상담상품을 상담사별로 묶어 보여준다.
+//   유일한 예외: 내가 단골로 등록한 상담사가 "지금 라이브 방송 중"인 상담상품을 상담사별로 묶어 보여준다.
 async function getHomeData(featureLive: boolean) {
   const session = await auth();
   const isBuyer = !!(session?.user && session.user.role === "CUSTOMER");
@@ -237,12 +237,12 @@ export default async function HomePage({
         liveCampaignCount={activeCampaignCount}
       />
 
-      {/* ───── 내 PICK 상담사 LIVE 방송 중 상담상품 (상담사별 구분) ───── */}
+      {/* ───── 내 단골 상담사 LIVE 방송 중 상담상품 (상담사별 구분) ───── */}
       {liveSellers.length > 0 && (
         <section className="pt-6 pb-2">
           <div className="flex items-center gap-1.5 px-4 mb-3">
             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            <h2 className="text-sm font-bold text-gray-900">내PICK 라이브</h2>
+            <h2 className="text-sm font-bold text-gray-900">내 단골 라이브</h2>
             <span className="text-[10px] text-gray-400">지금 방송 중</span>
           </div>
 
@@ -329,17 +329,17 @@ export default async function HomePage({
         </section>
       )}
 
-      {/* 라이브 중인 PICK 상담사가 없을 때(로그인 고객에게만) 안내 */}
+      {/* 라이브 중인 단골 상담사가 없을 때(로그인 고객에게만) 안내 */}
       {liveSellers.length === 0 && isBuyer && (
         <section className="pt-6 pb-1 px-4">
           <div className="flex items-center gap-1.5 mb-2">
             <span className="w-2 h-2 rounded-full bg-gray-300" />
-            <h2 className="text-sm font-bold text-gray-900">내PICK 라이브</h2>
+            <h2 className="text-sm font-bold text-gray-900">내 단골 라이브</h2>
           </div>
           <div className="rounded-2xl border border-gray-100 bg-gray-50/60 px-4 py-5 text-center">
             <Icon name="Live" size={24} strokeWidth={1.5} className="mx-auto mb-2 text-gray-300" />
-            <p className="text-[12px] text-gray-500">현재 라이브 중인 PICK 상담사가 없어요</p>
-            <p className="text-[11px] text-gray-400 mt-0.5">PICK한 상담사가 방송을 시작하면 여기에 표시돼요</p>
+            <p className="text-[12px] text-gray-500">현재 라이브 중인 단골 상담사가 없어요</p>
+            <p className="text-[11px] text-gray-400 mt-0.5">단골 상담사가 방송을 시작하면 여기에 표시돼요</p>
           </div>
         </section>
       )}
@@ -349,7 +349,7 @@ export default async function HomePage({
         <SellerSearchHero />
       </div>
 
-      {/* ───── 내 PICK + 빠른 메뉴 ───── */}
+      {/* ───── 내 단골 + 빠른 메뉴 ───── */}
       <HomeMyShopBar />
 
       {/* ───── 사주메이트 소개: 우리는 이런 곳이에요 ───── */}
@@ -361,7 +361,7 @@ export default async function HomePage({
           검색해서 찾는 마켓이 아니라, 상담사의 방송이 그대로 예약 창구가 됩니다.
         </p>
         <div className="mt-4 grid grid-cols-3 gap-2.5">
-          <IntroStat icon={<Icon name="Users" size={18} className="text-brand-600" />} value="단골 PICK" label="나만의 상담사" />
+          <IntroStat icon={<Icon name="Users" size={18} className="text-brand-600" />} value="단골" label="나만의 상담사" />
           <IntroStat icon={<Icon name="Live" size={18} className="text-rose-500" />} value="라이브" label="실시간 소통" />
           <IntroStat icon={<Icon name="Certified" size={18} className="text-emerald-500" />} value="안심거래" label="중개 보호" />
         </div>
@@ -584,7 +584,7 @@ export default async function HomePage({
         <h2 className="text-[15px] font-extrabold text-gray-900">이렇게 즐겨요</h2>
         <div className="mt-4 space-y-2.5">
           <StoryStep no={1} icon={<Icon name="Search" size={16} className="text-brand-600" />} title="상담사를 찾아요" desc="상담사 이름·분야로 검색해 마음에 드는 상담사를 만나요." />
-          <StoryStep no={2} icon={<Icon name="Wishlist" size={16} className="text-pink-500" />} title="상담사를 PICK해요" desc="PICK하면 방송 시작 알림을 받고 예약 소식을 놓치지 않아요." />
+          <StoryStep no={2} icon={<Icon name="Wishlist" size={16} className="text-pink-500" />} title="상담사를 단골로 설정해요" desc="단골로 설정하면 방송 시작 알림을 받고 예약 소식을 놓치지 않아요." />
           <StoryStep no={3} icon={<Icon name="Live" size={16} className="text-rose-500" />} title="방송 보고 바로 예약해요" desc="라이브를 보다가 원하는 시간을 골라 그 자리에서 예약·결제해요." />
         </div>
       </section>

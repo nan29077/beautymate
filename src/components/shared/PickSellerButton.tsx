@@ -46,7 +46,7 @@ export default function PickSellerButton({
     }
 
     if (isPicked) {
-      const confirmed = await appConfirm("Pick을 취소하시겠습니까?");
+      const confirmed = await appConfirm("단골 설정을 취소하시겠습니까?");
       if (!confirmed) return;
     }
 
@@ -91,15 +91,15 @@ export default function PickSellerButton({
             <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur mx-auto flex items-center justify-center mb-3">
               <Sparkles size={28} className="text-white" />
             </div>
-            <h2 className="text-xl font-bold text-white mb-1">Pick 완료!</h2>
-            <p className="text-white/80 text-sm">{sellerName}을(를) Pick 하셨습니다</p>
+            <h2 className="text-xl font-bold text-white mb-1">단골 설정 완료!</h2>
+            <p className="text-white/80 text-sm">{sellerName}을(를) 단골로 설정했습니다</p>
           </div>
         </div>
 
         <div className="px-6 py-5">
           <div className="bg-brand-50 rounded-xl px-4 py-3 mb-4">
             <p className="text-[13px] text-brand-700 leading-relaxed">
-              Pick 한 상담사의 <strong>라이브 상담 시작</strong>과 새 소식을 알림으로 받아볼 수 있어요.
+              단골 상담사의 <strong>라이브 상담 시작</strong>과 새 소식을 알림으로 받아볼 수 있어요.
             </p>
           </div>
           <button onClick={() => setShowPopup(false)} className="w-full py-3 text-sm btn-primary">
@@ -121,7 +121,7 @@ export default function PickSellerButton({
           className={`p-2 rounded-full transition-all ${
             isPicked ? "bg-brand-50 text-brand-500" : "bg-white/80 text-gray-400 hover:text-brand-500"
           } ${className}`}
-          title={isPicked ? "Pick 해제" : `${sellerName} Pick`}
+          title={isPicked ? "단골 해제" : `${sellerName} 단골 설정`}
         >
           <Icon name="Wishlist" size={20} strokeWidth={1.5} className={isPicked ? "fill-brand-500" : ""} />
         </button>
@@ -143,7 +143,7 @@ export default function PickSellerButton({
           } ${className}`}
         >
           <Icon name="Wishlist" size={18} strokeWidth={1.5} className={isPicked ? "fill-brand-500 text-brand-500" : ""} />
-          {isPicked ? "Picked!" : "Pick"}
+          {isPicked ? "단골" : "단골 설정"}
         </button>
         {showPopup && <PickPopup />}
       </>
@@ -162,7 +162,7 @@ export default function PickSellerButton({
         } ${className}`}
       >
         <Icon name="Wishlist" size={16} strokeWidth={isPicked ? 2 : 1.5} className={isPicked ? "fill-white" : ""} />
-        {isPicked ? "Picked" : "Pick"}
+        {isPicked ? "단골" : "단골 설정"}
       </button>
       {showPopup && <PickPopup />}
     </>

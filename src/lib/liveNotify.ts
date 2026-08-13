@@ -32,7 +32,7 @@ export async function notifyLiveStartToFollowers(
           shopName: true,
           slug: true,
           followers: {
-            // 라이브 알림톡 수신에 동의한 PICK 회원에게만 발송
+            // 라이브 알림톡 수신에 동의한 단골 회원에게만 발송
             where: { buyer: { liveAlimtalkOptIn: true } },
             select: {
               buyer: { select: { user: { select: { name: true, phone: true } } } },

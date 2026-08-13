@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useId } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Bell, User, BookOpen, Heart, Gift, Share2, X, Play, Clock, ChevronRight, ChevronDown, ChevronUp, Eye, Loader2, Star, ExternalLink, Copy, CheckCircle, Video, BellRing, Pin, Info, Calendar, Building2, Sparkles } from "lucide-react";
+import { Bell, User, BookOpen, Heart, Gift, Share2, X, Play, Clock, ChevronRight, ChevronDown, ChevronUp, Eye, Loader2, Star, ExternalLink, Copy, CheckCircle, Video, BellRing, Pin, Info, Calendar, CalendarClock, Radio, Store, Users, Building2, Sparkles } from "lucide-react";
 
 // ─── YouTube 미리보기 URL 파싱 (음소거 자동재생) ───
 function getYoutubePreviewUrl(url: string): string | null {
@@ -198,12 +198,6 @@ export default function LiveChannelPage() {
   const [myOverview, setMyOverview] = useState<any>(null);
   const [myOverviewLoading, setMyOverviewLoading] = useState(false);
 
-  // 장바구니 바텀시트
-  const [showCart, setShowCart] = useState(false);
-  const [cartItems, setCartItems] = useState<any[]>([]);
-  const [cartFetching, setCartFetching] = useState(false);
-  const [cartNeedLogin, setCartNeedLogin] = useState(false);
-
   const showToast = useCallback((msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 2500);
@@ -337,19 +331,6 @@ export default function LiveChannelPage() {
     showToast(next ? `'${title}' 방송 알림을 신청했어요!` : "방송 알림을 해제했어요");
   };
 
-  const openCart = async () => {
-    setShowCart(true);
-    setCartFetching(true);
-    setCartNeedLogin(false);
-    try {
-      const res = await fetch('/api/cart');
-      if (res.status === 401) { setCartNeedLogin(true); return; }
-      const data = await res.json();
-      setCartItems(data.items || []);
-    } catch { setCartItems([]); }
-    finally { setCartFetching(false); }
-  };
-
   // ─── 로딩/에러 ───
   if (loading) {
     return (
@@ -404,12 +385,11 @@ export default function LiveChannelPage() {
 
   // ─── 우측 아이콘 메뉴 정의 ───
   const iconMenu: { key: string; label: string; icon?: any; imgSrc?: string; badge?: number; filled?: boolean; onClick: () => void }[] = [
-    { key: "notice", label: "공지사항", imgSrc: "/icons/Notification_icon.png", badge: unreadNotices, onClick: openNotices },
+    { key: "notice", label: "공지사항", icon: Bell, badge: unreadNotices, onClick: openNotices },
     { key: "me", label: "마이페이지", icon: User, onClick: () => setShowMyPage(true) },
-    { key: "orders", label: "예약내역", imgSrc: "/icons/OrderManagement_icon.png", onClick: openOrders },
-    { key: "cart", label: "장바구니", icon: Calendar, onClick: openCart },
-    { key: "event", label: "이벤트", imgSrc: "/icons/Benefits_icon.png", onClick: () => setShowEvents(true) },
-    { key: "share", label: "공유하기", imgSrc: "/icons/ShareLink_icon.png", onClick: () => setShowShare(true) },
+    { key: "orders", label: "예약내역", icon: Calendar, onClick: openOrders },
+    { key: "event", label: "이벤트", icon: Gift, onClick: () => setShowEvents(true) },
+    { key: "share", label: "공유하기", icon: Share2, onClick: () => setShowShare(true) },
   ];
 
   return (
@@ -425,7 +405,7 @@ export default function LiveChannelPage() {
 
         {/* ═══ 상단 헤더 ═══ */}
         <header className="bg-white/85 backdrop-blur-sm border-b-2 border-amber-100 sticky top-0 z-30">
-          {/* 메인 행: 프로필 + 상담사명 + Pick 버튼 */}
+          {/* 메인 행: 프로필 + 상담사명 + 단골 버튼 */}
           <div className="px-4 py-2 h-12 flex items-center gap-3">
             <Link href={`/shop/${channel.seller.slug}`} className="flex-shrink-0">
               {channel.seller.shopLogo ? (
@@ -453,7 +433,7 @@ export default function LiveChannelPage() {
               className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[12px] font-bold transition-all shadow-sm ${following ? "bg-amber-50 border border-amber-200" : ""}`}
               style={following ? { color: GOLD } : { backgroundColor: HONEY, color: BROWN }}
             >
-              {followLoading ? <Loader2 size={14} className="animate-spin" /> : following ? "Pick 완료" : "+ Pick"}
+              {followLoading ? <Loader2 size={14} className="animate-spin" /> : following ? "단골" : "단골 설정"}
             </button>
           </div>
           {/* 방송 제목 별도 줄 */}
@@ -673,7 +653,7 @@ export default function LiveChannelPage() {
         {/* ═══ 방송 소개 ═══ */}
         <section className="mx-3 mt-3 bg-white rounded-2xl border border-amber-100 p-4">
           <h2 className="flex items-center gap-1.5 text-[13px] font-extrabold mb-2" style={{ color: BROWN }}>
-            <img src="/icons/Broadcast_icon.png" className="w-4 h-4 object-contain" alt="" /> 방송 소개
+            <Radio size={15} strokeWidth={1.6} /> 방송 소개
           </h2>
           <p className={`text-[12.5px] leading-relaxed text-gray-600 whitespace-pre-wrap ${descExpanded ? "" : "line-clamp-3"}`}>
             {(isLive && siteSettings.liveIntro) || channel.description || channel.seller.shopDescription || `${channel.seller.shopName} 채널에 오신 것을 환영합니다! 달콤한 혜택 가득한 라이브 방송을 만나보세요.`}
@@ -688,7 +668,7 @@ export default function LiveChannelPage() {
         {/* ═══ 예약된 라이브 ═══ */}
         <section className="mx-3 mt-3 bg-white rounded-2xl border border-amber-100 p-4">
           <h2 className="flex items-center gap-1.5 text-[13px] font-extrabold mb-3" style={{ color: BROWN }}>
-            <img src="/icons/ScheduleLive_icon.png" alt="예약 라이브" className="w-5 h-5 object-contain" /> 예약된 라이브
+            <CalendarClock size={16} strokeWidth={1.6} /> 예약된 라이브
           </h2>
           {channel.scheduledLives.length === 0 ? (
             <div className="py-6 text-center">
@@ -708,7 +688,7 @@ export default function LiveChannelPage() {
                           <span className="text-[16px] font-extrabold leading-none" style={{ color: BROWN }}>{d.getDate()}</span>
                         </>
                       ) : (
-                        <img src="/icons/Calendar_icon.png" alt="" className="w-6 h-6 object-contain opacity-50" />
+                        <Calendar size={22} strokeWidth={1.5} className="opacity-50" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -736,7 +716,7 @@ export default function LiveChannelPage() {
         <section className="mx-3 mt-3 mb-4 bg-white rounded-2xl border border-amber-100 p-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="flex items-center gap-1.5 text-[13px] font-extrabold" style={{ color: BROWN }}>
-              <img src="/icons/LiveProductShowcase_icon.png" className="w-4 h-4 object-contain" alt="" /> 라이브 상담상품 미리보기
+              <Sparkles size={15} strokeWidth={1.6} /> 라이브 상담상품 미리보기
             </h2>
             <span className="text-[11px] font-bold" style={{ color: GOLD }}>{channel.products.length}개</span>
           </div>
@@ -861,7 +841,7 @@ export default function LiveChannelPage() {
             className="flex items-center justify-center gap-2 w-full py-3 rounded-full text-[13px] font-bold shadow-sm transition-opacity hover:opacity-90"
             style={{ backgroundColor: BTN_COLOR, color: BROWN }}
           >
-            <img src="/icons/ShopManagement_icon.png" className="w-4 h-4 object-contain" alt="" />
+            <Store size={15} strokeWidth={1.6} />
             {channel.seller.shopName} 점집 바로가기
             <ChevronRight size={14} style={{ color: BROWN }} />
           </Link>
@@ -1055,12 +1035,11 @@ export default function LiveChannelPage() {
               </Link>
             </div>
             {/* 요약 수치 */}
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {([
                 { label: "예약", count: myOverview.counts.orders, href: "/my/orders" },
                 { label: "후기", count: myOverview.counts.reviews, href: "/my/reviews" },
                 { label: "찜", count: myOverview.counts.wishlists, href: "/my/wishlist" },
-                { label: "장바구니", count: myOverview.counts.cartItems, href: "/cart" },
               ] as { label: string; count: number; href: string }[]).map(item => (
                 <Link key={item.label} href={item.href} onClick={() => setShowMyPage(false)} className="flex flex-col items-center p-3 rounded-xl bg-white border border-amber-100">
                   <span className="text-[16px] font-extrabold" style={{ color: BROWN }}>{item.count}</span>
@@ -1071,8 +1050,8 @@ export default function LiveChannelPage() {
             {/* 바로가기 메뉴 */}
             <div className="grid grid-cols-2 gap-2">
               {([
-                { label: "예약내역", href: "/my/orders", Icon: Star },
-                { label: "장바구니", href: "/cart", Icon: Calendar },
+                { label: "예약내역", href: "/my/orders", Icon: Calendar },
+                { label: "단골 상담사", href: "/my/seller", Icon: Users },
                 { label: "찜한 상담상품", href: "/my/wishlist", Icon: Heart },
                 { label: "마이페이지 전체", href: "/my", Icon: User },
               ] as { label: string; href: string; Icon: React.ElementType }[]).map(item => (
@@ -1110,65 +1089,6 @@ export default function LiveChannelPage() {
           </div>
         ) : (
           <SheetEmpty message="정보를 불러올 수 없어요" />
-        )}
-      </BottomSheet>
-
-      {/* ═══ 장바구니 바텀시트 ═══ */}
-      <BottomSheet isOpen={showCart} title="장바구니" icon={<Calendar size={15} style={{ color: GOLD }} />} onClose={() => setShowCart(false)}>
-        {cartFetching ? (
-          <SheetLoading />
-        ) : cartNeedLogin ? (
-          <div className="py-8 text-center">
-            <User size={34} className="text-amber-300 mx-auto" />
-            <p className="text-[13px] font-bold mt-3" style={{ color: BROWN }}>로그인이 필요해요</p>
-            <p className="text-[11px] text-gray-400 mt-1">로그인하고 장바구니를 확인해보세요</p>
-            <Link href={`/auth/login?callbackUrl=/live/${code}`} className="inline-block mt-4 px-6 py-2.5 rounded-full text-[12px] font-bold shadow-sm" style={{ backgroundColor: HONEY, color: BROWN }}>
-              로그인 하러가기
-            </Link>
-          </div>
-        ) : cartItems.length === 0 ? (
-          <SheetEmpty message="장바구니가 비어있습니다" sub="라이브 상담상품을 담아보세요!" />
-        ) : (
-          <>
-            <div>
-              {cartItems.map(item => {
-                const price = item.variant?.price ?? item.product.basePrice;
-                return (
-                  <div key={item.id} className="flex items-center gap-3 p-3 border-b border-amber-50">
-                    <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-amber-50">
-                      {item.product.thumbnail ? (
-                        <img src={item.product.thumbnail} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center"><Star size={16} className="text-amber-200" /></div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[12.5px] font-bold truncate" style={{ color: BROWN }}>{item.product.name}</p>
-                      {item.variant && <p className="text-[10px] text-gray-400 mt-0.5">{item.variant.name}</p>}
-                      <p className="text-[13px] font-extrabold mt-0.5" style={{ color: GOLD }}>{price.toLocaleString()}원</p>
-                    </div>
-                    <span className="text-[12px] text-gray-400 flex-shrink-0">×{item.quantity}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="pt-4">
-              <div className="flex justify-between mb-3 text-[13px]">
-                <span className="text-gray-500 font-medium">총 {cartItems.reduce((s: number, i: any) => s + i.quantity, 0)}개</span>
-                <span className="font-extrabold" style={{ color: BROWN }}>
-                  {cartItems.reduce((s: number, i: any) => s + (i.variant?.price ?? i.product.basePrice) * i.quantity, 0).toLocaleString()}원
-                </span>
-              </div>
-              <Link
-                href="/cart"
-                onClick={() => setShowCart(false)}
-                className="w-full py-3 rounded-xl text-[13px] font-bold text-center block"
-                style={{ backgroundColor: HONEY, color: BROWN }}
-              >
-                장바구니 전체보기
-              </Link>
-            </div>
-          </>
         )}
       </BottomSheet>
 

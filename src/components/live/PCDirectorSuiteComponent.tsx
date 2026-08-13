@@ -27,8 +27,6 @@ export interface PCDirectorSuiteProps {
   coupons: any[];
   youtubeUrl?: string;
   onBack: () => void;
-  onOpenCart?: () => void;
-  onAddToCart?: (productId: string) => void;
   onBuyClick?: (productId: string) => void;
   onClaimCoupon?: (couponId: string) => void;
   onShare?: () => void;
@@ -38,8 +36,6 @@ export interface PCDirectorSuiteProps {
   onChatSend?: (message: string) => void;
   onMuteToggle?: () => void;
   onPauseToggle?: () => void;
-  cartCount?: number;
-  cartLoading?: string | null;
   couponClaimed?: Record<string, boolean>;
   couponClaimLoading?: string | null;
   chatMessages?: any[];
@@ -52,7 +48,7 @@ export interface PCDirectorSuiteProps {
 }
 
 // "chat" 탭 제거
-type RailTab = "products" | "coupon" | "intro" | "benefits";
+type RailTab = "products" | "coupon" | "intro";
 
 export default function PCDirectorSuiteComponent({
   channel,
@@ -61,8 +57,6 @@ export default function PCDirectorSuiteComponent({
   coupons,
   youtubeUrl,
   onBack,
-  onOpenCart,
-  onAddToCart,
   onBuyClick,
   onClaimCoupon,
   onShare,
@@ -72,8 +66,6 @@ export default function PCDirectorSuiteComponent({
   onChatSend,
   onMuteToggle,
   onPauseToggle,
-  cartCount = 0,
-  cartLoading = null,
   couponClaimed = {},
   couponClaimLoading = null,
   chatMessages = [],
@@ -136,7 +128,6 @@ export default function PCDirectorSuiteComponent({
     { tab: "products" as RailTab, icon: <BookOpen size={20} />, label: "상담상품" },
     { tab: "coupon" as RailTab, icon: <Ticket size={20} />, label: "쿠폰" },
     { tab: "intro" as RailTab, icon: <Info size={20} />, label: "라이브 소개" },
-    { tab: "benefits" as RailTab, icon: <Gift size={20} />, label: "혜택" },
   ];
 
   // ── 상담상품 목록 렌더 ──────────────────────────────────────────────
@@ -187,18 +178,15 @@ export default function PCDirectorSuiteComponent({
               {lp.livePrice && lp.product.basePrice !== Number(lp.livePrice) && (
                 <span className="text-[11px] text-white/30 line-through mt-0.5">{lp.product.basePrice.toLocaleString()}원</span>
               )}
-              <div className="flex items-center gap-2 mt-1.5">
-                <span className="text-[10px] text-emerald-400 bg-emerald-900/30 px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5"><Clock size={9} /> 무료배송</span>
-              </div>
             </div>
             <div className="self-center flex-shrink-0">
               <button
-                onClick={e => { e.stopPropagation(); onAddToCart?.(lp.product.id); }}
-                className="w-9 h-9 rounded-full flex items-center justify-center text-black shadow-md hover:opacity-80 transition-opacity"
+                onClick={e => { e.stopPropagation(); onBuyClick?.(lp.product.id); }}
+                className="px-3 py-1.5 rounded-full text-black text-[11px] font-bold shadow-md hover:opacity-80 transition-opacity whitespace-nowrap"
                 style={{ backgroundColor: AMBER }}
-                title="장바구니 담기"
+                title="상담 예약하기"
               >
-                <Calendar size={14} />
+                예약하기
               </button>
             </div>
           </div>
@@ -327,29 +315,6 @@ export default function PCDirectorSuiteComponent({
     </div>
   );
 
-  // ── 혜택 렌더 ──────────────────────────────────────────────────
-  const renderBenefits = () => (
-    <div className="px-4 py-4 space-y-3 min-h-0">
-      {[
-        { icon: Clock, label: "무료배송", desc: "라이브 상담 전 상품 무료배송", textCls: "text-blue-400", bgCls: "bg-blue-900/20" },
-        { icon: Tag, label: "라이브 특가", desc: "방송 중에만 적용되는 특별 할인가", textCls: "text-red-400", bgCls: "bg-red-900/20" },
-        { icon: Gift, label: "정품 보장", desc: "브랜드 공식 정품만 판매합니다", textCls: "text-emerald-400", bgCls: "bg-emerald-900/20" },
-        { icon: Star, label: "무료 반품", desc: "7일 이내 무료 교환/반품 가능", textCls: "text-purple-400", bgCls: "bg-purple-900/20" },
-        { icon: Star, label: "멤버 혜택", desc: "멤버 가입 시 추가 적립", textCls: "text-amber-400", bgCls: "bg-amber-900/20" },
-      ].map((b, i) => (
-        <div key={i} className={`flex items-center gap-3 p-4 rounded-xl ${b.bgCls}`}>
-          <div className={`w-10 h-10 rounded-full ${b.bgCls} flex items-center justify-center flex-shrink-0`}>
-            <b.icon size={18} className={b.textCls} />
-          </div>
-          <div>
-            <p className={`text-[13px] font-bold ${b.textCls}`}>{b.label}</p>
-            <p className="text-[11px] text-white/40 mt-0.5">{b.desc}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
   // ──────────────────────────────────────────────────────────────
   return (
     <div className="flex h-screen overflow-hidden honeycomb-bg">
@@ -391,15 +356,6 @@ export default function PCDirectorSuiteComponent({
         </div>
 
         <div className="flex flex-col items-center gap-1 mt-auto">
-          {/* 장바구니 */}
-          <button onClick={onOpenCart} title="장바구니" className="relative w-11 h-11 rounded-2xl flex items-center justify-center text-white/60 hover:text-white/90 hover:bg-white/10 transition-all">
-            <Calendar size={20} />
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center border border-[#050505]">
-                {cartCount > 9 ? "9+" : cartCount}
-              </span>
-            )}
-          </button>
           {/* 공지 */}
           <button onClick={onOpenNotices} title="공지사항" className="w-11 h-11 rounded-2xl flex items-center justify-center text-white/60 hover:text-white/90 hover:bg-white/10 transition-all">
             <Bell size={20} />
@@ -554,17 +510,10 @@ export default function PCDirectorSuiteComponent({
                   </div>
                 </div>
                 <button
-                  onClick={() => onAddToCart?.(lp.product.id)}
-                  className="text-amber-400 flex-shrink-0 hover:text-amber-300 transition-colors"
-                  title="장바구니 담기"
-                >
-                  <Calendar size={18} />
-                </button>
-                <button
                   onClick={() => onBuyClick?.(lp.product.id)}
                   className="bg-amber-500 text-black font-bold px-4 py-1.5 rounded-full text-sm whitespace-nowrap flex-shrink-0 hover:bg-amber-400 transition-colors"
                 >
-                  구매하기
+                  예약하기
                 </button>
               </div>
             );
@@ -604,7 +553,7 @@ export default function PCDirectorSuiteComponent({
             className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all flex-shrink-0 ${followed ? "bg-white/10 text-white/60" : "text-black"}`}
             style={followed ? {} : { backgroundColor: AMBER }}
           >
-            {followed ? "Pick완료" : "+ Pick"}
+            {followed ? "단골" : "단골 설정"}
           </button>
         </div>
 
@@ -615,12 +564,11 @@ export default function PCDirectorSuiteComponent({
 
         {/* 탭 (chat 탭 제거, '소개' → '라이브 소개') */}
         <div className="flex border-b border-white/[0.07] flex-shrink-0">
-          {(["products", "coupon", "intro", "benefits"] as const).map(tab => {
+          {(["products", "coupon", "intro"] as const).map(tab => {
             const labels: Record<RailTab, string> = {
               products: "상담상품",
               coupon: "쿠폰",
               intro: "라이브 소개",
-              benefits: "혜택",
             };
             return (
               <button
@@ -642,7 +590,6 @@ export default function PCDirectorSuiteComponent({
           {rightTab === "products" && renderProducts()}
           {rightTab === "coupon" && renderCoupons()}
           {rightTab === "intro" && renderIntro()}
-          {rightTab === "benefits" && renderBenefits()}
         </div>
 
         {/* 채팅 섹션 (flex-1, 남은 공간 채우기) */}

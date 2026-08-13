@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 // 구매회원 알림 수신 설정.
-// 현재: PICK한 상담사의 라이브 시작 카카오 알림톡 수신 동의(liveAlimtalkOptIn).
+// 현재: 단골 상담사의 라이브 시작 카카오 알림톡 수신 동의(liveAlimtalkOptIn).
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });

@@ -162,7 +162,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="InviteFriend" size={10} className="text-blue-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>1단계:</b> 상담사 "하늘 Pick"이 추천 코드 <span className="font-mono bg-white px-1 py-0.5 rounded text-brand-600 text-[10px]">HANEUL2024</span>를 팬에게 공유
+                    <b>1단계:</b> 상담사 "하늘"이 추천 코드 <span className="font-mono bg-white px-1 py-0.5 rounded text-brand-600 text-[10px]">HANEUL2024</span>를 팬에게 공유
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -186,7 +186,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="Wallet" size={10} className="text-brand-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>4단계:</b> 예약 완료 시 "하늘 Pick"에게 100,000원 × 3% = <b className="text-brand-600">3,000원 추천인 커미션</b> 자동 적립
+                    <b>4단계:</b> 예약 완료 시 "하늘"에게 100,000원 × 3% = <b className="text-brand-600">3,000원 추천인 커미션</b> 자동 적립
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -194,7 +194,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="Gift" size={10} className="text-orange-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>5단계:</b> 추후 김민수가 다시 구매할 때마다 "하늘 Pick"에게 3%의 추천인 커미션이 계속 적립 (영구 연결)
+                    <b>5단계:</b> 추후 김민수가 다시 구매할 때마다 "하늘"에게 3%의 추천인 커미션이 계속 적립 (영구 연결)
                   </div>
                 </div>
               </div>
@@ -231,40 +231,40 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
               </div>
               <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
                 <p className="text-[10px] text-amber-700">
-                  ⚠️ <b>중요:</b> 추천인 할인과 Pick+채널인증 할인은 중복 적용되지 않습니다. 둘 다 해당하는 경우 <b>더 높은 할인율</b>이 자동 적용됩니다.
+                  ⚠️ <b>중요:</b> 추천인 할인과 단골+채널인증 할인은 중복 적용되지 않습니다. 둘 다 해당하는 경우 <b>더 높은 할인율</b>이 자동 적용됩니다.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* 3. Pick 채널인증 할인 */}
+          {/* 3. 단골 채널인증 할인 */}
           <div className="p-5">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center">
                 <Icon name="Wishlist" size={16} className="text-pink-600" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-gray-900">③ Pick + 채널인증 할인 (pickDiscountRate)</h3>
+                <h3 className="text-sm font-bold text-gray-900">③ 단골 + 채널인증 할인 (pickDiscountRate)</h3>
                 <p className="text-[11px] text-gray-400">기본값: 3% | 범위: 0~5%</p>
               </div>
             </div>
             <div className="bg-pink-50 rounded-xl p-4 mb-3">
               <p className="text-xs text-gray-700 leading-relaxed">
-                <b>정의:</b> 고객이 특정 상담사를 "Pick"(팔로우)하고, SNS 채널 구독 인증을 완료한 경우 적용되는 추가 할인율입니다.
+                <b>정의:</b> 고객이 특정 상담사를 "단골"(팔로우)로 등록하고, SNS 채널 구독 인증을 완료한 경우 적용되는 추가 할인율입니다.
               </p>
               <p className="text-xs text-gray-600 leading-relaxed mt-2">
-                <b>조건:</b> ① 상담사 Pick(팔로우) 완료 <b>+</b> ② 해당 상담사의 유튜브/인스타 등 SNS 채널 구독 인증 완료 → 두 조건 모두 충족 시 할인 적용
+                <b>조건:</b> ① 상담사 단골 설정(팔로우) 완료 <b>+</b> ② 해당 상담사의 유튜브/인스타 등 SNS 채널 구독 인증 완료 → 두 조건 모두 충족 시 할인 적용
               </p>
             </div>
             <div className="bg-gray-50 rounded-xl p-4">
-              <p className="text-[11px] font-bold text-gray-600 mb-2">📋 Pick+채널인증 할인 예시 플로우</p>
+              <p className="text-[11px] font-bold text-gray-600 mb-2">📋 단골+채널인증 할인 예시 플로우</p>
               <div className="space-y-2.5">
                 <div className="flex items-start gap-2">
                   <div className="w-5 h-5 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <Icon name="Wishlist" size={10} className="text-pink-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>1단계:</b> 고객 "김민수"가 상담사 "수아 뷰티랩"을 <b>Pick</b>(팔로우) → SellerFollower 레코드 생성
+                    <b>1단계:</b> 고객 "김민수"가 상담사 "수아 뷰티랩"을 <b>단골</b>(팔로우)로 등록 → SellerFollower 레코드 생성
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -278,7 +278,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
               </div>
               <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
                 <p className="text-[10px] text-blue-700">
-                  ℹ️ Pick+채널인증 할인은 <b>해당 상담사의 상담상품 구매 시에만</b> 적용됩니다. 다른 상담사의 상담상품에는 적용되지 않습니다.
+                  ℹ️ 단골+채널인증 할인은 <b>해당 상담사의 상담상품 구매 시에만</b> 적용됩니다. 다른 상담사의 상담상품에는 적용되지 않습니다.
                 </p>
               </div>
             </div>
@@ -356,7 +356,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                 className="input-field text-sm py-2 text-center font-medium" placeholder="미변경" />
             </div>
             <div>
-              <label className="block text-[10px] font-semibold text-pink-600 mb-1">Pick 할인 (%)</label>
+              <label className="block text-[10px] font-semibold text-pink-600 mb-1">단골 할인 (%)</label>
               <input type="number" min={0} max={5} step={0.5} value={bulkValues.pickDiscountRate}
                 onChange={(e) => setBulkValues({ ...bulkValues, pickDiscountRate: e.target.value })}
                 className="input-field text-sm py-2 text-center font-medium" placeholder="미변경" />
@@ -374,7 +374,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
           <div><p className="text-[10px] text-brand-600 font-semibold mb-0.5">추천인 커미션</p><p className="text-[10px] text-gray-500">추천 코드 구매 시 인플루언서 적립</p></div>
           <div><p className="text-[10px] text-purple-600 font-semibold mb-0.5">추천인 할인</p><p className="text-[10px] text-gray-500">추천 코드 가입 회원 할인</p></div>
-          <div><p className="text-[10px] text-pink-600 font-semibold mb-0.5">Pick 채널인증 할인</p><p className="text-[10px] text-gray-500">Pick+구독인증 회원 할인</p></div>
+          <div><p className="text-[10px] text-pink-600 font-semibold mb-0.5">단골 채널인증 할인</p><p className="text-[10px] text-gray-500">단골+구독인증 회원 할인</p></div>
         </div>
       </div>
 
@@ -402,7 +402,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                   </div>
                   <div className="flex items-center gap-3 text-[10px] text-gray-400 mt-0.5">
                     <span className="flex items-center gap-0.5"><Link2 size={10} /> 추천 {seller._count.referredBuyers}명</span>
-                    <span className="flex items-center gap-0.5"><Icon name="Wishlist" size={10} /> Pick {seller._count.followers}명</span>
+                    <span className="flex items-center gap-0.5"><Icon name="Wishlist" size={10} /> 단골 {seller._count.followers}명</span>
                     <span className="flex items-center gap-0.5"><Icon name="Wallet" size={10} /> {seller.totalReferralEarnings.toLocaleString()}원</span>
                   </div>
                 </div>
@@ -425,7 +425,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     onChange={(e) => updateValue(seller.id, "referralDiscountRate", Number(e.target.value))} className="input-field text-sm py-2 text-center font-medium" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-semibold text-pink-600 mb-1">Pick 할인 (%)</label>
+                  <label className="block text-[10px] font-semibold text-pink-600 mb-1">단골 할인 (%)</label>
                   <input type="number" min={0} max={5} step={0.5} value={values.pickDiscountRate}
                     onChange={(e) => updateValue(seller.id, "pickDiscountRate", Number(e.target.value))} className="input-field text-sm py-2 text-center font-medium" />
                 </div>

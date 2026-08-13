@@ -2,7 +2,6 @@
 
 import { Icon } from '@/components/shared/Icon';
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Loader2 } from 'lucide-react';
 import { useAppDialog } from "@/components/shared/AppDialog";
 
@@ -15,7 +14,6 @@ interface Props {
 export default function ContentPostActions({ postId, status, isAdmin }: Props) {
   const [showMenu, setShowMenu] = useState(false);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const { appConfirm, appAlert } = useAppDialog();
 
   const handleAction = async (action: string) => {
@@ -28,12 +26,6 @@ export default function ContentPostActions({ postId, status, isAdmin }: Props) {
         }
         const endpoint = isAdmin ? `/api/admin/contents?id=${postId}` : `/api/content-posts?id=${postId}`;
         await fetch(endpoint, { method: "DELETE" });
-      } else if (action === "edit") {
-        // Navigate to content edit page
-        router.push(`/seller/contents/edit/${postId}`);
-        setShowMenu(false);
-        setLoading(false);
-        return;
       } else {
         const endpoint = isAdmin ? "/api/admin/contents" : "/api/content-posts";
         await fetch(endpoint, {
@@ -123,14 +115,6 @@ export default function ContentPostActions({ postId, status, isAdmin }: Props) {
             >
               <Icon name="Delete" size={14} />
               삭제
-            </button>
-            {/* 수정 버튼 */}
-            <button
-              onClick={() => handleAction("edit")}
-              className="flex items-center gap-2 w-full px-4 py-2 text-xs text-blue-600 hover:bg-blue-50 transition-colors"
-            >
-              <Icon name="Edit" size={14} />
-              수정
             </button>
           </div>
         </>

@@ -6,7 +6,7 @@ const DUMMY = [
   { name: "월령 선생", mood: "사주명리 · 신년운세", status: "오늘 상담 가능", avatar: 1 },
   { name: "청아 선생", mood: "연애운 · 궁합", status: "예약 가능", avatar: 3 },
   { name: "해월 선생", mood: "재물운 · 사업운", status: "라이브 상담", avatar: 8 },
-  { name: "연화 선생", mood: "타로 · 속마음", status: "오늘의 PICK", avatar: 14 },
+  { name: "연화 선생", mood: "타로 · 속마음", status: "오늘의 추천", avatar: 14 },
   { name: "도윤 선생", mood: "직업운 · 이직운", status: "예약 가능", avatar: 20 },
   { name: "별하 선생", mood: "가족운 · 인간관계", status: "오늘 상담 가능", avatar: 25 },
   { name: "현명 선생", mood: "대운 · 종합운세", status: "라이브 상담", avatar: 27 },

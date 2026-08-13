@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from 'lucide-react';
 
-// PICK한 상담사의 라이브 시작 시 카카오 알림톡 수신 동의 토글.
+// 단골 상담사의 라이브 시작 시 카카오 알림톡 수신 동의 토글.
 export default function LiveAlimtalkOptInToggle({ initialValue }: { initialValue: boolean }) {
   const [on, setOn] = useState(initialValue);
   const [saving, setSaving] = useState(false);
@@ -37,7 +37,7 @@ export default function LiveAlimtalkOptInToggle({ initialValue }: { initialValue
         <Icon name="Notification" size={18} strokeWidth={1.5} className="text-gray-400 flex-shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="text-sm text-gray-800">라이브 시작 알림톡</p>
-          <p className="text-[10px] text-gray-400">PICK한 상담사가 라이브를 시작하면 카카오 알림톡을 받아요</p>
+          <p className="text-[10px] text-gray-400">단골 상담사가 라이브를 시작하면 카카오 알림톡을 받아요</p>
         </div>
         {saving ? (
           <Loader2 size={16} className="animate-spin text-gray-400 flex-shrink-0" />

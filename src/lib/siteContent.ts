@@ -37,7 +37,7 @@ export const DEFAULT_HOME_STATS: HomeStat[] = [
 export const DEFAULT_HOME_STORIES: HomeStory[] = [
   { name: "월령 · 사주명리 상담사", quote: "방송 설명란에 예약 링크만 연결했는데 입금 확인과 시간 조율이 한 번에 정리됐어요. 이제 상담 자체에 더 집중합니다.", metric: "예약·결제 자동화", avatar: "/avatars/saju/saju-avatar-01.png" },
   { name: "연화 · 타로 상담사", quote: "라이브 중 남은 상담 시간이 바로 보여서 시청자도 편하게 예약해요. 방송이 끝난 뒤 따로 메시지를 정리할 일이 줄었습니다.", metric: "라이브 예약 연결", avatar: "/avatars/saju/saju-avatar-14.png" },
-  { name: "해월 · 재물운 상담사", quote: "PICK 고객에게 방송 소식을 전하고 지난 상담 기록을 확인할 수 있어 재상담 관리가 훨씬 수월해졌어요.", metric: "단골 상담 관리", avatar: "/avatars/saju/saju-avatar-08.png" },
+  { name: "해월 · 재물운 상담사", quote: "단골 고객에게 방송 소식을 전하고 지난 상담 기록을 확인할 수 있어 재상담 관리가 훨씬 수월해졌어요.", metric: "단골 상담 관리", avatar: "/avatars/saju/saju-avatar-08.png" },
   { name: "청아 · 궁합 상담사", quote: "유튜브 채팅과 예약 화면이 이어지니 시청자가 방송을 보다가 자연스럽게 원하는 시간을 선택합니다.", metric: "유튜브 LIVE 연동", avatar: "/avatars/saju/saju-avatar-25.png" },
 ];
 
@@ -51,12 +51,12 @@ export const DEFAULT_HOME_BENEFITS: HomeBenefits = {
   stats: [
     { value: "24시간", label: "쉬는 동안에도 예약", sub: "방송이 끝난 뒤에도" },
     { value: "LIVE", label: "방송 중 실시간 예약", sub: "유튜브·SNS 연동" },
-    { value: "PICK", label: "다시 찾는 단골 고객", sub: "재상담 이력까지" },
+    { value: "단골", label: "다시 찾는 단골 고객", sub: "재상담 이력까지" },
     { value: "0건", label: "입금 확인 수작업", sub: "예약·정산 자동화" },
   ],
   items: [
     { iconType: "radio", title: "방송하는 동안 예약이 쌓입니다", desc: "시청자가 채팅으로 묻고 기다릴 필요 없이, 남은 상담 시간을 보고 그 자리에서 예약합니다." },
-    { iconType: "heart", title: "한 번 만난 분이 다시 찾아옵니다", desc: "나를 PICK한 고객에게 방송 소식을 전하고, 지난 상담 기록을 보며 이어서 상담합니다." },
+    { iconType: "heart", title: "한 번 만난 분이 다시 찾아옵니다", desc: "나를 단골로 등록한 고객에게 방송 소식을 전하고, 지난 상담 기록을 보며 이어서 상담합니다." },
     { iconType: "shield", title: "상담에만 집중하시면 됩니다", desc: "예약 접수와 시간 조율, 입금 확인과 정산까지 플랫폼이 대신 처리합니다." },
   ],
 };

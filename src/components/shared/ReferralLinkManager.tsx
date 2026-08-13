@@ -93,7 +93,7 @@ export default function ReferralLinkManager({
             <p className="text-sm font-bold text-purple-700">{referralDiscountRate}%</p>
           </div>
           <div className="flex-1 bg-pink-50 rounded-lg px-3 py-2">
-            <p className="text-[9px] text-pink-600 font-medium">Pick 할인</p>
+            <p className="text-[9px] text-pink-600 font-medium">단골 할인</p>
             <p className="text-sm font-bold text-pink-700">{pickDiscountRate}%</p>
           </div>
         </div>

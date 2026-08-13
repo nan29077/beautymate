@@ -8,7 +8,7 @@ import { PCDirectorSuiteProps } from "./PCDirectorSuiteComponent";
 // 같은 Props 타입 재사용
 type MobileImmersiveProps = PCDirectorSuiteProps & {
   onOpenMobilePurchase?: () => void;
-  onOpenMobileInfoSheet?: (type: "coupon" | "intro" | "benefits") => void;
+  onOpenMobileInfoSheet?: (type: "coupon" | "intro") => void;
   onOpenMyPage?: () => void;
 };
 
@@ -31,8 +31,6 @@ export default function MobileImmersiveComponent({
   coupons,
   youtubeUrl,
   onBack,
-  onOpenCart,
-  onAddToCart,
   onBuyClick,
   onShare,
   onFollowToggle,
@@ -42,8 +40,6 @@ export default function MobileImmersiveComponent({
   onOpenMobilePurchase,
   onOpenMobileInfoSheet,
   onOpenMyPage,
-  cartCount = 0,
-  cartLoading = null,
   chatMessages = [],
   liked = false,
   likeAnim = [],
@@ -167,17 +163,11 @@ export default function MobileImmersiveComponent({
               <button onClick={onOpenMyPage} className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white">
                 <User size={16} />
               </button>
-              <button onClick={onOpenCart} className="relative w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white">
-                <Calendar size={16} />
-                {cartCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center leading-none">{cartCount > 9 ? "9+" : cartCount}</span>
-                )}
-              </button>
               <button
                 onClick={onFollowToggle}
                 className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${followed ? "bg-white/20 text-white/60" : "bg-white/20 text-white"}`}
               >
-                {followed ? "Pick완료" : "+ Pick"}
+                {followed ? "단골" : "단골 설정"}
               </button>
             </div>
           </div>
@@ -217,29 +207,12 @@ export default function MobileImmersiveComponent({
             </div>
             <span className="text-white/65 text-[9px] font-medium">소개</span>
           </button>
-          {/* 혜택 */}
-          <button onClick={() => onOpenMobileInfoSheet?.("benefits")} className="flex flex-col items-center gap-0.5">
-            <div className="w-10 h-10 rounded-full bg-black/35 backdrop-blur-sm flex items-center justify-center text-white">
-              <Gift size={18} />
-            </div>
-            <span className="text-white/65 text-[9px] font-medium">혜택</span>
-          </button>
           {/* 음소거 */}
           <button onClick={onMuteToggle} className="flex flex-col items-center gap-0.5">
             <div className="w-10 h-10 rounded-full bg-black/35 backdrop-blur-sm flex items-center justify-center text-white">
               {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
             </div>
             <span className="text-white/65 text-[9px] font-medium">{muted ? "소리끔" : "소리켬"}</span>
-          </button>
-          {/* 장바구니 */}
-          <button onClick={onOpenCart} className="relative flex flex-col items-center gap-0.5">
-            <div className="w-10 h-10 rounded-full bg-black/35 backdrop-blur-sm flex items-center justify-center text-white relative">
-              <Calendar size={18} />
-              {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center leading-none">{cartCount > 9 ? "9+" : cartCount}</span>
-              )}
-            </div>
-            <span className="text-white/65 text-[9px] font-medium">장바구니</span>
           </button>
           {/* 공유 */}
           <button onClick={onShare} className="flex flex-col items-center gap-0.5">
@@ -313,19 +286,11 @@ export default function MobileImmersiveComponent({
               </div>
               <div className="flex items-center gap-1.5 flex-shrink-0" onClick={e => e.stopPropagation()}>
                 <button
-                  onClick={() => onAddToCart?.(exposedProduct.product.id)}
-                  disabled={cartLoading === exposedProduct.product.id}
-                  className="w-9 h-9 rounded-lg flex items-center justify-center disabled:opacity-60"
-                  style={{ backgroundColor: AMBER_BG, color: AMBER }}
-                >
-                  {cartLoading === exposedProduct.product.id ? <Loader2 size={16} className="animate-spin" /> : <Calendar size={16} />}
-                </button>
-                <button
                   onClick={() => onBuyClick?.(exposedProduct.product.id)}
                   className="px-3.5 py-2 text-black text-[12px] font-bold rounded-lg"
                   style={{ backgroundColor: AMBER }}
                 >
-                  구매하기
+                  예약하기
                 </button>
               </div>
             </div>

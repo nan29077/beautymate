@@ -21,12 +21,6 @@ interface LiveCoupon {
   validDays: number; maxCount: number | null; minOrderAmount: number | null; issuedCount: number;
 }
 
-interface CartItem {
-  id: string; productId: string; sellerId: string; quantity: number;
-  product: { id: string; name: string; thumbnail: string | null; basePrice: number };
-  variant: { id: string; name: string; price: number; stock: number } | null;
-}
-
 interface LiveData {
   id: string; title: string; description: string | null; thumbnailImage: string | null;
   status: string; shareCode: string; viewerCount: number; peakViewerCount: number;
@@ -136,7 +130,7 @@ export default function LiveWatchPage() {
   const [likeAnim, setLikeAnim] = useState<number[]>([]);
   const [muted, setMuted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [sidebarTab, setSidebarTab] = useState<"products" | "coupon" | "intro" | "benefits">("products");
+  const [sidebarTab, setSidebarTab] = useState<"products" | "coupon" | "intro">("products");
   const [showMobilePurchase, setShowMobilePurchase] = useState(false);
   const [followed, setFollowed] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -145,16 +139,10 @@ export default function LiveWatchPage() {
   const [couponClaimed, setCouponClaimed] = useState<Record<string, boolean>>({});
   const [couponClaimLoading, setCouponClaimLoading] = useState<string | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-  const [cartLoading, setCartLoading] = useState<string | null>(null);
-  const [mobileInfoSheet, setMobileInfoSheet] = useState<null | "coupon" | "intro" | "benefits">(null);
-  const [showCart, setShowCart] = useState(false);
+  const [mobileInfoSheet, setMobileInfoSheet] = useState<null | "coupon" | "intro">(null);
   const [externalConfirmUrl, setExternalConfirmUrl] = useState<string | null>(null);
   const [showMyPage, setShowMyPage] = useState(false);
   const [pcSelectedProductId, setPcSelectedProductId] = useState<string | null>(null);
-  const [pcPurchaseQty, setPcPurchaseQty] = useState(1);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [cartFetching, setCartFetching] = useState(false);
-  const [cartItemLoading, setCartItemLoading] = useState<string | null>(null);
   // 공지사항
   const [showNotices, setShowNotices] = useState(false);
   const [notices, setNotices] = useState<Notice[] | null>(null);
@@ -230,7 +218,7 @@ export default function LiveWatchPage() {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // ── PICK 초기 상태 서버에서 조회 ─────────────────────────────
+  // ── 단골 초기 상태 서버에서 조회 ─────────────────────────────
   useEffect(() => {
     if (!live?.seller?.id || !session) return;
     fetch(`/api/sellers/pick?sellerId=${live.seller.id}`)
@@ -340,49 +328,6 @@ export default function LiveWatchPage() {
     }
   };
 
-  const handleAddToCart = async (productId: string) => {
-    if (!live) return;
-    setCartLoading(productId);
-    try {
-      const res = await fetch("/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, sellerId: live.seller.id, quantity: 1 }),
-      });
-      if (res.ok) showToast("장바구니에 담았습니다.");
-      else if (res.status === 401) showToast("로그인이 필요합니다.");
-      else { const d = await res.json().catch(() => ({})); showToast(d.error || "장바구니 추가에 실패했습니다."); }
-    } catch { showToast("장바구니 추가 중 오류가 발생했습니다."); }
-    finally { setCartLoading(null); }
-  };
-
-  const fetchCart = async () => {
-    setCartFetching(true);
-    try {
-      const res = await fetch("/api/cart");
-      if (res.ok) { const data = await res.json(); setCartItems(data.items); }
-    } catch {} finally { setCartFetching(false); }
-  };
-
-  const openCart = () => { setShowCart(true); fetchCart(); };
-
-  const handleCartQtyChange = async (itemId: string, quantity: number) => {
-    if (quantity < 1) return;
-    setCartItemLoading(itemId);
-    try {
-      await fetch("/api/cart", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ itemId, quantity }) });
-      await fetchCart();
-    } catch {} finally { setCartItemLoading(null); }
-  };
-
-  const handleCartDelete = async (itemId: string) => {
-    setCartItemLoading(itemId);
-    try {
-      await fetch("/api/cart", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ itemId }) });
-      await fetchCart();
-    } catch {} finally { setCartItemLoading(null); }
-  };
-
   const handleMuteToggle = useCallback(() => {
     setMuted(prev => {
       const next = !prev;
@@ -411,7 +356,7 @@ export default function LiveWatchPage() {
     setTimeout(() => setLikeAnim(prev => prev.filter(a => a !== id)), 1500);
   };
 
-  // ── PICK 토글 (서버 API 호출) ─────────────────────────────────
+  // ── 단골 토글 (서버 API 호출) ─────────────────────────────────
   const handleFollowToggle = async () => {
     if (!live?.seller?.id) return;
     try {
@@ -499,7 +444,6 @@ export default function LiveWatchPage() {
   const externalLinkUrl = !youtubeEmbedUrl && live.externalUrl ? live.externalUrl : null;
   const selectedLp = selectedProductId ? live.products.find(p => p.product.id === selectedProductId) : null;
   const pcSelectedLp = pcSelectedProductId ? live.products.find(p => p.product.id === pcSelectedProductId) : null;
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const myNickname = session?.user?.name || (session?.user?.email ? session.user.email.split("@")[0] : "익명");
 
   // ── 공통 쿠폰 렌더 ────────────────────────────────────────────
@@ -562,32 +506,6 @@ export default function LiveWatchPage() {
           <p className="text-[12px] text-gray-300 mt-1">현재 사용 가능한 쿠폰이 없습니다.</p>
         </div>
       )}
-    </div>
-  );
-
-  // ── 공통 혜택 렌더 ────────────────────────────────────────────
-  const renderBenefits = () => (
-    <div className="space-y-3">
-      {[
-        { icon: Clock, label: "무료배송", desc: "라이브 상담 전 상품 무료배송", color: "bg-blue-50 text-blue-500" },
-        { icon: Tag, label: "라이브 특가", desc: "방송 중에만 적용되는 특별 할인가", color: "bg-red-50 text-red-500" },
-        { icon: Gift, label: "정품 보장", desc: "브랜드 공식 정품만 판매합니다", color: "bg-green-50 text-green-600" },
-        { icon: Star, label: "무료 반품", desc: "7일 이내 무료 교환/반품 가능", color: "bg-purple-50 text-purple-500" },
-        { icon: Star, label: "멤버 혜택", desc: "멤버 가입 시 추가 적립", color: "bg-yellow-50 text-yellow-600" },
-      ].map((b, i) => {
-        const [bgCls, textCls] = b.color.split(" ");
-        return (
-          <div key={i} className={`flex items-center gap-3 p-4 rounded-xl ${bgCls}`}>
-            <div className={`w-10 h-10 rounded-full ${bgCls} flex items-center justify-center flex-shrink-0`}>
-              <b.icon size={18} className={textCls} />
-            </div>
-            <div>
-              <p className={`text-[13px] font-bold ${textCls}`}>{b.label}</p>
-              <p className="text-[11px] text-gray-500 mt-0.5">{b.desc}</p>
-            </div>
-          </div>
-        );
-      })}
     </div>
   );
 
@@ -675,9 +593,6 @@ export default function LiveWatchPage() {
               {lp.livePrice && lp.product.basePrice !== Number(lp.livePrice) && (
                 <span className="text-[11px] text-gray-300 line-through mt-0.5">{lp.product.basePrice.toLocaleString()}원</span>
               )}
-              <div className="flex items-center gap-2 mt-1.5">
-                <span className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5"><Clock size={9} /> 무료배송</span>
-              </div>
             </div>
             <div className="self-center flex-shrink-0">
               <div className="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md" style={{ backgroundColor: PRIMARY }}>
@@ -720,7 +635,7 @@ export default function LiveWatchPage() {
     ) : null;
 
   // ── 방송 화면 하단 상담상품 바 (PC · 모바일 공통) — 점사 예약 방식 ──
-  const ProductBar = ({ onCartClick, onBuyClick }: { onCartClick: () => void; onBuyClick: () => void }) => (
+  const ProductBar = ({ onBuyClick }: { onBuyClick: () => void }) => (
     currentProduct ? (
       <div>
         <ReservationStatusChip />
@@ -739,11 +654,6 @@ export default function LiveWatchPage() {
           </div>
         </div>
         <div className="flex items-center gap-1.5 flex-shrink-0">
-          <button onClick={onCartClick} disabled={cartLoading === currentProduct.product.id}
-            className="w-9 h-9 rounded-lg flex items-center justify-center disabled:opacity-60 transition-colors shadow-sm"
-            style={{ backgroundColor: HONEY_BG, color: PRIMARY }}>
-            {cartLoading === currentProduct.product.id ? <Loader2 size={15} className="animate-spin" /> : <Calendar size={15} />}
-          </button>
           <button onClick={onBuyClick}
             disabled={remainingSlots === 0}
             className="px-3.5 py-2 text-white text-[11px] font-bold rounded-lg shadow-sm disabled:opacity-50"
@@ -794,7 +704,6 @@ export default function LiveWatchPage() {
                 <span className="text-[11px] text-white/30 line-through mt-0.5">{lp.product.basePrice.toLocaleString()}원</span>
               )}
               <div className="flex items-center gap-2 mt-1.5">
-                <span className="text-[10px] text-emerald-400 bg-emerald-900/30 px-1.5 py-0.5 rounded font-medium flex items-center gap-0.5"><Clock size={9} /> 무료배송</span>
               </div>
             </div>
             <div className="self-center flex-shrink-0">
@@ -922,28 +831,6 @@ export default function LiveWatchPage() {
     </div>
   );
 
-  const renderBenefitsPC = () => (
-    <div className="space-y-3">
-      {[
-        { icon: Clock, label: "무료배송", desc: "라이브 상담 전 상품 무료배송", textCls: "text-blue-400", bgCls: "bg-blue-900/20" },
-        { icon: Tag, label: "라이브 특가", desc: "방송 중에만 적용되는 특별 할인가", textCls: "text-red-400", bgCls: "bg-red-900/20" },
-        { icon: Gift, label: "정품 보장", desc: "브랜드 공식 정품만 판매합니다", textCls: "text-emerald-400", bgCls: "bg-emerald-900/20" },
-        { icon: Star, label: "무료 반품", desc: "7일 이내 무료 교환/반품 가능", textCls: "text-purple-400", bgCls: "bg-purple-900/20" },
-        { icon: Star, label: "멤버 혜택", desc: "멤버 가입 시 추가 적립", textCls: "text-amber-400", bgCls: "bg-amber-900/20" },
-      ].map((b, i) => (
-        <div key={i} className={`flex items-center gap-3 p-4 rounded-xl ${b.bgCls}`}>
-          <div className={`w-10 h-10 rounded-full ${b.bgCls} flex items-center justify-center flex-shrink-0`}>
-            <b.icon size={18} className={b.textCls} />
-          </div>
-          <div>
-            <p className={`text-[13px] font-bold ${b.textCls}`}>{b.label}</p>
-            <p className="text-[11px] text-white/40 mt-0.5">{b.desc}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
   // ╔═══════════════════════════════════════════════════════════════
   // ║  렌더
   // ╚═══════════════════════════════════════════════════════════════
@@ -968,8 +855,6 @@ export default function LiveWatchPage() {
             coupons={live.coupons}
             youtubeUrl={youtubeEmbedUrl ?? undefined}
             onBack={() => router.back()}
-            onOpenCart={openCart}
-            onAddToCart={handleAddToCart}
             onBuyClick={handleBuyClick}
             onClaimCoupon={handleClaimCoupon}
             onShare={() => setShowSharePopup(true)}
@@ -979,8 +864,6 @@ export default function LiveWatchPage() {
             onChatSend={handleSendChat}
             onMuteToggle={handleMuteToggle}
             onPauseToggle={handlePauseToggle}
-            cartCount={cartCount}
-            cartLoading={cartLoading}
             couponClaimed={couponClaimed}
             couponClaimLoading={couponClaimLoading}
             chatMessages={live.chatMessages}
@@ -1006,8 +889,6 @@ export default function LiveWatchPage() {
             coupons={live.coupons}
             youtubeUrl={youtubeEmbedUrl ?? undefined}
             onBack={() => router.back()}
-            onOpenCart={openCart}
-            onAddToCart={handleAddToCart}
             onBuyClick={(id) => setSelectedProductId(id)}
             onShare={() => setShowSharePopup(true)}
             onFollowToggle={handleFollowToggle}
@@ -1017,8 +898,6 @@ export default function LiveWatchPage() {
             onOpenMobilePurchase={() => setShowMobilePurchase(true)}
             onOpenMobileInfoSheet={(type) => setMobileInfoSheet(type)}
             onOpenMyPage={() => setShowMyPage(true)}
-            cartCount={cartCount}
-            cartLoading={cartLoading}
             chatMessages={live.chatMessages}
             liked={liked}
             likeAnim={likeAnim}
@@ -1068,7 +947,6 @@ export default function LiveWatchPage() {
                       {lp.livePrice && lp.product.basePrice !== Number(lp.livePrice) && (
                         <span className="text-[11px] text-gray-300 line-through">{lp.product.basePrice.toLocaleString()}원</span>
                       )}
-                      <span className="text-[10px] text-gray-400 mt-0.5 block">무료배송</span>
                     </div>
                     <ChevronRight size={16} className="text-gray-300 flex-shrink-0" />
                   </button>
@@ -1079,7 +957,7 @@ export default function LiveWatchPage() {
         </div>
       )}
 
-      {/* 모바일 정보 바텀시트 (쿠폰/소개/혜택) */}
+      {/* 모바일 정보 바텀시트 (쿠폰/소개) */}
       {mobileInfoSheet && (
         <div className="lg:hidden fixed inset-0 z-[75]">
           <div className="absolute inset-0 bg-black/50" onClick={() => setMobileInfoSheet(null)} />
@@ -1090,7 +968,6 @@ export default function LiveWatchPage() {
               <span className="text-[14px] font-bold text-gray-900 flex items-center gap-1.5">
                 {mobileInfoSheet === "coupon"   && <><Ticket size={15} style={{ color: PRIMARY }} /> 쿠폰</>}
                 {mobileInfoSheet === "intro"    && <><Info size={15} style={{ color: PRIMARY }} /> 라이브 소개</>}
-                {mobileInfoSheet === "benefits" && <><Gift size={15} style={{ color: PRIMARY }} /> 혜택</>}
               </span>
               <button onClick={() => setMobileInfoSheet(null)} className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center">
                 <X size={16} className="text-amber-500" />
@@ -1099,7 +976,6 @@ export default function LiveWatchPage() {
             <div className="overflow-y-auto flex-1 p-4">
               {mobileInfoSheet === "coupon"   && renderCoupons()}
               {mobileInfoSheet === "intro"    && renderIntro()}
-              {mobileInfoSheet === "benefits" && renderBenefits()}
             </div>
           </div>
         </div>
@@ -1138,94 +1014,6 @@ export default function LiveWatchPage() {
             </div>
           )}
         </BottomSheet>
-      )}
-
-      {/* 장바구니 슬라이드 패널 */}
-      {showCart && (
-        <div className="fixed inset-0 z-[80] flex justify-end">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setShowCart(false)} />
-          <div className="relative w-full max-w-[360px] h-full bg-white flex flex-col shadow-2xl">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 flex-shrink-0">
-              <div className="flex items-center gap-2">
-                <Calendar size={17} className="text-gray-700" />
-                <span className="text-[15px] font-bold text-gray-900">장바구니</span>
-                {cartCount > 0 && (
-                  <span className="text-[12px] font-bold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: PRIMARY }}>{cartCount}</span>
-                )}
-              </div>
-              <button onClick={() => setShowCart(false)} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
-                <X size={16} className="text-gray-500" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              {cartFetching ? (
-                <div className="flex items-center justify-center h-32">
-                  <Loader2 size={22} className="animate-spin text-gray-300" />
-                </div>
-              ) : cartItems.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full py-16 text-gray-300">
-                  <Calendar size={40} className="mb-3" />
-                  <p className="text-[14px]">장바구니가 비어있습니다</p>
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-50">
-                  {cartItems.map(item => (
-                    <div key={item.id} className="flex items-start gap-3 px-4 py-3.5">
-                      <div className="flex-shrink-0 w-[60px] h-[60px] rounded-lg overflow-hidden bg-gray-100 border border-gray-100">
-                        {item.product.thumbnail
-                          ? <img src={item.product.thumbnail} alt="" className="w-full h-full object-cover" />
-                          : <div className="w-full h-full flex items-center justify-center"><Star size={18} className="text-gray-300" /></div>
-                        }
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] text-gray-700 line-clamp-2 leading-snug font-medium">{item.product.name}</p>
-                        {item.variant && <p className="text-[11px] text-gray-400 mt-0.5">{item.variant.name}</p>}
-                        <p className="text-[14px] font-bold text-gray-900 mt-1">
-                          {((item.variant?.price ?? item.product.basePrice) * item.quantity).toLocaleString()}원
-                        </p>
-                        <div className="flex items-center gap-1.5 mt-1.5">
-                          <button onClick={() => handleCartQtyChange(item.id, item.quantity - 1)}
-                            disabled={item.quantity <= 1 || cartItemLoading === item.id}
-                            className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-40">
-                            <Minus size={11} />
-                          </button>
-                          <span className="text-[13px] font-bold text-gray-800 min-w-[20px] text-center">
-                            {cartItemLoading === item.id ? <Loader2 size={11} className="animate-spin mx-auto" /> : item.quantity}
-                          </span>
-                          <button onClick={() => handleCartQtyChange(item.id, item.quantity + 1)}
-                            disabled={cartItemLoading === item.id}
-                            className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-40">
-                            <Plus size={11} />
-                          </button>
-                          <button onClick={() => handleCartDelete(item.id)}
-                            disabled={cartItemLoading === item.id}
-                            className="ml-1 w-6 h-6 rounded-full flex items-center justify-center text-gray-300 hover:text-red-400 hover:bg-red-50 disabled:opacity-40">
-                            <X size={12} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            {!cartFetching && cartItems.length > 0 && (
-              <div className="border-t border-gray-100 px-4 py-4 flex-shrink-0">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[13px] text-gray-500">총 금액</span>
-                  <span className="text-[16px] font-bold text-gray-900">
-                    {cartItems.reduce((sum, item) => sum + (item.variant?.price ?? item.product.basePrice) * item.quantity, 0).toLocaleString()}원
-                  </span>
-                </div>
-                <Link href="/my/cart" onClick={() => setShowCart(false)}
-                  className="w-full h-12 rounded-xl flex items-center justify-center text-white font-bold text-[14px] transition-opacity hover:opacity-90 gap-2"
-                  style={{ backgroundColor: PRIMARY }}>
-                  <Calendar size={16} /> 장바구니로 이동
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
       )}
 
       {/* 공유 팝업 */}
@@ -1342,50 +1130,15 @@ export default function LiveWatchPage() {
                     {pcSelectedLp.livePrice && Number(pcSelectedLp.livePrice) !== pcSelectedLp.product.basePrice && (
                       <p className="text-white/30 text-[13px] line-through mb-4">{pcSelectedLp.product.basePrice.toLocaleString()}원</p>
                     )}
-                    <div className="flex items-center gap-1.5 mb-4">
-                      <span className="text-[11px] text-emerald-400 bg-emerald-900/30 px-2 py-1 rounded font-medium flex items-center gap-1">
-                        <Clock size={10} /> 무료배송
-                      </span>
-                    </div>
                     {/* 상담상품 설명 */}
                     {pcSelectedLp.product.description && (
                       <div className="mb-4">
                         <p className="text-white/50 text-[13px] leading-relaxed line-clamp-4">{pcSelectedLp.product.description}</p>
                       </div>
                     )}
-                    {/* 수량 선택 */}
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-white/60 text-[13px]">수량</span>
-                      <div className="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2">
-                        <button
-                          onClick={() => setPcPurchaseQty(q => Math.max(1, q - 1))}
-                          className="w-6 h-6 flex items-center justify-center text-white/60 hover:text-white"
-                        ><Minus size={14} /></button>
-                        <span className="text-white font-bold text-[15px] min-w-[24px] text-center">{pcPurchaseQty}</span>
-                        <button
-                          onClick={() => setPcPurchaseQty(q => q + 1)}
-                          className="w-6 h-6 flex items-center justify-center text-white/60 hover:text-white"
-                        ><Plus size={14} /></button>
-                      </div>
-                    </div>
-                    {/* 총 결제 금액 */}
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl mb-2">
-                      <span className="text-white/50 text-[13px]">총 결제 금액</span>
-                      <span className="text-amber-400 text-[18px] font-bold">
-                        {((Number(pcSelectedLp.livePrice) || pcSelectedLp.product.basePrice) * pcPurchaseQty).toLocaleString()}원
-                      </span>
-                    </div>
                   </div>
                   {/* 버튼 */}
                   <div className="flex gap-3">
-                    <button
-                      onClick={() => { handleAddToCart(pcSelectedLp.product.id); }}
-                      disabled={cartLoading === pcSelectedLp.product.id}
-                      className="flex-1 py-3 px-8 rounded-xl border border-amber-400 text-amber-400 font-bold text-[14px] hover:bg-amber-400/10 transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
-                    >
-                      {cartLoading === pcSelectedLp.product.id ? <Loader2 size={15} className="animate-spin" /> : <Calendar size={16} />}
-                      장바구니
-                    </button>
                     <button
                       onClick={() => {
                         // 점사 예약 방식: 예약 플로우를 새 창으로 (방송 유래 예약으로 기록)

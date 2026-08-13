@@ -19,7 +19,7 @@ const ITEMS: { key: Key; icon: any; label: string; desc: string; color: string }
     key: "liveAlimtalkOptIn",
     icon: Radio,
     label: "라이브 시작 알림",
-    desc: "PICK한 상담사가 라이브를 시작하면 알림(앱·카카오 알림톡)을 받아요",
+    desc: "단골 상담사가 라이브를 시작하면 알림(앱·카카오 알림톡)을 받아요",
     color: "text-rose-500",
   },
   {

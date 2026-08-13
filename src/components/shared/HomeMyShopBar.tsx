@@ -10,12 +10,12 @@ import LiveBadge, { LIVE_RING_CLASS } from "@/components/shared/LiveBadge";
 
 export const dynamic = "force-dynamic";
 
-// 메인 페이지 상단: 로그인한 구매회원의 "단골 PICK" 상담사 빠른 진입 + 내 쇼핑(예약내역/내정보/장바구니) 바로가기.
+// 메인 페이지 상단: 로그인한 구매회원의 "단골" 상담사 빠른 진입 + 예약내역/내정보 바로가기.
 // - 비로그인/구매회원이 아닌 경우엔 로그인 유도 또는 비노출.
 export default async function HomeMyShopBar() {
   const session = await auth();
 
-  // 로그인 안 한 방문자: 단골 PICK 안내 CTA
+  // 로그인 안 한 방문자: 단골 안내 CTA
   if (!session?.user) {
     return (
       <section className="px-4 mt-3">
@@ -27,8 +27,8 @@ export default async function HomeMyShopBar() {
             <Icon name="Wishlist" size={16} className="fill-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-gray-900">로그인하고 단골 상담사 PICK하기</p>
-            <p className="text-[11px] text-gray-500 mt-0.5">PICK한 상담사가 단골가게로 모여요</p>
+            <p className="text-sm font-bold text-gray-900">로그인하고 단골 상담사 설정하기</p>
+            <p className="text-[11px] text-gray-500 mt-0.5">단골 상담사가 단골가게로 모여요</p>
           </div>
           <Icon name="ChevronDown" size={18} className="text-brand-400 flex-shrink-0 -rotate-90" />
         </Link>
@@ -89,12 +89,12 @@ export default async function HomeMyShopBar() {
         </div>
       </div>
 
-      {/* 단골 PICK */}
+      {/* 단골 */}
       <div className="mt-4">
         <div className="flex items-center justify-between px-4 mb-2.5">
           <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
             <Icon name="Wishlist" size={14} className="text-pink-500 fill-pink-500" />
-            단골 PICK
+            단골
           </h2>
           {picks.length > 0 && (
             <Link href="/my/seller" className="text-xs text-gray-400 flex items-center gap-0.5">
@@ -157,7 +157,7 @@ export default async function HomeMyShopBar() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-800">아직 단골 상담사가 없어요</p>
-                <p className="text-[11px] text-gray-500 mt-0.5">위에서 상담사 이름을 검색해 PICK해보세요</p>
+                <p className="text-[11px] text-gray-500 mt-0.5">위에서 상담사 이름을 검색해 단골로 설정해보세요</p>
               </div>
             </div>
           </div>

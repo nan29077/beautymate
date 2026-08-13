@@ -1,6 +1,6 @@
 // 인앱 알림(Notification) 생성 헬퍼 — 서버 전용.
 // 알림 종류(type)
-//  - live_start : PICK한 상담사의 라이브 시작 알림 (수신 설정: BuyerProfile.liveAlimtalkOptIn)
+//  - live_start : 단골 상담사의 라이브 시작 알림 (수신 설정: BuyerProfile.liveAlimtalkOptIn)
 //  - order      : 예약·상담 방식 관련 알림 (수신 설정: BuyerProfile.notifyOrder)
 //  - channel    : 채널 구독 인증 결과 (항상 발송)
 //  - payout_rejected : 상담사 출금 요청 반려 (사유 포함, 항상 발송)
@@ -57,7 +57,7 @@ export async function createNotificationsForUsers(
 }
 
 /**
- * 라이브 시작 시, PICK(팔로우)한 고객에게 인앱 알림을 생성한다.
+ * 라이브 시작 시, 단골(팔로우) 고객에게 인앱 알림을 생성한다.
  * - liveAlimtalkOptIn(라이브 알림 수신 동의)이 켜진 고객만 대상.
  * - 카카오 알림톡(lib/liveNotify)과 별개로 동작하며 알리고 설정과 무관하게 항상 저장된다.
  */
@@ -86,7 +86,7 @@ export async function createLiveStartNotifications(liveId: string): Promise<numb
     );
     return await createNotificationsForUsers(userIds, {
       title: `${live.seller.shopName} 라이브 시작`,
-      message: `PICK한 ${live.seller.shopName}님이 "${live.title}" 라이브를 시작했어요. 지금 입장해 보세요!`,
+      message: `단골 상담사 ${live.seller.shopName}님이 "${live.title}" 라이브를 시작했어요. 지금 입장해 보세요!`,
       type: "live_start",
       linkUrl: `/live/${live.shareCode}`,
     });

@@ -59,13 +59,13 @@ export default function HomeContentManager({
   const [savingStories, setSavingStories] = useState(false);
 
   const defaultBenefitStats: BenefitStat[] = initialBenefits?.stats ?? [
-    { value: "68%", label: "단골 재구매율", sub: "PICK 상담사 기준" },
+    { value: "68%", label: "단골 재구매율", sub: "단골 상담사 기준" },
     { value: "3.2x", label: "라이브 평균 체류", sub: "일반 대비" },
     { value: "1,200+", label: "활동 상담사", sub: "누적" },
     { value: "4,500+", label: "월 라이브 방송", sub: "플랫폼 합계" },
   ];
   const defaultBenefitItems: BenefitItem[] = initialBenefits?.items ?? [
-    { iconType: "heart", title: "단골 PICK으로 충성 고객", desc: "한 번 PICK한 팸이 다시 찾아오는, 관계 기반의 반복 구매." },
+    { iconType: "heart", title: "단골로 충성 고객", desc: "한 번 단골이 된 팬이 다시 찾아오는, 관계 기반의 반복 구매." },
     { iconType: "radio", title: "라이브로 실시간 소통", desc: "방송 중 바로 묻고 바로 사는, 몰입도 높은 쿼핑 경험." },
     { iconType: "shield", title: "정산·상담 방식 걱정 없이", desc: "복잡한 운영은 플랫폼이, 상담사는 판매와 소통에만 집중." },
   ];
@@ -178,7 +178,7 @@ export default function HomeContentManager({
                 <input value={s.label} onChange={(e) => updateBenefitStat(i, "label", e.target.value)}
                   placeholder="라벨 (예: 단골 재구매율)" className={inputCls} />
                 <input value={s.sub} onChange={(e) => updateBenefitStat(i, "sub", e.target.value)}
-                  placeholder="서브 (예: PICK 상담사 기준)" className={inputCls} />
+                  placeholder="서브 (예: 단골 상담사 기준)" className={inputCls} />
                 <button onClick={() => setBenefitStats((p) => p.filter((_, idx) => idx !== i))}
                   className="p-2 text-gray-300 hover:text-red-500" aria-label="삭제"><Icon name="Delete" size={15} /></button>
               </div>

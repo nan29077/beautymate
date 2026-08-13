@@ -114,13 +114,11 @@ export default function WatchMyPageSheet({ open, onClose }: Props) {
 
   const menuItems = data
     ? [
-        { href: "/my/orders", icon: Star, label: "예약 내역", count: data.counts.orders },
-        { href: "/cart", icon: Calendar, label: "장바구니", count: data.counts.cartItems },
+        { href: "/my/orders", icon: Calendar, label: "예약 내역", count: data.counts.orders },
         { href: "/my/reviews", icon: Star, label: "내 후기", count: data.counts.reviews },
         { href: "/my/wishlist", icon: Heart, label: "찜한 상담상품", count: data.counts.wishlists },
-        { href: "/my/seller", icon: Users, label: "Pick 상담사", count: data.pickedSellers.length || null },
+        { href: "/my/seller", icon: Users, label: "단골 상담사", count: data.pickedSellers.length || null },
         { href: "/my/game-coupons", icon: Gift, label: "게임 쿠폰", count: data.gameCouponCount || null },
-        { href: "/my/addresses", icon: MapPin, label: "배송지", count: null },
       ]
     : [];
 
@@ -230,11 +228,7 @@ export default function WatchMyPageSheet({ open, onClose }: Props) {
 
               {/* ─── 요약 카드 ─── */}
               <div className="mx-4 -mt-5 bg-[#1a1a1a] rounded-2xl border border-gray-800 p-4 mb-4">
-                <div className="grid grid-cols-4 divide-x divide-gray-800">
-                  <Link href="/my/points" onClick={onClose} className="text-center py-1">
-                    <p className="text-base font-bold text-white">0</p>
-                    <p className="text-[10px] text-gray-500">포인트</p>
-                  </Link>
+                <div className="grid grid-cols-3 divide-x divide-gray-800">
                   <Link href="/my/orders" onClick={onClose} className="text-center py-1">
                     <p className="text-base font-bold text-white">{data.counts.orders}</p>
                     <p className="text-[10px] text-gray-500">예약</p>
@@ -278,14 +272,14 @@ export default function WatchMyPageSheet({ open, onClose }: Props) {
                 </div>
               )}
 
-              {/* ─── Pick 상담사 미리보기 ─── */}
+              {/* ─── 단골 상담사 미리보기 ─── */}
               {data.pickedSellers.length > 0 && (
                 <div className="px-4 mb-4">
                   <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden">
                     <div className="flex items-center justify-between px-4 pt-3 pb-2">
                       <p className="text-xs font-bold text-gray-200 flex items-center gap-1.5">
                         <Heart size={13} className="text-pink-400 fill-pink-400" />
-                        내 Pick 상담사
+                        내 단골 상담사
                       </p>
                       <Link
                         href="/my/seller"

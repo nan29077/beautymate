@@ -95,10 +95,9 @@ export default function SellerLivePage() {
     youtubeChannelInput: "",
     // B방식: OBS/PRISM 송출용 YouTube 스트림 키 (선택 입력)
     youtubeStreamKey: "",
-    // New fields: coupons, intro, benefits, notices
+    // New fields: coupons, intro, notices
     couponCode: "", couponDiscount: "",
     liveIntro: "",
-    benefits: [] as string[],
     notices: "",
     theme: "default" as string,
     // 점사 예약 방식: 당일 예약 가능 슬롯 수(빈 값 = 무제한) + 방송 중 예약 위젯 표시
@@ -586,7 +585,7 @@ export default function SellerLivePage() {
   const resetCreate = () => {
     setShowCreate(false);
     setCreateStep(1);
-    setForm({ title: "", description: "", thumbnailImage: "", scheduledAt: "", selectedProducts: [], livePrices: {}, platform: null, externalUrl: "", youtubeMode: "url", youtubeChannelInput: "", youtubeStreamKey: "", couponCode: "", couponDiscount: "", liveIntro: "", benefits: [], notices: "", theme: "default", dailySlotLimit: "", showReservationWidget: true });
+    setForm({ title: "", description: "", thumbnailImage: "", scheduledAt: "", selectedProducts: [], livePrices: {}, platform: null, externalUrl: "", youtubeMode: "url", youtubeChannelInput: "", youtubeStreamKey: "", couponCode: "", couponDiscount: "", liveIntro: "", notices: "", theme: "default", dailySlotLimit: "", showReservationWidget: true });
     setYtDetectError("");
     setPendingCoupons([]);
     setShowCouponForm(false);
@@ -597,7 +596,7 @@ export default function SellerLivePage() {
   // 이전 라이브에서 고른 platform/youtubeMode가 다음 생성에 남아 강제 선택되지 않도록 함.
   const openCreate = () => {
     setCreateStep(1);
-    setForm({ title: "", description: "", thumbnailImage: "", scheduledAt: "", selectedProducts: [], livePrices: {}, platform: null, externalUrl: "", youtubeMode: "url", youtubeChannelInput: "", youtubeStreamKey: "", couponCode: "", couponDiscount: "", liveIntro: "", benefits: [], notices: "", theme: "default", dailySlotLimit: "", showReservationWidget: true });
+    setForm({ title: "", description: "", thumbnailImage: "", scheduledAt: "", selectedProducts: [], livePrices: {}, platform: null, externalUrl: "", youtubeMode: "url", youtubeChannelInput: "", youtubeStreamKey: "", couponCode: "", couponDiscount: "", liveIntro: "", notices: "", theme: "default", dailySlotLimit: "", showReservationWidget: true });
     setYtDetectError("");
     setPendingCoupons([]);
     setShowCouponForm(false);
@@ -1479,28 +1478,6 @@ export default function SellerLivePage() {
                   <label className="text-xs font-bold text-gray-700 flex items-center gap-1"><Icon name="Megaphone" size={12} /> 라이브 소개</label>
                   <textarea className="input-field mt-1.5 h-16 resize-none text-sm" placeholder="시청자에게 보여질 라이브 소개글" value={form.liveIntro} onChange={e => setForm({...form, liveIntro: e.target.value})} />
                 </div>
-                {/* Benefits */}
-                <div>
-                  <label className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1"><Icon name="DiscountPrice_icon" size={14} /> 혜택 설정</label>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { v: "free_shipping", l: "무료배송", c: "bg-blue-50 text-blue-600 border-blue-200" },
-                      { v: "free_return", l: "무료반품", c: "bg-green-50 text-green-600 border-green-200" },
-                      { v: "same_day", l: "당일배송", c: "bg-orange-50 text-orange-600 border-orange-200" },
-                      { v: "gift", l: "사은품", c: "bg-pink-50 text-pink-600 border-pink-200" },
-                      { v: "warranty", l: "정품보장", c: "bg-purple-50 text-purple-600 border-purple-200" },
-                      { v: "lowest_price", l: "최저가보장", c: "bg-red-50 text-red-600 border-red-200" },
-                    ].map(b => (
-                      <button key={b.v} type="button" onClick={() => setForm(prev => ({
-                        ...prev,
-                        benefits: prev.benefits.includes(b.v) ? prev.benefits.filter(x => x !== b.v) : [...prev.benefits, b.v]
-                      }))}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all ${form.benefits.includes(b.v) ? b.c + " border-current shadow-sm" : "bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100"}`}>
-                        {form.benefits.includes(b.v) && "✓ "}{b.l}
-                      </button>
-                    ))}
-                  </div>
-                </div>
                 {/* Notices */}
                 <div>
                   <label className="text-xs font-bold text-gray-700 flex items-center gap-1"><Icon name="ProductSummary_icon" size={14} /> 공지사항</label>
@@ -1520,7 +1497,6 @@ export default function SellerLivePage() {
                     <p>선택 상담상품: {form.selectedProducts.length}개</p>
                     <p>테마: {THEME_OPTIONS.find(t => t.id === form.theme)?.name || "기본"}</p>
                     {pendingCoupons.length > 0 && <p>쿠폰: {pendingCoupons.length}개 예정</p>}
-                    {form.benefits.length > 0 && <p>혜택: {form.benefits.join(", ")}</p>}
                     {FEATURE_LIVE_COMMERCE && form.thumbnailImage && (
                       <div className="mt-2">
                         <img src={form.thumbnailImage} alt="썸네일" className="w-32 h-20 object-cover rounded-lg" />
@@ -2228,10 +2204,6 @@ function GameManagerModal({ onClose }: { onClose: () => void }) {
                     className="text-[11px] px-2.5 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 font-semibold shrink-0 flex items-center gap-1">
                     <Monitor size={11} /> 게임화면
                   </a>
-                  <a href={`/seller/games/${game.id}`} target="_blank" rel="noopener noreferrer"
-                    className="text-[11px] px-2.5 py-1.5 bg-gray-50 text-gray-500 rounded-lg hover:bg-gray-100 font-semibold shrink-0">
-                    상세
-                  </a>
                   <button onClick={() => handleDelete(game.id)} disabled={!!actioning}
                     className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0">
                     <X size={14} />
@@ -2290,12 +2262,6 @@ function GameManagerModal({ onClose }: { onClose: () => void }) {
         </div>
       )}
 
-      <div className="px-4 border-t border-gray-100 pt-3 bg-white flex-shrink-0 sticky bottom-0 z-10" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
-        <a href="/seller/games" target="_blank" rel="noopener noreferrer"
-          className="block w-full text-center text-xs text-brand-600 hover:underline">
-          전체 게임 관리 페이지 →
-        </a>
-      </div>
     </Modal>
   );
 }
@@ -3101,7 +3067,7 @@ function LiveSiteSettingsPanel() {
           <input
             type="text"
             className="input-field text-sm"
-            placeholder="예: 하늘 Pick 라이브"
+            placeholder="예: 하늘 선생님 라이브"
             value={settings.siteTitle}
             onChange={e => set("siteTitle", e.target.value)}
           />

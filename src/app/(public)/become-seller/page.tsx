@@ -21,7 +21,7 @@ const BENEFITS = [
   { icon: TrendingUp, title: "예약 수익", desc: "내 점집에서 예약이 확정될 때마다 수익이 쌓여요. 방송이 곧 매출이 돼요." },
   { icon: Gift, title: "추천 수익", desc: "내 추천 코드로 가입·예약한 팬의 매출에서도 추천 커미션이 발생해요." },
   { icon: Radio, title: "라이브 상담", desc: "실시간 라이브 방송으로 팬과 소통하며 그 자리에서 예약을 받을 수 있어요." },
-  { icon: Users, title: "단골 팬 관리", desc: "PICK한 팬이 단골이 되고, 라이브·새 소식 알림으로 다시 찾아와요." },
+  { icon: Users, title: "단골 팬 관리", desc: "단골로 등록한 팬이, 라이브·새 소식 알림으로 다시 찾아와요." },
   { icon: ShieldCheck, title: "안심 정산", desc: "투명한 정산 체계로 수익을 정해진 주기에 안전하게 지급받아요." },
 ];
 
@@ -36,7 +36,7 @@ const FAQ = [
   { q: "상담사가 되려면 비용이 드나요?", a: "입점/가입 비용은 없습니다. 예약이 발생하면 약정된 수수료 구조로 정산됩니다." },
   { q: "상담 상품은 어떻게 등록하나요?", a: "사주·신점·타로 등 내가 진행하는 상담을 상품으로 직접 등록하고, 가능한 상담 시간을 함께 설정하면 됩니다." },
   { q: "승인까지 얼마나 걸리나요?", a: "일반적으로 1~2 영업일 이내에 관리자 검토 후 승인됩니다." },
-  { q: "팔로워(팬)가 적어도 신청할 수 있나요?", a: "네, 누구나 신청할 수 있어요. 사주메이트의 단골 PICK·라이브 기능으로 팬을 키워갈 수 있습니다." },
+  { q: "팔로워(팬)가 적어도 신청할 수 있나요?", a: "네, 누구나 신청할 수 있어요. 사주메이트의 단골·라이브 기능으로 팬을 키워갈 수 있습니다." },
 ];
 
 export default async function BecomeSellerPage() {
@@ -62,7 +62,7 @@ export default async function BecomeSellerPage() {
           </div>
           <p className="mt-3.5 text-[13px] text-gray-300 leading-relaxed">
             상담 상품과 가능한 시간만 등록하면,
-            <br />라이브와 단골 PICK으로 나만의 점집이 열려요.
+            <br />라이브와 단골 관리로 나만의 점집이 열려요.
           </p>
           <div className="mt-5 flex flex-wrap gap-2 text-[11px] font-semibold">
             <span className="inline-flex items-center gap-1 rounded-full bg-white/10 text-white px-3 py-1.5"><Icon name="Wallet" size={12} className="text-brand-500" /> 예약 수익</span>

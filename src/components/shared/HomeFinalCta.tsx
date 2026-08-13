@@ -45,7 +45,7 @@ export default function HomeFinalCta({ sellerCtaLink }: { sellerCtaLink: string 
                 지금 바로<br />사주메이트를 시작하세요
               </h2>
               <p className="mt-3 text-[13px] text-gray-300 leading-relaxed">
-                좋아하는 상담사를 PICK하고<br />라이브·단체 상담을 즐겨보세요.
+                좋아하는 상담사를 단골로 설정하고<br />라이브·단체 상담을 즐겨보세요.
               </p>
               <Link
                 href="/auth/register"

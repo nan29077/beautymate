@@ -41,7 +41,7 @@ export default async function DashboardLayout({
       // 회원 관리
       { href: "/admin/users", iconName: "Users", label: "회원 관리", group: "회원 관리" },
       { href: "/admin/customers", iconName: "UserCheck", label: "고객 귀속 관리", group: "회원 관리" },
-      { href: "/admin/members", iconName: "Users", label: "점집 회원 관리", group: "회원 관리" },
+      { href: "/admin/members", iconName: "Users", label: "단골 회원 관리", group: "회원 관리" },
       { href: "/admin/sellers", iconName: "Store", label: "상담사 관리", group: "회원 관리" },
       // 상담상품 관리
       { href: "/admin/products", iconName: "Package", label: "상담상품 관리", group: "상담상품 관리" },
@@ -71,18 +71,15 @@ export default async function DashboardLayout({
       { href: "/seller/shop", iconName: "Store", label: "내 점집 관리", group: "점집 관리" },
       // 상담상품 관리
       { href: "/seller/products", iconName: "Package", label: "상담상품 관리", group: "상담상품 관리" },
-      { href: "/seller/contents", iconName: "Content", label: "콘텐츠 관리", group: "상담상품 관리" },
-      // 판매·라이브
+      // 판매·라이브 (콘텐츠/단체 상담/게임 메뉴는 점집 운영에 쓰지 않아 제거)
       { href: "/seller/live-mode", iconName: "Video", label: "라이브 모드", group: "판매·라이브" },
       { href: "/seller/live", iconName: "Live", label: "라이브 상담", group: "판매·라이브" },
       { href: "/seller/widget", iconName: "QrCode", label: "위젯 설정", group: "판매·라이브" },
-      // 공동구매 캠페인(단체 상담)은 점집 운영에 쓰지 않아 사이드바에서 제외 (페이지 자체는 유지)
-      { href: "/seller/games", iconName: "Play", label: "게임관리", group: "판매·라이브" },
       // 예약·정산
       { href: "/seller/timeslots", iconName: "Clock", label: "예약 시간 설정", group: "예약·정산" },
       { href: "/seller/reservations", iconName: "Calendar", label: "예약 관리", group: "예약·정산" },
       { href: "/seller/customers", iconName: "Users", label: "고객관리(CRM)", group: "예약·정산" },
-      { href: "/seller/members", iconName: "UserCheck", label: "점집 회원", group: "예약·정산" },
+      { href: "/seller/members", iconName: "UserCheck", label: "단골 회원", group: "예약·정산" },
       { href: "/seller/settlements", iconName: "Settlement", label: "정산·출금", group: "예약·정산" },
       // 알림톡
       { href: "/seller/alimtalk", iconName: "Notification", label: "알림톡 관리", group: "알림톡" },
