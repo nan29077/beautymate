@@ -2,12 +2,11 @@ import { Icon } from '@/components/shared/Icon';
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Link2, Camera } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import SafeImage from "@/components/shared/SafeImage";
 import { resolveSellerDisplayImage, resolveShopBanner } from "@/lib/defaults";
 import ShopLinkButton from "@/components/shared/ShopLinkButton";
 import ShopThemeColorPicker from "@/components/shared/ShopThemeColorPicker";
-import ReferralLinkManager from "@/components/shared/ReferralLinkManager";
 import SellerBusinessInfoForm from "@/components/shared/SellerBusinessInfoForm";
 import ShopFeatureToggles from "@/components/shared/ShopFeatureToggles";
 import ShopLiveSettings from "@/components/shared/ShopLiveSettings";
@@ -141,12 +140,7 @@ export default async function SellerShopPage() {
             <Icon name="Star" size={14} strokeWidth={1.5} className="text-brand-500" />
             <span className="font-semibold">{seller._count.campaigns}</span> 캠페인
           </div>
-          {flags.referral && (
-            <div className="flex items-center gap-1.5 text-xs text-gray-500">
-              <Link2 size={14} strokeWidth={1.5} className="text-brand-500" />
-              <span className="font-semibold">{seller._count.referredBuyers}</span> 추천인
-            </div>
-          )}
+          {/* 사주메이트: 추천인 통계 미사용 */}
         </div>
       </div>
 

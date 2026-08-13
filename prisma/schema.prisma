@@ -18,7 +18,7 @@ datasource db {
 
 // 2자 구조: 상담사(CONSULTANT) ↔ 고객(CUSTOMER)
 //
-// ⚠️ 아래 레거시 값(SELLER/BUYER/NODE/MIDDLE_ADMIN/BRAND_ADMIN)은 셀러브릭스 시절 데이터가
+// ⚠️ 아래 레거시 값(SELLER/BUYER/NODE/MIDDLE_ADMIN/BRAND_ADMIN)은 초기 서비스 운영 당시 데이터가
 // 운영 DB 의 users.role 컬럼에 그대로 남아 있어서 선언해 둔 것이다. 선언이 없으면 Prisma Client 가
 // 해당 행을 "Value 'SELLER' not found in enum 'Role'" 로 읽기조차 실패해 로그인·조회가 전부 막힌다.
 // (DB enum 이 원본이고 스키마가 따라간 것 — 이 값들을 추가한다고 DB 가 바뀌지는 않는다)

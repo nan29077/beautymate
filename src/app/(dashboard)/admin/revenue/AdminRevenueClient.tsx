@@ -120,7 +120,7 @@ export default function AdminRevenueClient({ revenue, period }: Props) {
             <dd className="text-emerald-700">+ {formatPrice(totalSellerFee)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-gray-500">공급자(브랜드·중간관리자) 수수료 수익</dt>
+            <dt className="text-gray-500">공급자(상담 콘텐츠·파트너) 수수료 수익</dt>
             <dd className="text-emerald-700">+ {formatPrice(totalSupplierFee)}</dd>
           </div>
           <div className="flex justify-between">

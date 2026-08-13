@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Percent, SlidersHorizontal, ClipboardList, BadgePercent } from "lucide-react";
+import { Percent, SlidersHorizontal, ClipboardList } from "lucide-react";
 
 type TabKey = "fee" | "feature" | "register";
 
@@ -46,13 +46,7 @@ export default function SettingsTabs({
             </button>
           );
         })}
-        <Link
-          href="/admin/seller-rates"
-          className="inline-flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-semibold border-b-2 -mb-px border-transparent text-gray-400 hover:text-gray-600 whitespace-nowrap"
-        >
-          <BadgePercent size={15} strokeWidth={1.75} />
-          고객 추천·할인율
-        </Link>
+        {/* 사주메이트: 추천·할인율 메뉴 미사용 (채널인증·추천인 시스템 없음) */}
       </div>
 
       {/* 선택된 탭 콘텐츠 */}

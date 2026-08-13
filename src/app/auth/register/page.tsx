@@ -567,7 +567,7 @@ function RegisterForm() {
                 )}
               </div>
               <p className="text-[10px] text-gray-400 mt-1">
-                인플루언서 추천인 코드를 입력하면 특별 할인 혜택을 받을 수 있습니다
+                추천인이 있으면 코드를 입력해 주세요
               </p>
             </div>
             )}

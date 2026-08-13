@@ -39,7 +39,7 @@ export const SAJU_CUSTOMER_AVATARS = Array.from(
 );
 
 // 상담사 캐릭터 풀 — 사주 동물 캐릭터를 그대로 사용한다.
-// (셀러브릭스 시절 꿀벌 캐릭터 /avatars/라이브셀러_*.png 는 폐기)
+// (사주메이트 시절 꿀벌 캐릭터 /avatars/라이브셀러_*.png 는 폐기)
 export const SELLER_AVATARS = SAJU_CUSTOMER_AVATARS;
 
 // 전체 아바타 목록 (NodeSettingsClient 등에서 선택 UI용)
@@ -120,7 +120,7 @@ export function randomSajuAvatar(): string {
   return SAJU_CUSTOMER_AVATARS[Math.floor(Math.random() * SAJU_CUSTOMER_AVATARS.length)];
 }
 
-// 셀러브릭스 시절 번들 캐릭터(/avatars/*.png — 꿀벌 상담사·구매회원 등) 여부.
+// 사주메이트 시절 번들 캐릭터(/avatars/*.png — 꿀벌 상담사·구매회원 등) 여부.
 // /avatars/saju/* 는 사주메이트 전용 캐릭터이므로 레거시가 아니다.
 export function isLegacyBundledAvatar(path?: string | null): boolean {
   return Boolean(path?.startsWith("/avatars/") && !path.startsWith("/avatars/saju/"));

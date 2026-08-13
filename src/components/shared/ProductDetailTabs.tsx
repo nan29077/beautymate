@@ -94,24 +94,24 @@ const HONEYCOMB_BG =
 // 표준 교환·환불 카드 노출 여부 — 임시 비노출 상태. 다시 보여주려면 true 로 변경.
 const SHOW_STANDARD_REFUND_CARD = false;
 
-// 하드코딩 표준 교환·환불 규정
+// 하드코딩 표준 취소·환불 규정
 function StandardRefundCard() {
   const sections = [
-    { icon: "Shipping", title: "상담 방식", items: ["예약 후 1~3 영업일 이내 발송", "제주/도서산간 추가 배송비 발생 가능"] },
+    { icon: "Calendar", title: "예약 확정", items: ["결제 완료 즉시 예약 접수", "상담사 확정 후 마이페이지 > 예약내역에서 확인 가능"] },
     {
       icon: "Exchange",
-      title: "교환 및 반품",
+      title: "취소 및 환불",
       items: [
-        "상담상품 수령 후 7일 이내 신청 가능",
-        "단순 변심: 왕복 배송비 고객 부담",
-        "상담상품 하자/오배송: 배송비 판매자 부담",
-        "교환/반품 불가: 사용·훼손·라벨 제거된 상담상품",
+        "상담 시작 전 취소 시 전액 환불",
+        "상담 시작 24시간 이내 취소 시 환불 제한될 수 있음",
+        "상담사 귀책 사유 취소: 전액 환불",
+        "환불은 접수 후 3~5 영업일 이내 처리",
       ],
     },
     {
       icon: "Warning",
-      title: "교환·반품이 불가한 경우",
-      items: ["고객 과실로 인한 상담상품 손상", "포장 개봉 후 상담상품 가치 현저히 감소", "시간 경과로 재판매 불가한 상담상품"],
+      title: "환불이 불가한 경우",
+      items: ["상담이 이미 진행된 경우", "상담 임박(24시간 이내) 단순 변심 취소", "부적절한 이용으로 상담이 강제 종료된 경우"],
     },
   ];
   // 육각형 클립 (벌집 불릿)
@@ -173,14 +173,14 @@ export default function ProductDetailTabs({
 }: ProductDetailTabsProps) {
   const [activeTab, setActiveTab] = useState<"detail" | "review" | "info">("detail");
   const [refundPolicy, setRefundPolicy] = useState<string | null>(null);
-  const [shippingPolicy, setShippingPolicy] = useState<string | null>(null);
+  const [reservationPolicy, setReservationPolicy] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/site-config")
       .then((r) => r.json())
       .then((d) => {
         if (d.refundPolicy) setRefundPolicy(d.refundPolicy);
-        if (d.shippingPolicy) setShippingPolicy(d.shippingPolicy);
+        if (d.shippingPolicy) setReservationPolicy(d.shippingPolicy);
       })
       .catch(() => {});
   }, []);
@@ -201,7 +201,7 @@ export default function ProductDetailTabs({
   const tabs = [
     { key: "detail" as const, label: "상세정보" },
     { key: "review" as const, label: `후기 (${reviewCount})` },
-    { key: "info" as const, label: "상담 방식/교환" },
+    { key: "info" as const, label: "예약·취소·환불" },
   ];
 
   return (
@@ -274,13 +274,13 @@ export default function ProductDetailTabs({
           <div className="animate-fade-in px-4 py-5">
             <div className="space-y-5">
               <div>
-                <h3 className="text-[13px] font-bold text-gray-900 mb-2">상담 방식 안내</h3>
-                {shippingPolicy ? (
-                  <div className="text-[12px] text-gray-600 leading-relaxed whitespace-pre-line">{shippingPolicy}</div>
+                <h3 className="text-[13px] font-bold text-gray-900 mb-2">예약 안내</h3>
+                {reservationPolicy ? (
+                  <div className="text-[12px] text-gray-600 leading-relaxed whitespace-pre-line">{ reservationPolicy}</div>
                 ) : (
                   <div className="space-y-1.5 text-[12px] text-gray-600 leading-relaxed">
-                    <p>결제 완료 후 3~5일 이내 출고</p>
-                    <p>도서산간 지역은 추가 1~2일 소요될 수 있습니다.</p>
+                    <p>결제 완료 즉시 예약이 접수됩니다.</p>
+                    <p>상담사 확정 후 마이페이지 &gt; 예약내역에서 일정을 확인하세요.</p>
                   </div>
                 )}
               </div>
@@ -291,11 +291,10 @@ export default function ProductDetailTabs({
                   <RefundPolicyBlock text={refundPolicy} />
                 ) : (
                   <div className="space-y-1.5 text-[12px] text-gray-600 leading-relaxed">
-                    <p>교환/반품 기간: 수령 후 7일 이내</p>
-                    <p>교환/반품 배송비: 무료 (단순 변심 시 왕복 배송비 부담)</p>
-                    <p>상담상품 수령 후 사용하지 않은 경우에 한해 가능합니다.</p>
-                    <p>택이 제거되었거나 세탁된 제품은 교환/반품이 불가합니다.</p>
-                    <p>환불은 반품 상담상품 수거 확인 후 1~3영업일 이내 처리됩니다.</p>
+                    <p>상담 시작 전 취소 시 전액 환불됩니다.</p>
+                    <p>상담 시작 24시간 이내 취소 시 환불이 제한될 수 있습니다.</p>
+                    <p>상담사 귀책 사유로 상담이 취소된 경우 전액 환불됩니다.</p>
+                    <p>환불은 취소 접수 후 3~5 영업일 이내 처리됩니다.</p>
                   </div>
                 )}
               </div>

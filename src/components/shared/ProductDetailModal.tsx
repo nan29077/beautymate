@@ -230,20 +230,19 @@ export default function ProductDetailModal({ productId, productName, triggerClas
                         {data.variants.map((v) => (
                           <div key={v.id} className="flex items-center justify-between px-3.5 py-2.5">
                             <span className="text-[13px] text-gray-800">{v.name}</span>
-                            <span className="text-[12px] text-gray-500">{won(v.price)} · 재고 {v.stock}</span>
+                            <span className="text-[12px] text-gray-500">{won(v.price)}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {/* 재고/상담 방식 태그 */}
+                  {/* 상담 안내 태그 */}
                   <div className="flex items-center gap-2 text-[11px] text-gray-500 flex-wrap">
                     <span className="flex items-center gap-1 bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full">
-                      <Icon name="Truck" size={11} /> {data.freeShipping ? "무료배송" : `배송비 ${won(data.shippingFee)}`}
+                      <Icon name="Calendar" size={11} /> 예약 즉시 확정
                     </span>
-                    <span className="flex items-center gap-1 bg-green-50 text-green-600 px-2.5 py-1 rounded-full"><Icon name="Certified" size={11} /> 정품보장</span>
-                    <span className="flex items-center gap-1 bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full"><Icon name="Package" size={11} /> 재고 {data.totalStock}</span>
+                    <span className="flex items-center gap-1 bg-green-50 text-green-600 px-2.5 py-1 rounded-full"><Icon name="Certified" size={11} /> 전액 환불 가능</span>
                     {data._count && (
                       <span className="flex items-center gap-1 bg-amber-50 text-amber-600 px-2.5 py-1 rounded-full"><Icon name="Star" size={11} className="fill-amber-400 text-amber-400" /> 후기 {data._count.reviews}</span>
                     )}

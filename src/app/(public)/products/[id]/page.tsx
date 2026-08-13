@@ -83,16 +83,7 @@ export default async function ProductDetailPage({
   const basePrice = Number(product.basePrice) || 0;
   const comparePrice = product.comparePrice ? Number(product.comparePrice) : null;
 
-  // 상담 방식 정보
-  const shippingFee = 0;
-  const isFreeShipping = true;
-  const freeShippingThreshold = null;
-  const remoteAreaFee = 0;
-  const shippingLabel = isFreeShipping
-    ? "무료배송"
-    : freeShippingThreshold
-      ? `배송비 ${formatPrice(shippingFee)} · ${formatPrice(freeShippingThreshold)} 이상 무료배송`
-      : `배송비 ${formatPrice(shippingFee)}`;
+  // (배송 관련 변수 제거됨 — 상담 서비스는 배송 없음)
 
   const allImages = product.images.length > 0
     ? product.images.map((img) => img.url)
@@ -284,25 +275,16 @@ export default async function ProductDetailPage({
         </>
       )}
 
-      {/* ── Shipping & Benefits ── */}
+      {/* ── 상담 안내 ── */}
       <div className="px-4 py-4">
         <div className="space-y-3">
           <div className="flex items-center gap-3 text-sm text-gray-600">
-            <Icon name="Truck" size={18} strokeWidth={1.5} className="text-gray-400 flex-shrink-0" />
-            <span>
-              {shippingLabel} · 3~5일 이내 상담 방식
-              {remoteAreaFee > 0 && <span className="text-gray-400"> (도서산간 +{formatPrice(remoteAreaFee)})</span>}
-            </span>
+            <Icon name="Calendar" size={18} strokeWidth={1.5} className="text-gray-400 flex-shrink-0" />
+            <span>결제 완료 후 예약 즉시 확정</span>
           </div>
-          {/* 임시 비노출 (교환·환불 규정 정비 전까지) — 살릴 때 주석 해제
-          <div className="flex items-center gap-3 text-sm text-gray-600">
-            <Icon name="Reorder" size={18} strokeWidth={1.5} className="text-gray-400 flex-shrink-0" />
-            <span>7일 이내 무료 반품</span>
-          </div>
-          */}
           <div className="flex items-center gap-3 text-sm text-gray-600">
             <Icon name="Certified" size={18} strokeWidth={1.5} className="text-gray-400 flex-shrink-0" />
-            <span>정품 보장</span>
+            <span>상담 시작 전 전액 취소·환불 가능</span>
           </div>
         </div>
       </div>

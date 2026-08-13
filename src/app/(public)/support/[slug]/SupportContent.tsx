@@ -129,7 +129,7 @@ function ContactPage() {
 const PAGE_META: Record<string, { subtitle: string; icon: React.ReactNode }> = {
   contact:      { subtitle: "빠르게 답변드릴게요", icon: <Icon name="Message" size={24} strokeWidth={1.5} /> },
   faq:          { subtitle: "궁금한 점을 찾아보세요", icon: <Icon name="Help" size={24} strokeWidth={1.5} /> },
-  shipping:     { subtitle: "상담 방식 및 반품 안내", icon: <Icon name="Truck" size={24} strokeWidth={1.5} /> },
+  shipping:     { subtitle: "예약·취소·환불 안내", icon: <Icon name="Calendar" size={24} strokeWidth={1.5} /> },
   terms:        { subtitle: "서비스 이용 약관", icon: <Icon name="File" size={24} strokeWidth={1.5} /> },
   privacy:      { subtitle: "개인정보 보호 정책", icon: <Icon name="Certified" size={24} strokeWidth={1.5} /> },
   "seller-guide": { subtitle: "상담사로 시작하는 방법", icon: <Icon name="Store" size={24} strokeWidth={1.5} /> },
@@ -139,24 +139,24 @@ const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = 
   contact: { title: "1대1 문의", body: () => <ContactPage /> },
   faq:     { title: "자주 묻는 질문", body: () => <FaqPage /> },
   shipping: {
-    title: "상담 방식 안내",
+    title: "예약·취소·환불 안내",
     body: () => (
       <div className="space-y-3">
         <Card>
-          <SectionHeading>상담 방식 기간</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">결제 완료 후 영업일 기준 2~5일 이내 진행됩니다. 도서산간 지역은 추가 1~3일이 소요될 수 있습니다.</p>
+          <SectionHeading>예약 확정</SectionHeading>
+          <p className="text-[13px] text-gray-600 leading-relaxed">결제 완료 즉시 예약이 접수되며, 상담사가 확정하면 마이페이지 &gt; 예약내역에서 확인할 수 있습니다. 확정 알림은 앱/이메일로 발송됩니다.</p>
         </Card>
         <Card>
-          <SectionHeading>배송비</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">3만원 이상 구매 시 무료배송입니다. 미만 시 배송비 3,000원이 부과됩니다.</p>
+          <SectionHeading>예약 취소</SectionHeading>
+          <p className="text-[13px] text-gray-600 leading-relaxed">마이페이지 &gt; 예약내역에서 직접 취소하거나 1대1 문의로 접수해 주세요. 상담 시작 전에는 전액 환불이 원칙이며, 상담 임박 시점(24시간 이내)에는 환불이 제한될 수 있습니다.</p>
         </Card>
         <Card>
-          <SectionHeading>단체 상담 상담 방식</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">단체 상담 캠페인 종료 후 목표 달성 시 상담 방식이 시작됩니다. 캠페인 실패 시 전액 환불됩니다.</p>
+          <SectionHeading>공동구매 캠페인 환불</SectionHeading>
+          <p className="text-[13px] text-gray-600 leading-relaxed">공동구매 캠페인 종료 후 목표 달성 실패 시 전액 자동 환불됩니다. 목표 달성 후에는 개별 상담상품의 취소·환불 정책이 적용됩니다.</p>
         </Card>
         <Card>
-          <SectionHeading>교환/반품</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">수령 후 7일 이내 신청 가능합니다. 단순 변심의 경우 왕복 배송비가 발생합니다. 상담상품 하자의 경우 전액 무료로 처리됩니다.</p>
+          <SectionHeading>환불 처리 기간</SectionHeading>
+          <p className="text-[13px] text-gray-600 leading-relaxed">취소·환불 접수 후 보통 3~5 영업일 이내에 결제 수단으로 처리됩니다. 카드사 사정에 따라 다소 늦어질 수 있습니다.</p>
         </Card>
       </div>
     ),
@@ -191,11 +191,11 @@ const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = 
       <div className="space-y-3">
         <Card>
           <SectionHeading>수집하는 개인정보 항목</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">회원가입 시: 이름, 이메일, 비밀번호. 서비스 이용 시: 구매내역, 배송지 정보, 결제정보. 자동 수집: IP주소, 쿠키, 방문 기록.</p>
+          <p className="text-[13px] text-gray-600 leading-relaxed">회원가입 시: 이름, 이메일, 비밀번호. 서비스 이용 시: 예약·상담 내역, 결제정보. 자동 수집: IP주소, 쿠키, 방문 기록.</p>
         </Card>
         <Card>
           <SectionHeading>개인정보 수집 및 이용 목적</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">회원 관리, 서비스 제공, 예약 및 상담 방식 처리, 고객 상담, 마케팅 및 광고에 활용합니다.</p>
+          <p className="text-[13px] text-gray-600 leading-relaxed">회원 관리, 서비스 제공, 예약 및 상담 진행, 고객 상담, 마케팅 및 광고에 활용합니다.</p>
         </Card>
         <Card>
           <SectionHeading>개인정보 보유 기간</SectionHeading>
@@ -215,19 +215,19 @@ const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = 
       <div className="space-y-3">
         <Card>
           <SectionHeading>상담사란?</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">상담사는 브랜드 상담상품을 자신의 점집에 등록하고 팔로워(팬)에게 판매하는 인플루언서/크리에이터입니다. 별도 소싱 없이 브랜드 상담상품을 선택해 판매할 수 있습니다.</p>
+          <p className="text-[13px] text-gray-600 leading-relaxed">상담사는 사주·타로·운세 등 자신만의 상담 서비스를 나만의 점집에 등록하고 고객에게 제공하는 전문가입니다. 예약·결제·라이브 방송 기능을 모두 플랫폼에서 지원합니다.</p>
         </Card>
         <Card>
           <SectionHeading>신청 자격</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">SNS 채널(인스타그램, 유튜브, 틱톡 등)을 운영하는 누구나 신청 가능합니다. 팔로워 수 제한은 없으나 채널 활동 이력이 있어야 합니다.</p>
+          <p className="text-[13px] text-gray-600 leading-relaxed">사주·타로·운세·심리상담 등 역술·상담 분야에서 활동 중이거나 준비 중인 누구나 신청 가능합니다. SNS 채널이 있으면 심사에 도움이 됩니다.</p>
         </Card>
         <Card>
           <SectionHeading>신청 방법</SectionHeading>
           <p className="text-[13px] text-gray-600 leading-relaxed">회원가입 시 '상담사'를 선택하거나, 일반 회원으로 가입 후 마이페이지에서 상담사 신청을 할 수 있습니다. 관리자 검토 후 1~3 영업일 내 결과가 안내됩니다.</p>
         </Card>
         <Card>
-          <SectionHeading>커미션 수익</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">판매가 이루어질 때마다 설정된 커미션율에 따라 수익이 발생합니다. 캠페인 종료 후 구매 확정 시점에 정산됩니다.</p>
+          <SectionHeading>상담료 수익</SectionHeading>
+          <p className="text-[13px] text-gray-600 leading-relaxed">고객이 상담을 예약·결제할 때마다 설정된 상담료에서 플랫폼 수수료를 제한 금액이 수익으로 발생합니다. 캠페인 종료 후 확정 시점에 정산됩니다.</p>
         </Card>
         <a href="/seller-apply"
           className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors shadow-md shadow-amber-200 mt-2">

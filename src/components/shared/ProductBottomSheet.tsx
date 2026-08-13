@@ -475,7 +475,7 @@ export default function ProductBottomSheet({
                     선택: {effectiveVariant.name}
                   </p>
                   <p className="text-xs text-amber-700 mt-0.5">
-                    {formatPrice(effectiveVariant.price)} · 재고 {effectiveVariant.stock.toLocaleString()}개
+                    {formatPrice(effectiveVariant.price)}
                   </p>
                 </div>
               )}

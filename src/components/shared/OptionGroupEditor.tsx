@@ -127,7 +127,7 @@ export default function OptionGroupEditor({
     onChange({ optionGroups: ng, variants: newVariants });
   };
 
-  /** 그룹 변경 시 기존 variant 가격/재고를 유지하면서 조합 재생성 */
+  /** 그룹 변경 시 기존 variant 가격/정원을 유지하면서 조합 재생성 */
   function rebuildVariants(groups: OptionGroup[], prev: Variant[]): Variant[] {
     const combos = cartesian(groups);
     return combos.map((name) => {
@@ -187,7 +187,7 @@ export default function OptionGroupEditor({
               <div className="grid grid-cols-[1fr_100px_80px_32px] gap-2 px-1">
                 <span className="text-[10px] text-gray-400 font-medium">옵션명</span>
                 <span className="text-[10px] text-gray-400 font-medium text-right">가격(원)</span>
-                <span className="text-[10px] text-gray-400 font-medium text-right">재고</span>
+                <span className="text-[10px] text-gray-400 font-medium text-right">정원</span>
                 <span />
               </div>
               {variants.map((v, i) => (
@@ -229,7 +229,7 @@ export default function OptionGroupEditor({
                 </div>
               ))}
               <p className="text-[10px] text-gray-400 pt-1">
-                총 재고: {variants.reduce((s, v) => s + (parseInt(v.stock) || 0), 0).toLocaleString()}개
+                총 정원: {variants.reduce((s, v) => s + (parseInt(v.stock) || 0), 0).toLocaleString()}명
               </p>
             </>
           )}
@@ -327,14 +327,14 @@ export default function OptionGroupEditor({
           {variants.length > 0 && (
             <div className="mt-2">
               <p className="text-[11px] font-semibold text-gray-600 mb-2">
-                조합 ({variants.length}개) — 가격·재고 설정
+                조합 ({variants.length}개) — 가격·정원 설정
               </p>
               <div className="border border-gray-200 rounded-xl overflow-hidden">
                 {/* 헤더 */}
                 <div className="grid grid-cols-[1fr_100px_80px] gap-2 px-3 py-2 bg-gray-50 border-b border-gray-200">
                   <span className="text-[10px] text-gray-500 font-medium">조합</span>
                   <span className="text-[10px] text-gray-500 font-medium text-right">가격(원)</span>
-                  <span className="text-[10px] text-gray-500 font-medium text-right">재고</span>
+                  <span className="text-[10px] text-gray-500 font-medium text-right">정원</span>
                 </div>
                 <div className="divide-y divide-gray-100 max-h-52 overflow-y-auto">
                   {variants.map((v, i) => (
@@ -368,7 +368,7 @@ export default function OptionGroupEditor({
                 </div>
               </div>
               <p className="text-[10px] text-gray-400 mt-1">
-                총 재고: {variants.reduce((s, v) => s + (parseInt(v.stock) || 0), 0).toLocaleString()}개
+                총 정원: {variants.reduce((s, v) => s + (parseInt(v.stock) || 0), 0).toLocaleString()}명
               </p>
             </div>
           )}
