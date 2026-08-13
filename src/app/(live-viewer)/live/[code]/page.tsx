@@ -145,7 +145,7 @@ interface ChannelOrder {
 
 const ORDER_STATUS_LABEL: Record<string, string> = {
   PENDING: "결제 대기", PAID: "결제 완료", PREPARING: "상담상품 준비 중",
-  SHIPPED: "상담 방식 중", DELIVERED: "상담 방식 완료", CANCELLED: "취소됨",
+  SHIPPED: "상담 진행 중", DELIVERED: "상담 완료", CANCELLED: "취소됨",
   REFUNDED: "환불됨", CONFIRMED: "구매 확정",
 };
 

@@ -108,7 +108,7 @@ function BotGuideModal({ onClose }: { onClose: () => void }) {
   const FEATURES = [
     { icon: "ChatJoin_icon", name: "자동 인사 메시지", desc: "시청자가 라이브에서 첫 채팅을 남기면 봇이 자동으로 환영 인사를 보내요. 인사 문구는 직접 수정할 수 있어요." },
     { icon: "SnsComment_icon", name: "키워드 자동 응답", desc: "채팅에 등록한 키워드가 포함되면 답변을 자동 발송해요. 앱 채팅과 YouTube 채팅 모두 감지해요." },
-    { icon: "ProductDetail_icon", name: "상담상품 정보 자동 안내", desc: "“3번 상담상품 뭐예요?”, “가격 얼마예요?”, “재고 있어요?” 같은 질문에 라이브 상담상품의 이름·특가를 자동 안내해요." },
+    { icon: "ProductDetail_icon", name: "상담상품 정보 자동 안내", desc: "“3번 상담상품 뭐예요?”, “가격 얼마예요?”, “예약 가능한가요?” 같은 질문에 라이브 상담상품의 이름·특가를 자동 안내해요." },
     { icon: "ChatBlock_icon", name: "스팸/욕설 필터", desc: "금지어가 포함된 앱 채팅을 자동 숨김 처리하고 경고를 발송해요. 금지어는 원하는 만큼 등록할 수 있어요." },
     { icon: "ProductQA_icon", name: "FAQ 자동 응답", desc: "자주 묻는 질문(예: 상담 방식 언제)을 등록하면 해당 문구 감지 시 답변을 자동 발송해요." },
     { icon: "BuyNow_icon", name: "구매 유도 메시지", desc: "설정한 주기(분)마다 구매 유도 메시지를 자동 발송해 구매 전환을 도와요." },
@@ -720,7 +720,7 @@ export default function ChatBotManager({ onConfigSaved }: { onConfigSaved?: () =
           num={3}
           icon="ProductDetail_icon"
           title="상담상품 정보 자동 안내"
-          desc="“3번 상담상품 뭐예요?”, “가격 얼마예요?”, “재고 있어요?” 같은 질문에 라이브 상담상품 정보를 자동으로 안내해요."
+          desc=""3번 상담상품 뭐예요?", "가격 얼마예요?", "예약 가능한가요?" 같은 질문에 라이브 상담상품 정보를 자동으로 안내해요."
           on={config.productInfoEnabled}
           onToggle={() => patch({ productInfoEnabled: !config.productInfoEnabled })}
         />

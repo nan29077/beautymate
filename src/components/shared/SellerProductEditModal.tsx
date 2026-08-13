@@ -160,7 +160,7 @@ export default function SellerProductEditModal({ productId, onClose, onSaved }: 
                   </div>
                 </div>
               </div>
-              <p className="text-[11px] text-gray-400 -mt-3">배송비를 비워두거나 0원으로 두면 무료배송으로 표시됩니다.</p>
+              <p className="text-[11px] text-gray-400 -mt-3">상담상품은 배송이 없으므로 배송비 항목은 비워두거나 0으로 두세요.</p>
 
               <div>
                 <label className="text-xs font-semibold text-gray-700 mb-1.5 block">상담상품설명</label>

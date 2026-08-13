@@ -344,16 +344,16 @@ export default async function OrderDetailPage({
           </div>
         </div>
 
-        {/* 배송지 */}
+        {/* 예약자 정보 */}
         {order.customerName && (
           <div className="bg-white rounded-xl border border-gray-100 p-4">
             <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5 mb-3">
               <Icon name="Location" size={14} className="text-gray-400" />{" "}
-              배송지
+              예약자 정보
             </h2>
             <div className="space-y-1.5">
               {order.customerName && (
-                <InfoRow label="받는분" value={order.customerName} />
+                <InfoRow label="예약자" value={order.customerName} />
               )}
               {order.customerPhone && (
                 <InfoRow label="연락처" value={order.customerPhone} />

@@ -663,9 +663,9 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                     <div>
                       <label className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1.5"><Icon name="ProductTag_icon" size={16} /> 배지</label>
                       <div className="flex flex-wrap gap-2">
-                        {[{ v: "FREE_SHIPPING", l: "무료배송", c: "bg-blue-50 text-blue-600 border-blue-200", icon: "BadgeFreeShipping_icon" }, { v: "NEW", l: "신규", c: "bg-emerald-50 text-emerald-600 border-emerald-200", icon: "BadgeNew_icon" },
+                        {[{ v: "FREE_SHIPPING", l: "무료상담", c: "bg-blue-50 text-blue-600 border-blue-200", icon: "BadgeFreeShipping_icon" }, { v: "NEW", l: "신규", c: "bg-emerald-50 text-emerald-600 border-emerald-200", icon: "BadgeNew_icon" },
                           { v: "BEST", l: "베스트", c: "bg-orange-50 text-orange-600 border-orange-200", icon: "BadgeBest_icon" }, { v: "HOT_DEAL", l: "특가", c: "bg-red-50 text-red-600 border-red-200", icon: "BadgeSale_icon" },
-                          { v: "LIMITED", l: "한정판", c: "bg-purple-50 text-purple-600 border-purple-200", icon: "BadgeLimited_icon" }, { v: "HANDMADE", l: "핸드메이드", c: "bg-amber-50 text-amber-600 border-amber-200", icon: "BadgeRecommend_icon" },
+                          { v: "LIMITED", l: "한정", c: "bg-purple-50 text-purple-600 border-purple-200", icon: "BadgeLimited_icon" }, { v: "HANDMADE", l: "추천", c: "bg-amber-50 text-amber-600 border-amber-200", icon: "BadgeRecommend_icon" },
                         ].map(b => (
                           <button key={b.v} type="button" onClick={() => setBadges(p => p.includes(b.v) ? p.filter(x => x !== b.v) : [...p, b.v])}
                             className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all ${badges.includes(b.v) ? b.c + " border-current shadow-sm" : "bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100"}`}>
@@ -821,7 +821,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                     {form.variants.length === 0 && (
                       <div>
                         <label className="text-xs font-semibold text-gray-700 mb-1.5 block flex items-center gap-1">
-                          <Icon name="Package" size={13} /> 재고 수량
+                          <Icon name="Package" size={13} /> 예약 가능 수량
                         </label>
                         <div className="relative max-w-[50%]">
                           <input

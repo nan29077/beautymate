@@ -151,8 +151,8 @@ const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = 
           <p className="text-[13px] text-gray-600 leading-relaxed">마이페이지 &gt; 예약내역에서 직접 취소하거나 1대1 문의로 접수해 주세요. 상담 시작 전에는 전액 환불이 원칙이며, 상담 임박 시점(24시간 이내)에는 환불이 제한될 수 있습니다.</p>
         </Card>
         <Card>
-          <SectionHeading>공동구매 캠페인 환불</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">공동구매 캠페인 종료 후 목표 달성 실패 시 전액 자동 환불됩니다. 목표 달성 후에는 개별 상담상품의 취소·환불 정책이 적용됩니다.</p>
+          <SectionHeading>그룹 상담 캠페인 환불</SectionHeading>
+          <p className="text-[13px] text-gray-600 leading-relaxed">그룹 상담 캠페인 종료 후 목표 달성 실패 시 전액 자동 환불됩니다. 목표 달성 후에는 개별 상담상품의 취소·환불 정책이 적용됩니다.</p>
         </Card>
         <Card>
           <SectionHeading>환불 처리 기간</SectionHeading>

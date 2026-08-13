@@ -2,6 +2,7 @@
 
 import BrandWordmark from "@/components/shared/BrandWordmark";
 import { Icon } from "@/components/shared/Icon";
+import { Eye, EyeOff } from "lucide-react";
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -376,13 +377,15 @@ function LoginForm() {
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 active:text-gray-600"
-                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  onClick={() => setShowPassword((v) => !v)}
+                  tabIndex={-1}
+                  aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 표시"}
                 >
                   {showPassword ? (
-                    <Icon name="Eye" size={18} />
+                    <EyeOff size={17} strokeWidth={1.8} />
                   ) : (
-                    <Icon name="Eye" size={18} />
+                    <Eye size={17} strokeWidth={1.8} />
                   )}
                 </button>
               </div>

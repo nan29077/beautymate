@@ -104,7 +104,7 @@ export default function SellerLiveModeClient({ shopName, slug }: { shopName: str
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-gray-900 flex items-center gap-2">
             <Radio size={26} strokeWidth={1.8} className="text-red-500 animate-pulse" />
-            라이브 모드
+            예약 현황
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             {shopName} · {status?.date ?? localToday()} · 30초마다 자동 갱신

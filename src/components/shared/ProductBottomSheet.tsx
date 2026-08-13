@@ -360,18 +360,8 @@ export default function ProductBottomSheet({
               {/* 상담 방식 */}
               <div className="px-4 py-2">
                 <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <Icon name="Truck" size={13} strokeWidth={1.5} className="text-amber-400" />
-                  <span>{shippingLabel} · 3~5일 이내 상담 방식</span>
-                  {isFreeShipping && (
-                    <span className="inline-block text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full leading-none">
-                      무료
-                    </span>
-                  )}
-                  {product.remoteAreaFee > 0 && (
-                    <span className="text-gray-400">
-                      (도서산간 +{formatPrice(product.remoteAreaFee)})
-                    </span>
-                  )}
+                  <Icon name="Calendar" size={13} strokeWidth={1.5} className="text-amber-400" />
+                  <span>예약 후 상담사와 일정 조율</span>
                 </div>
               </div>
 

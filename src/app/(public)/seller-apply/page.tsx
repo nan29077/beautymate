@@ -9,7 +9,7 @@ import SellerApplyForm from "@/components/shared/SellerApplyForm";
 export const dynamic = "force-dynamic";
 
 const BENEFITS = [
-  { icon: Gift, color: "text-brand-600", bg: "bg-brand-50", title: "소싱 없이 바로 시작", desc: "브랜드 상담상품을 골라 담기만 하면 바로 판매할 수 있어요." },
+  { icon: Gift, color: "text-brand-600", bg: "bg-brand-50", title: "간편하게 바로 시작", desc: "나만의 상담 서비스를 등록하면 바로 예약을 받을 수 있어요." },
   { icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50", title: "판매 커미션 수익", desc: "판매가 이루어질 때마다 설정된 커미션을 받아요." },
   { icon: Radio, color: "text-rose-500", bg: "bg-rose-50", title: "라이브 상담", desc: "실시간 방송으로 팔로워와 소통하며 즉시 판매해요." },
   { icon: ShieldCheck, color: "text-blue-600", bg: "bg-blue-50", title: "안심 정산 시스템", desc: "복잡한 정산·상담 방식은 플랫폼이 처리해요." },
@@ -57,7 +57,7 @@ export default async function SellerApplyPage() {
           나만의 점집을 열고<br />팬과 함께 판매하세요
         </h2>
         <p className="mt-2 text-[13px] text-gray-300 leading-relaxed">
-          상담상품 소싱 걱정 없이, 브랜드 상담상품을 골라<br />라이브·콘텐츠로 판매하고 커미션을 받아요.
+          나만의 상담 서비스를 등록하고<br />라이브·콘텐츠로 고객과 소통하며 수익을 얻어요.
         </p>
       </div>
 

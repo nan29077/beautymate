@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 // ─────────────────────────────────────────────
-// 상담사 위젯 설정 화면.
+// 상담사 방송 도구 화면.
 // 위젯 URL / 예약 URL 복사, 예약 QR 다운로드, 실제 위젯 미리보기, 프리즘·OBS 설정 가이드.
 // ─────────────────────────────────────────────
 
@@ -26,12 +26,14 @@ function UrlRow({
   hint,
   url,
   openable = true,
+  description,
 }: {
   icon: React.ReactNode;
   label: string;
   hint: string;
   url: string;
   openable?: boolean;
+  description?: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -93,6 +95,10 @@ function UrlRow({
           </a>
         )}
       </div>
+
+      {description && (
+        <p className="text-xs text-gray-500 mt-2 leading-relaxed">{description}</p>
+      )}
     </div>
   );
 }
@@ -165,7 +171,7 @@ export default function SellerWidgetClient({
       <div className="mb-6">
         <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
           <MonitorPlay size={20} strokeWidth={1.6} className="text-[#2d1b69]" />
-          위젯 설정
+          방송 도구
         </h1>
         <p className="text-[13px] text-gray-500 mt-1">
           프리즘 라이브 스튜디오·OBS 방송 화면에 <strong>{shopName}</strong> 님의 예약 현황을
@@ -173,7 +179,7 @@ export default function SellerWidgetClient({
         </p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* ───── 왼쪽: URL & QR ───── */}
         <div className="space-y-4">
           <UrlRow
@@ -181,13 +187,15 @@ export default function SellerWidgetClient({
             label="라이브 위젯 URL"
             hint="방송 화면에 띄울 예약 현황 위젯입니다. 브라우저 소스에 붙여넣으세요."
             url={widgetUrl}
+            description='OBS 또는 프리즘 라이브 스튜디오에서 "브라우저 소스"를 추가할 때 이 주소를 입력하세요. 방송 화면에 오늘의 예약 현황이 실시간으로 표시됩니다.'
           />
 
           <UrlRow
             icon={<Bell size={16} strokeWidth={1.6} />}
-            label="예약 알림 오버레이 URL"
+            label="예약 알림 오버레이"
             hint="새 예약이 접수될 때만 5초간 배너가 뜹니다. 별도 브라우저 소스로 추가하세요. (선택)"
             url={alertUrl}
+            description="새 예약이 들어올 때 방송 화면에 5초 동안 알림 배너가 자동으로 표시됩니다. OBS/프리즘에서 별도 브라우저 소스로 추가하면 됩니다."
           />
 
           <UrlRow
@@ -195,6 +203,7 @@ export default function SellerWidgetClient({
             label="예약 페이지 URL"
             hint="유튜브 설명란·고정 댓글·인스타 프로필에 넣는 짧은 예약 주소입니다."
             url={bookingUrl}
+            description="유튜브 영상 설명란, 인스타그램 프로필 링크 등에 사용할 수 있는 짧은 주소입니다. 이 링크를 통해 시청자가 바로 예약할 수 있습니다."
           />
 
           {/* QR */}
@@ -211,13 +220,17 @@ export default function SellerWidgetClient({
               </div>
             </div>
 
-            <div className="mt-3 flex items-center gap-4">
-              <div className="p-2 bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div className="mt-3 flex flex-col sm:flex-row items-center gap-4">
+              <div className="p-2 bg-white rounded-xl border border-gray-200 shadow-sm w-full max-w-[200px] mx-auto sm:mx-0 sm:w-auto">
                 {qrDataUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={qrDataUrl} alt="예약 QR 코드" className="w-[132px] h-[132px] block" />
+                  <img
+                    src={qrDataUrl}
+                    alt="예약 QR 코드"
+                    className="w-full h-auto block sm:w-[132px] sm:h-[132px]"
+                  />
                 ) : (
-                  <div className="w-[132px] h-[132px] rounded bg-gray-50 animate-pulse" />
+                  <div className="w-full aspect-square rounded bg-gray-50 animate-pulse sm:w-[132px] sm:h-[132px]" />
                 )}
               </div>
               <button
@@ -230,6 +243,10 @@ export default function SellerWidgetClient({
                 QR 다운로드
               </button>
             </div>
+
+            <p className="text-xs text-gray-500 mt-2 leading-relaxed">
+              QR 코드를 방송 화면에 띄우거나 인쇄물에 활용하세요. 시청자가 스마트폰으로 스캔하면 바로 예약 페이지로 이동합니다.
+            </p>
           </div>
         </div>
 
@@ -250,21 +267,24 @@ export default function SellerWidgetClient({
 
             {/* 방송 화면 위에 얹힌 느낌을 주려고 어두운 체커보드 배경을 깐다 */}
             <div
-              className="rounded-xl overflow-hidden flex items-center justify-center p-3"
+              className="rounded-xl overflow-hidden p-3"
               style={{
                 background:
                   "repeating-conic-gradient(#2a2a2a 0% 25%, #3a3a3a 0% 50%) 50% / 20px 20px",
               }}
             >
-              <iframe
-                ref={previewRef}
-                src={widgetUrl}
-                title="라이브 위젯 미리보기"
-                width={300}
-                height={400}
-                className="border-0 bg-transparent"
-                style={{ colorScheme: "normal" }}
-              />
+              <div
+                className="w-full max-w-[300px] mx-auto overflow-hidden rounded-lg"
+                style={{ aspectRatio: "3/4" }}
+              >
+                <iframe
+                  ref={previewRef}
+                  src={widgetUrl}
+                  title="라이브 위젯 미리보기"
+                  className="border-0 bg-transparent w-full h-full"
+                  style={{ colorScheme: "normal" }}
+                />
+              </div>
             </div>
             <p className="text-[11px] text-gray-400 mt-2 leading-relaxed">
               실제 방송에서는 배경이 완전히 투명하게 표시됩니다. 남은 자리는 30초마다 자동
@@ -278,10 +298,10 @@ export default function SellerWidgetClient({
             <ol className="space-y-2.5">
               {[
                 "프리즘 라이브 스튜디오(또는 OBS)에서 소스 추가 → 브라우저(Browser Source) 선택",
-                "위의 “라이브 위젯 URL”을 복사해 URL 칸에 붙여넣기",
+                '위의 “라이브 위젯 URL”을 복사해 URL 칸에 붙여넣기',
                 "너비 300, 높이 400 으로 설정",
                 "방송 화면 우하단(또는 좌하단)으로 위치 조정",
-                "예약 알림 배너를 쓰려면 “예약 알림 오버레이 URL”을 브라우저 소스로 하나 더 추가해 상단 중앙에 배치",
+                '예약 알림 배너를 쓰려면 “예약 알림 오버레이 URL”을 브라우저 소스로 하나 더 추가해 상단 중앙에 배치',
               ].map((step, i) => (
                 <li key={i} className="flex gap-2.5 text-[12px] text-gray-600 leading-relaxed">
                   <span className="w-5 h-5 rounded-full bg-[#2d1b69] text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-px">

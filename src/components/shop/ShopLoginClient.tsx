@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { Eye, EyeOff } from "lucide-react";
 import ShopAuthShell from "./ShopAuthShell";
 
 interface Shop {
@@ -20,6 +21,7 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,15 +106,26 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
         </div>
         <div>
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">비밀번호</label>
-          <input
-            type="password"
-            className="input-field text-sm py-2.5"
-            placeholder="비밀번호를 입력하세요"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            required
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              className="input-field text-sm py-2.5 pr-10"
+              placeholder="비밀번호를 입력하세요"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              tabIndex={-1}
+              aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 표시"}
+            >
+              {showPassword ? <EyeOff size={17} strokeWidth={1.8} /> : <Eye size={17} strokeWidth={1.8} />}
+            </button>
+          </div>
         </div>
         {error && (
           <p className="text-xs text-red-500 bg-red-50 px-3 py-2 rounded-lg">{error}</p>
@@ -125,16 +138,21 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
           {loading ? "로그인 중..." : "로그인"}
         </button>
         {process.env.NODE_ENV === "development" && (
-          <button
-            type="button"
-            onClick={() => {
-              setEmail("customer1@example.com");
-              setPassword("password123");
-            }}
-            className="w-full py-2 text-sm text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 transition"
-          >
-            테스트 계정으로 로그인 (customer1@example.com)
-          </button>
+          <div className="space-y-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("test@test.com");
+                setPassword("Test1234!");
+              }}
+              className="w-full py-2 text-sm text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 transition"
+            >
+              테스트 계정 자동입력
+            </button>
+            <p className="text-center text-[10px] text-gray-400">
+              ※ 테스트 계정은 관리자가 직접 생성한 계정만 사용 가능합니다
+            </p>
+          </div>
         )}
         <p className="text-center text-xs text-gray-400">
           아직 회원이 아니신가요?{" "}

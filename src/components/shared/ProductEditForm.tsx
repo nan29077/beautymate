@@ -337,12 +337,12 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
               <label className="text-xs font-medium text-gray-600 mb-2 block">배지</label>
               <div className="flex flex-wrap gap-1.5">
                 {[
-                  { v: "FREE_SHIPPING", l: "무료배송", c: "bg-blue-50 text-blue-600" },
+                  { v: "FREE_SHIPPING", l: "무료상담", c: "bg-blue-50 text-blue-600" },
                   { v: "NEW", l: "신규", c: "bg-emerald-50 text-emerald-600" },
                   { v: "BEST", l: "베스트", c: "bg-orange-50 text-orange-600" },
                   { v: "HOT_DEAL", l: "특가", c: "bg-red-50 text-red-600" },
-                  { v: "LIMITED", l: "한정판", c: "bg-purple-50 text-purple-600" },
-                  { v: "HANDMADE", l: "핸드메이드", c: "bg-amber-50 text-amber-600" },
+                  { v: "LIMITED", l: "한정", c: "bg-purple-50 text-purple-600" },
+                  { v: "HANDMADE", l: "추천", c: "bg-amber-50 text-amber-600" },
                 ].map(b => (
                   <button key={b.v} type="button" onClick={() => setBadges(p => p.includes(b.v) ? p.filter(x => x !== b.v) : [...p, b.v])}
                     className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${badges.includes(b.v) ? b.c + " border-current" : "bg-gray-50 text-gray-400 border-gray-200"}`}>
@@ -447,10 +447,10 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
             {/* 재고 수량 (옵션 미사용 단일 상담상품) */}
             {form.variants.length === 0 && (
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-1.5 block flex items-center gap-1"><Icon name="Package" size={13} /> 재고 수량</label>
+                <label className="text-xs font-medium text-gray-600 mb-1.5 block flex items-center gap-1"><Icon name="Package" size={13} /> 예약 가능 수량</label>
                 <input type="number" min="0" className="input-field text-sm w-40" placeholder="0"
                   value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} />
-                <p className="text-[11px] text-gray-400 mt-1">옵션을 추가하면 옵션별 재고 합계로 계산됩니다.</p>
+                <p className="text-[11px] text-gray-400 mt-1">옵션을 추가하면 옵션별 수량 합계로 계산됩니다.</p>
               </div>
             )}
             {/* 옵션 (다차원 그룹 or 단순) */}

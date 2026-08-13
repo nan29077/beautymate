@@ -72,9 +72,9 @@ export default async function DashboardLayout({
       // 상담상품 관리
       { href: "/seller/products", iconName: "Package", label: "상담상품 관리", group: "상담상품 관리" },
       // 판매·라이브 (콘텐츠/단체 상담/게임 메뉴는 점집 운영에 쓰지 않아 제거)
-      { href: "/seller/live-mode", iconName: "Video", label: "라이브 모드", group: "판매·라이브" },
+      { href: "/seller/live-mode", iconName: "Video", label: "예약 현황", group: "판매·라이브" },
       { href: "/seller/live", iconName: "Live", label: "라이브 상담", group: "판매·라이브" },
-      { href: "/seller/widget", iconName: "QrCode", label: "위젯 설정", group: "판매·라이브" },
+      { href: "/seller/widget", iconName: "QrCode", label: "방송 도구", group: "판매·라이브" },
       // 예약·정산
       { href: "/seller/timeslots", iconName: "Clock", label: "예약 시간 설정", group: "예약·정산" },
       { href: "/seller/reservations", iconName: "Calendar", label: "예약 관리", group: "예약·정산" },

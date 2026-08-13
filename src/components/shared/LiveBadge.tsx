@@ -11,7 +11,7 @@ export const LIVE_ACCENT = "#6d28d9";
 
 export const LIVE_RING_CLASS = "ring-2 ring-violet-500 animate-heartbeat";
 
-// 프로필(이름) 옆에 붙는 라이브 배지 — Radio 아이콘 + "상담 중" (딥 퍼플).
+// 프로필(이름) 옆에 붙는 라이브 배지 — Radio 아이콘 + "라이브 중" (딥 퍼플).
 // ※ 아바타 하단의 <LiveBadge/>보다 약간 크게 표시한다.
 export function OnAirBadge({ className = "" }: { className?: string }) {
   return (
@@ -20,7 +20,7 @@ export function OnAirBadge({ className = "" }: { className?: string }) {
       style={{ backgroundColor: LIVE_ACCENT }}
     >
       <Radio size={10} strokeWidth={2.5} className="animate-pulse" />
-      상담 중
+      라이브 중
     </span>
   );
 }

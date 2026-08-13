@@ -93,7 +93,7 @@ export default function HomeStartTabs() {
           ) : (
             <div className="mt-5">
               <p className="text-[12px] text-gray-400 mb-4">
-                소싱 걱정 없이 브랜드 상담상품을 골라 나만의 점집을 열어보세요.
+                나만의 상담 서비스를 등록하고 나만의 점집을 열어보세요.
               </p>
               <Link
                 href="/become-seller"

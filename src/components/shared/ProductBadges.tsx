@@ -1,8 +1,8 @@
 "use client";
 
 const BADGE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  FREE_SHIPPING: { label: "무료배송", color: "text-white", bg: "bg-blue-500" },
-  CONDITIONAL_FREE_SHIPPING: { label: "조건부무료배송", color: "text-white", bg: "bg-cyan-500" },
+  FREE_SHIPPING: { label: "무료상담", color: "text-white", bg: "bg-blue-500" },
+  CONDITIONAL_FREE_SHIPPING: { label: "조건부무료", color: "text-white", bg: "bg-cyan-500" },
   NEW: { label: "NEW", color: "text-white", bg: "bg-emerald-500" },
   BEST: { label: "BEST", color: "text-white", bg: "bg-orange-500" },
   HOT_DEAL: { label: "특가", color: "text-white", bg: "bg-red-500" },
