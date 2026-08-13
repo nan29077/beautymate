@@ -79,7 +79,7 @@ export default async function DashboardLayout({
       { href: "/seller/campaigns", iconName: "Event", label: "단체 상담 관리", group: "판매·라이브" },
       { href: "/seller/games", iconName: "Play", label: "게임관리", group: "판매·라이브" },
       // 예약·정산
-      { href: "/seller/timeslots", iconName: "Clock", label: "시간슬롯 관리", group: "예약·정산" },
+      { href: "/seller/timeslots", iconName: "Clock", label: "예약 시간 설정", group: "예약·정산" },
       { href: "/seller/reservations", iconName: "Calendar", label: "예약 관리", group: "예약·정산" },
       { href: "/seller/customers", iconName: "Users", label: "고객관리(CRM)", group: "예약·정산" },
       { href: "/seller/members", iconName: "UserCheck", label: "점집 회원", group: "예약·정산" },

@@ -92,7 +92,7 @@ export default function TimeslotManager({
   };
 
   const handleDeleteSlot = async (slotId: string) => {
-    if (!confirm("이 슬롯을 삭제하시겠습니까?")) return;
+    if (!confirm("이 시간을 삭제하시겠습니까?")) return;
     const res = await fetch(`/api/timeslots/${slotId}`, { method: "DELETE" });
     if (res.ok) {
       setSlots(prev => prev.filter(s => s.id !== slotId));
@@ -130,7 +130,7 @@ export default function TimeslotManager({
     <div className="p-4 max-w-2xl mx-auto">
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-lg font-bold text-gray-900">시간슬롯 관리</h1>
+        <h1 className="text-lg font-bold text-gray-900">예약 시간 설정</h1>
         <button
           onClick={() => setShowBulkModal(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700"
@@ -197,25 +197,25 @@ export default function TimeslotManager({
         </div>
       </div>
 
-      {/* 선택 날짜 슬롯 목록 */}
+      {/* 선택 날짜 예약 가능 시간 목록 */}
       {selectedDate && (
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold text-gray-800">
-              {selectedDate} 슬롯
+              {selectedDate} 예약 가능 시간
             </h2>
             <button
               onClick={() => setShowAddModal(true)}
               className="flex items-center gap-1 px-2.5 py-1.5 bg-gray-900 text-white text-xs rounded-lg hover:bg-gray-700"
             >
-              <Plus size={13} /> 슬롯 추가
+              <Plus size={13} /> 시간 추가
             </button>
           </div>
 
           {loading ? (
             <div className="text-center py-8 text-gray-400 text-sm">로딩 중...</div>
           ) : slots.length === 0 ? (
-            <div className="text-center py-8 text-gray-400 text-sm">이 날짜에 등록된 슬롯이 없습니다.</div>
+            <div className="text-center py-8 text-gray-400 text-sm">이 날짜에 예약 가능한 시간이 없습니다.</div>
           ) : (
             <div className="space-y-2">
               {slots.map((slot) => (
@@ -269,7 +269,7 @@ export default function TimeslotManager({
         </div>
       )}
 
-      {/* 슬롯 추가 모달 */}
+      {/* 시간 추가 모달 */}
       {showAddModal && selectedDate && (
         <AddSlotModal
           date={selectedDate}
@@ -299,7 +299,7 @@ export default function TimeslotManager({
   );
 }
 
-// 단일 슬롯 추가 모달
+// 단일 시간 추가 모달
 function AddSlotModal({
   date,
   onClose,
@@ -328,7 +328,7 @@ function AddSlotModal({
       onSaved();
     } else {
       const data = await res.json();
-      setError(data.error || "슬롯 생성에 실패했습니다.");
+      setError(data.error || "시간 추가에 실패했습니다.");
     }
   };
 
@@ -336,7 +336,7 @@ function AddSlotModal({
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl p-6 w-full max-w-sm">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-gray-900">슬롯 추가 — {date}</h3>
+          <h3 className="font-bold text-gray-900">시간 추가 — {date}</h3>
           <button onClick={onClose}><X size={20} className="text-gray-400" /></button>
         </div>
         <form onSubmit={handleSubmit} className="space-y-3">
@@ -364,7 +364,7 @@ function AddSlotModal({
           <div className="flex gap-2 pt-1">
             <button type="button" onClick={onClose} className="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600">취소</button>
             <button type="submit" disabled={saving} className="flex-1 py-2 bg-indigo-600 text-white rounded-lg text-sm disabled:opacity-50">
-              {saving ? "생성 중..." : "슬롯 추가"}
+              {saving ? "생성 중..." : "시간 추가"}
             </button>
           </div>
         </form>
@@ -432,7 +432,7 @@ function BulkCreateModal({
     setSaving(false);
     if (res.ok) {
       const data = await res.json();
-      alert(`${data.created}개 슬롯이 생성되었습니다.`);
+      alert(`${data.created}개 시간이 추가되었습니다.`);
       onSaved();
     } else {
       const data = await res.json();
@@ -444,7 +444,7 @@ function BulkCreateModal({
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-gray-900">슬롯 일괄 생성 — {currentYear}년 {currentMonth}월</h3>
+          <h3 className="font-bold text-gray-900">예약 시간 일괄 생성 — {currentYear}년 {currentMonth}월</h3>
           <button onClick={onClose}><X size={20} className="text-gray-400" /></button>
         </div>
 
@@ -509,7 +509,7 @@ function BulkCreateModal({
               </select>
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">슬롯 간격 (분)</label>
+              <label className="block text-xs text-gray-500 mb-1">시간 간격 (분)</label>
               <select value={intervalMinutes} onChange={e => setIntervalMinutes(Number(e.target.value))} className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm">
                 {[30, 60, 90, 120].map(m => <option key={m} value={m}>{m}분</option>)}
               </select>

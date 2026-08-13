@@ -202,7 +202,7 @@ export default async function SellerDashboard() {
             </p>
           </div>
           <div className="bg-amber-400 rounded-xl p-3 sm:p-4 text-black">
-            <p className="text-black/60 text-[9px] sm:text-[10px] font-medium mb-1">남은 슬롯</p>
+            <p className="text-black/60 text-[9px] sm:text-[10px] font-medium mb-1">남은 예약</p>
             <p className="text-xl sm:text-2xl font-bold">{todayRemainSlots}<span className="text-xs font-normal text-black/50 ml-0.5">자리</span></p>
             <p className="text-black/50 text-[9px] sm:text-[10px] mt-1">전체 {todaySlots.length} · 예약 {todayReservedSlots}</p>
           </div>
@@ -220,7 +220,7 @@ export default async function SellerDashboard() {
       {/* 빠른 액세스 */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         {[
-          { href: "/seller/timeslots", label: "슬롯 관리", desc: "상담 가능 시간", icon: "Clock" },
+          { href: "/seller/timeslots", label: "예약 시간 설정", desc: "상담 가능 시간", icon: "Clock" },
           { href: "/seller/reservations", label: "예약 관리", desc: "확정·완료 처리", icon: "Calendar" },
           { href: "/seller/customers", label: "고객 목록", desc: "상담 이력·메모", icon: "Users" },
           { href: "/seller/live-mode", label: "라이브 모드", desc: "방송 중 현황", icon: "Live" },

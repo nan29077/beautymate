@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user || session.user.role !== "CONSULTANT") {
-    return NextResponse.json({ error: "상담사만 슬롯을 생성할 수 있습니다." }, { status: 403 });
+    return NextResponse.json({ error: "상담사만 예약 시간을 등록할 수 있습니다." }, { status: 403 });
   }
 
   const body = await request.json();
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
   } catch (err) {
     if (isMissingSchemaError(err)) {
       return NextResponse.json(
-        { error: "시간슬롯 저장소가 아직 준비되지 않았습니다. 관리자에게 문의해 주세요." },
+        { error: "예약 시간 저장소가 아직 준비되지 않았습니다. 관리자에게 문의해 주세요." },
         { status: 503 },
       );
     }

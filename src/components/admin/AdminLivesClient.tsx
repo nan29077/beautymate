@@ -138,7 +138,7 @@ export default function AdminLivesClient() {
                 <th className="px-4 py-3 font-medium">일시</th>
                 <th className="px-4 py-3 font-medium text-right">시청</th>
                 <th className="px-4 py-3 font-medium text-right">예약 현황</th>
-                <th className="px-4 py-3 font-medium text-right">슬롯 설정</th>
+                <th className="px-4 py-3 font-medium text-right">예약 시간 설정</th>
               </tr>
             </thead>
             <tbody>

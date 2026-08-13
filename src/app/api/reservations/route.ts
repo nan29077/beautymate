@@ -120,10 +120,10 @@ export async function POST(request: Request) {
       const slot = await tx.timeSlot.findUnique({
         where: { id: timeSlotId },
       });
-      if (!slot) throw new Error("존재하지 않는 시간 슬롯입니다.");
+      if (!slot) throw new Error("존재하지 않는 예약 시간입니다.");
       // 슬롯 소유자(consultantId=User.id)와 예약 대상 상담사가 일치해야 한다
       if (slot.consultantId !== sellerProfile.userId) {
-        throw new Error("해당 상담사의 시간 슬롯이 아닙니다.");
+        throw new Error("해당 상담사의 예약 시간이 아닙니다.");
       }
       if (!slot.isAvailable || slot.reservationId) {
         throw new Error("SLOT_TAKEN");
@@ -237,7 +237,7 @@ export async function POST(request: Request) {
     }
     if (msg === "LIVE_SLOTS_FULL") {
       return NextResponse.json(
-        { error: "이 방송의 당일 예약 슬롯이 모두 마감되었습니다." },
+        { error: "오늘 이 방송에서 받을 수 있는 상담이 모두 마감되었습니다." },
         { status: 409 },
       );
     }

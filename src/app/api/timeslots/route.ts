@@ -90,7 +90,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user || session.user.role !== "CONSULTANT") {
-    return NextResponse.json({ error: "상담사만 슬롯을 생성할 수 있습니다." }, { status: 403 });
+    return NextResponse.json({ error: "상담사만 예약 시간을 등록할 수 있습니다." }, { status: 403 });
   }
 
   const body = await request.json();
@@ -115,14 +115,14 @@ export async function POST(request: Request) {
   } catch (err: unknown) {
     const errMsg = err instanceof Error ? err.message : "";
     if (errMsg.includes("Unique constraint")) {
-      return NextResponse.json({ error: "이미 해당 시간에 슬롯이 존재합니다." }, { status: 409 });
+      return NextResponse.json({ error: "이미 해당 시간이 등록되어 있습니다." }, { status: 409 });
     }
     if (isMissingSchemaError(err)) {
       return NextResponse.json(
-        { error: "시간슬롯 저장소가 아직 준비되지 않았습니다. 관리자에게 문의해 주세요." },
+        { error: "예약 시간 저장소가 아직 준비되지 않았습니다. 관리자에게 문의해 주세요." },
         { status: 503 },
       );
     }
-    return NextResponse.json({ error: "슬롯 생성에 실패했습니다." }, { status: 500 });
+    return NextResponse.json({ error: "예약 시간 등록에 실패했습니다." }, { status: 500 });
   }
 }

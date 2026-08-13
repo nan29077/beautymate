@@ -132,10 +132,10 @@ export default function SellerLiveModeClient({ shopName, slug }: { shopName: str
         <div className="p-3.5 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600">{error}</div>
       )}
 
-      {/* 오늘 슬롯 현황 — 방송 중 한눈에 보이도록 크게 */}
+      {/* 오늘 상담 현황 — 방송 중 한눈에 보이도록 크게 */}
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
         {[
-          { label: "전체 슬롯", value: status?.totalSlots ?? 0, className: "bg-white border border-gray-100 text-gray-900" },
+          { label: "전체 상담 수", value: status?.totalSlots ?? 0, className: "bg-white border border-gray-100 text-gray-900" },
           { label: "예약 완료", value: status?.reservedSlots ?? 0, className: "bg-gray-900 text-white" },
           { label: "남은 자리", value: status?.availableSlots ?? 0, className: "bg-amber-400 text-black" },
         ].map((s) => (
@@ -146,7 +146,7 @@ export default function SellerLiveModeClient({ shopName, slug }: { shopName: str
         ))}
       </div>
 
-      {/* 오늘 슬롯 타임라인 */}
+      {/* 오늘 예약 가능 시간 타임라인 */}
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
         <div className="px-5 py-3.5 border-b border-gray-50 flex items-center justify-between">
           <h2 className="text-base font-bold text-gray-900">오늘의 시간표</h2>
@@ -154,7 +154,7 @@ export default function SellerLiveModeClient({ shopName, slug }: { shopName: str
         </div>
         {!status || status.slots.length === 0 ? (
           <div className="text-center py-12 text-sm text-gray-400">
-            {loading ? "불러오는 중…" : "오늘 열어둔 슬롯이 없습니다. 시간슬롯 관리에서 상담 가능 시간을 등록하세요."}
+            {loading ? "불러오는 중…" : "오늘 예약 가능한 시간이 없습니다. 예약 시간 설정에서 상담 가능 시간을 등록하세요."}
           </div>
         ) : (
           <div className="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5">
@@ -197,7 +197,7 @@ export default function SellerLiveModeClient({ shopName, slug }: { shopName: str
               <div key={r.id} className="flex items-center justify-between px-5 py-3.5 gap-3">
                 <div className="min-w-0">
                   <p className="text-base sm:text-lg font-bold text-gray-900 truncate">
-                    {monthDay(r.reservationDate)} {r.reservationTime} 슬롯 예약됨 — {r.customerName}
+                    {monthDay(r.reservationDate)} {r.reservationTime} 예약됨 — {r.customerName}
                   </p>
                   <p className="text-xs text-gray-400 mt-0.5 truncate">
                     {r.productName || "상담"} · {relativeTime(r.createdAt)}

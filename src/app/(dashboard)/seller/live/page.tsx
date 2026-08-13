@@ -864,7 +864,7 @@ export default function SellerLivePage() {
       {showCreate && (
         <Modal title="새 라이브 생성" onClose={resetCreate}>
           {/* Step Indicator */}
-          <div className="flex items-center gap-0 px-5 py-3 bg-gray-50 border-b border-gray-100">
+          <div className="flex items-center gap-0 px-5 py-3 bg-gray-50 border-b border-gray-100 flex-shrink-0">
             {[
               { n: 1, label: "기본 정보·예약 설정" },
               { n: 2, label: "예약 상담 상품" },
@@ -881,16 +881,16 @@ export default function SellerLivePage() {
             ))}
           </div>
 
-          <div className="p-5 space-y-4 max-h-[60vh] overflow-y-auto">
+          <div className="p-5 space-y-4 flex-1 min-h-0 overflow-y-auto overscroll-contain">
             {createStep === 1 && (
               <>
                 <div>
                   <label className="text-xs font-bold text-gray-700 flex items-center gap-1"><Icon name="ProductName_icon" size={14} /> 라이브 제목 <span className="text-red-500">*</span></label>
-                  <input type="text" className="input-field mt-1.5" placeholder="예: 봄 신상담상품 특가 라이브" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
+                  <input type="text" className="input-field mt-1.5" placeholder="예: 오늘의 사주·타로 상담 라이브" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-700 flex items-center gap-1"><Icon name="ShortDescription_icon" size={14} /> 설명</label>
-                  <textarea className="input-field mt-1.5 h-20 resize-none" placeholder="라이브 방송 소개글" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+                  <textarea className="input-field mt-1.5 h-20 resize-none" placeholder="예: 오늘 방송에서 받을 상담 종류와 특이사항을 적어주세요" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
                 </div>
                 {/* 썸네일 이미지 — 인앱 라이브 시스템 복원 시(FEATURE_LIVE_COMMERCE=true) 자동 노출 */}
                 {FEATURE_LIVE_COMMERCE && (
@@ -912,12 +912,12 @@ export default function SellerLivePage() {
                     <Icon name="Calendar" size={13} /> 점사 예약 설정
                   </p>
                   <div>
-                    <label className="text-[11px] font-semibold text-gray-700">당일 예약 가능 슬롯 수</label>
+                    <label className="text-[11px] font-semibold text-gray-700">오늘 받을 상담 수</label>
                     <input
                       type="number"
                       min={0}
                       className="input-field mt-1 text-sm py-2"
-                      placeholder="비워두면 무제한 (열어둔 시간슬롯 내에서)"
+                      placeholder="비워두면 무제한 (열어둔 예약 가능 시간 내에서)"
                       value={form.dailySlotLimit}
                       onChange={e => setForm({ ...form, dailySlotLimit: e.target.value })}
                     />
@@ -1566,7 +1566,11 @@ export default function SellerLivePage() {
             )}
           </div>
 
-          <div className="flex items-center justify-between gap-2 px-5 py-4 border-t border-gray-100 bg-white">
+          {/* 하단 액션 바 — 콘텐츠가 길어도 항상 보이도록 고정. iOS 홈 인디케이터 영역 확보. */}
+          <div
+            className="flex items-center justify-between gap-2 px-5 pt-4 border-t border-gray-100 bg-white flex-shrink-0 sticky bottom-0 z-10"
+            style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+          >
             <button onClick={createStep === 1 ? resetCreate : () => setCreateStep((createStep - 1) as any)} className="px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-100 rounded-xl font-medium">
               {createStep === 1 ? "취소" : "이전"}
             </button>
@@ -1587,7 +1591,7 @@ export default function SellerLivePage() {
       {/* ============ Product Manager Modal (with numbering) ============ */}
       {showProductManager && (
         <Modal title="라이브 상담상품 관리" onClose={() => setShowProductManager(null)}>
-          <div className="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
+          <div className="p-4 space-y-3 flex-1 min-h-0 overflow-y-auto overscroll-contain">
             <div className="flex items-center justify-between">
               <p className="text-xs text-gray-400">상담상품 순서를 변경하고 번호를 설정하세요. 방송 중에도 실시간 반영됩니다.</p>
               <span className="text-[11px] font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded-lg flex-shrink-0">
@@ -1687,7 +1691,7 @@ export default function SellerLivePage() {
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+          <div className="flex items-center justify-end gap-2 px-5 pt-4 border-t border-gray-100 bg-white flex-shrink-0 sticky bottom-0 z-10" style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}>
             <button onClick={() => setShowProductManager(null)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl">취소</button>
             <button onClick={() => handleProductUpdate(showProductManager)} className="btn-primary text-sm !px-5 !py-2.5">
               {actionLoading === showProductManager ? <Loader2 size={14} className="animate-spin" /> : <>
@@ -1701,7 +1705,7 @@ export default function SellerLivePage() {
       {/* ============ Chat Manager Modal ============ */}
       {showChatManager && (
         <Modal title="채팅 관리" onClose={() => setShowChatManager(null)}>
-          <div className="flex flex-col" style={{ height: "60vh" }}>
+          <div className="flex flex-col min-h-0" style={{ height: "60vh" }}>
             {/* 채팅 메시지 목록 */}
             <div className="flex-1 overflow-y-auto p-4 space-y-1.5 bg-gray-50 min-h-0">
               {chatMessages.length === 0 && <p className="text-xs text-gray-400 text-center py-8">채팅이 없습니다</p>}
@@ -1768,7 +1772,7 @@ export default function SellerLivePage() {
       {/* ============ Detail Modal ============ */}
       {detailLive && (
         <Modal title={detailLive.title} onClose={() => setShowDetail(null)}>
-          <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+          <div className="p-5 space-y-4 flex-1 min-h-0 overflow-y-auto overscroll-contain">
             <div className="grid grid-cols-3 gap-3">
               {[
                 { label: "시청자", value: detailLive.viewerCount, sub: `최고 ${detailLive.peakViewerCount}` },
@@ -2020,11 +2024,18 @@ function Modal({ title, onClose, children, wide }: { title: string; onClose: () 
       <div className="fixed inset-0 z-50 bg-black/40" />
       <div
         ref={modalRef}
-        className={`fixed z-[51] bg-white ${wide ? "w-[min(100vw-2rem,42rem)]" : "w-[min(100vw-2rem,32rem)]"} rounded-2xl shadow-2xl`}
-        style={pos ? { left: pos.x, top: pos.y } : { left: "50%", top: "4rem", transform: "translateX(-50%)" }}
+        // max-h-[calc(100vh-5rem)] 는 dvh 미지원 브라우저용 폴백.
+        // 인라인 style 의 dvh 값이 유효하면 그쪽이 우선 적용된다.
+        className={`fixed z-[51] bg-white ${wide ? "w-[min(100vw-2rem,42rem)]" : "w-[min(100vw-2rem,32rem)]"} rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[calc(100vh-5rem)]`}
+        style={{
+          ...(pos ? { left: pos.x, top: pos.y } : { left: "50%", top: "4rem", transform: "translateX(-50%)" }),
+          // 모바일에서 하단 버튼이 화면 밖으로 밀려나지 않도록 뷰포트 높이에 맞춰 제한한다.
+          // (iOS Safari 주소창 높이 변화 대응: dvh)
+          maxHeight: "calc(100dvh - 5rem)",
+        }}
       >
         <div
-          className="flex items-center justify-between px-5 py-4 border-b border-gray-100 cursor-grab active:cursor-grabbing select-none"
+          className="flex items-center justify-between px-5 py-4 border-b border-gray-100 cursor-grab active:cursor-grabbing select-none flex-shrink-0"
           onMouseDown={onTitleMouseDown}
         >
           <h3 className="text-base font-bold text-gray-900">{title}</h3>
@@ -2148,7 +2159,7 @@ function GameManagerModal({ onClose }: { onClose: () => void }) {
       )}
 
       {/* 탭 */}
-      <div className="flex border-b border-gray-100">
+      <div className="flex border-b border-gray-100 flex-shrink-0">
         {([["list", "내 게임"], ["create", "새 게임 만들기"]] as const).map(([id, label]) => (
           <button key={id} onClick={() => setTab(id)}
             className={`flex-1 py-2.5 text-xs font-bold transition-colors ${tab === id ? "text-amber-600 border-b-2 border-amber-500" : "text-gray-400 hover:text-gray-600"}`}>
@@ -2159,7 +2170,7 @@ function GameManagerModal({ onClose }: { onClose: () => void }) {
 
       {/* ── 내 게임 탭 ── */}
       {tab === "list" && (
-        <div className="p-4 space-y-2.5 max-h-[60vh] overflow-y-auto">
+        <div className="p-4 space-y-2.5 flex-1 min-h-0 overflow-y-auto overscroll-contain">
           {loading && <p className="text-sm text-gray-400 text-center py-8">불러오는 중...</p>}
           {!loading && games.length === 0 && (
             <div className="text-center py-8">
@@ -2234,7 +2245,7 @@ function GameManagerModal({ onClose }: { onClose: () => void }) {
 
       {/* ── 새 게임 탭 ── */}
       {tab === "create" && (
-        <div className="p-4 max-h-[60vh] overflow-y-auto">
+        <div className="p-4 flex-1 min-h-0 overflow-y-auto overscroll-contain">
           {/* 게임 종류 선택 */}
           <label className="block text-xs font-semibold text-gray-500 mb-2">게임 종류</label>
           <div className="grid grid-cols-5 gap-1.5 mb-3">
@@ -2279,7 +2290,7 @@ function GameManagerModal({ onClose }: { onClose: () => void }) {
         </div>
       )}
 
-      <div className="px-4 pb-3 border-t border-gray-100 pt-3">
+      <div className="px-4 border-t border-gray-100 pt-3 bg-white flex-shrink-0 sticky bottom-0 z-10" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
         <a href="/seller/games" target="_blank" rel="noopener noreferrer"
           className="block w-full text-center text-xs text-brand-600 hover:underline">
           전체 게임 관리 페이지 →
@@ -2653,7 +2664,7 @@ function CouponManagerModal({ liveId, onClose }: { liveId: string; onClose: () =
 
   return (
     <Modal title="라이브 쿠폰 관리" onClose={onClose}>
-      <div className="p-5 space-y-5">
+      <div className="p-5 space-y-5 flex-1 min-h-0 overflow-y-auto overscroll-contain">
         {/* 쿠폰 생성 폼 */}
         <div className="bg-amber-50/60 border border-amber-100 rounded-xl p-4 space-y-3">
           <p className="text-xs font-bold text-amber-800 flex items-center gap-1"><Icon name="Tag" size={12} /> 새 쿠폰 발급</p>
@@ -2840,7 +2851,7 @@ function StreamSetupModal({ live, onClose, onSaved, copyToClipboard }: {
 
   return (
     <Modal title="송출 설정 (OBS · PRISM)" onClose={onClose}>
-      <div className="p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+      <div className="p-5 space-y-4 flex-1 min-h-0 overflow-y-auto overscroll-contain">
         {/* 상단 안내 배너 */}
         <div className="rounded-2xl border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 p-4 flex items-start gap-3">
           <Icon name="EmojiHoney_icon" size={26} className="flex-shrink-0" />
@@ -2966,7 +2977,7 @@ function StreamSetupModal({ live, onClose, onSaved, copyToClipboard }: {
           </p>
         </div>
       </div>
-      <div className="flex items-center justify-end px-5 py-4 border-t border-gray-100">
+      <div className="flex items-center justify-end px-5 pt-4 border-t border-gray-100 bg-white flex-shrink-0 sticky bottom-0 z-10" style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}>
         <button onClick={onClose} className="px-5 py-2.5 text-sm font-bold text-amber-900 bg-amber-400 rounded-xl hover:bg-amber-500 transition-colors">
           확인
         </button>
