@@ -250,7 +250,7 @@ async function handleTick(req: NextRequest) {
 
   // ── 6. 구매 유도 메시지 (주기)
   if (config.purchaseNudgeEnabled && isDue(lastNudgeAt, config.purchaseNudgeInterval, now)) {
-    botMessages.push(`🍯 ${config.purchaseNudgeMessage?.trim() || "지금 구매하시면 라이브 특가 적용! 화면의 상담상품을 확인해보세요"}`);
+    botMessages.push(`🍯 ${config.purchaseNudgeMessage?.trim() || "지금 예약하시면 라이브 할인 적용! 화면의 상담 메뉴를 확인해보세요"}`);
     lastNudgeAt = now;
   }
 

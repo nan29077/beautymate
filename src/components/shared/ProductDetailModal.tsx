@@ -42,7 +42,7 @@ interface DetailData {
 const won = (n: number) => n.toLocaleString("ko-KR") + "원";
 
 const BADGE_LABEL: Record<string, string> = {
-  FREE_SHIPPING: "무료배송", NEW: "신상담상품", BEST: "베스트",
+  FREE_SHIPPING: "무료배송", NEW: "신규", BEST: "베스트",
   HOT_DEAL: "특가", LIMITED: "한정판", HANDMADE: "핸드메이드",
 };
 

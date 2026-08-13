@@ -663,7 +663,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                     <div>
                       <label className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1.5"><Icon name="ProductTag_icon" size={16} /> 배지</label>
                       <div className="flex flex-wrap gap-2">
-                        {[{ v: "FREE_SHIPPING", l: "무료배송", c: "bg-blue-50 text-blue-600 border-blue-200", icon: "BadgeFreeShipping_icon" }, { v: "NEW", l: "신상담상품", c: "bg-emerald-50 text-emerald-600 border-emerald-200", icon: "BadgeNew_icon" },
+                        {[{ v: "FREE_SHIPPING", l: "무료배송", c: "bg-blue-50 text-blue-600 border-blue-200", icon: "BadgeFreeShipping_icon" }, { v: "NEW", l: "신규", c: "bg-emerald-50 text-emerald-600 border-emerald-200", icon: "BadgeNew_icon" },
                           { v: "BEST", l: "베스트", c: "bg-orange-50 text-orange-600 border-orange-200", icon: "BadgeBest_icon" }, { v: "HOT_DEAL", l: "특가", c: "bg-red-50 text-red-600 border-red-200", icon: "BadgeSale_icon" },
                           { v: "LIMITED", l: "한정판", c: "bg-purple-50 text-purple-600 border-purple-200", icon: "BadgeLimited_icon" }, { v: "HANDMADE", l: "핸드메이드", c: "bg-amber-50 text-amber-600 border-amber-200", icon: "BadgeRecommend_icon" },
                         ].map(b => (

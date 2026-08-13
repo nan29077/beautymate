@@ -886,7 +886,7 @@ export default function SellerLivePage() {
               <>
                 <div>
                   <label className="text-xs font-bold text-gray-700 flex items-center gap-1"><Icon name="ProductName_icon" size={14} /> 라이브 제목 <span className="text-red-500">*</span></label>
-                  <input type="text" className="input-field mt-1.5" placeholder="예: 오늘의 사주·타로 상담 라이브" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
+                  <input type="text" className="input-field mt-1.5" placeholder="예: 오늘의 사주·타로 실시간 상담" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-700 flex items-center gap-1"><Icon name="ShortDescription_icon" size={14} /> 설명</label>

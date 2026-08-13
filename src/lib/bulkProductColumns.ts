@@ -25,7 +25,7 @@ export interface BulkColumn {
 // 배지: 한글 라벨 → 코드 (등록 폼과 동일)
 export const BADGE_LABEL_TO_CODE: Record<string, string> = {
   무료배송: "FREE_SHIPPING",
-  신상담상품: "NEW",
+  신규: "NEW",
   베스트: "BEST",
   특가: "HOT_DEAL",
   한정판: "LIMITED",
@@ -146,8 +146,8 @@ const REMOTE_FEE: BulkColumn = {
 const BADGES: BulkColumn = {
   key: "badges",
   header: "배지(쉼표로구분)",
-  guide: "선택. 무료배송/신상담상품/베스트/특가/한정판/핸드메이드 중 쉼표로 구분해 입력.",
-  example: "신상담상품,베스트",
+  guide: "선택. 무료배송/신규/베스트/특가/한정판/핸드메이드 중 쉼표로 구분해 입력.",
+  example: "신규,베스트",
 };
 const DESCRIPTION: BulkColumn = {
   key: "description",

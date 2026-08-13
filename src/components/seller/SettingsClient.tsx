@@ -347,7 +347,7 @@ export default function SettingsClient() {
             <div>
               <label className="text-xs font-medium text-gray-600">업태 / 업종</label>
               <input type="text" className="input-field mt-1 text-sm" value={form.businessCategory}
-                onChange={e => setForm({ ...form, businessCategory: e.target.value })} placeholder="예: 소매 / 화장품" />
+                onChange={e => setForm({ ...form, businessCategory: e.target.value })} placeholder="예: 사주 / 타로 상담" />
             </div>
           </div>
         )}

@@ -577,7 +577,7 @@ function RegisterForm() {
                 <label className="block text-xs font-semibold text-gray-600 mb-2">가입 유형</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { value: "CUSTOMER", label: "시청자 회원", desc: "쇼핑 & 단체 상담", badge: "즉시 이용 가능" },
+                    { value: "CUSTOMER", label: "시청자 회원", desc: "상담 예약 & 단체 상담", badge: "즉시 이용 가능" },
                     { value: "CONSULTANT", label: "상담사", desc: "점집 운영 & 판매", badge: "관리자 승인 필요" },
                   ].map((opt) => (
                     <button

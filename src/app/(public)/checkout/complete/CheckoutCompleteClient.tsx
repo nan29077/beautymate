@@ -138,7 +138,7 @@ export default function CheckoutCompleteClient({
           예약 내역 보기
         </Link>
         <Link href="/" className="btn-outline w-full py-3 text-center">
-          쇼핑 계속하기
+          상담 더 둘러보기
         </Link>
       </div>
     </div>

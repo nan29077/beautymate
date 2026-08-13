@@ -46,7 +46,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
   const router = useRouter();
   const { appAlert } = useAppDialog();
   const { groupBuy: FEATURE_GROUP_BUY } = useFeatureFlags();
-  // 점집 컨텍스트면 "쇼핑 둘러보기/계속하기"는 메인이 아닌 해당 점집 홈으로 보낸다.
+  // 점집 컨텍스트면 "상담 둘러보기/계속하기"는 메인이 아닌 해당 점집 홈으로 보낸다.
   const { shop } = useShopChrome();
   const shoppingHref = shop ? `/shop/${shop.slug}` : "/";
   const [items, setItems] = useState<CartItem[]>(initialItems);
@@ -291,7 +291,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
             href={shoppingHref}
             className="btn-outline w-full py-3 text-center"
           >
-            쇼핑 계속하기
+            상담 더 둘러보기
           </Link>
         </div>
       </div></>
@@ -308,7 +308,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
           href={shoppingHref}
           className="inline-block mt-4 text-sm text-brand-600 hover:underline"
         >
-          쇼핑 둘러보기
+          상담 둘러보기
         </Link>
       </div></>
     );

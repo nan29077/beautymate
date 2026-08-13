@@ -338,7 +338,7 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
               <div className="flex flex-wrap gap-1.5">
                 {[
                   { v: "FREE_SHIPPING", l: "무료배송", c: "bg-blue-50 text-blue-600" },
-                  { v: "NEW", l: "신상담상품", c: "bg-emerald-50 text-emerald-600" },
+                  { v: "NEW", l: "신규", c: "bg-emerald-50 text-emerald-600" },
                   { v: "BEST", l: "베스트", c: "bg-orange-50 text-orange-600" },
                   { v: "HOT_DEAL", l: "특가", c: "bg-red-50 text-red-600" },
                   { v: "LIMITED", l: "한정판", c: "bg-purple-50 text-purple-600" },

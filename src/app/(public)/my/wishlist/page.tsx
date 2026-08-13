@@ -114,7 +114,7 @@ export default async function WishlistPage() {
             className="inline-flex items-center gap-1.5 text-xs text-white bg-black px-4 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"
           >
             <Icon name="Cart" size={14} />
-             쇼핑하러 가기
+             상담 보러 가기
           </Link>
         </div>
       )}

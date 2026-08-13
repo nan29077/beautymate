@@ -195,7 +195,7 @@ export default function OptionGroupEditor({
                   <input
                     type="text"
                     className="input-field text-xs py-2"
-                    placeholder="예: 빨강 / M"
+                    placeholder="예: 30분 / 전화상담"
                     value={v.name}
                     onChange={(e) => updateFlatVariant(i, "name", e.target.value)}
                   />

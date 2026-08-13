@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 // 상담사/관리자/소싱 멤버가 등록한 상담상품을 자동으로 메인에 연동
 // 로직:
 //  1. 인기상담상품: soldCount 높은 순 (실시간 인기 반영)
-//  2. 신상담상품: 최근 승인된 상담상품
+//  2. 신규: 최근 승인된 상담상품
 //  3. 상담사 추천: 가장 많은 팬을 보유한 상담사의 상담상품
 //  4. 트렌드: 캠페인 참여수 기반
 //  5. 카테고리별 인기: 각 카테고리별 상위 상담상품
@@ -25,7 +25,7 @@ export async function GET() {
         orderBy: { soldCount: "desc" },
         take: 10,
       }),
-      // 2. 신상담상품 (최근 등록 + 승인)
+      // 2. 신규 (최근 등록 + 승인)
       prisma.product.findMany({
         where: { isActive: true, isApproved: true },
         include: { category: true },

@@ -849,15 +849,15 @@ export default function ChatBotManager({ onConfigSaved }: { onConfigSaved?: () =
         <FeatureCard
           num={6}
           icon="BuyNow_icon"
-          title="구매 유도 메시지"
-          desc="설정한 주기마다 구매 유도 메시지를 자동 발송해요."
+          title="예약 유도 메시지"
+          desc="설정한 주기마다 예약 유도 메시지를 자동 발송해요."
           on={config.purchaseNudgeEnabled}
           onToggle={() => patch({ purchaseNudgeEnabled: !config.purchaseNudgeEnabled })}
         >
           <input
             type="text"
             className="input-field text-sm"
-            placeholder="지금 구매하시면 라이브 특가 적용! (비워두면 기본 문구)"
+            placeholder="지금 예약하시면 라이브 할인 적용! (비워두면 기본 문구)"
             value={config.purchaseNudgeMessage}
             onChange={e => patch({ purchaseNudgeMessage: e.target.value })}
           />

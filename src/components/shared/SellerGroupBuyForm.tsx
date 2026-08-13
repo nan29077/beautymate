@@ -223,7 +223,7 @@ const [showForm, setShowForm] = useState(false);
                   <div>
                     <label className="text-sm font-medium text-gray-700">캠페인 제목 *</label>
                     <input
-                      type="text" className="input-field mt-1" placeholder="예: 봄맞이 특가 단체 상담"
+                      type="text" className="input-field mt-1" placeholder="예: 새해 운세 단체 상담"
                       value={campaign.title}
                       onChange={(e) => setCampaign({ ...campaign, title: e.target.value })}
                     />

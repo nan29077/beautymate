@@ -294,7 +294,7 @@ export default function GameFields({
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1.5">달성 보상 (선택)</label>
             <input value={config.reward ?? ""} onChange={(e) => cfg("reward", e.target.value)}
-              placeholder="예: 전 상담상품 10% 할인 쿠폰" className={inputCls} />
+              placeholder="예: 타로 상담 10% 할인 쿠폰" className={inputCls} />
             <Hint>목표 달성 시 모든 고객에게 제공할 혜택을 입력하세요. (예: 10% 추가 할인 쿠폰)</Hint>
           </div>
           <p className="text-[11px] text-gray-400 leading-relaxed">

@@ -331,7 +331,7 @@ export default function PCDirectorSuiteComponent({
   const renderBenefits = () => (
     <div className="px-4 py-4 space-y-3 min-h-0">
       {[
-        { icon: Clock, label: "무료배송", desc: "라이브 상담상품 전상담상품 무료배송", textCls: "text-blue-400", bgCls: "bg-blue-900/20" },
+        { icon: Clock, label: "무료배송", desc: "라이브 상담 전 상품 무료배송", textCls: "text-blue-400", bgCls: "bg-blue-900/20" },
         { icon: Tag, label: "라이브 특가", desc: "방송 중에만 적용되는 특별 할인가", textCls: "text-red-400", bgCls: "bg-red-900/20" },
         { icon: Gift, label: "정품 보장", desc: "브랜드 공식 정품만 판매합니다", textCls: "text-emerald-400", bgCls: "bg-emerald-900/20" },
         { icon: Star, label: "무료 반품", desc: "7일 이내 무료 교환/반품 가능", textCls: "text-purple-400", bgCls: "bg-purple-900/20" },
