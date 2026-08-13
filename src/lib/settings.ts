@@ -194,3 +194,71 @@ export async function setSettings(entries: Record<string, string>): Promise<void
     ),
   );
 }
+
+// ─────────────────────────────────────────────
+// AI 설정 (OpenAI) — 키는 .env 가 아니라 DB(settings)에 저장해 관리자가 직접 교체 가능
+// ─────────────────────────────────────────────
+export const AI_OPENAI_KEY = "ai.openai_key";
+
+/** OpenAI API 키 (없으면 null). 서버 전용. */
+export async function getOpenAiKey(): Promise<string | null> {
+  try {
+    const row = await prisma.setting.findUnique({ where: { key: AI_OPENAI_KEY } });
+    const value = row?.value?.trim();
+    return value ? value : null;
+  } catch {
+    // settings 테이블 조회 실패 → 키 없음으로 간주
+    return null;
+  }
+}
+
+/** 화면 표시용 마스킹 (앞 8자 + ***) */
+export function maskApiKey(key: string | null | undefined): string | null {
+  if (!key) return null;
+  const k = key.trim();
+  if (!k) return null;
+  return `${k.slice(0, 8)}***`;
+}
+
+// ─────────────────────────────────────────────
+// Daily.co 설정 — 키는 DB(settings)에 저장하며 환경변수보다 우선
+// ─────────────────────────────────────────────
+export const DAILY_API_KEY_SETTING = "daily.api_key";
+
+/** Daily.co API 키 (없으면 null). 서버 전용. */
+export async function getDailyApiKey(): Promise<string | null> {
+  try {
+    const row = await prisma.setting.findUnique({ where: { key: DAILY_API_KEY_SETTING } });
+    const value = row?.value?.trim();
+    return value ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+// ─────────────────────────────────────────────
+// 상담사 호칭(선생/선녀/도령/만신/무당) — 상담사별 지정값
+// 스키마 변경 없이 settings 에 JSON 으로 보관한다.
+//   key   : consultant.titles
+//   value : { "<sellerProfileId>": "만신", ... }
+// 지정값이 없는 상담사는 id 해시로 자동 선택된다 (lib/consultantTitle.ts)
+// ─────────────────────────────────────────────
+export const CONSULTANT_TITLES_KEY = "consultant.titles";
+
+/** 상담사별 지정 호칭 맵 (없거나 형식이 깨져 있으면 빈 맵) */
+export async function getConsultantTitleMap(): Promise<Record<string, string>> {
+  const map = await getSettingsMap();
+  const raw = map[CONSULTANT_TITLES_KEY];
+  if (!raw) return {};
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    const out: Record<string, string> = {};
+    for (const [k, v] of Object.entries(parsed)) {
+      if (typeof v === "string" && v.trim()) out[k] = v.trim();
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}

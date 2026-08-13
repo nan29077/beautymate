@@ -294,7 +294,7 @@ export default async function SellerShopPage({
               <div className="flex-1 min-w-0 pt-0.5">
                 <div className="flex items-center gap-2">
                   <h1 className="text-lg font-bold text-gray-900 truncate">{seller.shopName}</h1>
-                  {showLive && <OnAirBadge className="w-8 h-8" />}
+                  {showLive && <OnAirBadge />}
                 </div>
                 {customization.tagline && (
                   <p className="text-[12px] text-gray-500 mt-0.5 line-clamp-2">{customization.tagline}</p>

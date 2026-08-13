@@ -154,7 +154,7 @@ export default async function MySellerPage() {
                         <p className="text-sm font-bold text-gray-900 truncate">
                           {seller.shopName}
                         </p>
-                        {live && <OnAirBadge className="w-8 h-8" />}
+                        {live && <OnAirBadge />}
                       </div>
                       {seller.mood && (
                         <p className="text-[11px] text-gray-400 mt-0.5">

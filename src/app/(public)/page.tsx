@@ -262,7 +262,7 @@ export default async function HomePage({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <p className="text-[13px] font-bold text-gray-900 truncate">{s.shopName}</p>
-                      <OnAirBadge className="w-8 h-8" />
+                      <OnAirBadge />
                     </div>
                     <p className="text-[10px] text-gray-400 truncate">{s.liveTitle}</p>
                   </div>
