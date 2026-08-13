@@ -4,7 +4,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getShopAwareLoginPath } from "@/lib/shopLoginRedirect";
-import {  } from "lucide-react";
+import { Users } from "lucide-react";
 import SafeImage from "@/components/shared/SafeImage";
 import PickSellerButton from "@/components/shared/PickSellerButton";
 import { pickSajuAvatar } from "@/lib/defaults";
@@ -81,7 +81,7 @@ export default async function MySellerPage() {
             />
           </Link>
           <h1 className="text-base font-bold text-gray-900">
-            내 Pick 상담사
+            내 단골 상담사
           </h1>
           {uniqueSellers.length > 0 && (
             <span className="text-xs text-brand-600 font-bold bg-brand-50 px-2 py-0.5 rounded-full">
@@ -94,21 +94,26 @@ export default async function MySellerPage() {
       <div className="px-4 pt-4">
         {uniqueSellers.length === 0 ? (
           <div className="text-center py-20 text-gray-400">
-            <Icon
-              name="Wishlist"
+            <Users
               size={48}
-              strokeWidth={1.5}
+              strokeWidth={1.2}
               className="mx-auto mb-3 opacity-30"
             />
             <p className="text-sm font-medium text-gray-500">
-              아직 Pick한 상담사가 없습니다
+              아직 단골 상담사가 없습니다
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              좋아하는 상담사를 Pick하고 소식을 받아보세요!
+              마음에 드는 상담사를 단골로 등록하고 소식을 받아보세요!
             </p>
             <p className="text-[11px] text-gray-400 mt-3">
-              메인에서 상담사 이름을 검색해 PICK할 수 있어요
+              메인에서 상담사 이름을 검색해 단골로 등록할 수 있어요
             </p>
+            <Link
+              href="/sellers"
+              className="mt-5 inline-block px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800"
+            >
+              상담사 찾기
+            </Link>
           </div>
         ) : (
           <div className="space-y-3">
@@ -158,11 +163,11 @@ export default async function MySellerPage() {
                       )}
                       <div className="flex items-center gap-3 mt-1 text-[11px] text-gray-400">
                         <span className="flex items-center gap-0.5">
-                          <Icon name="Users" size={10} /> {seller._count.fans}명
+                          <Icon name="Users" size={10} /> 단골 {seller._count.fans}명
                         </span>
                         <span className="flex items-center gap-0.5">
-                          <Icon name="Cart" size={10} />{" "}
-                          {seller._count.campaigns}개 공구
+                          <Icon name="Package" size={10} /> 상담상품{" "}
+                          {seller._count.shopProducts}개
                         </span>
                       </div>
                     </div>

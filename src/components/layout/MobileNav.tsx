@@ -48,16 +48,15 @@ export default function MobileNav() {
   // "마이페이지"는 역할에 따라 본인 대시보드 또는 /my 로 연결 (비고객 /my 리다이렉트 플래시 방지)
   const myHref = myPageHref(session?.user?.role);
 
-  // 메인(고객) 하단 메뉴: 홈 · 상담사 찾기 · 라이브 · 예약내역 · 마이페이지
-  // (상담사 전용 진입은 빼고, 라이브·상담사 탐색은 기능 토글을 존중.
-  //  '상담사 탐색'이 꺼져 있으면 /sellers 가 404이므로 대신 내 PICK을 노출한다)
+  // 메인(고객) 하단 메뉴: 홈 · 라이브 · 예약 · 상담사 · 마이페이지
+  // ('상담사 탐색'이 꺼져 있으면 /sellers 가 404이므로 대신 내 단골 상담사(/my/seller)를 연결한다)
   const navItems: { href: string; icon: string; label: string; matchExact?: boolean }[] = [
     { href: "/", icon: "Home", label: "홈", matchExact: true },
-    flags.seller
-      ? { href: "/sellers", icon: "Search", label: "상담사 찾기" }
-      : { href: "/my/seller", icon: "MyPick", label: "내 PICK" },
     ...(flags.liveCommerce ? [{ href: "/live", icon: "Live", label: "라이브" }] : []),
-    { href: "/my/orders", icon: "OrderHistory", label: "예약내역" },
+    { href: "/my/reservations", icon: "Calendar", label: "예약" },
+    flags.seller
+      ? { href: "/sellers", icon: "Users", label: "상담사" }
+      : { href: "/my/seller", icon: "Users", label: "상담사" },
     { href: myHref, icon: "MyPage", label: "마이페이지", matchExact: true },
   ];
 

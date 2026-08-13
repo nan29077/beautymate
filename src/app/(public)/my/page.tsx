@@ -3,18 +3,24 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/utils";
-import { Wallet, Clock, XCircle, Instagram, Youtube, Tag, Sparkles, Users, Building2 } from 'lucide-react';
+import { Calendar, Users, Star, Bell, CalendarX2 } from 'lucide-react';
 import SafeImage from "@/components/shared/SafeImage";
 import MyPageBottomMenu from "@/components/shared/MyPageBottomMenu";
-import ApplySellerButton from "@/components/shared/ApplySellerButton";
-import { getFeatureFlags } from "@/lib/settings";
 import { requireBuyerSession } from "@/lib/buyerGuard";
 import { safeQuery } from "@/lib/safeDb";
-import { NO_IMAGE, pickBuyerAvatar, pickSajuAvatar } from "@/lib/defaults";
+import { pickBuyerAvatar, pickSajuAvatar } from "@/lib/defaults";
 import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
 import LiveBadge, { LIVE_RING_CLASS } from "@/components/shared/LiveBadge";
 
 export const dynamic = "force-dynamic";
+
+const RESERVATION_STATUS: Record<string, { label: string; color: string }> = {
+  PENDING: { label: "예약신청", color: "bg-yellow-50 text-yellow-700" },
+  CONFIRMED: { label: "예약확정", color: "bg-blue-50 text-blue-600" },
+  COMPLETED: { label: "상담완료", color: "bg-green-50 text-green-600" },
+  CANCELLED: { label: "취소됨", color: "bg-red-50 text-red-600" },
+  NO_SHOW: { label: "노쇼", color: "bg-gray-100 text-gray-500" },
+};
 
 export default async function MyPage() {
   // 비로그인 → 로그인, 비고객 → 역할 대시보드로 즉시 리다이렉트 (데이터 조회/렌더 이전)
@@ -25,12 +31,6 @@ export default async function MyPage() {
     include: {
       buyerProfile: {
         include: {
-          primarySeller: {
-            include: { user: { select: { name: true } } },
-          },
-          referredBySeller: {
-            select: { id: true, shopName: true, slug: true, referralDiscountRate: true, pickDiscountRate: true },
-          },
           follows: {
             include: {
               seller: {
@@ -44,78 +44,42 @@ export default async function MyPage() {
           },
         },
       },
-      reviews: { orderBy: { createdAt: "desc" }, take: 3 },
-      wishlists: {
-        include: {
-          product: {
-            include: {
-              sellerProducts: {
-                where: { isActive: true },
-                include: { seller: true },
-                take: 1,
-              },
-            },
-          },
-        },
-        orderBy: { createdAt: "desc" },
-        take: 6,
-      },
-      sellerProfile: { select: { id: true, isApproved: true } },
-      _count: { select: { reviews: true, cartItems: true, wishlists: true } },
+      _count: { select: { reviews: true } },
     },
   });
 
   if (!user) redirect("/auth/login");
-  const sellerApplied = !!user.sellerProfile;
 
   // 예약 조회는 운영 DB에 reservations 테이블이 아직 없을 수 있어(P2021)
   // 메인 include에서 분리해 safeQuery 폴백으로 감싼다. 통합 조회 시 페이지 전체가 500.
-  const [reservations, reservationCount] = await Promise.all([
+  const [reservations, reservationCount, completedCount] = await Promise.all([
     safeQuery(
       "my page reservations",
       () =>
         prisma.reservation.findMany({
           where: { userId: session.user!.id },
-          include: { seller: true, items: true },
+          include: { seller: { select: { shopName: true } }, items: { select: { productName: true } } },
           orderBy: { createdAt: "desc" },
-          take: 5,
+          take: 3,
         }),
       [],
     ),
     safeQuery("my page reservation count", () => prisma.reservation.count({ where: { userId: session.user!.id } }), 0),
+    safeQuery(
+      "my page completed count",
+      () => prisma.reservation.count({ where: { userId: session.user!.id, status: "COMPLETED" } }),
+      0,
+    ),
   ]);
 
-  // 사용 가능한 게임 당첨 쿠폰 수
-  const gameCouponCount = await prisma.userGameCoupon.count({
-    where: { userId: session.user!.id, usedAt: null, expiresAt: { gt: new Date() } },
-  });
-
-  const flags = await getFeatureFlags();
-
-  // Compute discount benefits (before menuItems to avoid reference error)
-  const referredSeller = user.buyerProfile?.referredBySeller;
   const pickedSellers = user.buyerProfile?.follows || [];
 
   const menuItems = [
-    { href: "/my/orders", icon: "OrderHistory", label: "예약 내역", count: reservationCount, color: "bg-blue-50" },
-    { href: "/cart", icon: "Cart", label: "장바구니", count: user._count.cartItems, color: "bg-brand-50" },
-    { href: "/my/reviews", icon: "WriteReview", label: "내 후기", count: user._count.reviews, color: "bg-yellow-50" },
-    { href: "/my/wishlist", icon: "Wishlist", label: "찜한 상담상품", count: user._count.wishlists, color: "bg-rose-50" },
-    { href: "/my/seller", icon: "MyPick", label: "내 Pick 상담사", count: pickedSellers.length || null, color: "bg-pink-50", small: true },
-    { href: "/my/game-coupons", icon: "Gift", label: "게임 쿠폰", count: gameCouponCount || null, color: "bg-amber-50" },
-    { href: "/my/addresses", icon: "Location", label: "배송지 관리", count: null, color: "bg-purple-50" },
+    { href: "/my/reservations", icon: Calendar, label: "예약 내역", count: reservationCount, color: "bg-blue-50", iconColor: "text-blue-500" },
+    { href: "/my/seller", icon: Users, label: "내 단골 상담사", count: pickedSellers.length, color: "bg-pink-50", iconColor: "text-pink-500", small: true },
+    { href: "/my/reviews", icon: Star, label: "상담 리뷰", count: user._count.reviews, color: "bg-yellow-50", iconColor: "text-yellow-500" },
+    { href: "/my/notifications", icon: Bell, label: "알림", count: 0, color: "bg-purple-50", iconColor: "text-purple-500" },
   ];
-
-  // Compute active discounts
-  const activeDiscounts: { sellerName: string; slug: string; type: string; rate: number }[] = [];
-  if (referredSeller && Number(referredSeller.referralDiscountRate) > 0) {
-    activeDiscounts.push({
-      sellerName: referredSeller.shopName,
-      slug: referredSeller.slug,
-      type: "추천인 할인",
-      rate: Number(referredSeller.referralDiscountRate),
-    });
-  }
 
   return (
     <div className="animate-fade-in pb-4">
@@ -144,75 +108,36 @@ export default async function MyPage() {
 
       </div>
 
-      {/* 포인트/쿠폰 요약 카드 */}
+      {/* 예약/상담 요약 카드 */}
       <div className="mx-4 -mt-6 bg-white rounded-2xl border border-gray-100 p-4 mb-4">
         <div className="grid grid-cols-4 divide-x divide-gray-100">
-          <Link href="/my/points" className="text-center py-1">
-            <p className="text-lg font-bold text-gray-900">0</p>
-            <p className="text-[10px] text-gray-400">포인트</p>
-          </Link>
-          <Link href="/my/orders" className="text-center py-1">
+          <Link href="/my/reservations" className="text-center py-1">
             <p className="text-lg font-bold text-gray-900">{reservationCount}</p>
             <p className="text-[10px] text-gray-400">예약</p>
           </Link>
+          <Link href="/my/reservations?status=COMPLETED" className="text-center py-1">
+            <p className="text-lg font-bold text-gray-900">{completedCount}</p>
+            <p className="text-[10px] text-gray-400">완료 상담</p>
+          </Link>
           <Link href="/my/reviews" className="text-center py-1">
             <p className="text-lg font-bold text-gray-900">{user._count.reviews}</p>
-            <p className="text-[10px] text-gray-400">후기</p>
+            <p className="text-[10px] text-gray-400">리뷰</p>
           </Link>
-          <Link href="/my/wishlist" className="text-center py-1">
-            <p className="text-lg font-bold text-rose-500">{user._count.wishlists}</p>
-            <p className="text-[10px] text-gray-400">찜</p>
+          <Link href="/my/seller" className="text-center py-1">
+            <p className="text-lg font-bold text-brand-600">{pickedSellers.length}</p>
+            <p className="text-[10px] text-gray-400">단골</p>
           </Link>
         </div>
       </div>
 
-      {/* 상담사 입점 신청 (고객 → 상담사) */}
-      <div className="px-4 mb-4">
-        <ApplySellerButton initialApplied={sellerApplied} />
-      </div>
-
-      {/* 할인 혜택 배너 — 추천인 제도 ON일 때만 */}
-      {flags.referral && activeDiscounts.length > 0 && (
-        <div className="px-4 mb-4">
-          <div className="bg-brand-50 rounded-xl border border-brand-100 p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Icon name="Gift" size={16} className="text-brand-600" />
-              <h2 className="text-sm font-bold text-gray-900">나의 할인 혜택</h2>
-            </div>
-            <div className="space-y-2">
-              {activeDiscounts.map((d, i) => (
-                <Link
-                  key={i}
-                  href={`/shop/${d.slug}`}
-                  className="flex items-center justify-between bg-white rounded-lg px-3 py-2.5 hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    {d.type === "추천인 할인" ? (
-                      <Sparkles size={14} className="text-brand-500" />
-                    ) : (
-                      <Icon name="Check" size={14} className="text-emerald-500" />
-                    )}
-                    <div>
-                      <p className="text-xs font-medium text-gray-900">{d.sellerName}</p>
-                      <p className="text-[10px] text-gray-400">{d.type}</p>
-                    </div>
-                  </div>
-                  <span className="text-sm font-bold text-brand-600">{d.rate}% OFF</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 내 Pick 상담사 미리보기 */}
+      {/* 내 단골 상담사 미리보기 */}
       {pickedSellers.length > 0 && (
         <div className="px-4 mb-4">
           <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
             <div className="flex items-center justify-between px-4 pt-4 pb-2">
               <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
-                <Icon name="Wishlist" size={14} className="text-pink-500 fill-pink-500" />
-                내 Pick 상담사
+                <Users size={14} strokeWidth={1.5} className="text-pink-500" />
+                내 단골 상담사
               </h2>
               <Link href="/my/seller" className="text-xs text-brand-600 hover:underline flex items-center gap-0.5">
                 전체보기 ({pickedSellers.length})
@@ -253,83 +178,27 @@ export default async function MyPage() {
 
       {/* 메뉴 그리드 */}
       <div className="px-4 mb-4">
-        <div className="grid grid-cols-3 gap-3">
-          {menuItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex flex-col items-center gap-2 p-4 bg-white rounded-xl border border-gray-100 hover:border-brand-200 transition-all"
-            >
-              <div className={`w-10 h-10 rounded-xl ${item.color} flex items-center justify-center`}>
-                <Icon name={item.icon} size={20} />
-              </div>
-              <div className="text-center">
-                <p className={`${(item as { small?: boolean }).small ? "text-[10px] whitespace-nowrap" : "text-xs"} font-medium text-gray-800`}>{item.label}</p>
-                {item.count !== null && item.count > 0 && (
-                  <p className="text-[10px] text-brand-600 font-bold">{item.count}</p>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* 내가 찜한 상담상품 */}
-      <div className="px-4 mb-4">
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-          <div className="flex items-center justify-between px-4 pt-4 pb-2">
-            <h2 className="text-sm font-bold text-gray-900">
-              <Icon name="Wishlist" size={14} className="inline-block mr-1 text-rose-500 fill-rose-500" />
-              내가 찜한 상담상품
-            </h2>
-            {user._count.wishlists > 0 && (
-              <Link href="/my/wishlist" className="text-xs text-brand-600 hover:underline">
-                전체보기 ({user._count.wishlists})
+        <div className="grid grid-cols-4 gap-2">
+          {menuItems.map((item) => {
+            const ItemIcon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex flex-col items-center gap-2 p-3 bg-white rounded-xl border border-gray-100 hover:border-brand-200 transition-all"
+              >
+                <div className={`w-10 h-10 rounded-xl ${item.color} flex items-center justify-center`}>
+                  <ItemIcon size={20} strokeWidth={1.5} className={item.iconColor} />
+                </div>
+                <div className="text-center">
+                  <p className={`${item.small ? "text-[10px]" : "text-[11px]"} font-medium text-gray-800 leading-tight`}>{item.label}</p>
+                  {item.count > 0 && (
+                    <p className="text-[10px] text-brand-600 font-bold">{item.count}</p>
+                  )}
+                </div>
               </Link>
-            )}
-          </div>
-          {user.wishlists.length > 0 ? (
-            <div className="px-4 pb-3">
-              <div className="grid grid-cols-3 gap-2">
-                {user.wishlists.map((wish) => {
-                  const p = wish.product;
-                  const discountPercent = p.comparePrice && Number(p.comparePrice) > Number(p.basePrice)
-                    ? Math.round((1 - Number(p.basePrice) / Number(p.comparePrice)) * 100)
-                    : 0;
-                  return (
-                    <Link key={wish.id} href={`/products/${p.id}`} className="group">
-                      <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 mb-1.5">
-                        <SafeImage
-                          src={p.thumbnail}
-                          placeholder={NO_IMAGE}
-                          alt={p.name}
-                          width={160}
-                          height={160}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          fallbackText={p.name.charAt(0)}
-                        />
-                        {discountPercent > 0 && (
-                          <span className="absolute top-1 left-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                            {discountPercent}%
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[10px] text-gray-400 truncate">
-                        {p.sellerProducts[0]?.seller?.shopName || ""}
-                      </p>
-                      <p className="text-xs font-medium text-gray-900 truncate">{p.name}</p>
-                      <p className="text-xs font-bold text-gray-900">{formatPrice(Number(p.basePrice))}</p>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-400 px-4">
-              <Icon name="Wishlist" size={36} strokeWidth={1.5} className="mx-auto mb-2 opacity-30" />
-              <p className="text-xs">아직 찜한 상담상품이 없습니다.</p>
-            </div>
-          )}
+            );
+          })}
         </div>
       </div>
 
@@ -338,65 +207,51 @@ export default async function MyPage() {
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
           <div className="flex items-center justify-between px-4 pt-4 pb-2">
             <h2 className="text-sm font-bold text-gray-900">최근 예약</h2>
-            <Link href="/my/orders" className="text-xs text-brand-600 hover:underline">
+            <Link href="/my/reservations" className="text-xs text-brand-600 hover:underline">
               전체보기
             </Link>
           </div>
           {reservations.length > 0 ? (
             <div className="px-4 pb-3">
-              {reservations.slice(0, 3).map((order) => (
-                <div
-                  key={order.id}
-                  className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0"
-                >
-                  <div className="min-w-0 flex-1 pr-2">
-                    {/* 상담상품명 + 고객명을 크게 강조 (예약번호는 작게) */}
-                    <p className="text-[15px] font-bold text-gray-900 truncate">
-                      {order.items[0]?.productName || "예약 상담상품"}
-                      {order.items.length > 1 && (
-                        <span className="text-[11px] font-normal text-gray-400"> 외 {order.items.length - 1}건</span>
-                      )}
-                    </p>
-                    <p className="text-[12px] font-semibold text-gray-700 mt-0.5">{user.name}</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">
-                      {order.seller.shopName} · {new Date(order.createdAt).toLocaleDateString("ko-KR")} · 예약 {order.reservationNumber}
-                    </p>
-                    {order.discountType && Number(order.discountAmount) > 0 && (
-                      <span className="text-[9px] text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded-full mt-0.5 inline-block">
-                        {order.discountType.startsWith("referral")
-                          ? "추천인 할인"
-                          : order.discountType.startsWith("cart")
-                          ? "장바구니 할인"
-                          : order.discountType.startsWith("coupon")
-                          ? "쿠폰 할인"
-                          : "채널인증 할인"} -{formatPrice(Number(order.discountAmount))}
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold">
-                      {formatPrice(Number(order.finalAmount))}
-                    </p>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                      order.status === "COMPLETED" ? "bg-green-50 text-green-600"
-                        : order.status === "CONFIRMED" ? "bg-blue-50 text-blue-600"
-                        : order.status === "CANCELLED" ? "bg-red-50 text-red-600"
-                        : "bg-gray-50 text-gray-600"
-                    }`}>
-                      {order.status === "PENDING" && "예약신청"}
-                      {order.status === "CONFIRMED" && "예약확정"}
-                      {order.status === "COMPLETED" && "상담완료"}
-                      {order.status === "CANCELLED" && "취소됨"}
-                      {order.status === "NO_SHOW" && "노쇼"}
-                    </span>
-                  </div>
-                </div>
-              ))}
+              {reservations.map((r) => {
+                const st = RESERVATION_STATUS[r.status] || { label: r.status, color: "bg-gray-50 text-gray-600" };
+                const d = new Date(r.reservationDate);
+                return (
+                  <Link
+                    key={r.id}
+                    href={`/my/reservations/${r.id}`}
+                    className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0"
+                  >
+                    <div className="min-w-0 flex-1 pr-2">
+                      <p className="text-[15px] font-bold text-gray-900 truncate">
+                        {r.items[0]?.productName || "상담 예약"}
+                        {r.items.length > 1 && (
+                          <span className="text-[11px] font-normal text-gray-400"> 외 {r.items.length - 1}건</span>
+                        )}
+                      </p>
+                      <p className="text-[12px] font-semibold text-gray-700 mt-0.5">{r.seller.shopName}</p>
+                      <p className="text-[10px] text-gray-400 mt-0.5">
+                        {d.getUTCFullYear()}.{d.getUTCMonth() + 1}.{d.getUTCDate()} {r.reservationTime} · 예약 {r.reservationNumber}
+                      </p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-sm font-semibold">{formatPrice(Number(r.finalAmount))}</p>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${st.color}`}>{st.label}</span>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-8 text-gray-400 px-4">
-              <Icon name="Package" size={36} strokeWidth={1.5} className="mx-auto mb-2 opacity-30" />
-              <p className="text-xs">아직 예약 내역이 없습니다.</p>
+              <CalendarX2 size={36} strokeWidth={1.5} className="mx-auto mb-2 opacity-30" />
+              <p className="text-xs">아직 상담 예약이 없습니다.</p>
+              <Link
+                href="/sellers"
+                className="mt-3 inline-block px-4 py-2 bg-gray-900 text-white text-xs font-semibold rounded-lg hover:bg-gray-800"
+              >
+                상담사 찾기
+              </Link>
             </div>
           )}
         </div>
