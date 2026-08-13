@@ -2,15 +2,16 @@
 
 // 활동중인 상담사를 가로로 자동 슬라이드(마퀴)로 보여주는 장식용 섹션.
 // ※ 더미(데모) 상담사 — 실제 상담사 디렉토리 탐색이 아니라 "활동중" 분위기를 보여주는 용도(클릭 비활성).
+// ※ 선녀·도령·무당·만신·선생·역술인 등 다양한 유형을 혼합해 표시.
 const DUMMY = [
   { name: "월령 선생", mood: "사주명리 · 신년운세", status: "오늘 상담 가능", avatar: 1 },
-  { name: "청아 선생", mood: "연애운 · 궁합", status: "예약 가능", avatar: 3 },
-  { name: "해월 선생", mood: "재물운 · 사업운", status: "라이브 상담", avatar: 8 },
-  { name: "연화 선생", mood: "타로 · 속마음", status: "오늘의 추천", avatar: 14 },
-  { name: "도윤 선생", mood: "직업운 · 이직운", status: "예약 가능", avatar: 20 },
-  { name: "별하 선생", mood: "가족운 · 인간관계", status: "오늘 상담 가능", avatar: 25 },
+  { name: "청아 선녀", mood: "천상계 사주 해석", status: "예약 가능", avatar: 3 },
+  { name: "해월 무당", mood: "신내림 30년 · 신점", status: "라이브 상담", avatar: 8 },
+  { name: "연화 만신", mood: "만신 · 굿 · 부적", status: "오늘의 추천", avatar: 14 },
+  { name: "도윤 도령", mood: "도령신 · 직업·이직운", status: "예약 가능", avatar: 20 },
+  { name: "별하 역술인", mood: "역술 · 가족·인간관계", status: "오늘 상담 가능", avatar: 25 },
   { name: "현명 선생", mood: "대운 · 종합운세", status: "라이브 상담", avatar: 27 },
-  { name: "소담 선생", mood: "택일 · 작명", status: "예약 가능", avatar: 30 },
+  { name: "소담 선녀", mood: "천기누설 · 타로", status: "예약 가능", avatar: 30 },
 ];
 
 function sajuAvatar(index: number): string {
