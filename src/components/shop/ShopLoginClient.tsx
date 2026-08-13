@@ -128,12 +128,12 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
           <button
             type="button"
             onClick={() => {
-              setEmail("test@sajumate.com");
-              setPassword("Test1234!");
+              setEmail("customer1@example.com");
+              setPassword("password123");
             }}
             className="w-full py-2 text-sm text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 transition"
           >
-            테스트 계정으로 로그인
+            테스트 계정으로 로그인 (customer1@example.com)
           </button>
         )}
         <p className="text-center text-xs text-gray-400">

@@ -4,9 +4,7 @@ import BrandWordmark from "@/components/shared/BrandWordmark";
 import { Icon } from '@/components/shared/Icon';
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { useCallback } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-;
+import { usePathname, useSearchParams } from "next/navigation";
 import { useShopChrome } from "@/components/shared/ShopChromeProvider";
 import { useFeatureFlags } from "@/components/shared/FeatureFlagsProvider";
 import NotificationBell from "@/components/shared/NotificationBell";
@@ -14,28 +12,17 @@ import NotificationBell from "@/components/shared/NotificationBell";
 export default function Header() {
   const { data: session, status } = useSession();
   const flags = useFeatureFlags();
-  const router = useRouter();
   const pathname = usePathname() ?? "";
   const searchParams = useSearchParams();
   // 라이브 팝업(iframe, ?embedded=true) 또는 라이브 진입(?from=live) 시 상단 헤더 숨김
   const embedded = searchParams?.get("embedded") === "true" || searchParams?.get("from") === "live";
 
-  const role = session?.user?.role;
   const loggedOut = !session && status !== "loading";
-  // 구매회원(또는 비로그인 방문자)에게만 장바구니 노출. 상담사/브랜드/관리자는 숨김.
-  const showCart = !role || role === "CUSTOMER";
 
   // 점집 안에서는 글로벌 헤더를 숨기고 점집 전용 헤더(SellerShopHeader)만 노출한다.
   const isSellerShop = /^\/shop\/[^/]+/.test(pathname);
   // 상담사 서브페이지(장바구니/내정보 등)에서는 공통 헤더 대신 상담사 전용 헤더가 노출된다.
   const { subpageActive } = useShopChrome();
-
-  const handleCartClick = useCallback((e: React.MouseEvent) => {
-    if (!session) {
-      e.preventDefault();
-      router.push("/auth/login");
-    }
-  }, [session, router]);
 
   if (isSellerShop || subpageActive || embedded) return null;
 
@@ -59,17 +46,6 @@ export default function Header() {
                 className="inline-flex items-center justify-center h-10 px-2 text-gray-900 hover:opacity-60 transition-opacity"
               >
                 <Icon name="Search" size={22} strokeWidth={1.5} />
-              </Link>
-            )}
-            {showCart && (
-              <Link
-                href="/cart"
-                prefetch={true}
-                onClick={handleCartClick}
-                className="inline-flex items-center justify-center h-10 px-2 text-gray-900 hover:opacity-60 transition-opacity relative"
-                aria-label="장바구니"
-              >
-                <Icon name="Cart" size={22} strokeWidth={1.5} />
               </Link>
             )}
             {loggedOut ? (

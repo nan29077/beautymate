@@ -10,12 +10,14 @@ import SellerShopBottomNav from "@/components/shared/SellerShopBottomNav";
 import ShopContextSync from "@/components/shared/ShopContextSync";
 import ShopBookingCalendar, { type DaySlots } from "@/components/shared/ShopBookingCalendar";
 import ShopShareButton from "@/components/shared/ShopShareButton";
+import ReservationCountdown from "@/components/shop/ReservationCountdown";
 import { CalendarCheck, Clock, Video, Phone, MapPin, Sparkles, ChevronRight, CalendarDays } from "lucide-react";
 import { getFeatureFlags } from "@/lib/settings";
 import { DEFAULT_PRODUCT_IMAGE, resolveSellerDisplayImage, resolveShopBanner } from "@/lib/defaults";
-import { OnAirBadge } from "@/components/shared/LiveBadge";
+import { OnAirBadge, LIVE_RING_CLASS } from "@/components/shared/LiveBadge";
 import { getShopCustomization } from "@/lib/shopCustomization";
 import { safeQuery } from "@/lib/safeDb";
+import { auth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -216,15 +218,35 @@ export default async function SellerShopPage({
     .sort((a, b) => a.date.localeCompare(b.date));
 
   const todayKey = toYmd(now);
-  const nowHm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-  const todayRemaining = (byDate.get(todayKey) ?? []).filter((t) => t > nowHm).sort();
-  const nextAvailable =
-    todayRemaining.length > 0
-      ? { date: todayKey, time: todayRemaining[0], isToday: true }
-      : (() => {
-          const future = daySlots.find((d) => d.date > todayKey);
-          return future ? { date: future.date, time: future.times[0], isToday: false } : null;
-        })();
+
+  // ─── 로그인 세션 + 내 예약 조회 ───
+  const session = await auth();
+  const myReservation = await safeQuery(
+    "shop page my reservation",
+    async (): Promise<{ reservationDate: Date; reservationTime: string } | null> => {
+      if (!session?.user?.id) return null;
+      return prisma.reservation.findFirst({
+        where: {
+          userId: session.user.id,
+          sellerId: seller.id,
+          reservationDate: { gte: now },
+          status: { in: ["PENDING", "CONFIRMED"] },
+        },
+        select: { reservationDate: true, reservationTime: true },
+        orderBy: { reservationDate: "asc" },
+      });
+    },
+    null,
+  );
+
+  // 예약 날짜 + 시간 → ISO string (클라이언트 컴포넌트에 직렬화하여 전달)
+  let myReservationIso: string | null = null;
+  if (myReservation) {
+    const rd = new Date(myReservation.reservationDate);
+    const [rh, rm] = myReservation.reservationTime.split(":").map(Number);
+    rd.setHours(rh, rm, 0, 0);
+    myReservationIso = rd.toISOString();
+  }
 
   // ─── 콘텐츠 (선택) ───
   const contents = FEATURE_CONTENT && (seller.featureContent ?? true)
@@ -278,7 +300,7 @@ export default async function SellerShopPage({
               <div className="flex flex-col items-center flex-shrink-0 -mt-8">
                 <div
                   className={`relative w-16 h-16 rounded-full overflow-hidden ring-4 bg-white shadow-md ${
-                    showLive ? "ring-red-400 animate-heartbeat" : "ring-white"
+                    showLive ? LIVE_RING_CLASS : "ring-white"
                   }`}
                 >
                   <SafeImage
@@ -324,41 +346,33 @@ export default async function SellerShopPage({
         </div>
       </section>
 
-      {/* ───── 2. 오늘의 예약 현황 ───── */}
+      {/* ───── 2. 내 예약 현황 ───── */}
       <section className="px-4 mt-4">
         <div className="bg-white rounded-2xl border border-gray-100 p-4">
           <div className="flex items-center gap-1.5 mb-3">
             <CalendarDays size={15} strokeWidth={1.8} style={{ color: themeColor }} />
-            <h2 className="text-sm font-bold text-gray-900">오늘의 예약 현황</h2>
+            <h2 className="text-sm font-bold text-gray-900">내 예약 현황</h2>
           </div>
 
-          <div className="flex items-stretch gap-2">
-            <div className="flex-1 rounded-xl px-3 py-3 text-center" style={{ backgroundColor: `${themeColor}10` }}>
-              <p className="text-[10px] text-gray-500">오늘 남은 자리</p>
-              <p className="text-xl font-extrabold mt-0.5" style={{ color: themeColor }}>
-                {todayRemaining.length}
-              </p>
+          {myReservation && myReservationIso ? (
+            <ReservationCountdown
+              reservationIso={myReservationIso}
+              reservationDateLabel={toYmd(new Date(myReservation.reservationDate))}
+              reservationTimeStr={myReservation.reservationTime}
+            />
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-sm text-gray-400 mb-3">예약 내역이 없습니다</p>
+              <Link
+                href={bookHref}
+                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-extrabold text-[14px] text-white shadow-sm active:scale-[0.98] transition-transform"
+                style={{ backgroundColor: themeColor }}
+              >
+                <CalendarCheck size={17} strokeWidth={2} />
+                지금 예약하기
+              </Link>
             </div>
-            <div className="flex-1 rounded-xl px-3 py-3 text-center bg-gray-50">
-              <p className="text-[10px] text-gray-500">다음 가능 시간</p>
-              <p className="text-[13px] font-bold text-gray-900 mt-1 leading-tight">
-                {nextAvailable
-                  ? nextAvailable.isToday
-                    ? `오늘 ${nextAvailable.time}`
-                    : `${nextAvailable.date.slice(5).replace("-", "/")} ${nextAvailable.time}`
-                  : "예약 대기"}
-              </p>
-            </div>
-          </div>
-
-          <Link
-            href={bookHref}
-            className="mt-3 flex items-center justify-center gap-2 w-full py-3 rounded-xl font-extrabold text-[14px] text-white shadow-sm active:scale-[0.98] transition-transform"
-            style={{ backgroundColor: themeColor }}
-          >
-            <CalendarCheck size={17} strokeWidth={2} />
-            지금 예약하기
-          </Link>
+          )}
 
           {daySlots.length === 0 && (
             <p className="text-[11px] text-gray-400 text-center mt-2">
