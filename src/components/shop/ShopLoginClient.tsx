@@ -46,6 +46,49 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
       title="점집 로그인"
       subtitle={`로그인 후 ${shop.shopName}으로 돌아갑니다`}
     >
+      {/* 점집 전용 소셜 로그인 — 메인 /auth/login 과 완전히 분리된 컴포넌트 */}
+      <div className="space-y-2.5 mb-4">
+        {/* 카카오 간편 로그인 */}
+        <button
+          type="button"
+          onClick={() => {
+            // TODO: 카카오 OAuth 연동 예정
+          }}
+          className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl text-sm font-semibold text-gray-900 transition active:scale-[0.98]"
+          style={{ backgroundColor: "#FEE500" }}
+        >
+          {/* 카카오 로고 */}
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M9 1.5C4.86 1.5 1.5 4.136 1.5 7.38c0 2.088 1.326 3.918 3.33 4.986l-.846 3.132a.225.225 0 0 0 .336.252l3.684-2.43c.33.048.666.072 1.002.072 4.14 0 7.5-2.634 7.5-5.88C16.5 4.136 13.14 1.5 9 1.5z"
+              fill="#3C1E1E"
+            />
+          </svg>
+          카카오로 시작하기
+        </button>
+
+        {/* 네이버 간편 로그인 */}
+        <button
+          type="button"
+          onClick={() => {
+            // TODO: 네이버 OAuth 연동 예정
+          }}
+          className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl text-sm font-semibold text-white transition active:scale-[0.98]"
+          style={{ backgroundColor: "#03C75A" }}
+        >
+          {/* 네이버 N 로고 */}
+          <span className="text-base font-extrabold leading-none">N</span>
+          네이버로 시작하기
+        </button>
+      </div>
+
+      {/* 구분선 */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex-1 h-px bg-gray-100" />
+        <span className="text-[11px] text-gray-400 font-medium">또는 이메일로 로그인</span>
+        <div className="flex-1 h-px bg-gray-100" />
+      </div>
+
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3.5">
         <div>
           <label className="block text-xs font-semibold text-gray-600 mb-1.5">이메일</label>
