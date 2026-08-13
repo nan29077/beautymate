@@ -1,11 +1,7 @@
 "use client";
 
-import { Icon } from '@/components/shared/Icon';
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useCallback } from "react";
-;
 import SafeImage from "@/components/shared/SafeImage";
 import NotificationBell from "@/components/shared/NotificationBell";
 import { pickSajuAvatar } from "@/lib/defaults";
@@ -30,18 +26,6 @@ export default function SellerShopHeader({
   liveHref?: string | null;
 }) {
   const { data: session } = useSession();
-  const router = useRouter();
-
-  const handleCartClick = useCallback(
-    (e: React.MouseEvent) => {
-      if (!session) {
-        e.preventDefault();
-        // 점집에서 로그인 시 메인이 아닌 현재 점집으로 복귀
-        router.push(`/auth/login?callbackUrl=${encodeURIComponent(`/shop/${sellerSlug}`)}`);
-      }
-    },
-    [session, router, sellerSlug]
-  );
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
@@ -67,17 +51,9 @@ export default function SellerShopHeader({
           </Link>
         </div>
 
-        {/* 우측: 비로그인 → 점집 전용 로그인/회원가입, 로그인 → 장바구니/알림 */}
+        {/* 우측: 비로그인 → 점집 전용 로그인/회원가입, 로그인 → 알림 */}
         {session ? (
           <div className="flex items-center gap-0.5 flex-shrink-0">
-            <Link
-              href="/cart"
-              onClick={handleCartClick}
-              className="p-3 text-gray-800 hover:opacity-60 transition-opacity"
-              aria-label="장바구니"
-            >
-              <Icon name="Cart" size={32} strokeWidth={1.5} />
-            </Link>
             {/* 알림 버튼 — 모든 사용자 노출 */}
             <NotificationBell className="text-gray-800" size={32} buttonClassName="p-3" />
           </div>

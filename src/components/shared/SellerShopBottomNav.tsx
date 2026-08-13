@@ -28,13 +28,6 @@ export default function SellerShopBottomNav({
       active: pathname === `/shop/${sellerSlug}`,
     },
     {
-      href: "/cart",
-      icon: "Cart",
-      label: "장바구니",
-      active: pathname === "/cart",
-      requiresAuth: true,
-    },
-    {
       href: "/my/orders",
       icon: "OrderHistory",
       label: "예약내역",
@@ -44,7 +37,7 @@ export default function SellerShopBottomNav({
     {
       href: "/my",
       icon: "MyPage",
-      label: "내정보",
+      label: "마이페이지",
       active: pathname === "/my",
       requiresAuth: true,
     },

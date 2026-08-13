@@ -81,6 +81,18 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
         >
           {loading ? "로그인 중..." : "로그인"}
         </button>
+        {process.env.NODE_ENV === "development" && (
+          <button
+            type="button"
+            onClick={() => {
+              setEmail("test@sajumate.com");
+              setPassword("Test1234!");
+            }}
+            className="w-full py-2 text-sm text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 transition"
+          >
+            테스트 계정으로 로그인
+          </button>
+        )}
         <p className="text-center text-xs text-gray-400">
           아직 회원이 아니신가요?{" "}
           <Link href={`/shop/${shop.slug}/join`} className="text-amber-600 font-semibold hover:underline">
