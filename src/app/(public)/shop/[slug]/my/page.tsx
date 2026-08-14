@@ -2,13 +2,11 @@ import { Icon } from "@/components/shared/Icon";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { formatPrice } from "@/lib/utils";
-import SafeImage from "@/components/shared/SafeImage";
 import SellerShopBottomNav from "@/components/shared/SellerShopBottomNav";
 import { auth } from "@/lib/auth";
 import { pickBuyerAvatar } from "@/lib/defaults";
 import { safeQuery } from "@/lib/safeDb";
-import { Sparkles, MessageCircle } from "lucide-react";
+import ConsultDetailSheet from "@/components/shop/ConsultDetailSheet";
 
 export const dynamic = "force-dynamic";
 
@@ -194,7 +192,7 @@ export default async function ShopMyPage({
         </div>
       </div>
 
-      {/* 이 점집에서의 상담 내역 */}
+      {/* 상담 내역 + 상세보기(AI 요약 포함) */}
       <div className="px-4 mb-4">
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
           <div className="flex items-center justify-between px-4 pt-4 pb-2">
@@ -208,87 +206,12 @@ export default async function ShopMyPage({
               </Link>
             )}
           </div>
-          {shopReservations.length > 0 ? (
-            <div className="px-4 pb-3">
-              {shopReservations.slice(0, 5).map((r: any) => {
-                const status = RESERVATION_STATUS[r.status] ?? { label: r.status, color: "bg-gray-50 text-gray-600" };
-                return (
-                  <div
-                    key={r.id}
-                    className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0"
-                  >
-                    <div className="min-w-0 flex-1 pr-2">
-                      <p className="text-[14px] font-bold text-gray-900 truncate">
-                        {r.product?.name || "상담"}
-                      </p>
-                      <p className="text-[10px] text-gray-400 mt-0.5">
-                        {new Date(r.reservationDate).toLocaleDateString("ko-KR")} {r.reservationTime}
-                      </p>
-                    </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${status.color}`}>
-                      {status.label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-400 px-4">
-              <Icon name="File" size={36} strokeWidth={1.5} className="mx-auto mb-2 opacity-30" />
-              <p className="text-xs">아직 상담 내역이 없습니다.</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* AI 상담 요약본 */}
-      <div className="px-4 mb-4">
-        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-          <div className="px-4 pt-4 pb-2">
-            <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
-              <Sparkles size={14} className="text-violet-500" />
-              AI 상담 요약본
-            </h2>
-            <p className="text-[11px] text-gray-400 mt-0.5">라이브 상담에서 AI가 정리한 내용이에요</p>
-          </div>
-          {consultSummaries.length > 0 ? (
-            <div className="px-4 pb-3 space-y-3">
-              {consultSummaries.map((msg: any) => (
-                <div key={msg.id} className="bg-violet-50 rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <Sparkles size={11} className="text-violet-500 flex-shrink-0" />
-                    <p className="text-[11px] font-bold text-violet-700 truncate">
-                      {msg.liveStream.title}
-                    </p>
-                    <span className="text-[10px] text-gray-400 ml-auto flex-shrink-0">
-                      {msg.liveStream.startedAt
-                        ? new Date(msg.liveStream.startedAt).toLocaleDateString("ko-KR")
-                        : new Date(msg.createdAt).toLocaleDateString("ko-KR")}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-700 leading-relaxed line-clamp-3">{msg.message}</p>
-                  {msg.liveStream.shareCode && (
-                    <Link
-                      href={`/live/${msg.liveStream.shareCode}`}
-                      className="text-[10px] text-violet-600 mt-1.5 inline-block hover:underline"
-                    >
-                      라이브 다시보기 →
-                    </Link>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 px-4">
-              <div className="w-12 h-12 rounded-full bg-violet-50 flex items-center justify-center mx-auto mb-2">
-                <MessageCircle size={22} className="text-violet-300" />
-              </div>
-              <p className="text-xs text-gray-500 font-medium">아직 AI 상담 요약본이 없어요</p>
-              <p className="text-[11px] text-gray-400 mt-1">
-                {consultantName}의 라이브 상담에 참여하면<br />AI가 상담 내용을 정리해드려요
-              </p>
-            </div>
-          )}
+          <ConsultDetailSheet
+            reservations={shopReservations as any}
+            aiSummaries={consultSummaries as any}
+            consultantName={consultantName}
+            sellerSlug={slug}
+          />
         </div>
       </div>
 
