@@ -35,10 +35,10 @@ export default function SellerShopBottomNav({
       requiresAuth: true,
     },
     {
-      href: "/my",
+      href: `/shop/${sellerSlug}/my`,
       icon: "MyPage",
       label: "마이페이지",
-      active: pathname === "/my",
+      active: pathname.startsWith(`/shop/${sellerSlug}/my`),
       requiresAuth: true,
     },
   ];

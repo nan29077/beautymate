@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     select: {
       id: true, slug: true, shopName: true, shopLogo: true, mood: true, isManualLive: true,
       liveLink: true,
-      user: { select: { avatar: true } },
+      user: { select: { avatar: true, name: true } },
       liveStreams: { where: { status: "LIVE" }, select: { shareCode: true }, take: 1 },
     },
     take: 20,
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
         select: {
           id: true, slug: true, shopName: true, shopLogo: true, mood: true, isManualLive: true,
           liveLink: true,
-          user: { select: { avatar: true } },
+          user: { select: { avatar: true, name: true } },
           liveStreams: { where: { status: "LIVE" }, select: { shareCode: true }, take: 1 },
         },
       },
@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
     id: s.id,
     slug: s.slug,
     shopName: s.shopName,
+    name: s.user?.name || null,
     profileImage: sellerProfileImage(s),
     mood: s.mood,
     isLive: isSellerLive(s),

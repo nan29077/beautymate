@@ -6,7 +6,7 @@ import SafeImage from "@/components/shared/SafeImage";
 import {  } from 'lucide-react';
 import { pickSajuAvatar } from "@/lib/defaults";
 import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
-import LiveBadge, { LIVE_RING_CLASS } from "@/components/shared/LiveBadge";
+import { LIVE_RING_CLASS } from "@/components/shared/LiveBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -48,7 +48,7 @@ export default async function HomeMyShopBar() {
           seller: {
             select: {
               id: true, slug: true, shopName: true, shopLogo: true, isManualLive: true, liveLink: true,
-              user: { select: { avatar: true } },
+              user: { select: { avatar: true, name: true } },
               liveStreams: { where: { status: "LIVE" }, take: 1, select: { id: true, shareCode: true, externalUrl: true } },
             },
           },
@@ -58,7 +58,7 @@ export default async function HomeMyShopBar() {
     },
   });
 
-  const picks = profile?.follows?.map((f) => f.seller) || [];
+  const picks = profile?.follows?.map((f: any) => f.seller) || [];
 
   return (
     <section className="mt-3">
@@ -116,27 +116,31 @@ export default async function HomeMyShopBar() {
               const liveHref = live ? (inAppLiveUrl || manualLink || null) : null;
               const href = liveHref || `/shop/${s.slug}`;
 
+              const displayName = (s.user as any)?.name || s.shopName;
               const content = (
                 <>
-                  <div className="relative">
-                    <div className={`w-14 h-14 rounded-full overflow-hidden bg-gray-50 ${live ? LIVE_RING_CLASS : "ring-2 ring-pink-200"}`}>
-                      <SafeImage
-                        src={sellerProfileImage(s)}
-                        placeholder={pickSajuAvatar(s.id)}
-                        alt={s.shopName}
-                        width={56}
-                        height={56}
-                        fallbackText={s.shopName.charAt(0)}
-                      />
-                    </div>
-                    {live && <LiveBadge className="absolute -bottom-1 left-1/2 -translate-x-1/2" />}
+                  <div className={`w-14 h-14 rounded-full overflow-hidden bg-gray-50 ${live ? LIVE_RING_CLASS : "ring-2 ring-pink-200"}`}>
+                    <SafeImage
+                      src={sellerProfileImage(s)}
+                      placeholder={pickSajuAvatar(s.id)}
+                      alt={displayName}
+                      width={56}
+                      height={56}
+                      fallbackText={displayName.charAt(0)}
+                    />
                   </div>
-                  <span className="text-[10px] text-gray-700 font-medium max-w-[56px] truncate">
-                    {s.shopName}
+                  <span className="text-[10px] text-gray-700 font-medium max-w-[64px] truncate">
+                    {displayName}
                   </span>
+                  {live && (
+                    <span className="inline-flex items-center gap-0.5 bg-violet-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap leading-none">
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/></svg>
+                      라이브 중
+                    </span>
+                  )}
                 </>
               );
-              const cls = "flex flex-col items-center gap-1.5 flex-shrink-0 w-14";
+              const cls = "flex flex-col items-center gap-1 flex-shrink-0 w-16";
               // 라이브 실행 중이면 인앱 시청페이지·외부 링크 모두 항상 새창으로 연다.
               return liveHref ? (
                 <a key={s.id} href={liveHref} target="_blank" rel="noopener noreferrer" className={cls}>
