@@ -108,8 +108,8 @@ export default function SocialOrderModal({ open, onClose, productId, sellerId, p
 
   const handleSubmit = async () => {
     setError(null);
-    if (!name.trim() || !address.trim() || !phone.trim()) {
-      setError("예약자명, 배송지, 연락처를 모두 입력해 주세요.");
+    if (!name.trim() || !phone.trim()) {
+      setError("예약자명과 연락처를 입력해 주세요.");
       return;
     }
     setSubmitting(true);
@@ -122,7 +122,6 @@ export default function SocialOrderModal({ open, onClose, productId, sellerId, p
           sellerId,
           name: name.trim(),
           depositorName: depositorName.trim(),
-          address: address.trim(),
           phone: phone.trim(),
           snsPlatform: channelPlatform.trim(),
           snsHandle: channelHandle.trim(),
@@ -237,44 +236,7 @@ export default function SocialOrderModal({ open, onClose, productId, sellerId, p
                 />
               </div>
 
-              <div>
-                <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-700 mb-1.5">
-                  <Icon name="Location_icon" size={15} /> 배송지 <span className="text-amber-500">*</span>
-                </label>
-                <div className="flex gap-2 mb-2">
-                  <input
-                    value={zonecode}
-                    readOnly
-                    placeholder="우편번호"
-                    className="w-28 h-11 px-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-600 cursor-not-allowed"
-                  />
-                  <button
-                    type="button"
-                    onClick={openPostcode}
-                    className="flex-1 h-11 bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold rounded-xl transition-colors"
-                  >
-                    주소 검색
-                  </button>
-                </div>
-                <input
-                  value={address}
-                  readOnly
-                  placeholder="기본 주소 (주소 검색 버튼 클릭)"
-                  className="w-full h-11 px-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-600 cursor-not-allowed mb-2"
-                />
-                <input
-                  value={addressDetail}
-                  onChange={(e) => {
-                    setAddressDetail(e.target.value);
-                    setAddress((prev) => {
-                      const base = prev.split(" (")[0];
-                      return e.target.value ? `${base} (${e.target.value})` : base;
-                    });
-                  }}
-                  placeholder="상세 주소 입력 (동/호수 등)"
-                  className="w-full h-11 px-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-200"
-                />
-              </div>
+              {/* 배송지 입력 제거: 사주나라는 예약(비실물) 전용 서비스 */}
 
               <div>
                 <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-700 mb-1.5">

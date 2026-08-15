@@ -24,7 +24,7 @@ export interface BulkColumn {
 
 // 배지: 한글 라벨 → 코드 (등록 폼과 동일)
 export const BADGE_LABEL_TO_CODE: Record<string, string> = {
-  무료배송: "FREE_SHIPPING",
+  무료상담: "FREE_SHIPPING",
   신규: "NEW",
   베스트: "BEST",
   특가: "HOT_DEAL",
@@ -146,7 +146,7 @@ const REMOTE_FEE: BulkColumn = {
 const BADGES: BulkColumn = {
   key: "badges",
   header: "배지(쉼표로구분)",
-  guide: "선택. 무료배송/신규/베스트/특가/한정판/핸드메이드 중 쉼표로 구분해 입력.",
+  guide: "선택. 무료상담/신규/베스트/특가/한정판/핸드메이드 중 쉼표로 구분해 입력.",
   example: "신규,베스트",
 };
 const DESCRIPTION: BulkColumn = {
@@ -187,10 +187,6 @@ export function columnsForMode(mode: BulkMode, priceType: PriceType = "SUPPLY_PR
     COMPARE_PRICE,
     STOCK,
     OPTIONS,
-    SHIPPING_FEE,
-    FREE_SHIPPING,
-    FREE_SHIP_THRESHOLD,
-    REMOTE_FEE,
     BADGES,
     DESCRIPTION,
     DETAIL,
@@ -222,7 +218,6 @@ export const DIRECT_COLUMNS: BulkColumn[] = [
   NAME,
   BASE_PRICE,
   DIRECT_STOCK,
-  DIRECT_SHIPPING,
   DIRECT_IMAGES,
   DESCRIPTION,
 ];
@@ -242,10 +237,6 @@ const ALL_COLUMNS: BulkColumn[] = [
   COMPARE_PRICE,
   STOCK,
   OPTIONS,
-  SHIPPING_FEE,
-  FREE_SHIPPING,
-  FREE_SHIP_THRESHOLD,
-  REMOTE_FEE,
   BADGES,
   DESCRIPTION,
   DETAIL,

@@ -28,7 +28,7 @@ export type HomeBenefits = { stats: HomeBenefitStat[]; items: HomeBenefitItem[] 
 // "숫자로 보는 사주나라" 기본값
 export const DEFAULT_HOME_STATS: HomeStat[] = [
   { value: "24시간", label: "온라인 예약 접수" },
-  { value: "1분", label: "남은 시간 확인" },
+  { value: "실시간", label: "오늘의 남은 예약" },
   { value: "한 번에", label: "예약과 결제" },
   { value: "LIVE", label: "방송 연동 상담" },
 ];

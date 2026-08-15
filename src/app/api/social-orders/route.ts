@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     const { productId, sellerId, name, address, phone } = body || {};
     const snsAccountsRaw: SnsAccount[] = Array.isArray(body?.snsAccounts) ? body.snsAccounts : [];
 
-    if (!productId || !sellerId || !name || !address || !phone) {
+    if (!productId || !sellerId || !name || !phone) {
       return NextResponse.json({ error: "필수 정보가 누락되었습니다." }, { status: 400 });
     }
 
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
         productId: String(productId),
         sellerId: String(sellerId),
         name: String(name).trim(),
-        address: String(address).trim(),
+        address: String(address || "").trim(),
         phone: String(phone).trim(),
         depositorName,
         snsAccounts: JSON.stringify(snsAccounts),
