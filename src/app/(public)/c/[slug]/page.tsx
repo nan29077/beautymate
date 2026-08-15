@@ -88,10 +88,10 @@ export async function generateMetadata({
     where: { slug },
     select: { id: true, shopName: true, shopDescription: true, shopBanner: true },
   });
-  if (!seller) return { title: "사주메이트" };
+  if (!seller) return { title: "사주나라" };
 
   const custom = await getShopCustomization(seller.id);
-  const title = `${seller.shopName}의 점집 - 사주메이트`;
+  const title = `${seller.shopName}의 점집 - 사주나라`;
   const description =
     custom.tagline || seller.shopDescription || `${seller.shopName}에게 지금 상담을 예약하세요.`;
   const image = seller.shopBanner || "/opengraph-image";
@@ -103,7 +103,7 @@ export async function generateMetadata({
       title,
       description,
       url: `/c/${slug}`,
-      siteName: "사주메이트",
+      siteName: "사주나라",
       type: "profile",
       images: [{ url: image, width: 1200, height: 630, alt: `${seller.shopName}의 점집` }],
     },

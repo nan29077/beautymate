@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "사주메이트 - 라이브 점사 예약 플랫폼";
+export const alt = "사주나라 - 라이브 점사 예약 플랫폼";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -65,10 +65,10 @@ export default function OpenGraphImage() {
                 fontSize: 52,
                 fontWeight: 800,
                 letterSpacing: -2,
-                color: "#ffffff",
               }}
             >
-              사주메이트
+              <span style={{ color: "#ffffff" }}>사주</span>
+              <span style={{ color: "#f2c66d" }}>나라</span>
             </div>
           </div>
 
@@ -130,7 +130,7 @@ export default function OpenGraphImage() {
             }}
           >
             <span>LIVE FORTUNE CONSULTING</span>
-            <span>sajumate.co.kr</span>
+            <span>sajunara.co.kr</span>
           </div>
         </div>
       </div>

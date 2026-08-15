@@ -132,7 +132,7 @@ const PAGE_META: Record<string, { subtitle: string; icon: React.ReactNode }> = {
   shipping:     { subtitle: "예약·취소·환불 안내", icon: <Icon name="Calendar" size={24} strokeWidth={1.5} /> },
   terms:        { subtitle: "서비스 이용 약관", icon: <Icon name="File" size={24} strokeWidth={1.5} /> },
   privacy:      { subtitle: "개인정보 보호 정책", icon: <Icon name="Certified" size={24} strokeWidth={1.5} /> },
-  "seller-guide": { subtitle: "상담사로 시작하는 방법", icon: <Icon name="Store" size={24} strokeWidth={1.5} /> },
+  "seller-guide": { subtitle: "상담사로 시작하는 방법", icon: <Icon name="Sparkles" size={24} strokeWidth={1.5} /> },
 };
 
 const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = {
@@ -167,7 +167,7 @@ const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = 
       <div className="space-y-3">
         <Card>
           <SectionHeading>제1조 (목적)</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">이 약관은 사주메이트(이하 "회사")가 운영하는 마켓플레이스 서비스(이하 "서비스")의 이용 조건 및 절차, 회사와 회원 간의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+          <p className="text-[13px] text-gray-600 leading-relaxed">이 약관은 사주나라(이하 "회사")가 운영하는 마켓플레이스 서비스(이하 "서비스")의 이용 조건 및 절차, 회사와 회원 간의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.</p>
         </Card>
         <Card>
           <SectionHeading>제2조 (정의)</SectionHeading>
@@ -231,7 +231,7 @@ const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = 
         </Card>
         <a href="/seller-apply"
           className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors shadow-md shadow-amber-200 mt-2">
-          <Icon name="Store" size={15} strokeWidth={1.5} />
+          <Icon name="Sparkles" size={15} strokeWidth={1.5} />
           상담사 신청하기
         </a>
       </div>
@@ -307,7 +307,7 @@ export default function SupportContent({
   }
 
   const title = dbContent?.title || hardcoded?.title || "고객센터";
-  const subtitle = meta?.subtitle ?? "사주메이트 고객센터";
+  const subtitle = meta?.subtitle ?? "사주나라 고객센터";
   const icon = meta?.icon ?? <Icon name="File" size={24} strokeWidth={1.5} />;
 
   return (

@@ -86,7 +86,7 @@ export async function notifySignupWelcome(opts: {
   const phone = normalizePhone(opts.phone);
   if (!phone) return { notified: false, reason: "전화번호 없음" };
 
-  let shopName = "사주메이트";
+  let shopName = "사주나라";
   let sellerId: string | null = null;
   if (opts.sellerRef) {
     const seller = await prisma.sellerProfile.findUnique({

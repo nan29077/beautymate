@@ -229,7 +229,7 @@ function LoginForm() {
           <BrandWordmark size="lg" />
         </Link>
         <p className="text-sm text-gray-400">
-          사주메이트 라이브 점사 예약 플랫폼
+          사주나라 라이브 점사 예약 플랫폼
         </p>
       </div>
 
@@ -536,9 +536,9 @@ function SellerSupportNotice() {
         가능합니다.
       </p>
       <p className="text-xs text-amber-700">
-        고객센터: 카카오톡 채널 <b>@사주메이트</b>
+        고객센터: 카카오톡 채널 <b>@사주나라</b>
         <br />
-        또는 <b>support@sajumate.com</b>
+        또는 <b>support@sajunara.co.kr</b>
       </p>
     </div>
   );

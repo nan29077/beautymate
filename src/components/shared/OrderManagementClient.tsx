@@ -1029,7 +1029,7 @@ export default function OrderManagementClient({
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={order.thumbnail} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <Icon name="Package" size={20} className="text-gray-300" />
+                      <Icon name="Gem" size={20} className="text-gray-300" />
                     )}
                   </div>
 
@@ -1356,7 +1356,7 @@ export default function OrderManagementClient({
 
               {/* Order Items */}
               <div>
-                <p className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1"><Icon name="Package" size={12} /> 예약 상담상품</p>
+                <p className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1"><Icon name="Gem" size={12} /> 예약 상담상품</p>
                 <div className="bg-gray-50 rounded-xl overflow-hidden">
                   {detailOrder.items.map(item => (
                     <div key={item.id} className="flex justify-between p-3 border-b border-gray-100 last:border-0">
@@ -1366,7 +1366,7 @@ export default function OrderManagementClient({
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={item.thumbnail} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <Icon name="Package" size={14} className="text-gray-300" />
+                            <Icon name="Gem" size={14} className="text-gray-300" />
                           )}
                         </div>
                         <div className="min-w-0">

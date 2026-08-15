@@ -88,7 +88,7 @@ export default function LiveWidgetClient({
         {/* 브랜딩 */}
         <div className="sm-brand">
           <span className="sm-brand-mark">✦</span>
-          <span className="sm-brand-text">사주메이트</span>
+          <span className="sm-brand-text">사주나라</span>
         </div>
 
         {/* 상담사명 */}

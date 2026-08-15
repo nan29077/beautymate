@@ -161,7 +161,7 @@ function BotGuideModal({ onClose }: { onClose: () => void }) {
             <Icon name="EmojiHoney_icon" size={26} className="flex-shrink-0" />
             <p className="text-[12px] text-amber-800 leading-relaxed">
               AI 사주봇은 <b>라이브 진행 중, 라이브 관리 페이지가 열려 있는 동안</b> 약 20초 간격으로 채팅을 분석해요.
-              사주메이트 앱 채팅과 YouTube 채팅(읽기)을 함께 감지하고, 봇 메시지는 <b>🤖 봇 뱃지</b>와 함께 앱 채팅에 표시됩니다.
+              사주나라 앱 채팅과 YouTube 채팅(읽기)을 함께 감지하고, 봇 메시지는 <b>🤖 봇 뱃지</b>와 함께 앱 채팅에 표시됩니다.
             </p>
           </div>
 
@@ -260,7 +260,7 @@ function ApiKeyGuideModal({ onClose }: { onClose: () => void }) {
     },
     {
       title: "프로젝트 생성",
-      body: <>상단 프로젝트 선택 메뉴 → <b>새 프로젝트</b>를 클릭하고, 프로젝트 이름(예: sajumate-live)을 입력한 뒤 <b>만들기</b>를 누르세요. 생성 후 상단에서 해당 프로젝트가 선택되어 있는지 확인하세요.</>,
+      body: <>상단 프로젝트 선택 메뉴 → <b>새 프로젝트</b>를 클릭하고, 프로젝트 이름(예: sajunara-live)을 입력한 뒤 <b>만들기</b>를 누르세요. 생성 후 상단에서 해당 프로젝트가 선택되어 있는지 확인하세요.</>,
     },
     {
       title: "YouTube Data API v3 활성화",
@@ -306,7 +306,7 @@ function ApiKeyGuideModal({ onClose }: { onClose: () => void }) {
           <div className="rounded-2xl border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 p-4 flex items-start gap-3">
             <Icon name="YouTube_icon" size={22} className="flex-shrink-0 mt-0.5" />
             <p className="text-[12px] text-amber-800 leading-relaxed">
-              API 키를 등록하면 라이브 방송 화면에서 <b>YouTube 실시간 채팅</b>을 읽어와 사주메이트 채팅과 함께 표시하고,
+              API 키를 등록하면 라이브 방송 화면에서 <b>YouTube 실시간 채팅</b>을 읽어와 사주나라 채팅과 함께 표시하고,
               AI 봇의 키워드·FAQ 감지에도 활용돼요. 키는 <b>서버에만 저장</b>되며 시청자에게 노출되지 않아요.
             </p>
           </div>
@@ -492,7 +492,7 @@ export default function ChatBotManager({ onConfigSaved }: { onConfigSaved?: () =
         <div className="mt-3 flex items-start gap-2 rounded-xl bg-white/70 border border-amber-200 px-3 py-2.5">
           <Icon name="Info" size={13} className="text-amber-500 flex-shrink-0 mt-0.5" />
           <p className="text-[11px] text-amber-800 leading-relaxed">
-            봇 메시지는 <b>사주메이트 앱 채팅</b>에 표시되고, 아래에서 YouTube 채널을 연결하면 <b>YouTube 채팅에도 동시 전송</b>할 수 있어요.
+            봇 메시지는 <b>사주나라 앱 채팅</b>에 표시되고, 아래에서 YouTube 채널을 연결하면 <b>YouTube 채팅에도 동시 전송</b>할 수 있어요.
             YouTube 채팅은 <b>읽기 연동</b>되어 키워드 감지에 활용돼요.
             봇은 <b>라이브 진행 중 이 라이브 관리 페이지가 열려 있는 동안</b> 약 20초 간격으로 동작합니다.
           </p>
@@ -515,7 +515,7 @@ export default function ChatBotManager({ onConfigSaved }: { onConfigSaved?: () =
           <KeyRound size={15} className="text-amber-500" /> YouTube Data API v3 API 키
         </p>
         <p className="text-[11px] text-gray-500 leading-relaxed">
-          API 키를 등록하면 라이브 방송 화면에서 <b>YouTube 실시간 채팅</b>을 읽어와 사주메이트 채팅과 함께 표시하고,
+          API 키를 등록하면 라이브 방송 화면에서 <b>YouTube 실시간 채팅</b>을 읽어와 사주나라 채팅과 함께 표시하고,
           AI 봇의 키워드·FAQ 감지에도 활용돼요. 키는 서버에만 저장되며 시청자에게 노출되지 않아요.
         </p>
         <div className="flex gap-2">
@@ -720,7 +720,7 @@ export default function ChatBotManager({ onConfigSaved }: { onConfigSaved?: () =
           num={3}
           icon="ProductDetail_icon"
           title="상담상품 정보 자동 안내"
-          desc=""3번 상담상품 뭐예요?", "가격 얼마예요?", "예약 가능한가요?" 같은 질문에 라이브 상담상품 정보를 자동으로 안내해요."
+          desc="“3번 상담상품 뭐예요?”, “가격 얼마예요?”, “예약 가능한가요?” 같은 질문에 라이브 상담상품 정보를 자동으로 안내해요."
           on={config.productInfoEnabled}
           onToggle={() => patch({ productInfoEnabled: !config.productInfoEnabled })}
         />

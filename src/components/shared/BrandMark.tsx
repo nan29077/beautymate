@@ -17,7 +17,7 @@ export default function BrandMark({
       className={className}
       style={style}
       role="img"
-      aria-label="사주메이트 초승달"
+      aria-label="사주나라 초승달"
     >
       <path
         d="M40.8 8.2c-12.2 2.9-21.3 13.9-21.3 27 0 11.1 6.6 20.7 16.1 25-2.1.6-4.4.9-6.7.9C14.5 61.1 3 49.6 3 35.3 3 20.9 14.6 9.2 29 9.2c4.2 0 8.2 1 11.8 2.7V8.2Z"

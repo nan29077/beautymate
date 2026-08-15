@@ -21,7 +21,7 @@ export default function HomeStartTabs() {
             <Icon name="Rocket" size={13} /> <span className="text-[11px] font-bold tracking-wide">START NOW</span>
           </div>
           <h2 className="text-[24px] font-extrabold text-white leading-tight">
-            지금 바로<br />사주메이트를 시작하세요
+            지금 바로<br />사주나라를 시작하세요
           </h2>
           <p className="mt-3 text-[13px] text-gray-300 leading-relaxed">
             좋아하는 상담사의 라이브를 즐기거나,<br />나만의 점집을 열어 판매를 시작해보세요.
@@ -45,7 +45,7 @@ export default function HomeStartTabs() {
                 tab === "seller" ? "bg-white text-gray-900" : "text-white/70 hover:text-white"
               }`}
             >
-              <Icon name="Store" size={15} strokeWidth={1.8} /> 상담사로 시작하기
+              <Icon name="Sparkles" size={15} strokeWidth={1.8} /> 상담사로 시작하기
             </button>
           </div>
 

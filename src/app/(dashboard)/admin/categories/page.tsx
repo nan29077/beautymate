@@ -62,7 +62,7 @@ export default async function AdminCategoriesPage() {
       <div className="bg-gradient-to-r from-brand-50 to-purple-50 rounded-xl border border-brand-100 p-4 mb-6">
         <div className="flex items-start gap-3">
           <div className="w-8 h-8 rounded-lg bg-brand-100 flex items-center justify-center flex-shrink-0">
-            <Icon name="Package" size={16} className="text-brand-600" />
+            <Icon name="Gem" size={16} className="text-brand-600" />
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-900">카테고리 구조</p>

@@ -44,7 +44,7 @@ export default async function AdminSettlementsPage() {
     }),
   );
 
-  // 사주메이트 수익 — /admin/revenue 와 동일한 계산(lib/revenue.ts)을 사용한다.
+  // 사주나라 수익 — /admin/revenue 와 동일한 계산(lib/revenue.ts)을 사용한다.
   // 두 화면이 각자 다른 공식을 쓰면 같은 지표가 서로 다른 숫자를 내므로 하나로 모은다.
   const revenue = await getPlatformRevenue({ fees });
   const platformRevenue = revenue.netRevenue;

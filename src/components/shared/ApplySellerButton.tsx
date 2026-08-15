@@ -33,7 +33,7 @@ export default function ApplySellerButton({ initialApplied }: { initialApplied: 
       className="w-full flex items-center gap-3 rounded-2xl border border-gray-900 bg-gray-900 text-white px-4 py-3.5 active:scale-[0.99] transition-transform"
     >
       <div className="w-9 h-9 rounded-full bg-brand-500 flex items-center justify-center text-black flex-shrink-0">
-        <Icon name="Store" size={16} strokeWidth={2} />
+        <Icon name="Sparkles" size={16} strokeWidth={2} />
       </div>
       <div className="flex-1 min-w-0 text-left">
         <p className="text-sm font-bold">상담사로 입점 신청하기</p>

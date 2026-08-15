@@ -73,7 +73,7 @@ export default function ConsultantAvatarPicker({ currentImage, hasShopLogo = fal
             </p>
           )}
           <p className="text-[10px] text-gray-400 mt-2">
-            사주메이트 동물 캐릭터 {SAJU_CUSTOMER_AVATARS.length}종 중에서 고르거나 직접 올릴 수 있어요.
+            사주나라 동물 캐릭터 {SAJU_CUSTOMER_AVATARS.length}종 중에서 고르거나 직접 올릴 수 있어요.
           </p>
         </div>
       </div>

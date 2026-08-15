@@ -3,7 +3,7 @@
 import BrandWordmark from "@/components/shared/BrandWordmark";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Instagram, Youtube, Mail } from "lucide-react";
+import { Instagram, Youtube, Mail, Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { FeatureFlags, SocialLinks } from "@/lib/featureFlags";
 import type { FooterSettings } from "@/lib/settings";
@@ -87,6 +87,15 @@ export default function Footer({
               <li><Link href="/support/contact" className="text-xs hover:text-white transition-colors">1대1 문의</Link></li>
               <li><Link href="/support/faq" className="text-xs hover:text-white transition-colors">자주 묻는 질문</Link></li>
               <li><Link href="/support/shipping" className="text-xs hover:text-white transition-colors">상담 방식 안내</Link></li>
+              <li>
+                <a
+                  href="/sajunara-brochure.pdf"
+                  download="사주나라-서비스소개서.pdf"
+                  className="inline-flex items-center gap-1 text-xs text-gray-300 hover:text-white transition-colors"
+                >
+                  <Download size={12} strokeWidth={1.8} /> 서비스 소개서 (PDF)
+                </a>
+              </li>
             </ul>
           </div>
         </div>

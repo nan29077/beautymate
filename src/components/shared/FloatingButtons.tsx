@@ -91,10 +91,10 @@ export default function FloatingButtons() {
   useEffect(() => {
     if (showChat && chatMessages.length === 0) {
       const greeting = contactSettings
-        ? `안녕하세요! 사주메이트 고객센터입니다.
+        ? `안녕하세요! 사주나라 고객센터입니다.
 ${contactSettings.operatingHours} | ${contactSettings.lunchBreak}
 궁금한 점이 있으시면 아래 질문을 선택하거나 직접 입력해주세요.`
-        : "안녕하세요! 사주메이트 고객센터입니다. 궁금한 점이 있으시면 아래 자주 묻는 질문을 선택하거나, 직접 입력해주세요.";
+        : "안녕하세요! 사주나라 고객센터입니다. 궁금한 점이 있으시면 아래 자주 묻는 질문을 선택하거나, 직접 입력해주세요.";
       setChatMessages([{ role: "bot", text: greeting }]);
     }
   }, [showChat]);
@@ -223,7 +223,7 @@ ${contactSettings.operatingHours} | ${contactSettings.lunchBreak}
             {/* Header */}
             <div className="bg-brand-600 text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-2">
-                <Bot size={18} /> <span className="text-sm font-bold">사주메이트 FAQ</span>
+                <Bot size={18} /> <span className="text-sm font-bold">사주나라 FAQ</span>
               </div>
               <div className="flex items-center gap-1">
                 <button onClick={handleEndChat} className="p-1 hover:bg-white/20 rounded-lg text-[10px] px-2 py-1 bg-white/10">종료</button>

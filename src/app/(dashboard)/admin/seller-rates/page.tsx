@@ -170,7 +170,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="InviteFriend" size={10} className="text-green-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>2단계:</b> 팬 "김민수"가 추천 코드를 입력하여 사주메이트에 회원가입 (회원가입 시 <b className="text-purple-600">추천인 할인 5%</b> 즉시 적용)
+                    <b>2단계:</b> 팬 "김민수"가 추천 코드를 입력하여 사주나라에 회원가입 (회원가입 시 <b className="text-purple-600">추천인 할인 5%</b> 즉시 적용)
                   </div>
                 </div>
                 <div className="flex items-start gap-2">

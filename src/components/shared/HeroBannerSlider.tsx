@@ -97,7 +97,7 @@ export default function HeroBannerSlider({ banners, liveCampaignCount = 0 }: Her
       ? banners.map((b, i) => ({
           id: b.id,
           title: b.title,
-          subtitle: b.subtitle || "SAJUMATE CURATED",
+          subtitle: b.subtitle || "SAJUNARA CURATED",
           imageUrl: b.imageUrl,
           linkUrl: b.linkUrl || "/",
           gradient: DEFAULT_BANNERS[i % DEFAULT_BANNERS.length].gradient,

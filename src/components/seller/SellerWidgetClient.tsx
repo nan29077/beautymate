@@ -154,7 +154,7 @@ export default function SellerWidgetClient({
     if (!qrDataUrl) return;
     const a = document.createElement("a");
     a.href = qrDataUrl;
-    a.download = `사주메이트-예약QR-${slug}.png`;
+    a.download = `사주나라-예약QR-${slug}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

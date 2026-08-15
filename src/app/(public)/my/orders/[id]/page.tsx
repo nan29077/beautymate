@@ -286,7 +286,7 @@ export default async function OrderDetailPage({
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[11px] text-gray-400 flex items-center gap-1">
-              <Icon name="Store" size={11} /> 라이브 점집
+              <Icon name="Sparkles" size={11} /> 라이브 점집
             </p>
             <p className="text-sm font-semibold text-gray-900 truncate">
               {order.seller.shopName}
@@ -297,7 +297,7 @@ export default async function OrderDetailPage({
         {/* 예약 상담상품 */}
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-50 flex items-center gap-1.5">
-            <Icon name="Package" size={14} className="text-gray-400" />
+            <Icon name="Gem" size={14} className="text-gray-400" />
             <h2 className="text-sm font-bold text-gray-900">예약 상담상품</h2>
             {order.campaign && (
               <span className="text-[10px] text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded-full ml-1">

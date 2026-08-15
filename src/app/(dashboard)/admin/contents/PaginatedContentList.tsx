@@ -115,7 +115,7 @@ function AdminContentRow({
       {linkedProducts.length > 0 && (
         <div className="mt-2 ml-[76px]">
           <div className="flex items-center gap-1 mb-1.5">
-            <Icon name="Package" size={10} className="text-brand-500" />
+            <Icon name="Gem" size={10} className="text-brand-500" />
             <span className="text-[10px] text-brand-500 font-medium">내 상담상품 연계 ({linkedProducts.length})</span>
           </div>
           <div className="flex flex-wrap gap-1.5">

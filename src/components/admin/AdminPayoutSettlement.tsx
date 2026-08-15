@@ -101,7 +101,7 @@ export default function AdminPayoutSettlement({ totals, payouts }: Props) {
         <SummaryCard icon={<Icon name="Clock" size={16} className="text-orange-500" />} label={`정산 대기 (영업일 ${totals.businessDays}일 이전)`} value={won(totals.pendingTotal)} tone="bg-white" />
         <SummaryCard icon={<Icon name="Wallet" size={16} className="text-emerald-600" />} label="정산 가능액" value={won(totals.availableTotal)} tone="bg-white" />
         <SummaryCard icon={<Icon name="Share" size={16} className="text-indigo-600" />} label="정산 요청금액" value={won(totals.requestedTotal)} tone="bg-indigo-50" />
-        <SummaryCard icon={<PiggyBank size={16} className="text-brand-600" />} label="사주메이트 수익 (판매가 기준, PG 2.86% 제외)" value={won(totals.platformRevenue)} tone="bg-brand-50" />
+        <SummaryCard icon={<PiggyBank size={16} className="text-brand-600" />} label="사주나라 수익 (판매가 기준, PG 2.86% 제외)" value={won(totals.platformRevenue)} tone="bg-brand-50" />
       </div>
 
       {/* 출금요청 리스트 */}

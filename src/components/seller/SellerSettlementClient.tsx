@@ -342,11 +342,11 @@ export default function SellerSettlementClient({
           </h3>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-[11px]">
-              <span className="flex items-center gap-1 text-gray-500"><Icon name="Store" size={11} /> 총 판매금액</span>
+              <span className="flex items-center gap-1 text-gray-500"><Icon name="Sparkles" size={11} /> 총 판매금액</span>
               <span className="font-semibold text-gray-800">{formatPrice(summary.totalGrossAmount)}</span>
             </div>
             <div className="flex items-center justify-between text-[11px]">
-              <span className="flex items-center gap-1 text-rose-500"><Icon name="Package" size={11} /> 공급가 차감 (브랜드 정산)</span>
+              <span className="flex items-center gap-1 text-rose-500"><Icon name="Gem" size={11} /> 공급가 차감 (브랜드 정산)</span>
               <span className="font-semibold text-rose-600">- {formatPrice(summary.totalSupplyAmount)}</span>
             </div>
             <div className="flex items-center justify-between text-[11px]">
@@ -600,7 +600,7 @@ export default function SellerSettlementClient({
                     <div className="flex items-center justify-between">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
-                          {o.type === "groupbuy" ? <Icon name="Cart" size={11} className="text-emerald-500 flex-shrink-0" /> : <Icon name="Package" size={11} className="text-gray-400 flex-shrink-0" />}
+                          {o.type === "groupbuy" ? <Icon name="Cart" size={11} className="text-emerald-500 flex-shrink-0" /> : <Icon name="Gem" size={11} className="text-gray-400 flex-shrink-0" />}
                           <span className="text-[11px] font-medium text-gray-700 truncate">
                             {o.campaignTitle || "일반 판매"}
                           </span>
@@ -833,7 +833,7 @@ export default function SellerSettlementClient({
                 <div>
                   <div className="flex items-center gap-1.5 mb-2">
                     <span className="text-[10px] font-bold bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded flex items-center gap-1">
-                      <Icon name="Package" size={10} /> B타입 · 상담상품신청 판매
+                      <Icon name="Gem" size={10} /> B타입 · 상담상품신청 판매
                     </span>
                     <span className="text-[10px] text-gray-400">판매가 − 공급가가 정산 기준</span>
                   </div>
@@ -1029,7 +1029,7 @@ export default function SellerSettlementClient({
                   <Building2 size={14} className="text-blue-500 flex-shrink-0 mt-0.5" />
                   <p className="text-[11px] text-blue-700">
                     사업자 상담사에게는 원천징수 없이 정산액 전액이 지급되며,
-                    <b> 사주메이트(주식회사 이십세기소년들)가 매입 세금계산서를 발행</b>합니다.
+                    <b> 사주나라(테스트 주식회사)가 매입 세금계산서를 발행</b>합니다.
                     입력하신 상호명·사업자등록번호 기준으로 발행됩니다.
                   </p>
                 </div>

@@ -117,7 +117,7 @@ export default function SellerLivePage() {
 
   // ★ 테마 옵션
   const THEME_OPTIONS = [
-    { id: "default", name: "기본", color: "#6366f1", desc: "사주메이트 기본 테마" },
+    { id: "default", name: "기본", color: "#6366f1", desc: "사주나라 기본 테마" },
     { id: "modern", name: "모던", color: "#111827", desc: "심플하고 세련된 블랙" },
     { id: "simple", name: "심플", color: "#0ea5e9", desc: "깔끔한 스카이블루" },
     { id: "lovely", name: "러블리", color: "#ec4899", desc: "사랑스러운 핑크" },
@@ -780,7 +780,7 @@ export default function SellerLivePage() {
                 {[
                   { n: 1, text: "유튜브 스튜디오(studio.youtube.com)에서 라이브 방송 시작" },
                   { n: 2, text: "방송 중인 유튜브 URL 복사\n(예: youtube.com/watch?v=xxxx 또는 youtu.be/xxxx)" },
-                  { n: 3, text: "사주메이트 라이브 생성 → URL 입력란에 붙여넣기" },
+                  { n: 3, text: "사주나라 라이브 생성 → URL 입력란에 붙여넣기" },
                   { n: 4, text: "라이브 시작 클릭" },
                 ].map(s => (
                   <div key={s.n} className="flex gap-3 items-start">
@@ -828,7 +828,7 @@ export default function SellerLivePage() {
               <div className="space-y-2.5">
                 {[
                   { n: 1, text: "유튜브 채널 URL 또는 채널 ID 확인\n(유튜브 채널 페이지 → 더보기 → 채널 정보)" },
-                  { n: 2, text: "사주메이트 라이브 생성 → 채널 ID/URL 입력" },
+                  { n: 2, text: "사주나라 라이브 생성 → 채널 ID/URL 입력" },
                   { n: 3, text: "'라이브 자동 감지' 버튼 클릭 → 현재 라이브 중인 영상 자동 세팅" },
                   { n: 4, text: "라이브 시작 클릭" },
                 ].map(s => (
@@ -1284,7 +1284,7 @@ export default function SellerLivePage() {
                   </div>
                 )}
 
-                {/* 상담상품 탭 (내 상담상품 / 사주메이트 상담상품) */}
+                {/* 상담상품 탭 (내 상담상품 / 사주나라 상담상품) */}
                 {(() => {
                   const ownCount = products.filter(p => p.isOwn).length;
                   const brickCount = products.length - ownCount;
@@ -1302,7 +1302,7 @@ export default function SellerLivePage() {
                         onClick={() => setProductTab("brick")}
                         className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${productTab === "brick" ? "bg-white text-brand-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
                       >
-                        사주메이트 상담상품 <span className="text-[10px] text-gray-400">({brickCount})</span>
+                        사주나라 상담상품 <span className="text-[10px] text-gray-400">({brickCount})</span>
                       </button>
                     </div>
                   );
@@ -1317,7 +1317,7 @@ export default function SellerLivePage() {
                         <p className="text-xs text-gray-400 text-center py-8">
                           {productTab === "own"
                             ? "직접 등록한 상담상품이 없습니다. 상담상품관리에서 등록해주세요."
-                            : "점집에 추가한 사주메이트 상담상품이 없습니다. 상담상품관리에서 추가해주세요."}
+                            : "점집에 추가한 사주나라 상담상품이 없습니다. 상담상품관리에서 추가해주세요."}
                         </p>
                       );
                     }
@@ -1693,11 +1693,11 @@ export default function SellerLivePage() {
                   msg.isHidden ? "bg-gray-50 border border-gray-100 opacity-50 line-through" : "bg-white border border-gray-100"
                 }`}>
                   <span className="font-bold inline-flex items-center gap-1 align-middle">
-                    {/* 출처 배지: YouTube 실시간 채팅 vs 사주메이트 앱 채팅 */}
+                    {/* 출처 배지: YouTube 실시간 채팅 vs 사주나라 앱 채팅 */}
                     {msg.isYoutube ? (
                       <span title="YouTube 채팅" className="inline-flex items-center px-1 py-[1px] rounded bg-[#FF0000] text-white text-[8px] font-bold leading-none">YT</span>
                     ) : (!msg.isBot && !msg.isManager && !msg.isSystem) ? (
-                      <img src="/favicon.png" alt="사주메이트" title="사주메이트 채팅" className="w-3.5 h-3.5 rounded-[3px]" />
+                      <img src="/favicon.png" alt="사주나라" title="사주나라 채팅" className="w-3.5 h-3.5 rounded-[3px]" />
                     ) : null}
                     <span>{msg.isBot ? "🤖 " : msg.isManager ? "📢 " : msg.isSystem ? "📌 " : ""}{msg.nickname}</span>
                   </span>
@@ -2321,7 +2321,7 @@ function LiveCard({ live, onAction, actionLoading, onDetail, onProductManage, on
             {live.scheduledAt && <span><Icon name="Clock" size={10} className="inline mr-0.5" />{formatDate(live.scheduledAt)}</span>}
             <span><Icon name="Eye" size={10} className="inline mr-0.5" />{live.viewerCount}</span>
             <span><Icon name="Wishlist" size={10} className="inline mr-0.5" />{live.likeCount}</span>
-            <span><Icon name="Package" size={10} className="inline mr-0.5" />{live._count.products}개</span>
+            <span><Icon name="Gem" size={10} className="inline mr-0.5" />{live._count.products}개</span>
             <span><Icon name="Message" size={10} className="inline mr-0.5" />{live._count.chatMessages}</span>
           </div>
         </div>
@@ -2824,7 +2824,7 @@ function StreamSetupModal({ live, onClose, onSaved, copyToClipboard }: {
           <p className="text-[12px] text-amber-800 leading-relaxed">
             YouTube 스튜디오에서 발급받은 <b>스트림 키</b>를 아래에 저장하고,
             OBS 또는 PRISM Live에 서버 주소와 함께 입력하면 유튜브로 송출됩니다.
-            송출이 시작되면 사주메이트 시청 페이지에 유튜브 방송이 자동으로 표시돼요.
+            송출이 시작되면 사주나라 시청 페이지에 유튜브 방송이 자동으로 표시돼요.
           </p>
         </div>
 

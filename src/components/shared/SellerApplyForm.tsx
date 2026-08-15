@@ -101,7 +101,7 @@ export default function SellerApplyForm({ initialApplied, initialApproved, isLog
       className="w-full flex items-center gap-3 rounded-2xl bg-gray-900 text-white px-5 py-4 active:scale-[0.99] transition-transform disabled:opacity-60"
     >
       <div className="w-10 h-10 rounded-full bg-brand-500 flex items-center justify-center text-black flex-shrink-0">
-        {loading ? <Loader2 size={18} className="animate-spin" /> : <Icon name="Store" size={18} strokeWidth={2} />}
+        {loading ? <Loader2 size={18} className="animate-spin" /> : <Icon name="Sparkles" size={18} strokeWidth={2} />}
       </div>
       <div className="flex-1 min-w-0 text-left">
         <p className="text-[14px] font-extrabold">상담사 입점신청하기</p>

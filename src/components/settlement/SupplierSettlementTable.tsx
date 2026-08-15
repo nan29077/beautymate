@@ -37,7 +37,7 @@ export default function SupplierSettlementTable({ orders, feeRate, supplyLabel =
     <section className="bg-white rounded-2xl border border-gray-100 p-4">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
-          <Icon name="Package" size={16} className="text-brand-600" /> 공급자 정산 내역
+          <Icon name="Gem" size={16} className="text-brand-600" /> 공급자 정산 내역
         </h2>
         <span className="inline-flex items-center gap-1 text-[11px] text-gray-500 bg-gray-50 border border-gray-100 rounded-lg px-2 py-1">
           <Icon name="Discount" size={12} className="text-gray-400" /> 플랫폼 수수료 {feeRate}% (부가세 포함)
@@ -46,7 +46,7 @@ export default function SupplierSettlementTable({ orders, feeRate, supplyLabel =
 
       {orders.length === 0 ? (
         <div className="text-center py-10 text-gray-400">
-          <Icon name="Package" size={34} strokeWidth={1.5} className="mx-auto mb-2 opacity-30" />
+          <Icon name="Gem" size={34} strokeWidth={1.5} className="mx-auto mb-2 opacity-30" />
           <p className="text-xs">정산 대상 판매 내역이 없습니다.</p>
         </div>
       ) : (

@@ -53,7 +53,7 @@ export async function GET(request: Request) {
       isLive: isSellerLive(s),
       liveHref: (() => {
         const live = s.liveStreams?.[0];
-        // 진행중 인앱 라이브는 항상 사주메이트 시청페이지로 연결 (외부 URL 직접연결 금지)
+        // 진행중 인앱 라이브는 항상 사주나라 시청페이지로 연결 (외부 URL 직접연결 금지)
         if (live) return `/live/${live.shareCode}`;
         if (s.liveLink) return s.liveLink;
         return null;

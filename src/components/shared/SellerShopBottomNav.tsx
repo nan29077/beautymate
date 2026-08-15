@@ -18,7 +18,7 @@ export default function SellerShopBottomNav({
   const router = useRouter();
   const { data: session } = useSession();
   const shopPath = `/shop/${encodeURIComponent(sellerSlug)}`;
-  const loginPath = `/auth/login?callbackUrl=${encodeURIComponent(shopPath)}`;
+  const loginPath = `/shop/${encodeURIComponent(sellerSlug)}/login`;
 
   const items = [
     {

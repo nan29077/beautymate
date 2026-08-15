@@ -5,7 +5,7 @@
 import { getSettingsMap, setSettings } from "@/lib/settings";
 
 // ⚠️ 키를 v2 로 올린 이유 (2026-08-12)
-// 운영 DB Setting 테이블에 사주메이트 시절 값이 남아 코드 기본값을 덮어쓰고 있었다.
+// 운영 DB Setting 테이블에 사주나라 시절 값이 남아 코드 기본값을 덮어쓰고 있었다.
 //   home.stats    → "30억+ 누적 거래액", "50+ 활동 라이브 셀러", "98% 배송 만족도"
 //   home.benefits → "68% 단골 재구매율", "3.2x 라이브 평균 체류", "정산·배송 걱정 없이"
 // DB 값이 코드 기본값보다 우선하는 구조라 기본값만 고쳐서는 화면이 바뀌지 않는다.
@@ -25,7 +25,7 @@ export type HomeBenefitStat = { value: string; label: string; sub: string };
 export type HomeBenefitItem = { iconType: string; title: string; desc: string };
 export type HomeBenefits = { stats: HomeBenefitStat[]; items: HomeBenefitItem[] };
 
-// "숫자로 보는 사주메이트" 기본값
+// "숫자로 보는 사주나라" 기본값
 export const DEFAULT_HOME_STATS: HomeStat[] = [
   { value: "24시간", label: "온라인 예약 접수" },
   { value: "1분", label: "남은 시간 확인" },
@@ -33,7 +33,7 @@ export const DEFAULT_HOME_STATS: HomeStat[] = [
   { value: "LIVE", label: "방송 연동 상담" },
 ];
 
-// "사주메이트로 성공한 상담사" 기본값
+// "사주나라로 성공한 상담사" 기본값
 export const DEFAULT_HOME_STORIES: HomeStory[] = [
   { name: "월령 · 사주명리 상담사", quote: "방송 설명란에 예약 링크만 연결했는데 입금 확인과 시간 조율이 한 번에 정리됐어요. 이제 상담 자체에 더 집중합니다.", metric: "예약·결제 자동화", avatar: "/avatars/saju/saju-avatar-01.png" },
   { name: "연화 · 타로 상담사", quote: "라이브 중 남은 상담 시간이 바로 보여서 시청자도 편하게 예약해요. 방송이 끝난 뒤 따로 메시지를 정리할 일이 줄었습니다.", metric: "라이브 예약 연결", avatar: "/avatars/saju/saju-avatar-14.png" },
@@ -41,10 +41,10 @@ export const DEFAULT_HOME_STORIES: HomeStory[] = [
   { name: "청아 · 궁합 상담사", quote: "유튜브 채팅과 예약 화면이 이어지니 시청자가 방송을 보다가 자연스럽게 원하는 시간을 선택합니다.", metric: "유튜브 LIVE 연동", avatar: "/avatars/saju/saju-avatar-25.png" },
 ];
 
-// "상담사가 사주메이트를 선택하는 이유" 기본값 — 상담사 관점
+// "상담사가 사주나라를 선택하는 이유" 기본값 — 상담사 관점
 //
 // ⚠️ 수치 표기 원칙: 여기 값은 "플랫폼이 제공하는 것"을 나타내는 기능형 수치다.
-// 재구매율·전환율 같은 성과 지표는 실측 데이터 없이 쓰지 않는다. (사주메이트 시절
+// 재구매율·전환율 같은 성과 지표는 실측 데이터 없이 쓰지 않는다. (사주나라 시절
 // "68% 단골 재구매율", "3.2x 라이브 평균 체류" 는 근거 없는 수치였다.)
 // 실제 성과 수치가 필요하면 Reservation 집계로 계산해 주입할 것 — docs 참고.
 export const DEFAULT_HOME_BENEFITS: HomeBenefits = {

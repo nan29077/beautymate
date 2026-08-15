@@ -372,7 +372,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
         <div className="divide-y divide-gray-50">
           {filtered.length === 0 ? (
             <div className="text-center py-12 text-gray-400">
-              <Icon name="Package" size={36} className="mx-auto mb-2 opacity-30" />
+              <Icon name="Gem" size={36} className="mx-auto mb-2 opacity-30" />
               <p className="text-sm">{searchQuery ? "검색 결과가 없습니다." : "등록된 상담상품이 없습니다."}</p>
             </div>
           ) : paged.map((product) => {

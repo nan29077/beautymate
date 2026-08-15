@@ -1,9 +1,9 @@
 // 앱 전반 기본 이미지(placeholder) 통일.
-// - 상담상품 썸네일 없음 → 사주메이트 브랜드 placeholder(자체 SVG)
+// - 상담상품 썸네일 없음 → 사주나라 브랜드 placeholder(자체 SVG)
 // - 점집 상단 배경 기본값 → 깔끔한 실사 이미지(unsplash)
 // - 역할별 프로필 기본 이미지 → 역할별 캐릭터 아바타(public/avatars/*.png)
 
-// 사주메이트 전용 "노이미지" placeholder (public/no-image.png — 노랑+검정 브랜드 톤)
+// 사주나라 전용 "노이미지" placeholder (public/no-image.png — 노랑+검정 브랜드 톤)
 // 상담상품 썸네일이 없거나(null/빈 문자열) 로드 실패할 때 모든 화면에서 이 이미지를 표시.
 export const NO_IMAGE = "/no-image.png";
 
@@ -30,7 +30,7 @@ export const BUYER_FEMALE_AVATARS = Array.from({ length: 13 }, (_, i) => `/avata
 export const BUYER_MALE_AVATARS = Array.from({ length: 13 }, (_, i) => `/avatars/남성구매회원_${i + 1}.png`);
 export const ALL_BUYER_AVATARS = [...BUYER_FEMALE_AVATARS, ...BUYER_MALE_AVATARS];
 
-// 사주메이트 랜덤 동물 캐릭터(30종) — 십이지신 계열 동물 + 한복 + 밤하늘/달·별 일러스트.
+// 사주나라 랜덤 동물 캐릭터(30종) — 십이지신 계열 동물 + 한복 + 밤하늘/달·별 일러스트.
 // 일반 가입 고객·최고관리자·상담사가 모두 이 풀을 공유한다.
 // 상담사 개인 샵(?ref=<slug>)으로 가입한 고객은 기존 구매회원 캐릭터 풀을 그대로 사용한다.
 export const SAJU_CUSTOMER_AVATARS = Array.from(
@@ -39,7 +39,7 @@ export const SAJU_CUSTOMER_AVATARS = Array.from(
 );
 
 // 상담사 캐릭터 풀 — 사주 동물 캐릭터를 그대로 사용한다.
-// (사주메이트 시절 꿀벌 캐릭터 /avatars/라이브셀러_*.png 는 폐기)
+// (사주나라 시절 꿀벌 캐릭터 /avatars/라이브셀러_*.png 는 폐기)
 export const SELLER_AVATARS = SAJU_CUSTOMER_AVATARS;
 
 // 전체 아바타 목록 (NodeSettingsClient 등에서 선택 UI용)
@@ -120,8 +120,8 @@ export function randomSajuAvatar(): string {
   return SAJU_CUSTOMER_AVATARS[Math.floor(Math.random() * SAJU_CUSTOMER_AVATARS.length)];
 }
 
-// 사주메이트 시절 번들 캐릭터(/avatars/*.png — 꿀벌 상담사·구매회원 등) 여부.
-// /avatars/saju/* 는 사주메이트 전용 캐릭터이므로 레거시가 아니다.
+// 사주나라 시절 번들 캐릭터(/avatars/*.png — 꿀벌 상담사·구매회원 등) 여부.
+// /avatars/saju/* 는 사주나라 전용 캐릭터이므로 레거시가 아니다.
 export function isLegacyBundledAvatar(path?: string | null): boolean {
   return Boolean(path?.startsWith("/avatars/") && !path.startsWith("/avatars/saju/"));
 }
@@ -141,12 +141,12 @@ export function resolveConsultantAvatar(seed: string, currentAvatar?: string | n
   return pickSajuAvatar(seed);
 }
 
-// ─── 점집 기본 배너 (public/images/banners/*.svg) ───────────────────────────
-// 배너를 올리지 않은 상담사에게 점집·사주 분위기의 기본 배너를 배정한다.
+// ─── 점집 기본 배너 (생성형 이미지 5종) ──────────────────────────────────────
+// 배너를 올리지 않은 상담사에게 사주나라의 보라·금빛 분위기를 담은 기본 배너를 배정한다.
 // 상담사 id 해시 기반이라 같은 상담사는 항상 같은 배너를 본다.
 export const SHOP_BANNERS = Array.from(
-  { length: 6 },
-  (_, i) => `/images/banners/shop-banner-${String(i + 1).padStart(2, "0")}.svg`,
+  { length: 5 },
+  (_, i) => `/images/banners/sajunara/shop-default-${String(i + 1).padStart(2, "0")}.jpg`,
 );
 
 export function pickShopBanner(seed: string): string {

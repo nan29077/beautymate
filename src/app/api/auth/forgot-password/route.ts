@@ -77,11 +77,11 @@ export async function POST(request: NextRequest) {
     const tempPassword = generateTempPassword();
     const hashed = await bcrypt.hash(tempPassword, 12);
 
-    const message = `[사주메이트] 임시 비밀번호는 [${tempPassword}] 입니다. 로그인 후 반드시 새 비밀번호로 변경해주세요.`;
+    const message = `[사주나라] 임시 비밀번호는 [${tempPassword}] 입니다. 로그인 후 반드시 새 비밀번호로 변경해주세요.`;
     const sms = await sendSms({
       receiver: normalizedPhone,
       message,
-      title: "사주메이트 임시 비밀번호",
+      title: "사주나라 임시 비밀번호",
     });
 
     await logAligoSend({

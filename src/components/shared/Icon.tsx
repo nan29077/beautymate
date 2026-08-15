@@ -77,6 +77,9 @@ import {
   Percent,
   QrCode,
   WifiOff,
+  Moon,
+  MoonStar,
+  Gem,
   type LucideIcon,
 } from "lucide-react";
 
@@ -159,6 +162,9 @@ const SYSTEM_ICONS: Record<string, LucideIcon> = {
   Coupon: TicketPercent,
   Menu,
   // ─ 관리자 사이드바 전용 (모두 lucide 라인 아이콘으로 통일) ─
+  Gem: Gem,
+  Moon: Moon,
+  MoonStar: MoonStar,
   Dashboard: LayoutDashboard,
   Event: CalendarClock,
   Settlement: Landmark,

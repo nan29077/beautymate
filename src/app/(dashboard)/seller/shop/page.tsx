@@ -104,7 +104,7 @@ export default async function SellerShopPage() {
         <p className="text-[10px] text-gray-400 mb-3">
           {seller.shopBanner
             ? "직접 등록하신 배너입니다. 위 '점집 배너 이미지'에서 변경할 수 있어요."
-            : "배너를 등록하지 않아 사주메이트 기본 배너가 자동 적용됐습니다. 직접 등록하면 교체됩니다."}
+            : "배너를 등록하지 않아 사주나라 기본 배너가 자동 적용됐습니다. 직접 등록하면 교체됩니다."}
         </p>
         <div className="w-full h-32 rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
           <img src={displayBanner} alt="점집 배너 미리보기" className="w-full h-full object-cover" />
@@ -140,7 +140,7 @@ export default async function SellerShopPage() {
             <Icon name="Star" size={14} strokeWidth={1.5} className="text-brand-500" />
             <span className="font-semibold">{seller._count.campaigns}</span> 캠페인
           </div>
-          {/* 사주메이트: 추천인 통계 미사용 */}
+          {/* 사주나라: 추천인 통계 미사용 */}
         </div>
       </div>
 

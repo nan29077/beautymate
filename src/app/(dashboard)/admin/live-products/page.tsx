@@ -103,7 +103,7 @@ export default function AdminLiveProductsPage() {
       {/* Stats */}
       <div className="grid grid-cols-1 min-[430px]:grid-cols-3 gap-2 sm:gap-3 mb-5">
         <div className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4">
-          <Icon name="Package" size={16} className="text-gray-400 mb-1" />
+          <Icon name="Gem" size={16} className="text-gray-400 mb-1" />
           <p className="text-lg font-bold">{products.length}</p>
           <p className="text-[10px] text-gray-400">전체 상담상품</p>
         </div>
@@ -210,7 +210,7 @@ export default function AdminLiveProductsPage() {
         ))}
         {filtered.length === 0 && (
           <div className="text-center py-16 bg-white rounded-xl border border-gray-100">
-            <Icon name="Package" size={36} className="mx-auto text-gray-200 mb-3" />
+            <Icon name="Gem" size={36} className="mx-auto text-gray-200 mb-3" />
             <p className="text-sm text-gray-400">조건에 맞는 상담상품이 없습니다</p>
 
           <p className="text-sm text-gray-400">조건에 맞는 상담상품이 없습니다</p>

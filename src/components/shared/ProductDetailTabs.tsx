@@ -124,7 +124,7 @@ function StandardRefundCard() {
         <div className="flex items-center gap-2">
           <Sparkles size={30} strokeWidth={1.4} className="w-9 h-9 text-amber-700" aria-hidden="true" />
           <div>
-            <p className="text-[13.5px] font-extrabold text-amber-900 leading-tight">사주메이트 표준 교환·환불 안내</p>
+            <p className="text-[13.5px] font-extrabold text-amber-900 leading-tight">사주나라 표준 교환·환불 안내</p>
             <p className="text-[10.5px] text-amber-700/80 mt-0.5">모든 상담상품에 공통 적용되는 규정이에요</p>
           </div>
         </div>

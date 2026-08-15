@@ -157,7 +157,7 @@ export default function GameFields({
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1.5">키워드</label>
             <input value={config.keyword ?? ""} onChange={(e) => cfg("keyword", e.target.value)}
-              placeholder="예) 사주메이트" maxLength={30} className={inputCls} />
+              placeholder="예) 사주나라" maxLength={30} className={inputCls} />
             <Hint>시청자가 채팅에 입력해야 하는 정확한 단어를 입력하세요. 대소문자는 구분하지 않습니다.</Hint>
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -225,7 +225,7 @@ export default function GameFields({
             <input
               value={type === "QUIZ" ? (config.question ?? "") : (config.topic ?? "")}
               onChange={(e) => cfg(type === "QUIZ" ? "question" : "topic", e.target.value)}
-              placeholder={type === "QUIZ" ? "예) 사주메이트 마스코트는?" : "예) 다음 라이브 상담상품은?"}
+              placeholder={type === "QUIZ" ? "예) 사주나라 마스코트는?" : "예) 다음 라이브 상담상품은?"}
               maxLength={80} className={inputCls}
             />
           </div>

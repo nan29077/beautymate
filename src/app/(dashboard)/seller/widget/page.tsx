@@ -20,7 +20,7 @@ export default async function SellerWidgetPage() {
   if (!seller) redirect("/");
 
   // 상담사에게 안내할 절대 URL 의 기준 도메인. 클라이언트에서 현재 origin 으로 보정한다.
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://sajumate.co.kr";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://sajunara.co.kr";
 
   return (
     <SellerWidgetClient

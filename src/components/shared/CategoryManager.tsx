@@ -295,7 +295,7 @@ export default function CategoryManager({ initialCategories }: { initialCategori
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         {categories.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
-            <Icon name="Package" size={36} className="mx-auto mb-3 opacity-30" />
+            <Icon name="Gem" size={36} className="mx-auto mb-3 opacity-30" />
             <p className="text-sm">등록된 카테고리가 없습니다</p>
             <p className="text-xs mt-1">메인 페이지에 표시할 카테고리를 추가하세요</p>
           </div>

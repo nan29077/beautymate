@@ -110,7 +110,7 @@ export default function ProductSalesDetail({ productId, productName, thumbnail, 
                 </div>
               ) : !data || data.sellerSales.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">
-                  <Icon name="Package" size={36} className="mx-auto mb-2 opacity-30" />
+                  <Icon name="Gem" size={36} className="mx-auto mb-2 opacity-30" />
                   <p className="text-sm">판매 상담사가 없습니다</p>
                 </div>
               ) : (

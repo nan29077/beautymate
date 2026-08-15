@@ -82,7 +82,7 @@ export async function sendSms(opts: {
   params.set("receiver", phone);
   params.set("msg", message);
   params.set("msg_type", isLms ? "LMS" : "SMS");
-  if (isLms) params.set("title", (opts.title || "사주메이트").slice(0, 20));
+  if (isLms) params.set("title", (opts.title || "사주나라").slice(0, 20));
   params.set("testmode_yn", IS_TEST ? "Y" : "N");
 
   try {

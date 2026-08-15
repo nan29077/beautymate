@@ -118,7 +118,7 @@ export default function HomeContentManager({
       <section className="bg-white rounded-xl border border-gray-100 p-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
-            <Quote size={15} className="text-brand-600" /> 사주메이트로 성공한 상담사
+            <Quote size={15} className="text-brand-600" /> 사주나라로 성공한 상담사
           </h2>
           <button
             onClick={() => setStories((p) => [...p, { name: "", quote: "", metric: "", avatar: AVATARS[0] }])}
@@ -160,7 +160,7 @@ export default function HomeContentManager({
 
       <section className="bg-white rounded-xl border border-gray-100 p-4">
         <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5 mb-4">
-          <Sparkles size={15} className="text-brand-600" /> 사주메이트로 얻는 것
+          <Sparkles size={15} className="text-brand-600" /> 사주나라로 얻는 것
         </h2>
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
@@ -213,13 +213,13 @@ export default function HomeContentManager({
           </div>
         </div>
         <SectionSaveButton saving={savingBenefits} label="얻는 것 저장"
-          onClick={() => save(setSavingBenefits, { section: "benefits", benefitStats, benefitItems }, "사주메이트로 얻는 것이 저장되었습니다.")} />
+          onClick={() => save(setSavingBenefits, { section: "benefits", benefitStats, benefitItems }, "사주나라로 얻는 것이 저장되었습니다.")} />
       </section>
 
       <section className="bg-white rounded-xl border border-gray-100 p-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
-            <Icon name="Chart" size={15} className="text-brand-600" /> 숫자로 보는 사주메이트
+            <Icon name="Chart" size={15} className="text-brand-600" /> 숫자로 보는 사주나라
           </h2>
           <button onClick={() => setStats((p) => [...p, { value: "", label: "" }])}
             className="text-xs flex items-center gap-1 text-brand-600 font-medium hover:underline">
@@ -240,7 +240,7 @@ export default function HomeContentManager({
           {stats.length === 0 && <p className="text-xs text-gray-400 py-2">항목이 없습니다. 추가해주세요.</p>}
         </div>
         <SectionSaveButton saving={savingStats} label="숫자 저장"
-          onClick={() => save(setSavingStats, { section: "stats", stats }, "숫자로 보는 사주메이트가 저장되었습니다.")} />
+          onClick={() => save(setSavingStats, { section: "stats", stats }, "숫자로 보는 사주나라가 저장되었습니다.")} />
       </section>
 
     </div>

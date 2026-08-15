@@ -195,7 +195,7 @@ export default function GameJoinClient({
         {/* 상단 로고 헤더 */}
         <header className="mb-5 flex flex-col items-center rounded-2xl bg-white border border-amber-100 py-4 px-6">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <span className="text-[15px] font-extrabold tracking-tight text-[#2d1b69]">사주메이트 GAMES</span>
+          <span className="text-[15px] font-extrabold tracking-tight text-[#2d1b69]">사주나라 GAMES</span>
           <p className="mt-2 text-[11px] font-semibold text-amber-700/70">라이브 게임 참여</p>
         </header>
 
@@ -368,7 +368,7 @@ export default function GameJoinClient({
         </div>
 
         <p className="text-center text-[11px] text-amber-700/50 mt-5">
-          Powered by 사주메이트 라이브 게임
+          Powered by 사주나라 라이브 게임
         </p>
       </div>
     </div>

@@ -20,7 +20,7 @@ export default function ShopShareButton({
   const handleShare = async () => {
     const url = typeof window !== "undefined" ? `${window.location.origin}/shop/${slug}` : `/shop/${slug}`;
     const shareData = {
-      title: `${shopName} | 사주메이트`,
+      title: `${shopName} | 사주나라`,
       text: `${shopName}에서 상담을 예약해 보세요.`,
       url,
     };

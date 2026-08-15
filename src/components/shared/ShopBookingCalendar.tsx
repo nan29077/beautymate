@@ -68,7 +68,7 @@ export default function ShopBookingCalendar({ sellerSlug, slots, themeColor, tod
   const monthLabel = `${cursor.year}년 ${cursor.month + 1}월`;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-4">
+    <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-[18px]">
       <div className="flex items-center gap-1.5 mb-3">
         <CalendarDays size={15} strokeWidth={1.8} style={{ color: themeColor }} />
         <h2 className="text-sm font-bold text-gray-900">예약 달력</h2>

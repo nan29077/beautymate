@@ -614,13 +614,13 @@ export default function PCDirectorSuiteComponent({
                   </div>
                 ) : (
                   <div className="flex items-start gap-1.5">
-                    {/* 출처 배지: YouTube 실시간 채팅 vs 사주메이트 앱 채팅 */}
+                    {/* 출처 배지: YouTube 실시간 채팅 vs 사주나라 앱 채팅 */}
                     {msg.isYoutube ? (
                       <span title="YouTube 채팅" className="inline-flex items-center justify-center h-[15px] px-1 rounded bg-[#FF0000] flex-shrink-0 mt-[1px]">
                         <Youtube size={10} className="text-white" />
                       </span>
                     ) : (
-                      <img src="/favicon.png" alt="사주메이트" title="사주메이트 채팅" className="w-[15px] h-[15px] rounded-[3px] flex-shrink-0 mt-[1px]" />
+                      <img src="/favicon.png" alt="사주나라" title="사주나라 채팅" className="w-[15px] h-[15px] rounded-[3px] flex-shrink-0 mt-[1px]" />
                     )}
                     <div className="min-w-0">
                       <span className="font-semibold text-white/60">{msg.nickname}</span>

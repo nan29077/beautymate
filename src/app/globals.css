@@ -110,7 +110,7 @@
 /* 공개 앱의 PC 좌우 여백 전용 초승달·궤도 패턴.
    OBS/PRISM 위젯과 독립 라이브 화면에는 적용하지 않는다. */
 @media (min-width: 1024px) {
-  .sajumate-public-shell {
+  .sajunara-public-shell {
     position: relative;
     isolation: isolate;
     background-color: #f7f4fc;
@@ -121,8 +121,8 @@
     background-attachment: fixed;
   }
 
-  .sajumate-public-shell::before,
-  .sajumate-public-shell::after {
+  .sajunara-public-shell::before,
+  .sajunara-public-shell::after {
     content: "";
     position: fixed;
     z-index: 0;
@@ -133,8 +133,8 @@
     pointer-events: none;
   }
 
-  .sajumate-public-shell::before { left: -9rem; top: 17vh; }
-  .sajumate-public-shell::after { right: -10rem; bottom: 10vh; }
+  .sajunara-public-shell::before { left: -9rem; top: 17vh; }
+  .sajunara-public-shell::after { right: -10rem; bottom: 10vh; }
 }
 
 /* ── 라이브 뷰어 다크 UI ─────────────────────────────────────────── */

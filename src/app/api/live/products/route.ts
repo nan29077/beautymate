@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 
     // 상담사가 상담상품관리에서 자기 점집에 추가한 상담상품만 노출
     // - 상담사가 직접 등록한 상담상품(브랜드 없음) → 내 상담상품 탭
-    // - 브랜드/관리자 상담상품을 점집에 추가한 것(브랜드 있음) → 사주메이트 상담상품 탭
+    // - 브랜드/관리자 상담상품을 점집에 추가한 것(브랜드 있음) → 사주나라 상담상품 탭
     const shopProducts = await prisma.sellerShopProduct.findMany({
       where: { sellerId: seller.id, isActive: true },
       include: { product: { include: { category: true } } },

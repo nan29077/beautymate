@@ -46,7 +46,7 @@ export const ALIMTALK_PURPOSES: Record<string, AlimtalkPurposeDef> = {
     label: "회원가입 환영 (고객에게)",
     description: "고객 회원가입 직후 환영 메시지 발송 (카카오 승인 조건: 가입 즉시 발송)",
     variables: ["고객명", "셀러샵명"],
-    sampleVariables: { "고객명": "홍길동", "셀러샵명": "사주메이트" },
+    sampleVariables: { "고객명": "홍길동", "셀러샵명": "사주나라" },
   },
 };
 

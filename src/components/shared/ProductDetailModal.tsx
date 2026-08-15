@@ -116,7 +116,7 @@ export default function ProductDetailModal({ productId, productName, triggerClas
             <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-9 h-9 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0">
-                  <Icon name="Package" size={18} className="text-brand-600" />
+                  <Icon name="Gem" size={18} className="text-brand-600" />
                 </div>
                 <div className="min-w-0">
                   <h3 className="text-[15px] font-bold text-gray-900 truncate">{data?.name || productName || "상담상품 상세정보"}</h3>
@@ -136,7 +136,7 @@ export default function ProductDetailModal({ productId, productName, triggerClas
                 </div>
               ) : error ? (
                 <div className="text-center py-20 text-gray-400">
-                  <Icon name="Package" size={36} className="mx-auto mb-2 opacity-30" />
+                  <Icon name="Gem" size={36} className="mx-auto mb-2 opacity-30" />
                   <p className="text-sm">{error}</p>
                 </div>
               ) : data ? (

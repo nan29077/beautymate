@@ -39,13 +39,13 @@ export default function FooterManager({ initialSettings }: { initialSettings: Fo
   };
 
   const fields: { key: keyof FooterSettings; label: string; placeholder: string }[] = [
-    { key: "companyName", label: "상호", placeholder: "주식회사 이십세기소년들" },
-    { key: "ceoName", label: "대표자명", placeholder: "박진혜" },
-    { key: "bizNum", label: "사업자등록번호", placeholder: "662-86-02270" },
-    { key: "mailOrderNum", label: "통신판매신고번호", placeholder: "2022-고양일산서-0400" },
-    { key: "phone", label: "대표번호", placeholder: "070-4158-2540" },
-    { key: "address", label: "주소", placeholder: "경기도 파주시 재두루미길 70, 302호" },
-    { key: "copyright", label: "저작권 문구", placeholder: "2026 사주메이트. All rights reserved." },
+    { key: "companyName", label: "상호", placeholder: "테스트 주식회사" },
+    { key: "ceoName", label: "대표자명", placeholder: "홍길동" },
+    { key: "bizNum", label: "사업자등록번호", placeholder: "000-00-00000" },
+    { key: "mailOrderNum", label: "통신판매신고번호", placeholder: "0000-테스트-0000" },
+    { key: "phone", label: "대표번호", placeholder: "000-0000-0000" },
+    { key: "address", label: "주소", placeholder: "서울특별시 테스트구 테스트로 000, 0층" },
+    { key: "copyright", label: "저작권 문구", placeholder: "2026 사주나라. All rights reserved." },
   ];
 
   return (

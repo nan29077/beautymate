@@ -483,7 +483,7 @@ export default function ProductBottomSheet({
                   href={`/products/${product.id}${sellerSlug ? `?ref=${sellerSlug}` : ""}${sellerId ? `${sellerSlug ? "&" : "?"}sellerId=${sellerId}` : ""}`}
                   className="flex items-center justify-center gap-1.5 w-full py-2.5 text-xs text-amber-600 hover:text-amber-700 transition-colors border border-amber-100 rounded-xl hover:bg-amber-50"
                 >
-                  <Icon name="Package" size={12} strokeWidth={1.5} />
+                  <Icon name="Gem" size={12} strokeWidth={1.5} />
                   상세페이지 전체 보기
                 </a>
               </div>

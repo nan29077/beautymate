@@ -48,13 +48,13 @@ export type FooterSettings = {
 };
 
 export const FOOTER_DEFAULTS: FooterSettings = {
-  companyName: "주식회사 이십세기소년들",
-  ceoName: "박진혜",
-  bizNum: "662-86-02270",
-  mailOrderNum: "2022-고양일산서-0400",
-  phone: "070-4158-2540",
-  address: "경기도 파주시 재두루미길 70, 302호",
-  copyright: "2026 사주메이트. All rights reserved.",
+  companyName: "테스트 주식회사",
+  ceoName: "홍길동",
+  bizNum: "000-00-00000",
+  mailOrderNum: "0000-테스트-0000",
+  phone: "000-0000-0000",
+  address: "서울특별시 테스트구 테스트로 000, 0층",
+  copyright: "2026 사주나라. All rights reserved.",
 };
 
 

@@ -105,7 +105,7 @@ function SellerGuideBody({ sections }: { sections: Section[] }) {
       ))}
       <a href="/seller-apply"
         className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors mt-2">
-        <Icon name="Store" size={15} strokeWidth={1.5} />
+        <Icon name="Sparkles" size={15} strokeWidth={1.5} />
         상담사 신청하기
       </a>
     </div>
@@ -162,7 +162,7 @@ export default function SupportPageClient({
       <div className="px-4 pt-5 pb-4 bg-gradient-to-b from-amber-100/60 to-transparent">
         <div className="flex items-center gap-2 text-amber-600 mb-1">
           <Hexagon size={16} className="fill-amber-200 stroke-amber-400" />
-          <span className="text-xs font-medium">사주메이트 고객센터</span>
+          <span className="text-xs font-medium">사주나라 고객센터</span>
         </div>
         <p className="text-xl font-bold text-gray-900">{title}</p>
       </div>

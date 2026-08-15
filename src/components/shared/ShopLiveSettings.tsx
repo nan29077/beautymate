@@ -148,7 +148,7 @@ export default function ShopLiveSettings({ initial }: Props) {
       <div className="flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 px-3.5 py-3 mb-3.5">
         <Icon name="Info" size={14} className="text-amber-500 flex-shrink-0 mt-0.5" />
         <p className="text-[11px] text-amber-800 leading-relaxed">
-          이 기능은 사주메이트 앱 내 라이브 방송 없이, 유튜브·인스타그램·틱톡 등 외부 SNS에서만 라이브를 진행할 때 사용하세요.
+          이 기능은 사주나라 앱 내 라이브 방송 없이, 유튜브·인스타그램·틱톡 등 외부 SNS에서만 라이브를 진행할 때 사용하세요.
           외부 SNS 라이브 진행 중 이 스위치를 켜면 라이브 점집에 <b>&ldquo;라이브 중&rdquo;</b> 표시와 함께 선택한 상담상품이 노출됩니다.
         </p>
       </div>
@@ -185,8 +185,8 @@ export default function ShopLiveSettings({ initial }: Props) {
           <div className="mt-3.5 flex items-start gap-2 rounded-xl border border-brand-200 bg-brand-50 px-3 py-2.5">
             <Lightbulb size={15} className="text-brand-600 flex-shrink-0 mt-0.5" />
             <p className="text-[11px] text-gray-600 leading-relaxed">
-              <b className="text-gray-800">사주메이트 라이브 상담을 실행하면 자동으로 우선 적용</b>됩니다.
-              이 경우 &lsquo;라이브 중 표시&rsquo;의 외부 링크 대신 사주메이트 라이브 방송 화면으로 연결돼요.
+              <b className="text-gray-800">사주나라 라이브 상담을 실행하면 자동으로 우선 적용</b>됩니다.
+              이 경우 &lsquo;라이브 중 표시&rsquo;의 외부 링크 대신 사주나라 라이브 방송 화면으로 연결돼요.
             </p>
           </div>
 
@@ -328,7 +328,7 @@ export default function ShopLiveSettings({ initial }: Props) {
                 ) : savedProducts ? (
                   <Icon name="Check" size={14} />
                 ) : (
-                  <Icon name="Package" size={14} />
+                  <Icon name="Gem" size={14} />
                 )}
                 {savedProducts ? "저장됨" : "상담상품 저장"}
               </button>

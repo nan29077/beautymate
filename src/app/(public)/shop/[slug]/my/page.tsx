@@ -27,7 +27,7 @@ export default async function ShopMyPage({
   // 인증 확인 (비로그인 → 점집 로그인 페이지로)
   const session = await auth();
   if (!session?.user) {
-    redirect(`/auth/login?callbackUrl=${encodeURIComponent(`/shop/${slug}/my`)}`);
+    redirect(`/shop/${slug}/login`);
   }
 
   const userId = session.user.id!;
@@ -40,7 +40,7 @@ export default async function ShopMyPage({
     },
   });
 
-  if (!user) redirect(`/auth/login?callbackUrl=${encodeURIComponent(`/shop/${slug}/my`)}`);
+  if (!user) redirect(`/shop/${slug}/login`);
 
   // 이 점집에서의 예약 내역
   const shopReservations = await safeQuery(

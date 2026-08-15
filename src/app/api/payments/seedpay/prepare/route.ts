@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     : firstItem?.productName ?? "상담상품";
 
   // nginx 가 Host 헤더를 전달하지 않을 때 request.url 이 localhost:3000 으로 평가되므로
-  // 환경변수(NEXT_PUBLIC_APP_URL=https://sajumate.co.kr) 를 우선 사용한다.
+  // 환경변수(NEXT_PUBLIC_APP_URL=https://sajunara.co.kr) 를 우선 사용한다.
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.AUTH_URL ||

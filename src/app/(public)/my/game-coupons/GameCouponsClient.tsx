@@ -168,7 +168,7 @@ export default function GameCouponsClient() {
                     </div>
                     <p className="text-[13px] font-bold text-gray-900 truncate">{c.gameTitle}</p>
                     <p className="text-[11px] text-gray-500 flex items-center gap-1 mt-0.5">
-                      <Icon name="Store" size={11} /> {c.sellerName} 전용
+                      <Icon name="Sparkles" size={11} /> {c.sellerName} 전용
                     </p>
                     {c.minOrderAmount > 0 && (
                       <p className="text-[11px] text-gray-400 mt-0.5">

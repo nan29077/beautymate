@@ -258,7 +258,7 @@ export default function SettingsClient() {
         {activeSection === "seller" && (
           <div className="space-y-5">
             <div className="text-sm font-semibold text-gray-900 mb-1 flex items-center gap-2">
-              <Icon name="Store" size={16} className="text-brand-500" /> 상담사 기본 정보
+              <Icon name="Sparkles" size={16} className="text-brand-500" /> 상담사 기본 정보
             </div>
 
             {/* Shop Name */}

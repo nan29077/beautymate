@@ -23,8 +23,8 @@ exit /b %ERRORLEVEL%
 setlocal
 cd /d "%~dp0"
 
-set "PORT=3022"
-set "ALT_PORT=3023"
+set "PORT=3023"
+set "ALT_PORT=3024"
 set "DO_CLEAN=0"
 set "DO_OPEN=1"
 

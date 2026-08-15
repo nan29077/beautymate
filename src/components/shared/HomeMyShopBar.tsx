@@ -109,7 +109,7 @@ export default async function HomeMyShopBar() {
             {picks.map((s) => {
               const live = isSellerLive(s);
               const liveStream = s.liveStreams?.[0] as { id: string; shareCode: string; externalUrl: string | null } | undefined;
-              // 진행중 인앱 라이브는 항상 사주메이트 시청페이지로 연결 (외부 URL 직접연결 금지)
+              // 진행중 인앱 라이브는 항상 사주나라 시청페이지로 연결 (외부 URL 직접연결 금지)
               const inAppLiveUrl = liveStream ? `/live/${liveStream.shareCode}` : null;
               const manualLink = (s as any).liveLink || null;
               // 최종 링크: 1) 진행중 라이브 → 인앱 시청페이지 2) (인앱 라이브 없는 수동표시) 수동 liveLink

@@ -352,37 +352,7 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
               </div>
             </div>
 
-            {/* 상담 방식 설정 */}
-            <div className="border border-gray-200 rounded-xl p-4 space-y-3.5">
-              <label className="text-xs font-medium text-gray-600 flex items-center gap-1.5">
-                <Icon name="Truck" size={13} /> 상담 방식 설정
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input type="checkbox" className="w-4 h-4 rounded accent-brand-600"
-                  checked={shipping.freeShipping}
-                  onChange={e => setShipping(s => ({ ...s, freeShipping: e.target.checked }))} />
-                <span className="text-xs font-medium text-gray-700">무료배송</span>
-              </label>
-              {!shipping.freeShipping && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[11px] font-medium text-gray-500 mb-1 block">배송료</label>
-                    <input type="number" min="0" className="input-field text-sm" placeholder="0"
-                      value={shipping.fee} onChange={e => setShipping(s => ({ ...s, fee: e.target.value }))} />
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-medium text-gray-500 mb-1 block">무료배송 기준금액 (선택)</label>
-                    <input type="number" min="0" className="input-field text-sm" placeholder="예: 50000"
-                      value={shipping.freeThreshold} onChange={e => setShipping(s => ({ ...s, freeThreshold: e.target.value }))} />
-                  </div>
-                </div>
-              )}
-              <div className="max-w-[50%]">
-                <label className="text-[11px] font-medium text-gray-500 mb-1 block">도서산간 추가배송비 (선택)</label>
-                <input type="number" min="0" className="input-field text-sm" placeholder="예: 3000"
-                  value={shipping.remoteFee} onChange={e => setShipping(s => ({ ...s, remoteFee: e.target.value }))} />
-              </div>
-            </div>
+            {/* 배송 설정 제거: 사주나라는 예약(비실물) 전용 서비스 (기존 배송값은 그대로 유지·저장) */}
 
             {/* 외부 최저가 (브랜드·관리자만 입력) */}
             {!isSeller && (
@@ -447,7 +417,7 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
             {/* 재고 수량 (옵션 미사용 단일 상담상품) */}
             {form.variants.length === 0 && (
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-1.5 block flex items-center gap-1"><Icon name="Package" size={13} /> 예약 가능 수량</label>
+                <label className="text-xs font-medium text-gray-600 mb-1.5 block flex items-center gap-1"><Icon name="Gem" size={13} /> 예약 가능 수량</label>
                 <input type="number" min="0" className="input-field text-sm w-40" placeholder="0"
                   value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} />
                 <p className="text-[11px] text-gray-400 mt-1">옵션을 추가하면 옵션별 수량 합계로 계산됩니다.</p>

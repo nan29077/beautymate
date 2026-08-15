@@ -16,7 +16,7 @@ export default function ProductNotFound() {
         <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
           <div className="bg-gradient-to-br from-gray-50 to-gray-100 pt-10 pb-6 flex flex-col items-center">
             <div className="w-16 h-16 rounded-2xl bg-gray-200 flex items-center justify-center mb-4">
-              <Icon name="Package" size={28} className="text-gray-400" />
+              <Icon name="Gem" size={28} className="text-gray-400" />
             </div>
             <h2 className="text-lg font-bold text-gray-900 mb-1">상담상품을 찾을 수 없습니다</h2>
             <p className="text-sm text-gray-500 text-center px-6">
@@ -29,7 +29,7 @@ export default function ProductNotFound() {
                 href={shopHref}
                 className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-gray-800 transition-colors"
               >
-                <Icon name="Store" size={16} />
+                <Icon name="Sparkles" size={16} />
                 점집 홈으로
               </Link>
             ) : (
@@ -37,7 +37,7 @@ export default function ProductNotFound() {
                 href="/"
                 className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-gray-800 transition-colors"
               >
-                <Icon name="Store" size={16} />
+                <Icon name="Sparkles" size={16} />
                 홈으로
               </Link>
             )}

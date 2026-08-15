@@ -97,7 +97,7 @@ export default function SellerSearchHero() {
         {/* 소개 카피 */}
         <div className="inline-flex items-center gap-1 rounded-full bg-white border border-brand-100 px-2.5 py-1 mb-3">
           <Sparkles size={11} className="text-brand-500" />
-          <span className="text-[10px] font-semibold text-brand-600">사주메이트</span>
+          <span className="text-[10px] font-semibold text-brand-600">사주나라</span>
         </div>
         <h1 className="text-[22px] font-extrabold leading-tight text-gray-900">
           좋아하는 <span className="text-brand-600">상담사</span>를 단골로 설정하고,
@@ -168,7 +168,7 @@ export default function SellerSearchHero() {
                               fallbackText={s.shopName.charAt(0)}
                             />
                           </div>
-                          {s.isLive && <LiveBadge className="absolute -bottom-1 left-1/2 -translate-x-1/2" />}
+                          {s.isLive && <LiveBadge className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2" />}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-gray-900 truncate">{s.shopName}</p>

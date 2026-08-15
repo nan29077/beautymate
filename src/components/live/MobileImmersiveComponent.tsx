@@ -240,13 +240,13 @@ export default function MobileImmersiveComponent({
                     <span className="text-white/30">{msg.message}</span>
                   ) : (
                     <span className="inline-flex items-baseline gap-1">
-                      {/* 출처 배지: YouTube 실시간 채팅 vs 사주메이트 앱 채팅 */}
+                      {/* 출처 배지: YouTube 실시간 채팅 vs 사주나라 앱 채팅 */}
                       {msg.isYoutube ? (
                         <span title="YouTube 채팅" className="inline-flex items-center justify-center h-[13px] px-0.5 rounded bg-[#FF0000] flex-shrink-0 self-center">
                           <Youtube size={9} className="text-white" />
                         </span>
                       ) : (
-                        <img src="/favicon.png" alt="사주메이트" title="사주메이트 채팅" className="w-[13px] h-[13px] rounded-[3px] flex-shrink-0 self-center" />
+                        <img src="/favicon.png" alt="사주나라" title="사주나라 채팅" className="w-[13px] h-[13px] rounded-[3px] flex-shrink-0 self-center" />
                       )}
                       <span className="font-semibold text-white/70">{msg.nickname}</span>
                       <span className="text-white/50">{msg.message}</span>

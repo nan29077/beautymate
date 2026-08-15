@@ -138,7 +138,7 @@ export default function GameOverlayClient({
         {/* 상단 카드: 로고 + 게임 제목 */}
         <div className="bg-white/90 rounded-2xl shadow-lg px-4 py-3 text-center w-full max-w-sm flex-shrink-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <p className="text-[15px] font-extrabold tracking-tight text-[#2d1b69] text-center mb-1">사주메이트 GAMES</p>
+          <p className="text-[15px] font-extrabold tracking-tight text-[#2d1b69] text-center mb-1">사주나라 GAMES</p>
           <p className="text-sm font-semibold text-gray-700">{state.title}</p>
         </div>
 
@@ -257,7 +257,7 @@ export default function GameOverlayClient({
         {/* 상단 카드: 로고 */}
         <header className="bg-white rounded-2xl shadow-sm p-5 text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <p className="text-[16px] font-extrabold tracking-tight text-[#2d1b69] text-center mb-2">사주메이트 GAMES</p>
+          <p className="text-[16px] font-extrabold tracking-tight text-[#2d1b69] text-center mb-2">사주나라 GAMES</p>
           <p className="text-sm font-medium text-amber-500">라이브 게임 참여</p>
         </header>
 
@@ -269,7 +269,7 @@ export default function GameOverlayClient({
         </main>
 
         {/* 하단 푸터 */}
-        <p className="text-center text-xs text-gray-400 pb-4">Powered by 사주메이트 라이브 게임</p>
+        <p className="text-center text-xs text-gray-400 pb-4">Powered by 사주나라 라이브 게임</p>
       </div>
     </div>
   );

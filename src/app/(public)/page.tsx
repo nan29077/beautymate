@@ -20,19 +20,19 @@ import { Heart, Radio, Sparkles, ShieldCheck, Gift, Award, Quote, Instagram, You
 
 export const dynamic = "force-dynamic";
 
-// 서비스 차별점 (왜 사주메이트인가)
+// 서비스 차별점 (왜 사주나라인가)
 const DIFFERENTIATORS = [
   { icon: Radio, color: "text-rose-500", bg: "bg-rose-50", title: "내 방송이 곧 예약창구", desc: "검색 마켓플레이스가 아니라, 상담사가 자신의 시청자를 그대로 데려오는 구조예요." },
   { icon: Heart, color: "text-pink-500", bg: "bg-pink-50", title: "단골 중심 구조", desc: "내가 단골로 등록한 상담사와 깊게 연결돼요. 상담사는 팬을 고객으로 만들 수 있어요." },
   { icon: ShieldCheck, color: "text-emerald-500", bg: "bg-emerald-50", title: "안심 거래·정산", desc: "통신판매중개 보호와 투명한 정산으로 안전하게." },
-  { icon: Gift, color: "text-brand-600", bg: "bg-brand-50", title: "5분이면 시작", desc: "상담 상품과 가능한 시간만 등록하면 오늘 방송부터 예약을 받아요." },
+  { icon: Sparkles, color: "text-brand-600", bg: "bg-brand-50", title: "AI 상담요약", desc: "상담 내용을 AI가 정리해 드려요. 다시 봐도 쉽게 이해되고, 상담사는 재방문 고객을 편하게 관리해요." },
 ];
 
 // 라이브 상담 진행 방법 (고객 / 상담사)
 const BUYER_STEPS = ["좋아하는 상담사를 단골로 설정해요", "방송 시작 알림을 받아요", "라이브에 입장해 소통해요", "원하는 시간에 바로 예약·결제해요"];
 const SELLER_STEPS = ["상담 상품과 가능한 시간을 등록해요", "평소처럼 라이브 방송을 켜요", "예약 URL·QR을 설명란에 걸어둬요", "방송이 끝나면 예약이 쌓여 있어요"];
 
-// 메인 페이지 = "사주메이트 브랜드 소개 + 상담사 진입(이름검색/단골) + 상담사 신청 유도" 화면.
+// 메인 페이지 = "사주나라 브랜드 소개 + 상담사 진입(이름검색/단골) + 상담사 신청 유도" 화면.
 // ※ 상담상품 판매/구매 리스트(인기상담상품·공구·상담상품 그리드 등)는 두지 않는다.
 //   유일한 예외: 내가 단골로 등록한 상담사가 "지금 라이브 방송 중"인 상담상품을 상담사별로 묶어 보여준다.
 async function getHomeData(featureLive: boolean) {
@@ -101,7 +101,7 @@ async function getHomeData(featureLive: boolean) {
     liveSellers = (profile?.follows || [])
       .map((f) => f.seller)
       .map((s) => {
-        // 1순위: 사주메이트 라이브 상담(실제 LIVE 방송) — 라이브 상담 기능 ON + 방송 진행 중
+        // 1순위: 사주나라 라이브 상담(실제 LIVE 방송) — 라이브 상담 기능 ON + 방송 진행 중
         const hasRealLive = featureLive && (s.featureLiveCommerce ?? false) && s.liveStreams.length > 0;
         if (hasRealLive) {
           const live = s.liveStreams[0];
@@ -216,7 +216,7 @@ export default async function HomePage({
     prisma.groupBuyCampaign.count({ where: { status: "ACTIVE" } }),
   ]);
 
-  // 이미지 파일이 없는 배너는 서버에서 걸러 첫 렌더부터 기본(사주메이트) 배너가 나가게 한다
+  // 이미지 파일이 없는 배너는 서버에서 걸러 첫 렌더부터 기본(사주나라) 배너가 나가게 한다
   const heroBanners = heroBannersRaw.filter((b) => bannerImageExists(b.imageUrl));
   const bottomBanner = bottomBannerRaw && bannerImageExists(bottomBannerRaw.imageUrl) ? bottomBannerRaw : null;
 
@@ -275,7 +275,7 @@ export default async function HomePage({
                   href={`/shop/${s.slug}`}
                   className="flex-shrink-0 w-20 flex flex-col items-center justify-center gap-1 rounded-xl border border-gray-200 bg-gray-50 active:scale-[0.98] transition-transform aspect-square self-start"
                 >
-                  <Icon name="Store" size={18} className="text-gray-500" />
+                  <Icon name="Sparkles" size={18} className="text-gray-500" />
                   <span className="text-[10px] font-semibold text-gray-600">점집 바로가기</span>
                 </Link>
               );
@@ -352,9 +352,9 @@ export default async function HomePage({
       {/* ───── 내 단골 + 빠른 메뉴 ───── */}
       <HomeMyShopBar />
 
-      {/* ───── 사주메이트 소개: 우리는 이런 곳이에요 ───── */}
+      {/* ───── 사주나라 소개: 우리는 이런 곳이에요 ───── */}
       <section className="px-5 pt-8 pb-2">
-        <h2 className="text-[17px] font-extrabold text-gray-900">사주메이트는요</h2>
+        <h2 className="text-[17px] font-extrabold text-gray-900">사주나라는요</h2>
         <p className="mt-1.5 text-[13px] text-gray-500 leading-relaxed">
           유튜브·SNS에서 활동하는 사주·신점·타로 상담사가 자신의 시청자에게
           바로 예약을 받을 수 있게 해주는 예약 커머스 플랫폼이에요.
@@ -377,9 +377,9 @@ export default async function HomePage({
         <SellerMarquee />
       </section>
 
-      {/* ───── 상담사가 사주메이트를 선택하는 이유 (수치·혜택) ───── */}
+      {/* ───── 상담사가 사주나라를 선택하는 이유 (수치·혜택) ───── */}
       <section className="px-5 pt-7 pb-2">
-        <h2 className="text-[17px] font-extrabold text-gray-900">상담사가 사주메이트를 선택하는 이유</h2>
+        <h2 className="text-[17px] font-extrabold text-gray-900">상담사가 사주나라를 선택하는 이유</h2>
         <p className="mt-1 text-[12px] text-gray-500">방송부터 예약, 단골 관리까지 한 곳에서</p>
         <div className="mt-4 grid grid-cols-2 gap-2.5">
           {homeBenefits.stats.map((s, i) => (
@@ -393,13 +393,13 @@ export default async function HomePage({
         </div>
       </section>
 
-      {/* ───── 숫자로 보는 사주메이트 (다크 배너) ───── */}
+      {/* ───── 숫자로 보는 사주나라 (다크 배너) ───── */}
       <section className="px-4 pt-7">
         <div className="rounded-3xl bg-gray-900 text-white p-6">
           <div className="inline-flex items-center gap-1 rounded-full bg-brand-500/20 text-brand-300 px-2.5 py-1 mb-3">
             <Award size={12} /> <span className="text-[10px] font-bold tracking-wide">BY THE NUMBERS</span>
           </div>
-          <h2 className="text-[18px] font-extrabold">숫자로 보는 사주메이트</h2>
+          <h2 className="text-[18px] font-extrabold">숫자로 보는 사주나라</h2>
           <p className="text-[11px] text-white/60 mt-1">함께 성장하는 단골 상담</p>
           <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-5">
             {homeStats.map((s, i) => (
@@ -412,7 +412,7 @@ export default async function HomePage({
       {/* ───── 성공한 상담사 스토리 ───── */}
       <section className="pt-8 pb-1">
         <div className="px-5 mb-3">
-          <h2 className="text-[17px] font-extrabold text-gray-900">사주메이트로 성공한 상담사</h2>
+          <h2 className="text-[17px] font-extrabold text-gray-900">사주나라로 성공한 상담사</h2>
           <p className="mt-1 text-[12px] text-gray-500">평범한 일상에서, 나만의 점집으로</p>
         </div>
         <div className="flex gap-3 overflow-x-auto scrollbar-hide px-4 pb-1">
@@ -449,7 +449,7 @@ export default async function HomePage({
           </div>
           <div className="rounded-2xl border border-brand-100 bg-brand-50/50 p-4">
             <div className="flex items-center gap-2 mb-2.5">
-              <div className="w-9 h-9 rounded-xl bg-brand-100 flex items-center justify-center"><Icon name="Store" size={17} className="text-brand-600" /></div>
+              <div className="w-9 h-9 rounded-xl bg-brand-100 flex items-center justify-center"><Icon name="Sparkles" size={17} className="text-brand-600" /></div>
               <p className="text-[14px] font-bold text-gray-900">이렇게 상담하고 싶다면</p>
             </div>
             <ul className="space-y-1.5">
@@ -464,12 +464,12 @@ export default async function HomePage({
         </div>
       </section>
 
-      {/* ───── 왜 사주메이트일까요 (차별점) ───── */}
+      {/* ───── 왜 사주나라일까요 (차별점) ───── */}
       <section className="px-5 pt-8">
         <div className="inline-flex items-center gap-1 rounded-full bg-brand-50 text-brand-700 px-2.5 py-1 mb-2">
-          <Icon name="Lightning" size={12} /> <span className="text-[10px] font-bold">WHY 사주메이트</span>
+          <Icon name="Lightning" size={12} /> <span className="text-[10px] font-bold">WHY 사주나라</span>
         </div>
-        <h2 className="text-[18px] font-extrabold text-gray-900">왜 사주메이트일까요?</h2>
+        <h2 className="text-[18px] font-extrabold text-gray-900">왜 사주나라일까요?</h2>
         <div className="mt-4 grid grid-cols-2 gap-2.5">
           {DIFFERENTIATORS.map((d) => {
             const Icon = d.icon;
@@ -507,7 +507,7 @@ export default async function HomePage({
           </div>
           <div className="rounded-2xl border border-brand-100 bg-brand-50/40 p-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-brand-100 flex items-center justify-center"><Icon name="Store" size={16} className="text-brand-600" /></div>
+              <div className="w-8 h-8 rounded-lg bg-brand-100 flex items-center justify-center"><Icon name="Sparkles" size={16} className="text-brand-600" /></div>
               <p className="text-[14px] font-bold text-gray-900">상담사라면</p>
             </div>
             <ol className="space-y-2">
@@ -609,10 +609,12 @@ export default async function HomePage({
             <p className="mt-1.5 text-[12px] text-white/85 leading-relaxed">
               상담 상품과 가능한 시간만 등록하면 오늘 방송부터 예약을 받을 수 있어요.
             </p>
-            <div className="mt-3 flex items-center gap-3 text-[11px] text-white/90">
+            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-white/90">
               <span className="flex items-center gap-1"><Icon name="Clock" size={12} /> 실시간 예약</span>
               <span className="flex items-center gap-1"><Icon name="CreditCard" size={12} /> 자동 결제</span>
               <span className="flex items-center gap-1"><Icon name="Chart" size={12} /> 정산 자동화</span>
+              <span className="flex items-center gap-1"><Icon name="Users" size={12} /> 고객관리 CRM</span>
+              <span className="flex items-center gap-1"><Icon name="Sparkles" size={12} /> AI 상담요약</span>
             </div>
             <span className="mt-4 inline-flex items-center gap-1 rounded-full bg-white text-brand-700 text-[13px] font-bold px-4 py-2">
               상담사로 신청하기 <Icon name="ChevronDown" size={15} className="-rotate-90" />
@@ -637,7 +639,7 @@ export default async function HomePage({
           <div className="w-11 h-11 rounded-full bg-brand-500 flex items-center justify-center mx-auto mb-3">
             <Sparkles size={18} className="text-black" />
           </div>
-          <h2 className="text-[16px] font-extrabold text-gray-900">사주메이트와 더 가까이</h2>
+          <h2 className="text-[16px] font-extrabold text-gray-900">사주나라와 더 가까이</h2>
           <p className="text-[12px] text-gray-500 mt-1 leading-relaxed">
             새로운 상담사와 라이브 소식,<br />이벤트를 가장 먼저 받아보세요.
           </p>

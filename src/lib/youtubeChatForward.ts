@@ -10,10 +10,10 @@ import {
 //
 // YouTube Data API 는 OAuth 인증 계정 명의로만 게시되므로(표시 이름 지정 불가)
 // 상담사 채널이 직접 친 것처럼 보인다. 발신 주체를 구분하려고 본문에 프리픽스를 붙인다.
-// 계정 자체를 사주메이트 명의로 바꾸려면 전용 봇 계정 OAuth 가 필요하다.
+// 계정 자체를 사주나라 명의로 바꾸려면 전용 봇 계정 OAuth 가 필요하다.
 
-/** 사주메이트가 대신 게시한 메시지임을 나타내는 프리픽스 */
-export const YT_FORWARD_PREFIX = "[사주메이트]";
+/** 사주나라가 대신 게시한 메시지임을 나타내는 프리픽스 */
+export const YT_FORWARD_PREFIX = "[사주나라]";
 
 /** 프리픽스를 붙인 YouTube 전송용 본문 생성 */
 export function withForwardPrefix(body: string): string {
@@ -21,7 +21,7 @@ export function withForwardPrefix(body: string): string {
 }
 
 /**
- * 사주메이트가 보낸 메시지인지 판별 (폴링 에코 필터용).
+ * 사주나라가 보낸 메시지인지 판별 (폴링 에코 필터용).
  * 프리픽스 형식을 바꾸면 이 함수도 함께 유지보수할 것.
  */
 export function isForwardedText(text: string): boolean {
@@ -98,7 +98,7 @@ export async function forwardSiteChatToYoutube(
   }
   if (!liveChatId) return;
 
-  // "[사주메이트] 닉네임: 메시지" — 에코 필터(youtube-sync)가 isForwardedText 로 인식한다
+  // "[사주나라] 닉네임: 메시지" — 에코 필터(youtube-sync)가 isForwardedText 로 인식한다
   const text = withForwardPrefix(`${(nickname || "익명").slice(0, 30)}: ${message}`);
   await sendYoutubeChatMessage(live.sellerId, liveChatId, text, accessToken);
 }

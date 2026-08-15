@@ -137,23 +137,53 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
         >
           {loading ? "로그인 중..." : "로그인"}
         </button>
-        {process.env.NODE_ENV === "development" && (
-          <div className="space-y-1.5">
-            <button
-              type="button"
-              onClick={() => {
-                setEmail("test@test.com");
-                setPassword("Test1234!");
-              }}
-              className="w-full py-2 text-sm text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 transition"
-            >
-              테스트 계정 자동입력
-            </button>
-            <p className="text-center text-[10px] text-gray-400">
-              ※ 테스트 계정은 관리자가 직접 생성한 계정만 사용 가능합니다
-            </p>
-          </div>
-        )}
+        {/* 테스트 계정으로 로그인 — 개발/프로덕션 어디서든 동작한다.
+            이 점집 회원(고객)으로 계정을 준비(귀속)한 뒤 로그인한다.
+            ⚠️ 실서비스 정식 오픈 전에는 이 블록을 제거하세요. */}
+        <div className="space-y-1.5">
+          <button
+            type="button"
+            disabled={loading}
+            onClick={async () => {
+              setLoading(true);
+              setError("");
+              const TEST_EMAIL = "test-customer@example.com";
+              const TEST_PW = "testpass1234";
+              try {
+                // 1) 기존 테스트 계정으로 로그인 시도
+                let result = await signIn("credentials", { email: TEST_EMAIL, password: TEST_PW, redirect: false });
+                // 2) 계정이 없으면 이 점집 회원(고객)으로 생성 → 귀속 → 재로그인
+                if (result?.error) {
+                  const res = await fetch(`/api/shop/${shop.slug}/join`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: "테스트고객", email: TEST_EMAIL, password: TEST_PW }),
+                  });
+                  if (!res.ok) {
+                    const body = await res.json().catch(() => ({}));
+                    setError("테스트 계정 준비 실패 (" + res.status + "): " + (body?.error || "알 수 없는 오류"));
+                    return;
+                  }
+                  result = await signIn("credentials", { email: TEST_EMAIL, password: TEST_PW, redirect: false });
+                  if (result?.error) {
+                    setError("테스트 로그인 실패: " + result.error);
+                    return;
+                  }
+                }
+                router.push(`/shop/${shop.slug}`);
+                router.refresh();
+              } catch {
+                setError("테스트 로그인 중 오류가 발생했습니다.");
+              } finally {
+                setLoading(false);
+              }
+            }}
+            className="w-full py-2.5 text-sm font-semibold text-violet-600 border border-violet-200 rounded-lg hover:bg-violet-50 disabled:opacity-50 transition"
+          >
+            {loading ? "처리 중..." : "🧪 테스트 계정으로 로그인"}
+          </button>
+          <p className="text-center text-[10px] text-gray-300">이 점집 회원(고객)으로 로그인해 화면을 확인합니다</p>
+        </div>
         <p className="text-center text-xs text-gray-400">
           아직 회원이 아니신가요?{" "}
           <Link href={`/shop/${shop.slug}/join`} className="text-amber-600 font-semibold hover:underline">

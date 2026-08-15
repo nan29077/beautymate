@@ -51,7 +51,7 @@ export default async function SellerApplyPage() {
       {/* 히어로 */}
       <div className="bg-gray-900 text-white px-5 py-10 text-center">
         <div className="w-14 h-14 rounded-2xl bg-brand-500 flex items-center justify-center mx-auto mb-4">
-          <Icon name="Store" size={28} strokeWidth={1.5} className="text-black" />
+          <Icon name="Sparkles" size={28} strokeWidth={1.5} className="text-black" />
         </div>
         <h2 className="text-[22px] font-extrabold leading-snug">
           나만의 점집을 열고<br />팬과 함께 판매하세요

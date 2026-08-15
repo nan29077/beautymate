@@ -42,9 +42,9 @@ export default async function DashboardLayout({
       { href: "/admin/users", iconName: "Users", label: "회원 관리", group: "회원 관리" },
       { href: "/admin/customers", iconName: "UserCheck", label: "고객 귀속 관리", group: "회원 관리" },
       { href: "/admin/members", iconName: "Users", label: "단골 회원 관리", group: "회원 관리" },
-      { href: "/admin/sellers", iconName: "Store", label: "상담사 관리", group: "회원 관리" },
+      { href: "/admin/sellers", iconName: "Sparkles", label: "상담사 관리", group: "회원 관리" },
       // 상담상품 관리
-      { href: "/admin/products", iconName: "Package", label: "상담상품 관리", group: "상담상품 관리" },
+      { href: "/admin/products", iconName: "Gem", label: "상담상품 관리", group: "상담상품 관리" },
       { href: "/admin/categories", iconName: "Category", label: "카테고리 관리", group: "상담상품 관리" },
       // 예약·정산
       { href: "/admin/reservations", iconName: "Calendar", label: "예약 관리", group: "예약·정산" },
@@ -68,9 +68,9 @@ export default async function DashboardLayout({
     CONSULTANT: [
       { href: "/seller", iconName: "Dashboard", label: "대시보드", group: "메인" },
       // 점집 관리
-      { href: "/seller/shop", iconName: "Store", label: "내 점집 관리", group: "점집 관리" },
+      { href: "/seller/shop", iconName: "MoonStar", label: "내 점집 관리", group: "점집 관리" },
       // 상담상품 관리
-      { href: "/seller/products", iconName: "Package", label: "상담상품 관리", group: "상담상품 관리" },
+      { href: "/seller/products", iconName: "Gem", label: "상담상품 관리", group: "상담상품 관리" },
       // 판매·라이브 (콘텐츠/단체 상담/게임 메뉴는 점집 운영에 쓰지 않아 제거)
       { href: "/seller/live-mode", iconName: "Video", label: "예약 현황", group: "판매·라이브" },
       { href: "/seller/live", iconName: "Live", label: "라이브 상담", group: "판매·라이브" },

@@ -7,7 +7,7 @@ import NotificationBell from "@/components/shared/NotificationBell";
 import { pickSajuAvatar } from "@/lib/defaults";
 
 // 점집 전용 상단 바.
-// - 좌측 상단: 사주메이트 로고 대신 "상담사 프로필 사진(또는 점집 로고) + 상담사 이름".
+// - 좌측 상단: 사주나라 로고 대신 "상담사 프로필 사진(또는 점집 로고) + 상담사 이름".
 // - 메인 페이지로 가는 링크는 일절 두지 않는다(상담사 세계 안에서만 이동).
 // - 우측: 구매회원용 장바구니/내정보 진입만 제공.
 export default function SellerShopHeader({
@@ -59,7 +59,7 @@ export default function SellerShopHeader({
           </div>
         ) : (
           <div className="flex items-center gap-1.5 flex-shrink-0">
-            {/* 점집 독립 로그인/가입 — 사주메이트 메인과 분리된 점집 전용 화면 */}
+            {/* 점집 독립 로그인/가입 — 사주나라 메인과 분리된 점집 전용 화면 */}
             <Link
               href={`/shop/${sellerSlug}/login`}
               className="px-3 py-1.5 text-[13px] font-medium text-gray-600 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"

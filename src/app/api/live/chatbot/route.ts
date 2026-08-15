@@ -8,7 +8,7 @@ import { isMissingDbColumnError } from "@/lib/prismaErrors";
 // AI 채팅 봇 엔진 (tick 방식)
 // 상담사 라이브 관리 페이지가 라이브 진행 중 주기적으로 호출하면(약 20초 간격)
 // 마지막 처리 시점 이후의 앱 채팅 + YouTube 채팅을 분석해 봇 메시지를 앱 채팅에 발송한다.
-// - 봇 메시지는 사주메이트 앱 채팅에 표시 (isBot=true)
+// - 봇 메시지는 사주나라 앱 채팅에 표시 (isBot=true)
 // - 상담사가 YouTube OAuth(youtube.force-ssl) 연결 + "YouTube로 전송" 옵션 ON 시
 //   liveChat/messages insert 로 YouTube 채팅에도 동시 전송 (토큰 만료 시 자동 갱신)
 

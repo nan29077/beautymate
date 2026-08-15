@@ -71,8 +71,8 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
     description: "", bannerImage: "", estimatedDelivery: "",
     minSalePrice: "", // 최저판매가 (드라이브)
   });
-  // 상담 방식 설정
-  const [shipping, setShipping] = useState({ fee: "", freeShipping: false, freeThreshold: "", remoteFee: "" });
+  // 배송 상태: 사주나라는 예약(비실물) 전용 — 항상 배송 없음(무료)으로 저장. 입력 UI 없음.
+  const [shipping, setShipping] = useState({ fee: "", freeShipping: true, freeThreshold: "", remoteFee: "" });
   // 인플루언서 커미션 (브랜드/관리자용)
   const [commissionRate, setCommissionRate] = useState("");
   // 제공 방식: SUPPLY(공급가로 제공) / COMMISSION(수수료로 제공)
@@ -342,7 +342,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
     setForm({ name: "", basePrice: "", comparePrice: "", description: "", detailContent: "", brandId: "", categoryId: "", thumbnail: "", images: [], supplyPrice: "", middleAdminMargin: "", stock: "", variants: [] });
     setGroupBuy({ title: "", campaignPrice: "", goalQuantity: "", minOrderQuantity: "1", maxOrderQuantity: "", limitPerPerson: "10", startDate: "", endDate: "", description: "", bannerImage: "", estimatedDelivery: "", minSalePrice: "" });
     setBadges([]); setCurrentStep(0); setProductType(defaultProductType); setCommissionRate(""); setChatMessages([]); setChatInput("");
-    setShipping({ fee: "", freeShipping: false, freeThreshold: "", remoteFee: "" });
+    setShipping({ fee: "", freeShipping: true, freeThreshold: "", remoteFee: "" });
     setPriceModel("SUPPLY"); setCommissionSalePrice(""); setSellerCommissionRate("");
     setOptionMode("flat"); setOptionGroups([]);
   };
@@ -676,52 +676,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                       </div>
                     </div>
 
-                    {/* 상담 방식 설정 */}
-                    <div className="border border-gray-200 rounded-xl p-4 space-y-3.5">
-                      <label className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
-                        <Icon name="Truck" size={13} /> 상담 방식 설정
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer select-none">
-                        <input type="checkbox" className="w-4 h-4 rounded accent-brand-600"
-                          checked={shipping.freeShipping}
-                          onChange={e => setShipping(s => ({ ...s, freeShipping: e.target.checked }))} />
-                        <span className="text-xs font-medium text-gray-700">무료배송</span>
-                      </label>
-
-                      {!shipping.freeShipping && (
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="text-[11px] font-medium text-gray-500 mb-1 block">배송료</label>
-                            <div className="relative">
-                              <input type="number" min="0" className="input-field text-sm pr-8" placeholder="0"
-                                value={shipping.fee} onChange={e => setShipping(s => ({ ...s, fee: e.target.value }))} />
-                              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">원</span>
-                            </div>
-                          </div>
-                          <div>
-                            <label className="text-[11px] font-medium text-gray-500 mb-1 block">무료배송 기준금액 <span className="text-gray-300">(선택)</span></label>
-                            <div className="relative">
-                              <input type="number" min="0" className="input-field text-sm pr-8" placeholder="예: 50000"
-                                value={shipping.freeThreshold} onChange={e => setShipping(s => ({ ...s, freeThreshold: e.target.value }))} />
-                              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">원</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      <div>
-                        <label className="text-[11px] font-medium text-gray-500 mb-1 block">도서산간 추가배송비 <span className="text-gray-300">(선택)</span></label>
-                        <div className="relative max-w-[50%]">
-                          <input type="number" min="0" className="input-field text-sm pr-8" placeholder="예: 3000"
-                            value={shipping.remoteFee} onChange={e => setShipping(s => ({ ...s, remoteFee: e.target.value }))} />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">원</span>
-                        </div>
-                      </div>
-
-                      {!shipping.freeShipping && shipping.freeThreshold && (
-                        <p className="text-[10px] text-gray-400">{Number(shipping.freeThreshold).toLocaleString()}원 이상 구매 시 무료배송으로 표시됩니다.</p>
-                      )}
-                    </div>
+                    {/* 배송 설정 제거: 사주나라는 예약(비실물) 전용 서비스 (배송비 항상 없음) */}
                   </div>
                 )}
 
@@ -821,7 +776,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                     {form.variants.length === 0 && (
                       <div>
                         <label className="text-xs font-semibold text-gray-700 mb-1.5 block flex items-center gap-1">
-                          <Icon name="Package" size={13} /> 예약 가능 수량
+                          <Icon name="Gem" size={13} /> 예약 가능 수량
                         </label>
                         <div className="relative max-w-[50%]">
                           <input

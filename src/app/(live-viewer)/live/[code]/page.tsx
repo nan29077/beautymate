@@ -791,7 +791,7 @@ export default function LiveChannelPage() {
             )}
           </div>
 
-          {/* 사주메이트 통신판매중개업 안내 */}
+          {/* 사주나라 통신판매중개업 안내 */}
           <div className="rounded-xl bg-amber-50/60 border border-amber-100 overflow-hidden">
             <button
               type="button"
@@ -800,7 +800,7 @@ export default function LiveChannelPage() {
             >
               <Info size={13} className="text-gray-400 flex-shrink-0" />
               <span className="flex-1 text-[10.5px] text-gray-500 leading-snug">
-                <b className="text-gray-600 font-semibold">사주메이트는 통신판매중개자</b>이며 거래의 당사자가 아닙니다.
+                <b className="text-gray-600 font-semibold">사주나라는 통신판매중개자</b>이며 거래의 당사자가 아닙니다.
               </span>
               <span className="text-[9px] text-gray-400 flex items-center gap-0.5 flex-shrink-0">
                 자세히 보기
@@ -810,24 +810,24 @@ export default function LiveChannelPage() {
             {bizOpen && (
               <div className="px-3 pb-3 pt-0.5 border-t border-amber-100">
                 <p className="text-[10px] text-gray-500 leading-relaxed mt-2">
-                  사주메이트는 통신판매중개자로서 통신판매의 당사자가 아니며, 상담상품의 예약·상담 방식·환불 등 거래에 대한
-                  의무와 책임은 판매자(상담사)에게 있습니다. 사주메이트는 거래 시스템(플랫폼)을 제공할 뿐 개별 거래에 대해서는
+                  사주나라는 통신판매중개자로서 통신판매의 당사자가 아니며, 상담상품의 예약·상담 방식·환불 등 거래에 대한
+                  의무와 책임은 판매자(상담사)에게 있습니다. 사주나라는 거래 시스템(플랫폼)을 제공할 뿐 개별 거래에 대해서는
                   책임을 지지 않습니다.
                 </p>
                 <div className="mt-3 pt-3 border-t border-amber-100 space-y-0.5 text-[10px] text-gray-400 leading-relaxed">
                   <p className="font-semibold text-gray-500 mb-1">통신판매중개자 정보</p>
-                  <p><span className="text-gray-400">상호</span> 주식회사 이십세기소년들 · <span className="text-gray-400">대표</span> 박진혜</p>
-                  <p><span className="text-gray-400">사업자등록번호</span> 662-86-02270</p>
-                  <p><span className="text-gray-400">통신판매신고번호</span> 2022-고양일산서-0400</p>
-                  <p><span className="text-gray-400">대표번호</span> 070-4158-2540</p>
-                  <p><span className="text-gray-400">주소</span> 경기도 고양시 일산서구 킨텍스로 240, 2501호</p>
+                  <p><span className="text-gray-400">상호</span> 테스트 주식회사 · <span className="text-gray-400">대표</span> 홍길동</p>
+                  <p><span className="text-gray-400">사업자등록번호</span> 000-00-00000</p>
+                  <p><span className="text-gray-400">통신판매신고번호</span> 0000-테스트-0000</p>
+                  <p><span className="text-gray-400">대표번호</span> 000-0000-0000</p>
+                  <p><span className="text-gray-400">주소</span> 서울특별시 테스트구 테스트로 000, 0층</p>
                 </div>
               </div>
             )}
           </div>
 
           <p className="text-[10px] text-gray-400 text-center pt-1">
-            &copy; {new Date().getFullYear()} 사주메이트. All rights reserved.
+            &copy; {new Date().getFullYear()} 사주나라. All rights reserved.
           </p>
         </footer>
       </div>

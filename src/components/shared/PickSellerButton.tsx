@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useAppDialog } from "@/components/shared/AppDialog";
 
 // 상담사 Pick(팔로우) 토글.
-// 사주메이트 시절의 SNS 채널 구독 인증(ChannelVerification) 연동은 제거되었고,
+// 사주나라 시절의 SNS 채널 구독 인증(ChannelVerification) 연동은 제거되었고,
 // 지금은 순수하게 Pick / Pick 해제만 처리한다.
 
 interface PickSellerButtonProps {

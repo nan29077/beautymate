@@ -123,13 +123,14 @@ export async function generateMetadata({
     where: { slug },
     select: { id: true, shopName: true, shopDescription: true, shopBanner: true },
   });
-  if (!seller) return { title: "점집을 찾을 수 없습니다 | 사주메이트" };
+  if (!seller) return { title: "점집을 찾을 수 없습니다 | 사주나라" };
 
   const custom = await getShopCustomization(seller.id);
-  const title = `${seller.shopName}의 점집 - 사주메이트`;
   const description =
     custom.tagline || seller.shopDescription || `${seller.shopName}에게 지금 상담을 예약하세요.`;
-  const image = seller.shopBanner || "/opengraph-image";
+  const image = resolveShopBanner(seller.shopBanner, seller.id);
+  const pageTitle = seller.shopName.endsWith("점집") ? seller.shopName : `${seller.shopName}의 점집`;
+  const title = `${pageTitle} - 사주나라`;
 
   return {
     title,
@@ -138,7 +139,7 @@ export async function generateMetadata({
       title,
       description,
       url: `/shop/${slug}`,
-      siteName: "사주메이트",
+      siteName: "사주나라",
       type: "profile",
       images: [{ url: image, width: 1200, height: 630, alt: `${seller.shopName}의 점집` }],
     },
@@ -157,7 +158,7 @@ export default async function SellerShopPage({
   if (!seller || !seller.isApproved) notFound();
 
   const customization = await getShopCustomization(seller.id);
-  const themeColor = seller.shopThemeColor || "#f5a700";
+  const themeColor = seller.shopThemeColor || "#6D4BE8";
   const avatar = resolveSellerDisplayImage(seller);
   const banner = resolveShopBanner(seller.shopBanner, seller.id);
 
@@ -272,7 +273,7 @@ export default async function SellerShopPage({
   const bookHref = `/shop/${seller.slug}/book`;
 
   return (
-    <div className="animate-fade-in bg-[#fdfaf0] min-h-screen">
+    <div className="animate-fade-in bg-[#f7f6fb] min-h-screen">
       <ShopContextSync shop={{ slug: seller.slug, name: seller.shopName, logo: avatar }} />
 
       <SellerShopHeader
@@ -285,29 +286,36 @@ export default async function SellerShopPage({
       />
 
       {/* ───── 1. 상담사 프로필 헤더 ───── */}
-      <section className="relative">
-        <div className="h-40 overflow-hidden bg-gray-200 relative">
-          <img src={banner} alt={`${seller.shopName} 배너`} className="w-full h-full object-cover" />
+      <section className="relative pb-1">
+        <div className="h-44 overflow-hidden bg-[#171029] relative">
+          <img
+            src={banner}
+            alt={`${seller.shopName} 배너`}
+            className="w-full h-full object-cover"
+            fetchPriority="high"
+            decoding="async"
+          />
           <div
             className="absolute inset-0"
-            style={{ background: `linear-gradient(to top, ${themeColor}33 0%, transparent 55%)` }}
+            style={{ background: `linear-gradient(to top, rgba(16, 10, 31, 0.62) 0%, ${themeColor}20 48%, transparent 78%)` }}
           />
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/25 to-transparent" />
         </div>
 
-        <div className="relative px-4 -mt-12">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 pb-5">
+        <div className="relative px-4 -mt-10">
+          <div className="bg-white/95 backdrop-blur-sm rounded-[26px] shadow-[0_12px_36px_rgba(35,22,67,0.12)] border border-white p-[18px] pb-5">
             <div className="flex items-start gap-3">
-              <div className="flex flex-col items-center flex-shrink-0 -mt-8">
+              <div className="flex flex-col items-center flex-shrink-0 -mt-9">
                 <div
-                  className={`relative w-16 h-16 rounded-full overflow-hidden ring-4 bg-white shadow-md ${
+                  className={`relative w-[72px] h-[72px] rounded-full overflow-hidden ring-4 bg-white shadow-md ${
                     showLive ? LIVE_RING_CLASS : "ring-white"
                   }`}
                 >
                   <SafeImage
                     src={avatar}
                     alt={seller.shopName}
-                    width={64}
-                    height={64}
+                    width={72}
+                    height={72}
                     fallbackText={seller.shopName.charAt(0)}
                   />
                 </div>
@@ -315,22 +323,25 @@ export default async function SellerShopPage({
 
               <div className="flex-1 min-w-0 pt-0.5">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-lg font-bold text-gray-900 truncate">{seller.user.name || seller.shopName}</h1>
+                  <h1 className="text-[18px] font-extrabold tracking-[-0.02em] text-gray-950 truncate">{seller.shopName}</h1>
                   {showLive && <OnAirBadge />}
                 </div>
+                {seller.user.name && seller.user.name !== seller.shopName && (
+                  <p className="mt-0.5 text-[11px] font-medium text-gray-400">{seller.user.name} 상담사</p>
+                )}
                 {customization.tagline && (
-                  <p className="text-[12px] text-gray-500 mt-0.5 line-clamp-2">{customization.tagline}</p>
+                  <p className="text-[12px] text-gray-500 mt-1 leading-relaxed line-clamp-2">{customization.tagline}</p>
                 )}
               </div>
             </div>
 
             {/* 상담 분야 태그 */}
             {consultTags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-3">
+              <div className="flex flex-wrap gap-1.5 mt-3.5">
                 {consultTags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-2 py-0.5 rounded-full text-[10px] font-semibold border"
+                    className="px-2.5 py-1 rounded-full text-[10px] font-semibold border"
                     style={{ color: themeColor, borderColor: `${themeColor}55`, backgroundColor: `${themeColor}12` }}
                   >
                     #{tag}
@@ -339,7 +350,7 @@ export default async function SellerShopPage({
               </div>
             )}
 
-            <div className="mt-4">
+            <div className="mt-3.5 pt-3.5 border-t border-gray-100">
               <ShopShareButton slug={seller.slug} shopName={seller.shopName} themeColor={themeColor} />
             </div>
           </div>
@@ -347,8 +358,8 @@ export default async function SellerShopPage({
       </section>
 
       {/* ───── 2. 내 예약 현황 ───── */}
-      <section className="px-4 mt-4">
-        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+      <section className="px-4 mt-5">
+        <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-[18px]">
           <div className="flex items-center gap-1.5 mb-3">
             <CalendarDays size={15} strokeWidth={1.8} style={{ color: themeColor }} />
             <h2 className="text-sm font-bold text-gray-900">내 예약 현황</h2>
@@ -384,7 +395,7 @@ export default async function SellerShopPage({
 
       {/* ───── 3. 상담 메뉴 ───── */}
       <section className="px-4 mt-4">
-        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+        <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-[18px]">
           <div className="flex items-center gap-1.5 mb-1">
             <Sparkles size={15} strokeWidth={1.8} style={{ color: themeColor }} />
             <h2 className="text-sm font-bold text-gray-900">상담 메뉴</h2>
@@ -403,7 +414,7 @@ export default async function SellerShopPage({
                   <li key={p.id}>
                     <Link
                       href={`${bookHref}?productId=${p.id}`}
-                      className="flex items-center gap-3 p-3 rounded-2xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm active:scale-[0.99] transition-all"
+                      className="flex items-center gap-3 p-3 rounded-2xl border border-transparent bg-gray-50/80 hover:bg-white hover:border-gray-200 hover:shadow-sm active:scale-[0.99] transition-all"
                     >
                       <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0">
                         <SafeImage
@@ -458,7 +469,7 @@ export default async function SellerShopPage({
       {/* ───── 4. 상세 소개 ───── */}
       {(customization.intro || seller.shopDescription) && (
         <section className="px-4 mt-4">
-          <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-[18px]">
             <div className="flex items-center gap-1.5 mb-2">
               <Sparkles size={14} strokeWidth={1.8} style={{ color: themeColor }} />
               <h2 className="text-sm font-bold text-gray-900">{seller.shopName} 소개</h2>
@@ -483,7 +494,7 @@ export default async function SellerShopPage({
       {/* ───── 6. 콘텐츠 (feature 플래그) ───── */}
       {contents.length > 0 && (
         <section className="px-4 mt-4">
-          <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-[18px]">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-bold text-gray-900">상담사 콘텐츠</h2>
               <Link href="/content" className="text-[11px] text-gray-400 hover:text-gray-600 flex items-center gap-0.5">

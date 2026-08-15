@@ -122,7 +122,7 @@ async function handleSync(req: NextRequest) {
     const cData = await cRes.json();
     const nextPageToken: string | null = cData.nextPageToken ?? null;
 
-    // 사주메이트가 상담사 계정 명의로 보낸 메시지("[사주메이트] ...")가 폴링으로 되돌아와
+    // 사주나라가 상담사 계정 명의로 보낸 메시지("[사주나라] ...")가 폴링으로 되돌아와
     // 사이트 채팅에 중복 표시되는 것 방지. 상담사가 YouTube에서 직접 친 일반 채팅은 프리픽스가 없어 통과한다.
     const sellerChannelId = live.seller?.youtubeChannelId || null;
     const isForwardedEcho = (it: any): boolean => {

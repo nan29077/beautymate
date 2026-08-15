@@ -2,7 +2,7 @@
 // - LIVE_RING_CLASS: 프로필 사진(아바타) 링에 적용하는 "두근두근" 펄스 (globals.css 의 animate-heartbeat).
 // - <LiveBadge />: Radio 라인 아이콘 + "상담 중" 배지.
 //
-// 사주메이트 톤: 커머스식 빨강 "LIVE" 대신 딥 퍼플 + 상담 문구를 쓴다.
+// 사주나라 톤: 커머스식 빨강 "LIVE" 대신 딥 퍼플 + 상담 문구를 쓴다.
 
 import { Radio } from "lucide-react";
 
@@ -28,7 +28,7 @@ export function OnAirBadge({ className = "" }: { className?: string }) {
 export default function LiveBadge({
   className = "",
   size = "xs",
-  label = "상담 중",
+  label = "라이브 중",
 }: {
   className?: string;
   size?: "xs" | "sm";
