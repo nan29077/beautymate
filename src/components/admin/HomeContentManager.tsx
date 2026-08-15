@@ -17,13 +17,13 @@ const AVATARS = Array.from(
 );
 
 const ICON_OPTIONS = [
-  { value: "heart", label: "❤️ 하트" },
-  { value: "radio", label: "📻 라디오" },
-  { value: "shield", label: "🛡️ 방패" },
-  { value: "star", label: "⭐ 별" },
-  { value: "zap", label: "⚡ 번개" },
-  { value: "trending", label: "📈 성장" },
-  { value: "users", label: "👥 사용자" },
+  { value: "heart", label: "하트" },
+  { value: "radio", label: "라디오" },
+  { value: "shield", label: "방패" },
+  { value: "star", label: "별" },
+  { value: "zap", label: "번개" },
+  { value: "trending", label: "성장" },
+  { value: "users", label: "사용자" },
 ];
 
 function SectionSaveButton({ saving, label, onClick }: { saving: boolean; label: string; onClick: () => void }) {

@@ -36,7 +36,7 @@ export function DashboardPageHeader({
         </span>
         <div className="min-w-0">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            <h1 className="text-lg font-extrabold text-brand-950 sm:text-xl">{title}</h1>
+            <h1 className="dashboard-page-title text-lg font-extrabold text-brand-950 sm:text-xl">{title}</h1>
             {meta && <span className="text-xs font-medium text-slate-400">{meta}</span>}
           </div>
           {description && <p className="mt-1 text-xs leading-relaxed text-slate-500 sm:text-sm">{description}</p>}
@@ -74,7 +74,7 @@ export function DashboardStatusBadge({
 }) {
   return (
     <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-bold", STATUS_TONES[tone], className)}>
-      {live && <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />}
+      {live && <span className={cn("h-1.5 w-1.5 rounded-full animate-pulse", tone === "success" ? "bg-emerald-500" : "bg-red-500")} />}
       {children}
     </span>
   );

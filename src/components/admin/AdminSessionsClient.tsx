@@ -3,7 +3,14 @@
 // 관리자 영상 세션 관리 — 목록/필터/실시간 모니터링/강제 종료
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Video, RefreshCw, Users, PhoneOff } from "lucide-react";
+import { RefreshCw, Users, PhoneOff } from "lucide-react";
+import {
+  DashboardEmptyState,
+  DashboardFilterPill,
+  DashboardPageHeader,
+  DashboardPanel,
+  DashboardStatusBadge,
+} from "@/components/shared/DashboardUI";
 
 interface SessionRow {
   id: string;
@@ -34,11 +41,11 @@ const STATUS_TABS = [
   { key: "CANCELLED", label: "취소" },
 ] as const;
 
-const STATUS_BADGE: Record<SessionRow["status"], { label: string; cls: string }> = {
-  WAITING: { label: "대기", cls: "bg-amber-50 text-amber-600" },
-  ACTIVE: { label: "진행 중", cls: "bg-green-50 text-green-600" },
-  COMPLETED: { label: "완료", cls: "bg-gray-100 text-gray-500" },
-  CANCELLED: { label: "취소", cls: "bg-red-50 text-red-500" },
+const STATUS_BADGE: Record<SessionRow["status"], { label: string; tone: "gold" | "success" | "neutral" | "danger" }> = {
+  WAITING: { label: "대기", tone: "gold" },
+  ACTIVE: { label: "진행 중", tone: "success" },
+  COMPLETED: { label: "완료", tone: "neutral" },
+  CANCELLED: { label: "취소", tone: "danger" },
 };
 
 export default function AdminSessionsClient() {
@@ -131,10 +138,8 @@ export default function AdminSessionsClient() {
 
   if (unavailable) {
     return (
-      <div className="p-6">
-        <h1 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <Video size={20} className="text-indigo-500" /> 영상 세션 관리
-        </h1>
+      <div className="space-y-5">
+        <DashboardPageHeader iconName="Video" title="영상 세션 관리" description="영상 상담 세션의 연결 및 진행 상태를 관리합니다." />
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 text-sm text-amber-800">
           영상 상담 세션 테이블이 아직 데이터베이스에 반영되지 않았습니다. 스키마 반영 후
           이용할 수 있습니다.
@@ -144,36 +149,32 @@ export default function AdminSessionsClient() {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-          <Video size={20} className="text-indigo-500" /> 영상 세션 관리
-          <span className="text-sm font-normal text-gray-400">총 {total}건</span>
-        </h1>
-        <button
+    <div className="space-y-5">
+      <DashboardPageHeader
+        iconName="Video"
+        title="영상 세션 관리"
+        description="진행 중인 영상 상담과 고객 접속 상태를 실시간으로 확인합니다."
+        meta={`총 ${total}건`}
+        actions={<button
           onClick={load}
-          className="flex items-center gap-1.5 text-xs text-gray-500 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50"
+          className="flex items-center gap-1.5 rounded-xl border border-brand-100 bg-white px-3 py-2 text-xs font-semibold text-brand-700 shadow-sm hover:bg-brand-50"
         >
           <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
           새로고침
-        </button>
-      </div>
+        </button>}
+      />
 
       {/* 필터 */}
       <div className="flex items-center gap-2 flex-wrap">
         <div className="flex gap-1.5">
           {STATUS_TABS.map((t) => (
-            <button
+            <DashboardFilterPill
               key={t.key}
               onClick={() => setStatus(t.key)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                status === t.key
-                  ? "bg-indigo-600 text-white"
-                  : "bg-white border border-gray-200 text-gray-600 hover:border-indigo-300"
-              }`}
+              active={status === t.key}
             >
               {t.label}
-            </button>
+            </DashboardFilterPill>
           ))}
         </div>
         <input
@@ -196,11 +197,9 @@ export default function AdminSessionsClient() {
       {loading && rows.length === 0 ? (
         <div className="py-16 text-center text-sm text-gray-400">불러오는 중...</div>
       ) : rows.length === 0 ? (
-        <div className="py-16 text-center text-sm text-gray-400">
-          해당 조건의 영상 세션이 없습니다.
-        </div>
+        <DashboardEmptyState iconName="Video" title="해당 조건의 영상 세션이 없습니다" description="필터를 변경하거나 새로고침해 보세요." />
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+        <DashboardPanel className="overflow-x-auto">
           <table className="w-full text-xs min-w-[760px]">
             <thead>
               <tr className="border-b border-gray-100 text-gray-400 text-left">
@@ -220,14 +219,9 @@ export default function AdminSessionsClient() {
                 return (
                   <tr key={row.id} className="border-b border-gray-50 last:border-0">
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-medium ${badge.cls}`}
-                      >
-                        {live && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                        )}
+                      <DashboardStatusBadge tone={badge.tone} live={live}>
                         {badge.label}
-                      </span>
+                      </DashboardStatusBadge>
                     </td>
                     <td className="px-4 py-3 text-gray-700">
                       {new Date(row.reservation.reservationDate).toLocaleDateString("ko-KR", {
@@ -284,7 +278,7 @@ export default function AdminSessionsClient() {
               })}
             </tbody>
           </table>
-        </div>
+        </DashboardPanel>
       )}
     </div>
   );

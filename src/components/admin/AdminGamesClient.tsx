@@ -70,7 +70,7 @@ export default function AdminGamesClient({ rows }: { rows: GameTypeRow[] }) {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:py-2 rounded-lg bg-brand-500 hover:bg-brand-600 disabled:opacity-60 text-black text-sm font-semibold shadow-sm transition-colors shrink-0"
+          className="flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:py-2 rounded-xl bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white text-sm font-semibold shadow-[0_7px_18px_rgba(104,73,216,0.2)] transition-colors shrink-0"
         >
           <Save size={15} />
           {saving ? "저장 중..." : "설정 저장"}

@@ -1,20 +1,18 @@
 import { Icon } from '@/components/shared/Icon';
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getFeatureFlags } from "@/lib/settings";
 import { safeQuery } from "@/lib/safeDb";
 import { formatPrice } from "@/lib/utils";
 import { pickRoleAvatar, resolveAdminDashboardAvatar, resolveConsultantAvatar } from "@/lib/defaults";
 import SafeImage from "@/components/shared/SafeImage";
 import SeedDataButton from "@/components/admin/SeedDataButton";
+import { DashboardPageHeader } from "@/components/shared/DashboardUI";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-  const { beeDecoration: SHOW_BEES } = await getFeatureFlags();
   const session = await auth();
   if (!session) redirect("/auth/login");
   if (session.user?.role !== "SUPER_ADMIN") redirect("/");
@@ -121,23 +119,17 @@ export default async function AdminDashboard() {
 
   return (
     <div className="animate-fade-in space-y-6">
-      {/* Header */}
-      <div className="flex flex-col min-[430px]:flex-row items-start justify-between gap-3">
-        <div className="min-w-0 flex items-center gap-2">
-          <div>
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900">관리자 대시보드</h1>
-            <p className="text-xs text-gray-400 mt-0.5">{new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}</p>
-          </div>
-          {SHOW_BEES && <Sparkles size={44} strokeWidth={1.3}
-            className="w-11 h-11 text-[#2d1b69] opacity-70 pointer-events-none select-none hidden sm:block" aria-hidden="true" />}
-        </div>
-        {pendingSellers > 0 && (
+      <DashboardPageHeader
+        iconName="Dashboard"
+        title="관리자 대시보드"
+        description={new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}
+        actions={pendingSellers > 0 ? (
           <Link href="/admin/sellers" className="flex items-center justify-center gap-1.5 w-full min-[430px]:w-auto px-2.5 sm:px-3 py-2 bg-amber-50 text-amber-700 rounded-lg text-[11px] sm:text-xs font-medium hover:bg-amber-100 transition-colors border border-amber-100 flex-shrink-0">
             <Icon name="Warning" size={13} />
             <span className="hidden sm:inline">승인 대기</span> {pendingSellers}명
           </Link>
-        )}
-      </div>
+        ) : undefined}
+      />
 
       {/* Today Overview */}
       <div className="grid grid-cols-1 min-[430px]:grid-cols-3 gap-2 sm:gap-3">
@@ -185,9 +177,9 @@ export default async function AdminDashboard() {
       {/* KPI Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         {[
-          { label: "상담사", value: sellerCount, icon: "Store", href: "/admin/sellers", color: "text-blue-500" },
-          { label: "상담상품", value: `${activeProductCount}/${productCount}`, icon: "Package", href: "/admin/products", color: "text-orange-500", sub: "활성/전체" },
-          { label: "캠페인", value: `${activeCampaigns}/${campaignCount}`, icon: "Event", href: "/admin/campaigns", color: "text-pink-500", sub: "진행/전체" },
+          { label: "상담사", value: sellerCount, icon: "Consultant", href: "/admin/sellers", color: "text-brand-600" },
+          { label: "상담상품", value: `${activeProductCount}/${productCount}`, icon: "Gem", href: "/admin/products", color: "text-brand-500", sub: "활성/전체" },
+          { label: "캠페인", value: `${activeCampaigns}/${campaignCount}`, icon: "Event", href: "/admin/campaigns", color: "text-moon-700", sub: "진행/전체" },
           { label: "처리 대기", value: pendingOrders, icon: "Cart", href: "/admin/reservations", color: "text-amber-500" },
           { label: "진행중 캠페인", value: activeCampaigns, icon: "Chart", href: "/admin/campaigns", color: "text-red-500" },
           { label: "총 예약", value: reservationCount, icon: "OrderManagement", href: "/admin/reservations", color: "text-indigo-500" },

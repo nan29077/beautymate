@@ -29,7 +29,7 @@ const DEFAULT_SETTINGS: ContactSettings = {
   chatTerminationNotice: "상담이 종료되었습니다. 추가 문의사항이 있으시면 다시 문의해 주세요.",
   faqs: [
     { id: "f1", question: "상담 방식은 얼마나 걸리나요?", answer: "일반 상담 방식은 결제 완료 후 2~5일 이내, 단체 상담 상담상품은 캠페인 종료 후 7~14일 내에 진행됩니다.", isActive: true, sortOrder: 1 },
-    { id: "f2", question: "교환/반품은 어떻게 하나요?", answer: "상담상품 수령 후 7일 이내 마이페이지 > 예약내역에서 교환/반품 신청이 가능합니다. 단순 변심의 경우 반품 배송비가 발생합니다.", isActive: true, sortOrder: 2 },
+    { id: "f2", question: "예약 취소/환불은 어떻게 하나요?", answer: "마이페이지 > 예약내역에서 예약 취소·환불을 신청할 수 있습니다. 상담 진행 여부와 취소 시점에 따라 환불 규정이 적용됩니다.", isActive: true, sortOrder: 2 },
     { id: "f3", question: "상담사가 되려면 어떻게 하나요?", answer: "회원가입 후 상담사 신청 페이지에서 사업자 정보를 입력하시면 관리자 승인 후 상담사 활동이 가능합니다.", isActive: true, sortOrder: 3 },
     { id: "f4", question: "결제 수단은 무엇이 있나요?", answer: "신용카드, 체크카드, 네이버페이, 카카오페이, 토스페이, 무통장 입금 등 다양한 결제 수단을 지원합니다.", isActive: true, sortOrder: 4 },
     { id: "f5", question: "단체 상담은 무엇인가요?", answer: "상담사가 진행하는 그룹 구매로, 목표 수량 달성 시 더 저렴한 가격에 상담상품을 구매할 수 있습니다.", isActive: true, sortOrder: 5 },

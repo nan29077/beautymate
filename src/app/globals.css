@@ -117,6 +117,18 @@
   color: var(--dashboard-primary) !important;
 }
 
+.dashboard-content h1:not(.dashboard-page-title):not(:has(> svg:first-child))::before {
+  content: "";
+  display: inline-block;
+  width: 0.32rem;
+  height: 1.05em;
+  margin-right: 0.55rem;
+  border-radius: 999px;
+  vertical-align: -0.08em;
+  background: linear-gradient(to bottom, var(--dashboard-primary), var(--dashboard-gold));
+  box-shadow: 0 0 0 4px rgba(104, 73, 216, 0.07);
+}
+
 .dashboard-content h2,
 .dashboard-content h3 {
   color: #352653;
@@ -124,8 +136,10 @@
 
 .dashboard-content .bg-white.rounded-xl.border.border-gray-100,
 .dashboard-content .bg-white.rounded-2xl.border.border-gray-100,
+.dashboard-content .bg-white.rounded-lg.border.border-gray-100,
 .dashboard-content .bg-white.rounded-xl.border.border-gray-200,
-.dashboard-content .bg-white.rounded-2xl.border.border-gray-200 {
+.dashboard-content .bg-white.rounded-2xl.border.border-gray-200,
+.dashboard-content .bg-white.rounded-lg.border.border-gray-200 {
   border-color: var(--dashboard-border) !important;
   box-shadow: 0 8px 28px rgba(45, 27, 105, 0.055);
 }
@@ -200,6 +214,45 @@
   background-color: var(--dashboard-primary-dark) !important;
 }
 
+.dashboard-content .text-indigo-500,
+.dashboard-content .text-indigo-600,
+.dashboard-content .text-indigo-700,
+.dashboard-content .text-purple-500,
+.dashboard-content .text-purple-600,
+.dashboard-content .text-purple-700 {
+  color: var(--dashboard-primary) !important;
+}
+
+.dashboard-content .bg-indigo-50,
+.dashboard-content .bg-purple-50 {
+  background-color: var(--dashboard-primary-soft) !important;
+}
+
+.dashboard-content .border-indigo-100,
+.dashboard-content .border-indigo-200,
+.dashboard-content .border-purple-100,
+.dashboard-content .border-purple-200 {
+  border-color: #ddd3ff !important;
+}
+
+.dashboard-content button.bg-gray-900,
+.dashboard-content a.bg-gray-900 {
+  background: linear-gradient(135deg, var(--dashboard-primary-dark), var(--dashboard-primary)) !important;
+  color: white !important;
+}
+
+.dashboard-content button.bg-gray-900:hover,
+.dashboard-content a.bg-gray-900:hover {
+  filter: brightness(1.06);
+}
+
+.dashboard-content .fixed.inset-0.bg-black\/40,
+.dashboard-content .fixed.inset-0.bg-black\/50,
+.dashboard-content .fixed.inset-0.bg-black\/60 {
+  background-color: rgba(23, 16, 45, 0.56) !important;
+  backdrop-filter: blur(4px);
+}
+
 .dashboard-content [role="dialog"] {
   border-color: var(--dashboard-border);
   box-shadow: 0 28px 80px rgba(36, 20, 69, 0.22);
@@ -207,6 +260,13 @@
 
 .dashboard-content .animate-pulse.bg-gray-100 {
   background-color: #eee9f7;
+}
+
+@media (min-width: 768px) {
+  .dashboard-content-inner > .p-4.md\:p-6,
+  .dashboard-content-inner > .p-6 {
+    padding: 0 !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -296,8 +356,8 @@
 
 /* ── 라이브 뷰어 다크 UI ─────────────────────────────────────────── */
 .honeycomb-bg {
-  background-color: #050505;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill='%23F2A900' fill-opacity='0.03'%3E%3Cpolygon points='13.99 9.25 13.99 19.85 8.56 22.85 3.14 19.85 3.14 9.25 8.56 6.25'/%3E%3Cpolygon points='24.99 9.25 24.99 19.85 19.56 22.85 14.14 19.85 14.14 9.25 19.56 6.25'/%3E%3Cpolygon points='13.99 30.25 13.99 40.85 8.56 43.85 3.14 40.85 3.14 30.25 8.56 27.25'/%3E%3C/g%3E%3C/svg%3E");
+  background-color: #17102d;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill='%23C9B8FF' fill-opacity='0.045'%3E%3Cpolygon points='13.99 9.25 13.99 19.85 8.56 22.85 3.14 19.85 3.14 9.25 8.56 6.25'/%3E%3Cpolygon points='24.99 9.25 24.99 19.85 19.56 22.85 14.14 19.85 14.14 9.25 19.56 6.25'/%3E%3Cpolygon points='13.99 30.25 13.99 40.85 8.56 43.85 3.14 40.85 3.14 30.25 8.56 27.25'/%3E%3C/g%3E%3C/svg%3E");
 }
 .glass-dark {
   background: rgba(5, 5, 5, 0.7);
@@ -341,7 +401,7 @@
   }
 
   .badge-live {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500 text-white;
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-500 text-white;
   }
 
   .badge-scheduled {
@@ -353,13 +413,13 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center px-6 py-3 bg-brand-500 text-black font-bold rounded-3xl
-           hover:bg-brand-600 active:scale-[0.97] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center px-6 py-3 bg-brand-600 text-white font-bold rounded-3xl
+           hover:bg-brand-700 active:scale-[0.97] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center px-6 py-3 bg-gray-900 text-white font-semibold rounded-3xl
-           hover:bg-gray-800 active:scale-[0.97] transition-all duration-200;
+    @apply inline-flex items-center justify-center px-6 py-3 bg-brand-950 text-white font-semibold rounded-3xl
+           hover:bg-brand-900 active:scale-[0.97] transition-all duration-200;
   }
 
   .btn-outline {
@@ -375,7 +435,7 @@
 
   /* 친근한 카드: 큰 라운드 + 은은한 그림자 (말랑말랑) */
   .card-soft {
-    @apply bg-white rounded-[1.75rem] border border-gray-100 shadow-[0_4px_20px_rgba(245,167,0,0.06)];
+    @apply bg-white rounded-[1.75rem] border border-brand-100/70 shadow-[0_8px_28px_rgba(104,73,216,0.07)];
   }
 
   .campaign-progress {

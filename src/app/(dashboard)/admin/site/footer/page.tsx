@@ -4,13 +4,13 @@ import { Icon } from '@/components/shared/Icon';
 import { useEffect, useState } from "react";
 import { FileText, Save, X } from 'lucide-react';
 
-const SLUG_META: Record<string, { label: string; emoji: string }> = {
-  "seller-guide": { label: "상담사 신청 안내", emoji: "⬡" },
-  contact:        { label: "1대1 문의",       emoji: "📬" },
-  faq:            { label: "자주 묻는 질문",  emoji: "❓" },
-  shipping:       { label: "상담 방식 안내",       emoji: "🚚" },
-  terms:          { label: "이용약관",        emoji: "📄" },
-  privacy:        { label: "개인정보처리방침", emoji: "🔒" },
+const SLUG_META: Record<string, { label: string; iconName: string }> = {
+  "seller-guide": { label: "상담사 신청 안내", iconName: "Consultant" },
+  contact:        { label: "1대1 문의",       iconName: "Mail" },
+  faq:            { label: "자주 묻는 질문",  iconName: "Help" },
+  shipping:       { label: "상담 방식 안내",       iconName: "Video" },
+  terms:          { label: "이용약관",        iconName: "File" },
+  privacy:        { label: "개인정보처리방침", iconName: "Lock" },
 };
 
 interface FooterItem {
@@ -140,7 +140,7 @@ export default function AdminFooterPage() {
       ) : adding ? (
         <div className="bg-white rounded-xl border border-amber-200 p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-amber-700">📄 새 콘텐츠 추가</h2>
+            <h2 className="flex items-center gap-1.5 text-sm font-bold text-brand-700"><Icon name="File" size={15} /> 새 콘텐츠 추가</h2>
             <button onClick={() => setAdding(null)} className="text-gray-400 hover:text-gray-700">
               <X size={18} />
             </button>
@@ -203,8 +203,8 @@ export default function AdminFooterPage() {
       ) : editing ? (
         <div className="bg-white rounded-xl border border-amber-200 p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-amber-700">
-              {SLUG_META[editing.slug]?.emoji} {editing.title} 편집
+            <h2 className="flex items-center gap-1.5 text-sm font-bold text-brand-700">
+              <Icon name={SLUG_META[editing.slug]?.iconName ?? "File"} size={15} /> {editing.title} 편집
             </h2>
             <button onClick={() => setEditing(null)} className="text-gray-400 hover:text-gray-700">
               <X size={18} />
@@ -252,7 +252,7 @@ export default function AdminFooterPage() {
           {items.map((item) => (
             <div key={item.slug} className="bg-white rounded-xl border border-gray-100 px-4 py-3 flex items-center justify-between hover:border-amber-200 transition-colors">
               <div className="flex items-center gap-3">
-                <span className="text-xl">{SLUG_META[item.slug]?.emoji ?? "📄"}</span>
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-600"><Icon name={SLUG_META[item.slug]?.iconName ?? "File"} size={17} /></span>
                 <div>
                   <p className="text-sm font-semibold text-gray-900">{item.title}</p>
                   <p className="text-[11px] text-gray-400 mt-0.5">

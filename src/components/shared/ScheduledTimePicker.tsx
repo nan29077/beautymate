@@ -82,7 +82,7 @@ export default function ScheduledTimePicker({
               type="button"
               onClick={confirm}
               disabled={!date || hour === "" || minute === ""}
-              className="inline-flex items-center gap-1 text-xs font-bold text-black bg-brand-500 hover:bg-brand-600 px-4 py-2 rounded-lg disabled:opacity-40"
+              className="inline-flex items-center gap-1 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 px-4 py-2 rounded-xl disabled:opacity-40"
             >
               <Icon name="Check" size={13} /> 확인
             </button>

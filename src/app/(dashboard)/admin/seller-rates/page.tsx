@@ -155,7 +155,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
             </div>
             {/* 예시 플로우 */}
             <div className="bg-gray-50 rounded-xl p-4">
-              <p className="text-[11px] font-bold text-gray-600 mb-2.5">📋 예시 플로우</p>
+              <p className="flex items-center gap-1.5 text-[11px] font-bold text-gray-600 mb-2.5"><Icon name="Reorder" size={13} className="text-brand-500" /> 예시 플로우</p>
               <div className="space-y-2.5">
                 <div className="flex items-start gap-2">
                   <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -221,7 +221,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
               </p>
             </div>
             <div className="bg-gray-50 rounded-xl p-4">
-              <p className="text-[11px] font-bold text-gray-600 mb-2">💡 추천인 할인 플로우</p>
+              <p className="flex items-center gap-1.5 text-[11px] font-bold text-gray-600 mb-2"><Icon name="Lightning" size={13} className="text-moon-700" /> 추천인 할인 플로우</p>
               <div className="flex items-center gap-2 text-[11px] text-gray-500 flex-wrap">
                 <span className="bg-white px-2 py-1 rounded-lg border border-gray-200">추천 코드 입력하여 가입</span>
                 <Icon name="ArrowRight" size={12} className="text-gray-300" />
@@ -231,7 +231,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
               </div>
               <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
                 <p className="text-[10px] text-amber-700">
-                  ⚠️ <b>중요:</b> 추천인 할인과 단골+채널인증 할인은 중복 적용되지 않습니다. 둘 다 해당하는 경우 <b>더 높은 할인율</b>이 자동 적용됩니다.
+                  <b>중요:</b> 추천인 할인과 단골+채널인증 할인은 중복 적용되지 않습니다. 둘 다 해당하는 경우 <b>더 높은 할인율</b>이 자동 적용됩니다.
                 </p>
               </div>
             </div>
@@ -257,7 +257,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
               </p>
             </div>
             <div className="bg-gray-50 rounded-xl p-4">
-              <p className="text-[11px] font-bold text-gray-600 mb-2">📋 단골+채널인증 할인 예시 플로우</p>
+              <p className="flex items-center gap-1.5 text-[11px] font-bold text-gray-600 mb-2"><Icon name="Reorder" size={13} className="text-brand-500" /> 단골+채널인증 할인 예시 플로우</p>
               <div className="space-y-2.5">
                 <div className="flex items-start gap-2">
                   <div className="w-5 h-5 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -278,7 +278,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
               </div>
               <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
                 <p className="text-[10px] text-blue-700">
-                  ℹ️ 단골+채널인증 할인은 <b>해당 상담사의 상담상품 구매 시에만</b> 적용됩니다. 다른 상담사의 상담상품에는 적용되지 않습니다.
+                  <b>안내:</b> 단골+채널인증 할인은 <b>해당 상담사의 상담상품 구매 시에만</b> 적용됩니다. 다른 상담사의 상담상품에는 적용되지 않습니다.
                 </p>
               </div>
             </div>
@@ -286,7 +286,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
 
           {/* 수익 분배 종합 예시 */}
           <div className="p-5 bg-gradient-to-br from-gray-50 to-brand-50 border-t border-gray-100">
-            <h3 className="text-sm font-bold text-gray-900 mb-3">💰 종합 수익 분배 예시</h3>
+            <h3 className="flex items-center gap-1.5 text-sm font-bold text-gray-900 mb-3"><Icon name="Revenue" size={15} className="text-moon-700" /> 종합 수익 분배 예시</h3>
             <div className="bg-white rounded-xl p-4 border border-gray-100">
               <p className="text-xs text-gray-500 mb-3">상담상품가격 100,000원 | 상담사 기본 수수료 10% | 추천인 커미션 3% | 추천인 할인 5%</p>
               <div className="space-y-1.5 text-[11px]">

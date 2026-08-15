@@ -12,6 +12,7 @@ import RecommendSellerButton from "@/components/shared/RecommendSellerButton";
 import { useAppDialog } from "@/components/shared/AppDialog";
 import { withVatRate } from "@/lib/utils";
 import Pagination, { usePagination } from "@/components/shared/Pagination";
+import { DashboardEmptyState, DashboardPageHeader } from "@/components/shared/DashboardUI";
 
 export interface Seller {
   id: string; userId: string; shopName: string; shopLogo: string | null;
@@ -171,12 +172,13 @@ export default function AdminSellersClient({
 
   return (
     <>
-      <div className="mb-5">
-        <h1 className="text-lg sm:text-xl font-bold text-gray-900">상담사 관리</h1>
-        <p className="text-xs sm:text-sm text-gray-500">
-          총 {sellers.length}명 · 승인 대기 {pending.length}명
-        </p>
-      </div>
+      <DashboardPageHeader
+        iconName="Consultant"
+        title="상담사 관리"
+        description="상담사 입점 승인, 수수료와 운영 현황을 관리합니다."
+        meta={`총 ${sellers.length}명 · 승인 대기 ${pending.length}명`}
+        className="mb-5"
+      />
 
       {pending.length > 0 && (
         <div className="mb-5 rounded-xl border border-yellow-200 bg-yellow-50/60 p-3 sm:p-4">
@@ -217,9 +219,11 @@ export default function AdminSellersClient({
 
       <div className="space-y-3">
         {filtered.length === 0 ? (
-          <div className="text-center py-12 text-gray-400 bg-white rounded-xl border border-gray-100">
-            <p className="text-sm">{searchQuery ? "검색 결과가 없습니다." : "등록된 상담사가 없습니다."}</p>
-          </div>
+          <DashboardEmptyState
+            iconName="Consultant"
+            title={searchQuery ? "검색 결과가 없습니다" : "등록된 상담사가 없습니다"}
+            description={searchQuery ? "다른 상담사명이나 이메일로 검색해 보세요." : "상담사가 입점을 신청하면 이곳에 표시됩니다."}
+          />
         ) : pageItems.map((seller) => (
           <div key={seller.id} className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4">
             <div className="flex flex-wrap sm:flex-nowrap items-start sm:items-center gap-2.5 sm:gap-3 mb-3">

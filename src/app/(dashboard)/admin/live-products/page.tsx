@@ -6,6 +6,7 @@ import { NO_IMAGE } from "@/lib/defaults";
 import { Video, Eye, X, Loader2, Tag } from 'lucide-react';
 import SafeImage from "@/components/shared/SafeImage";
 import Pagination, { usePagination } from "@/components/shared/Pagination";
+import { DashboardEmptyState, DashboardFilterPill, DashboardPageHeader } from "@/components/shared/DashboardUI";
 
 interface ProductItem {
   id: string;
@@ -93,12 +94,12 @@ export default function AdminLiveProductsPage() {
 
   return (
     <div className="animate-fade-in">
-      <div className="mb-6">
-        <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-          <Icon name="Live" size={20} className="text-red-500" /> 라이브 상담 / 단체 상담 상담상품관리
-        </h1>
-        <p className="text-sm text-gray-500 mt-0.5">상담상품별 단체 상담/라이브 상담 판매 허용 여부를 설정합니다.</p>
-      </div>
+      <DashboardPageHeader
+        iconName="LiveProduct"
+        title="라이브·단체 상담 상품 관리"
+        description="상담상품별 단체 상담과 라이브 상담 판매 허용 여부를 설정합니다."
+        className="mb-6"
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-1 min-[430px]:grid-cols-3 gap-2 sm:gap-3 mb-5">
@@ -108,8 +109,8 @@ export default function AdminLiveProductsPage() {
           <p className="text-[10px] text-gray-400">전체 상담상품</p>
         </div>
         <div className="bg-white rounded-xl border border-red-100 p-3 sm:p-4">
-          <Icon name="Live" size={16} className="text-red-500 mb-1" />
-          <p className="text-lg font-bold text-red-600">{liveCount}</p>
+          <Icon name="LiveConsulting" size={16} className="text-brand-500 mb-1" />
+          <p className="text-lg font-bold text-brand-700">{liveCount}</p>
           <p className="text-[10px] text-gray-400">라이브 상담 등록</p>
         </div>
         <div className="bg-white rounded-xl border border-emerald-100 p-3 sm:p-4">
@@ -137,17 +138,14 @@ export default function AdminLiveProductsPage() {
             { id: "live" as const, label: "라이브" },
             { id: "groupbuy" as const, label: "단체 상담" },
           ].map(f => (
-            <button
+            <DashboardFilterPill
               key={f.id}
               onClick={() => setFilter(f.id)}
-              className={`px-3 py-2 text-xs font-medium rounded-lg border transition-colors ${
-                filter === f.id
-                  ? "bg-indigo-50 border-indigo-200 text-indigo-600"
-                  : "bg-white border-gray-200 text-gray-500 hover:bg-gray-50"
-              }`}
+              active={filter === f.id}
+              className="rounded-xl px-3 py-2"
             >
               {f.label}
-            </button>
+            </DashboardFilterPill>
           ))}
         </div>
       </div>
@@ -199,7 +197,7 @@ export default function AdminLiveProductsPage() {
                 {actionLoading?.startsWith(product.id) && actionLoading.includes("LiveCommerce") ? (
                   <Loader2 size={10} className="animate-spin" />
                 ) : product.allowLiveCommerce ? (
-                  <Icon name="Live" size={10} />
+                  <Icon name="LiveConsulting" size={10} />
                 ) : (
                   <X size={10} />
                 )}
@@ -209,12 +207,7 @@ export default function AdminLiveProductsPage() {
           </div>
         ))}
         {filtered.length === 0 && (
-          <div className="text-center py-16 bg-white rounded-xl border border-gray-100">
-            <Icon name="Gem" size={36} className="mx-auto text-gray-200 mb-3" />
-            <p className="text-sm text-gray-400">조건에 맞는 상담상품이 없습니다</p>
-
-          <p className="text-sm text-gray-400">조건에 맞는 상담상품이 없습니다</p>
-          </div>
+          <DashboardEmptyState iconName="LiveProduct" title="조건에 맞는 상담상품이 없습니다" description="검색어나 판매 유형 필터를 변경해 보세요." />
         )}
       </div>
       <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />

@@ -86,6 +86,8 @@ import {
   RadioTower,
   CircleDollarSign,
   MonitorPlay,
+  Bot,
+  Pin,
   type LucideIcon,
 } from "lucide-react";
 
@@ -188,6 +190,8 @@ const SYSTEM_ICONS: Record<string, LucideIcon> = {
   LiveProduct: PackageSearch,
   Revenue: CircleDollarSign,
   BroadcastTool: MonitorPlay,
+  Bot,
+  Pin,
 };
 
 export function Icon({

@@ -254,7 +254,7 @@ export default function AdminTaxClient({ sellerBusiness, sellerNonBusiness, bran
               onClick={() => setSellerSub(t.key)}
               className={`px-3.5 py-1.5 rounded-lg text-[13px] font-semibold border transition-all ${
                 sellerSub === t.key
-                  ? "bg-brand-500 text-black border-brand-500"
+                  ? "bg-brand-600 text-white border-brand-600"
                   : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
               }`}
             >

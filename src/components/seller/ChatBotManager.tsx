@@ -161,7 +161,7 @@ function BotGuideModal({ onClose }: { onClose: () => void }) {
             <Icon name="EmojiHoney_icon" size={26} className="flex-shrink-0" />
             <p className="text-[12px] text-amber-800 leading-relaxed">
               AI 사주봇은 <b>라이브 진행 중, 라이브 관리 페이지가 열려 있는 동안</b> 약 20초 간격으로 채팅을 분석해요.
-              사주나라 앱 채팅과 YouTube 채팅(읽기)을 함께 감지하고, 봇 메시지는 <b>🤖 봇 뱃지</b>와 함께 앱 채팅에 표시됩니다.
+              사주나라 앱 채팅과 YouTube 채팅(읽기)을 함께 감지하고, 봇 메시지는 <b>봇 배지</b>와 함께 앱 채팅에 표시됩니다.
             </p>
           </div>
 
@@ -647,7 +647,7 @@ export default function ChatBotManager({ onConfigSaved }: { onConfigSaved?: () =
           <input
             type="text"
             className="input-field text-sm"
-            placeholder="환영합니다! 즐거운 라이브 되세요 🍯 (비워두면 기본 문구)"
+            placeholder="환영합니다! 즐거운 라이브 되세요. (비워두면 기본 문구)"
             value={config.greetingMessage}
             onChange={e => patch({ greetingMessage: e.target.value })}
           />
@@ -960,7 +960,7 @@ export default function ChatBotManager({ onConfigSaved }: { onConfigSaved?: () =
           <div className="space-y-1.5 max-h-72 overflow-y-auto">
             {logs.map(log => (
               <div key={log.id} className="flex items-start gap-2.5 p-2.5 bg-amber-50/50 border border-amber-100/70 rounded-xl">
-                <span className="text-sm flex-shrink-0">🤖</span>
+                <Icon name="Bot" size={15} className="flex-shrink-0 text-brand-600" />
                 <div className="flex-1 min-w-0">
                   <p className="text-[12px] text-gray-700 leading-relaxed break-all">{log.message}</p>
                   <p className="text-[10px] text-gray-400 mt-0.5">

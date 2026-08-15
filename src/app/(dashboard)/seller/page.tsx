@@ -2,7 +2,6 @@ import { Icon } from '@/components/shared/Icon';
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
-  Sparkles,
   CalendarCheck,
   CheckCircle2,
   Clock,
@@ -22,6 +21,7 @@ import { isVideoMethod, CONSULTING_METHOD_FALLBACK } from "@/lib/consultingSessi
 import ShopLinkButton from "@/components/shared/ShopLinkButton";
 import SellerLiveCodeCard from "@/components/shared/SellerLiveCodeCard";
 import DashboardReservationComplete from "@/components/seller/DashboardReservationComplete";
+import { DashboardPageHeader } from "@/components/shared/DashboardUI";
 
 export const dynamic = "force-dynamic";
 
@@ -52,7 +52,7 @@ function MethodBadge({ method }: { method: string | null }) {
 }
 
 export default async function SellerDashboard() {
-  const { beeDecoration: SHOW_BEES, liveCommerce: LIVE_ON } = await getFeatureFlags();
+  const { liveCommerce: LIVE_ON } = await getFeatureFlags();
   const session = await auth();
   if (!session) redirect("/auth/login");
   if (session.user?.role !== "CONSULTANT") redirect("/");
@@ -166,17 +166,11 @@ export default async function SellerDashboard() {
 
   return (
     <div className="animate-fade-in space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex items-center gap-2">
-          <div>
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900">상담사 대시보드</h1>
-            <p className="text-xs text-gray-400 mt-0.5">{seller.shopName} · {new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })}</p>
-          </div>
-          {SHOW_BEES && <Sparkles size={44} strokeWidth={1.3}
-            className="w-11 h-11 text-[#2d1b69] opacity-70 pointer-events-none select-none hidden sm:block" aria-hidden="true" />}
-        </div>
-      </div>
+      <DashboardPageHeader
+        iconName="MoonStar"
+        title="상담사 대시보드"
+        description={`${seller.shopName} · ${new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })}`}
+      />
 
       {/* My Shop URL */}
       <div className="bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100 p-3.5 sm:p-4">

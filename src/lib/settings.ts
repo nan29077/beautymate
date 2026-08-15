@@ -170,6 +170,9 @@ export async function getSocialLinks(): Promise<import("@/lib/featureFlags").Soc
 // 푸터 회사정보 조회
 export async function getFooterSettings(): Promise<FooterSettings> {
   const map = await getSettingsMap();
+  const copyright = (map[FOOTER_COPYRIGHT_KEY] ?? FOOTER_DEFAULTS.copyright)
+    .replace(/Sellerbricks/gi, "사주나라")
+    .replace(/셀러브릭스|사주메이트/g, "사주나라");
   return {
     companyName: map[FOOTER_COMPANY_NAME_KEY] ?? FOOTER_DEFAULTS.companyName,
     ceoName: map[FOOTER_CEO_NAME_KEY] ?? FOOTER_DEFAULTS.ceoName,
@@ -177,7 +180,7 @@ export async function getFooterSettings(): Promise<FooterSettings> {
     mailOrderNum: map[FOOTER_MAIL_ORDER_NUM_KEY] ?? FOOTER_DEFAULTS.mailOrderNum,
     phone: map[FOOTER_PHONE_KEY] ?? FOOTER_DEFAULTS.phone,
     address: map[FOOTER_ADDRESS_KEY] ?? FOOTER_DEFAULTS.address,
-    copyright: map[FOOTER_COPYRIGHT_KEY] ?? FOOTER_DEFAULTS.copyright,
+    copyright,
   };
 }
 

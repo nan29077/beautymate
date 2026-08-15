@@ -13,6 +13,7 @@ import ScheduledTimePicker from "@/components/shared/ScheduledTimePicker";
 import { useAppDialog } from "@/components/shared/AppDialog";
 import { useFeatureFlags } from "@/components/shared/FeatureFlagsProvider";
 import Pagination, { usePagination } from "@/components/shared/Pagination";
+import { DashboardPageHeader } from "@/components/shared/DashboardUI";
 
 interface LiveStream {
   id: string; title: string; description: string | null; thumbnailImage: string | null;
@@ -626,18 +627,15 @@ export default function SellerLivePage() {
 
   return (
     <div className="animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <Icon name="Live" size={20} className="text-red-500" /> 라이브 상담
-          </h1>
-          <p className="text-sm text-gray-500 mt-0.5">총 {lives.length}개의 라이브 · 진행/예정 {liveCount}개</p>
-        </div>
-        <button onClick={openCreate} className="btn-primary text-sm flex items-center gap-1.5 !px-4 !py-2.5">
+      <DashboardPageHeader
+        iconName="LiveConsulting"
+        title="라이브 상담"
+        description={`총 ${lives.length}개의 라이브 · 진행/예정 ${liveCount}개`}
+        className="mb-6"
+        actions={<button onClick={openCreate} className="btn-primary text-sm flex items-center gap-1.5 !px-4 !py-2.5 !text-white">
           <Icon name="Plus" size={16} /> 새 라이브
-        </button>
-      </div>
+        </button>}
+      />
 
       {/* Tab: Live / VOD / AI Bot / Site Settings */}
       <div className="flex gap-1 bg-gray-100 p-1 rounded-xl mb-5 overflow-x-auto no-scrollbar">
@@ -1699,7 +1697,8 @@ export default function SellerLivePage() {
                     ) : (!msg.isBot && !msg.isManager && !msg.isSystem) ? (
                       <img src="/favicon.png" alt="사주나라" title="사주나라 채팅" className="w-3.5 h-3.5 rounded-[3px]" />
                     ) : null}
-                    <span>{msg.isBot ? "🤖 " : msg.isManager ? "📢 " : msg.isSystem ? "📌 " : ""}{msg.nickname}</span>
+                    {msg.isBot ? <Icon name="Bot" size={12} className="text-brand-600" /> : msg.isManager ? <Icon name="Megaphone" size={12} className="text-brand-600" /> : msg.isSystem ? <Icon name="Pin" size={12} className="text-moon-700" /> : null}
+                    <span>{msg.nickname}</span>
                   </span>
                   {msg.isHidden && <span className="text-[9px] text-red-400 ml-1">[숨김]</span>}
                   <span className="text-gray-400 mx-1">·</span>
@@ -2436,7 +2435,7 @@ function LiveCard({ live, onAction, actionLoading, onDetail, onProductManage, on
           </button>
           <button
             onClick={() => {
-              const kakaoMsg = `🔴 라이브 방송 안내\n\n${live.title}\n\n지금 바로 시청하세요!\n${shareUrl}`;
+              const kakaoMsg = `[라이브 방송 안내]\n\n${live.title}\n\n지금 바로 시청하세요!\n${shareUrl}`;
               if (navigator.share) {
                 navigator.share({ title: live.title, text: kakaoMsg, url: shareUrl }).catch(() => {});
               } else {

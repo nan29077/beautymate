@@ -378,7 +378,7 @@ export default function AiSettingsForm({
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-brand-500 text-black text-[13px] font-bold hover:bg-brand-600 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-600 text-white text-[13px] font-bold hover:bg-brand-700 disabled:opacity-50 transition-colors"
           >
             {saving ? <Loader2 size={15} strokeWidth={1.75} className="animate-spin" /> : <Save size={15} strokeWidth={1.75} />}
             저장

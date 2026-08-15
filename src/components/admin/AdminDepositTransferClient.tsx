@@ -329,7 +329,7 @@ export default function AdminDepositTransferClient() {
             <button
               onClick={saveSettings}
               disabled={savingSettings}
-              className="px-4 py-2 text-[13px] font-semibold text-black bg-brand-500 rounded-lg hover:bg-brand-600 disabled:opacity-50"
+              className="px-4 py-2 text-[13px] font-semibold text-white bg-brand-600 rounded-xl hover:bg-brand-700 disabled:opacity-50"
             >
               {savingSettings ? "저장 중..." : "설정 저장"}
             </button>
@@ -442,7 +442,7 @@ export default function AdminDepositTransferClient() {
             <button
               onClick={() => setShowConfirm(true)}
               disabled={!canTransfer}
-              className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold text-black bg-brand-500 rounded-lg hover:bg-brand-600 disabled:opacity-40"
+              className="flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold text-white bg-brand-600 rounded-xl hover:bg-brand-700 disabled:opacity-40"
             >
               <Icon name="Share" size={14} /> 2. 이체 실행
             </button>
@@ -527,7 +527,7 @@ export default function AdminDepositTransferClient() {
               <button
                 key={p}
                 onClick={() => loadHistory(p)}
-                className={`w-7 h-7 text-[12px] rounded-lg ${p === page ? "bg-brand-500 text-black font-bold" : "text-gray-500 hover:bg-gray-100"}`}
+                className={`w-7 h-7 text-[12px] rounded-lg ${p === page ? "bg-brand-600 text-white font-bold" : "text-gray-500 hover:bg-brand-50"}`}
               >
                 {p}
               </button>
@@ -567,7 +567,7 @@ export default function AdminDepositTransferClient() {
               <button
                 onClick={executeTransfer}
                 disabled={transferring}
-                className="flex-1 py-2.5 text-[13px] font-bold text-black bg-brand-500 rounded-xl hover:bg-brand-600 disabled:opacity-50"
+                className="flex-1 py-2.5 text-[13px] font-bold text-white bg-brand-600 rounded-xl hover:bg-brand-700 disabled:opacity-50"
               >
                 {transferring ? "이체 중..." : `${fmt(amountNum)}원 이체`}
               </button>
