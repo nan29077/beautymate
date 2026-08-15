@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { getShareBaseUrl, toAbsoluteShareUrl } from "@/lib/shareMetadata";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/utils";
 import SafeImage from "@/components/shared/SafeImage";
@@ -94,7 +95,9 @@ export async function generateMetadata({
   const title = `${seller.shopName}의 점집 - 사주나라`;
   const description =
     custom.tagline || seller.shopDescription || `${seller.shopName}에게 지금 상담을 예약하세요.`;
-  const image = seller.shopBanner || "/opengraph-image";
+  const shareBaseUrl = getShareBaseUrl();
+  const pageUrl = new URL(`/c/${encodeURIComponent(slug)}`, shareBaseUrl).toString();
+  const image = toAbsoluteShareUrl(seller.shopBanner, shareBaseUrl);
 
   return {
     title,
@@ -102,7 +105,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      url: `/c/${slug}`,
+      url: pageUrl,
       siteName: "사주나라",
       type: "profile",
       images: [{ url: image, width: 1200, height: 630, alt: `${seller.shopName}의 점집` }],

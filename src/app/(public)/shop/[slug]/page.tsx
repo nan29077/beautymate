@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { getShareBaseUrl, toAbsoluteShareUrl } from "@/lib/shareMetadata";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/utils";
 import SafeImage from "@/components/shared/SafeImage";
@@ -129,6 +130,9 @@ export async function generateMetadata({
   const description =
     custom.tagline || seller.shopDescription || `${seller.shopName}에게 지금 상담을 예약하세요.`;
   const image = resolveShopBanner(seller.shopBanner, seller.id);
+  const shareBaseUrl = getShareBaseUrl();
+  const pageUrl = new URL(`/shop/${encodeURIComponent(slug)}`, shareBaseUrl).toString();
+  const imageUrl = toAbsoluteShareUrl(image, shareBaseUrl);
   const pageTitle = seller.shopName.endsWith("점집") ? seller.shopName : `${seller.shopName}의 점집`;
   const title = `${pageTitle} - 사주나라`;
 
@@ -138,12 +142,12 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      url: `/shop/${slug}`,
+      url: pageUrl,
       siteName: "사주나라",
       type: "profile",
-      images: [{ url: image, width: 1200, height: 630, alt: `${seller.shopName}의 점집` }],
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: `${seller.shopName}의 점집` }],
     },
-    twitter: { card: "summary_large_image", title, description, images: [image] },
+    twitter: { card: "summary_large_image", title, description, images: [imageUrl] },
   };
 }
 

@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { headers } from "next/headers";
 import { Suspense } from "react";
 import "./globals.css";
 import Providers from "@/components/shared/Providers";
@@ -7,6 +6,7 @@ import NavigationProgress from "@/components/shared/NavigationProgress";
 import { getFeatureFlags } from "@/lib/settings";
 import ThemeEffect from "@/components/shared/ThemeEffect";
 import { prisma } from "@/lib/prisma";
+import { getShareBaseUrl, toAbsoluteShareUrl } from "@/lib/shareMetadata";
 
 export const dynamic = "force-dynamic";
 
@@ -17,8 +17,7 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-const metadataBase: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://sajunara.co.kr"),
+const baseMetadata: Metadata = {
   title: "사주나라 - 라이브 점사 예약 플랫폼",
   description:
     "방송하는 동안 예약이 알아서 들어옵니다. 유튜브·SNS 사주·신점·타로 상담사를 위한 예약 커머스",
@@ -60,25 +59,23 @@ const metadataBase: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  // 공유(카카오톡 등) 미리보기 이미지(OG 이미지)가 "실제 접속 도메인"에서 로드되도록
-  // 요청 호스트로 metadataBase 를 계산한다.
-  // (localhost 로 고정하면 카카오 서버 등 외부에서 이미지를 못 불러와 미리보기가 빈칸이 된다.)
-  const h = headers();
-  const host = h.get("x-forwarded-host") || h.get("host") || "";
-  const proto =
-    h.get("x-forwarded-proto") ||
-    (host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https");
-  const base = host
-    ? `${proto}://${host}`
-    : process.env.NEXT_PUBLIC_APP_URL || "https://sajunara.co.kr";
-
-  let metaBaseUrl: URL;
-  try {
-    metaBaseUrl = new URL(base);
-  } catch {
-    metaBaseUrl = new URL(process.env.NEXT_PUBLIC_APP_URL || "https://sajunara.co.kr");
-  }
-  const withBase: Metadata = { ...metadataBase, metadataBase: metaBaseUrl };
+  const metaBaseUrl = getShareBaseUrl();
+  const pageUrl = metaBaseUrl.toString();
+  const imageUrl = toAbsoluteShareUrl("/og-image.png", metaBaseUrl);
+  const withBase: Metadata = {
+    ...baseMetadata,
+    metadataBase: metaBaseUrl,
+    alternates: { canonical: pageUrl },
+    openGraph: {
+      ...baseMetadata.openGraph,
+      url: pageUrl,
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: "사주나라 - 라이브 점사 예약 플랫폼", type: "image/png" }],
+    },
+    twitter: {
+      ...baseMetadata.twitter,
+      images: [imageUrl],
+    },
+  };
 
   let customFavicon = "";
   try {
