@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { getFeatureFlags } from "@/lib/settings";
 import { pickRoleAvatar, resolveAdminDashboardAvatar, resolveConsultantAvatar, shouldUseAvatar } from "@/lib/defaults";
 import type { FeatureFlags } from "@/lib/featureFlags";
-import { Shield, Building2, Crown, User } from 'lucide-react';
+import { Shield, UserRoundCog, User } from 'lucide-react';
 import LogoutButton from "@/components/shared/LogoutButton";
 import MobileSidebar from "@/components/shared/MobileSidebar";
 import SidebarNavLinks from "@/components/shared/SidebarNavLinks";
@@ -42,12 +42,12 @@ export default async function DashboardLayout({
       { href: "/admin/users", iconName: "Users", label: "회원 관리", group: "회원 관리" },
       { href: "/admin/customers", iconName: "UserCheck", label: "고객 귀속 관리", group: "회원 관리" },
       { href: "/admin/members", iconName: "Users", label: "단골 회원 관리", group: "회원 관리" },
-      { href: "/admin/sellers", iconName: "Sparkles", label: "상담사 관리", group: "회원 관리" },
+      { href: "/admin/sellers", iconName: "Consultant", label: "상담사 관리", group: "회원 관리" },
       // 상담상품 관리
       { href: "/admin/products", iconName: "Gem", label: "상담상품 관리", group: "상담상품 관리" },
       { href: "/admin/categories", iconName: "Category", label: "카테고리 관리", group: "상담상품 관리" },
       // 예약·정산
-      { href: "/admin/reservations", iconName: "Calendar", label: "예약 관리", group: "예약·정산" },
+      { href: "/admin/reservations", iconName: "Reservation", label: "예약 관리", group: "예약·정산" },
       { href: "/admin/sessions", iconName: "Video", label: "영상 세션 관리", group: "예약·정산" },
       { href: "/admin/campaigns", iconName: "Event", label: "단체 상담 관리", group: "예약·정산" },
       { href: "/admin/settlements", iconName: "Settlement", label: "정산·재무 관리", group: "예약·정산" },
@@ -55,8 +55,8 @@ export default async function DashboardLayout({
       { href: "/admin/banners", iconName: "Globe", label: "사이트 관리", group: "콘텐츠" },
       { href: "/admin/contents", iconName: "Content", label: "콘텐츠 관리", group: "콘텐츠" },
       { href: "/admin/games", iconName: "Play", label: "게임관리", group: "콘텐츠" },
-      { href: "/admin/lives", iconName: "Live", label: "라이브 관리", group: "콘텐츠" },
-      { href: "/admin/live-products", iconName: "Live", label: "라이브 상담상품관리", group: "콘텐츠" },
+      { href: "/admin/lives", iconName: "LiveConsulting", label: "라이브 관리", group: "콘텐츠" },
+      { href: "/admin/live-products", iconName: "LiveProduct", label: "라이브 상담상품관리", group: "콘텐츠" },
       // 알림톡
       { href: "/admin/alimtalk", iconName: "Notification", label: "알림톡 관리", group: "알림톡" },
       // 고객지원
@@ -72,12 +72,12 @@ export default async function DashboardLayout({
       // 상담상품 관리
       { href: "/seller/products", iconName: "Gem", label: "상담상품 관리", group: "상담상품 관리" },
       // 판매·라이브 (콘텐츠/단체 상담/게임 메뉴는 점집 운영에 쓰지 않아 제거)
-      { href: "/seller/live-mode", iconName: "Video", label: "예약 현황", group: "판매·라이브" },
-      { href: "/seller/live", iconName: "Live", label: "라이브 상담", group: "판매·라이브" },
-      { href: "/seller/widget", iconName: "QrCode", label: "방송 도구", group: "판매·라이브" },
+      { href: "/seller/live-mode", iconName: "Reservation", label: "예약 현황", group: "판매·라이브" },
+      { href: "/seller/live", iconName: "LiveConsulting", label: "라이브 상담", group: "판매·라이브" },
+      { href: "/seller/widget", iconName: "BroadcastTool", label: "방송 도구", group: "판매·라이브" },
       // 예약·정산
       { href: "/seller/timeslots", iconName: "Clock", label: "예약 시간 설정", group: "예약·정산" },
-      { href: "/seller/reservations", iconName: "Calendar", label: "예약 관리", group: "예약·정산" },
+      { href: "/seller/reservations", iconName: "Reservation", label: "예약 관리", group: "예약·정산" },
       { href: "/seller/customers", iconName: "Users", label: "고객관리(CRM)", group: "예약·정산" },
       { href: "/seller/members", iconName: "UserCheck", label: "단골 회원", group: "예약·정산" },
       { href: "/seller/settlements", iconName: "Settlement", label: "정산·출금", group: "예약·정산" },
@@ -145,18 +145,18 @@ export default async function DashboardLayout({
   const sidebarAvatar = displayImage;
 
   const roleConfig: Record<string, { label: string; labelEn: string; icon: any; color: string; gradient: string }> = {
-    SUPER_ADMIN: { label: "최고관리자", labelEn: "Admin Console", icon: Shield, color: "text-red-600 bg-red-50", gradient: "from-red-500 to-rose-600" },
-    CONSULTANT: { label: "상담사", labelEn: "Consultant Studio", icon: Building2, color: "text-blue-600 bg-blue-50", gradient: "from-blue-500 to-indigo-600" },
-    CUSTOMER: { label: "고객", labelEn: "My Page", icon: User, color: "text-green-600 bg-green-50", gradient: "from-green-500 to-emerald-600" },
+    SUPER_ADMIN: { label: "최고관리자", labelEn: "Admin Console", icon: Shield, color: "text-brand-700 bg-brand-50 border border-brand-100", gradient: "from-brand-700 to-brand-500" },
+    CONSULTANT: { label: "상담사", labelEn: "Consultant Studio", icon: UserRoundCog, color: "text-brand-700 bg-moon-50 border border-moon-100", gradient: "from-brand-600 to-moon-500" },
+    CUSTOMER: { label: "고객", labelEn: "My Page", icon: User, color: "text-brand-700 bg-brand-50 border border-brand-100", gradient: "from-brand-600 to-brand-400" },
   };
   const rc = roleConfig[role] || roleConfig.CUSTOMER;
 
   return (
-    <div className="min-h-screen bg-[#fdfaf0]" data-dashboard-role={role}>
+    <div className="dashboard-shell min-h-screen" data-dashboard-role={role}>
       {/* Desktop Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-[260px] bg-white border-r border-gray-100/80 hidden lg:flex flex-col z-40">
+      <aside className="dashboard-sidebar fixed left-0 top-0 bottom-0 w-[272px] hidden lg:flex flex-col z-40">
         {/* Logo & Role */}
-        <div className="px-5 py-4 border-b border-gray-100/80 flex items-start justify-between">
+        <div className="px-5 py-5 border-b border-brand-100/70 flex items-start justify-between">
           <Link href="/" className="flex flex-col items-start gap-0.5">
             <BrandWordmark size="md" />
             <p className="text-[9px] text-gray-400 tracking-wide pl-0.5">{rc.labelEn}</p>
@@ -166,7 +166,7 @@ export default async function DashboardLayout({
         </div>
 
         {/* User Profile */}
-        <div className="px-4 py-3.5 border-b border-gray-100/80">
+        <div className="mx-3 mt-3 px-3 py-3.5 rounded-2xl border border-brand-100/80 bg-gradient-to-br from-brand-50/90 to-white shadow-sm">
           <div className="flex items-center gap-3">
             {displayImage ? (
               <img
@@ -191,7 +191,7 @@ export default async function DashboardLayout({
         <SidebarNavLinks items={items} />
 
         {/* Bottom Actions */}
-        <div className="p-3 border-t border-gray-100/80 space-y-0.5">
+        <div className="p-3 border-t border-brand-100/70 space-y-0.5">
           <Link
             href="/?main=1"
             className="flex items-center gap-3 px-3 py-2 text-[13px] text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -216,8 +216,8 @@ export default async function DashboardLayout({
       />
 
       {/* Main Content */}
-      <main className="dashboard-content lg:ml-[260px] min-h-screen p-3 sm:p-6 lg:p-8 overflow-x-hidden">
-        {children}
+      <main className="dashboard-content lg:ml-[272px] min-h-screen p-3 sm:p-6 lg:p-8 overflow-x-hidden">
+        <div className="dashboard-content-inner mx-auto w-full max-w-[1560px]">{children}</div>
       </main>
     </div>
   );

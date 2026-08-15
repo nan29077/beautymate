@@ -3,7 +3,14 @@
 // 관리자 라이브 관리 — 전체 라이브 목록 + 방송별 예약 현황
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Radio, RefreshCw, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { RefreshCw, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import {
+  DashboardEmptyState,
+  DashboardFilterPill,
+  DashboardPageHeader,
+  DashboardPanel,
+  DashboardStatusBadge,
+} from "@/components/shared/DashboardUI";
 
 interface LiveRow {
   id: string;
@@ -32,11 +39,11 @@ const STATUS_TABS = [
   { key: "ENDED", label: "종료" },
 ] as const;
 
-const STATUS_BADGE: Record<LiveRow["status"], { label: string; cls: string }> = {
-  SCHEDULED: { label: "예정", cls: "bg-amber-50 text-amber-600" },
-  LIVE: { label: "LIVE", cls: "bg-red-50 text-red-600" },
-  ENDED: { label: "종료", cls: "bg-gray-100 text-gray-500" },
-  CANCELLED: { label: "취소", cls: "bg-gray-100 text-gray-400" },
+const STATUS_BADGE: Record<LiveRow["status"], { label: string; tone: "gold" | "danger" | "neutral" }> = {
+  SCHEDULED: { label: "예정", tone: "gold" },
+  LIVE: { label: "LIVE", tone: "danger" },
+  ENDED: { label: "종료", tone: "neutral" },
+  CANCELLED: { label: "취소", tone: "neutral" },
 };
 
 export default function AdminLivesClient() {
@@ -72,38 +79,34 @@ export default function AdminLivesClient() {
   }, [load]);
 
   return (
-    <div className="p-4 md:p-6 space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-          <Radio size={20} className="text-red-500" /> 라이브 관리
-          <span className="text-sm font-normal text-gray-400">총 {total}건</span>
-        </h1>
-        <button
+    <div className="space-y-5">
+      <DashboardPageHeader
+        iconName="LiveConsulting"
+        title="라이브 관리"
+        description="상담사의 라이브 방송과 예약 연결 상태를 한곳에서 확인합니다."
+        meta={`총 ${total}건`}
+        actions={<button
           onClick={load}
-          className="flex items-center gap-1.5 text-xs text-gray-500 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50"
+          className="flex items-center gap-1.5 rounded-xl border border-brand-100 bg-white px-3 py-2 text-xs font-semibold text-brand-700 shadow-sm hover:bg-brand-50"
         >
           <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
           새로고침
-        </button>
-      </div>
+        </button>}
+      />
 
       <div className="flex items-center gap-2 flex-wrap">
         <div className="flex gap-1.5">
           {STATUS_TABS.map((t) => (
-            <button
+            <DashboardFilterPill
               key={t.key}
               onClick={() => {
                 setPage(1);
                 setStatus(t.key);
               }}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                status === t.key
-                  ? "bg-gray-900 text-white"
-                  : "bg-white border border-gray-200 text-gray-600 hover:border-gray-400"
-              }`}
+              active={status === t.key}
             >
               {t.label}
-            </button>
+            </DashboardFilterPill>
           ))}
         </div>
         <select
@@ -124,11 +127,11 @@ export default function AdminLivesClient() {
       </div>
 
       {loading && rows.length === 0 ? (
-        <div className="py-16 text-center text-sm text-gray-400">불러오는 중...</div>
+        <div className="py-16 text-center text-sm text-brand-400">불러오는 중...</div>
       ) : rows.length === 0 ? (
-        <div className="py-16 text-center text-sm text-gray-400">라이브가 없습니다.</div>
+        <DashboardEmptyState iconName="LiveConsulting" title="등록된 라이브가 없습니다" description="상담사가 라이브를 등록하면 이곳에 표시됩니다." />
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+        <DashboardPanel className="overflow-x-auto">
           <table className="w-full text-xs min-w-[860px]">
             <thead>
               <tr className="border-b border-gray-100 text-gray-400 text-left">
@@ -148,14 +151,9 @@ export default function AdminLivesClient() {
                 return (
                   <tr key={row.id} className="border-b border-gray-50 last:border-0">
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-medium ${badge.cls}`}
-                      >
-                        {row.status === "LIVE" && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                        )}
+                      <DashboardStatusBadge tone={badge.tone} live={row.status === "LIVE"}>
                         {badge.label}
-                      </span>
+                      </DashboardStatusBadge>
                     </td>
                     <td className="px-4 py-3">
                       <Link
@@ -204,7 +202,7 @@ export default function AdminLivesClient() {
               })}
             </tbody>
           </table>
-        </div>
+        </DashboardPanel>
       )}
 
       {totalPages > 1 && (

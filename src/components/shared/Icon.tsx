@@ -80,6 +80,12 @@ import {
   Moon,
   MoonStar,
   Gem,
+  UserRoundCog,
+  CalendarCheck2,
+  PackageSearch,
+  RadioTower,
+  CircleDollarSign,
+  MonitorPlay,
   type LucideIcon,
 } from "lucide-react";
 
@@ -176,6 +182,12 @@ const SYSTEM_ICONS: Record<string, LucideIcon> = {
   Support: Headset,
   Operation: SlidersHorizontal,
   LinkShorten_icon: Link2,
+  Consultant: UserRoundCog,
+  Reservation: CalendarCheck2,
+  LiveConsulting: RadioTower,
+  LiveProduct: PackageSearch,
+  Revenue: CircleDollarSign,
+  BroadcastTool: MonitorPlay,
 };
 
 export function Icon({

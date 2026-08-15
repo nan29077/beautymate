@@ -86,17 +86,22 @@ export async function POST(
   }
 
   const hashed = await bcrypt.hash(password, 12);
+  // 운영 DB 스키마 드리프트 대응:
+  //  - role 은 레거시 enum 값 BUYER 로 생성(운영 DB에 CUSTOMER enum 이 미반영일 수 있음).
+  //    normalizeRole 이 세션 레이어에서 BUYER → CUSTOMER 로 변환하므로 동작은 동일.
+  //  - select: { id: true } 로 미반영 컬럼 전체 조회를 피한다(없으면 create 가 500 을 낸다).
   const user = await prisma.user.create({
     data: {
       name,
       email,
       password: hashed,
-      role: "CUSTOMER",
+      role: "BUYER",
       isActive: true,
       phone,
       gender: Math.random() < 0.5 ? "male" : "female",
       avatar: randomAvatar(Math.random() < 0.5 ? "male" : "female"),
     },
+    select: { id: true },
   });
 
   // 점집 귀속(레퍼럴) — 기존 1단계 체계와 병행 유지

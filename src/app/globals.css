@@ -63,6 +63,163 @@
   }
 }
 
+/* ── 사주나라 대시보드 디자인 시스템 ─────────────────────────────── */
+.dashboard-shell {
+  --dashboard-primary: #6849d8;
+  --dashboard-primary-dark: #3b2977;
+  --dashboard-primary-soft: #f1edff;
+  --dashboard-gold: #d8ad50;
+  --dashboard-canvas: #f7f5fc;
+  --dashboard-border: #e9e3f7;
+  --dashboard-ink: #241445;
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 10% 4%, rgba(137, 106, 241, 0.13), transparent 24rem),
+    radial-gradient(circle at 92% 92%, rgba(242, 198, 109, 0.12), transparent 25rem),
+    var(--dashboard-canvas);
+}
+
+.dashboard-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.45;
+  background-image: radial-gradient(rgba(104, 73, 216, 0.12) 0.7px, transparent 0.7px);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+}
+
+.dashboard-sidebar {
+  border-right: 1px solid rgba(221, 211, 255, 0.82);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 16px 0 44px rgba(36, 20, 69, 0.045);
+  backdrop-filter: blur(18px);
+}
+
+.dashboard-sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dashboard-mobile-header,
+.dashboard-mobile-drawer {
+  box-shadow: 0 8px 28px rgba(36, 20, 69, 0.07);
+}
+
+.dashboard-content h1 {
+  color: var(--dashboard-ink);
+  letter-spacing: -0.025em;
+}
+
+.dashboard-content h1 > svg:first-child {
+  color: var(--dashboard-primary) !important;
+}
+
+.dashboard-content h2,
+.dashboard-content h3 {
+  color: #352653;
+}
+
+.dashboard-content .bg-white.rounded-xl.border.border-gray-100,
+.dashboard-content .bg-white.rounded-2xl.border.border-gray-100,
+.dashboard-content .bg-white.rounded-xl.border.border-gray-200,
+.dashboard-content .bg-white.rounded-2xl.border.border-gray-200 {
+  border-color: var(--dashboard-border) !important;
+  box-shadow: 0 8px 28px rgba(45, 27, 105, 0.055);
+}
+
+.dashboard-content .bg-gray-900.rounded-xl,
+.dashboard-content .bg-gray-900.rounded-2xl {
+  background: linear-gradient(135deg, #241445, #5639b5) !important;
+  box-shadow: 0 12px 30px rgba(36, 20, 69, 0.18);
+}
+
+.dashboard-content .bg-amber-400.rounded-xl,
+.dashboard-content .bg-amber-400.rounded-2xl {
+  background: linear-gradient(135deg, #f7dda0, #f2c66d) !important;
+  box-shadow: 0 10px 26px rgba(183, 138, 54, 0.14);
+}
+
+.dashboard-content input:not([type="checkbox"]):not([type="radio"]),
+.dashboard-content select,
+.dashboard-content textarea {
+  border-color: #ded8eb;
+  background-color: rgba(255, 255, 255, 0.94);
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.dashboard-content input:not([type="checkbox"]):not([type="radio"]):focus,
+.dashboard-content select:focus,
+.dashboard-content textarea:focus {
+  border-color: var(--dashboard-primary) !important;
+  box-shadow: 0 0 0 3px rgba(104, 73, 216, 0.13) !important;
+  outline: none;
+}
+
+.dashboard-content table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.dashboard-content thead {
+  background: linear-gradient(to right, #faf9fd, #f5f1ff);
+}
+
+.dashboard-content th {
+  color: #675a7d;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.dashboard-content tbody tr {
+  transition: background-color 150ms ease;
+}
+
+.dashboard-content tbody tr:hover {
+  background-color: rgba(247, 244, 255, 0.8);
+}
+
+.dashboard-content button,
+.dashboard-content a {
+  outline-color: var(--dashboard-primary);
+}
+
+.dashboard-content button.bg-indigo-600,
+.dashboard-content a.bg-indigo-600,
+.dashboard-content button.bg-purple-600,
+.dashboard-content a.bg-purple-600 {
+  background-color: var(--dashboard-primary) !important;
+}
+
+.dashboard-content button.bg-indigo-600:hover,
+.dashboard-content a.bg-indigo-600:hover,
+.dashboard-content button.bg-purple-600:hover,
+.dashboard-content a.bg-purple-600:hover {
+  background-color: var(--dashboard-primary-dark) !important;
+}
+
+.dashboard-content [role="dialog"] {
+  border-color: var(--dashboard-border);
+  box-shadow: 0 28px 80px rgba(36, 20, 69, 0.22);
+}
+
+.dashboard-content .animate-pulse.bg-gray-100 {
+  background-color: #eee9f7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-shell *,
+  .dashboard-shell *::before,
+  .dashboard-shell *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* 관리자 콘솔 모바일 공통 규칙: 콘텐츠 폭, 폼, 표, 모달을 작은 화면 안에 유지한다. */
 @media (max-width: 639px) {
   [data-dashboard-role="SUPER_ADMIN"] .dashboard-content {
