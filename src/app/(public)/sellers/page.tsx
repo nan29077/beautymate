@@ -18,14 +18,17 @@ export default async function SellersPage({
 }: {
   searchParams?: { category?: string };
 }) {
-  const { seller: FEATURE_SELLER } = await getFeatureFlags();
-  if (!FEATURE_SELLER) notFound();
+  // FEATURE_SELLER 플래그와 무관하게 상담사 목록 페이지는 항상 접근 가능
 
   // 메인 카테고리(사주·신점·타로 등)에서 넘어온 경우 해당 분야 상담사만 노출
   const category = searchParams?.category?.trim() || "";
 
   const sellers = await prisma.sellerProfile.findMany({
-    where: { isApproved: true, ...(category ? { category } : {}) },
+    where: {
+      isApproved: true,
+      user: { role: "CONSULTANT" as any }, // 셀러브릭스 레거시 역할 제외
+      ...(category ? { category } : {}),
+    },
     include: {
       user: { select: { name: true, avatar: true } },
       _count: { select: { campaigns: true, shopProducts: true, fans: true } },
@@ -102,6 +105,7 @@ export default async function SellersPage({
     const startPrice = products.length > 0 ? Math.min(...products.map((p) => p.basePrice)) : null;
 
     return {
+      id: s.id,
       slug: s.slug,
       shopName: s.shopName,
       startPrice,

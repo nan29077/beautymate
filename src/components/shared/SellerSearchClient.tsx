@@ -6,6 +6,7 @@ import { List, X, ChevronRight, Radio, Eye } from 'lucide-react';
 import Link from "next/link";
 import SafeImage from "@/components/shared/SafeImage";
 import { sellerShopUrl } from "@/lib/utils";
+import PickSellerButton from "@/components/shared/PickSellerButton";
 
 
 interface ProductInfo {
@@ -17,6 +18,7 @@ interface ProductInfo {
 }
 
 interface Seller {
+  id: string;
   slug: string;
   shopName: string;
   shopLogo: string | null;
@@ -234,9 +236,9 @@ function SellerRankingCard({ seller, rank }: { seller: Seller; rank: number }) {
           )}
         </div>
 
-        {/* 하트 + 팬 수 */}
-        <div className="flex flex-col items-center gap-0.5 flex-shrink-0 pt-0.5">
-          <Icon name="Wishlist" size={16} strokeWidth={1.5} className="text-gray-300" />
+        {/* 단골 설정 + 팬 수 */}
+        <div className="flex flex-col items-center gap-1 flex-shrink-0 pt-0.5">
+          <PickSellerButton sellerId={seller.id} sellerName={seller.shopName} variant="icon" />
           <span className="text-[11px] text-gray-400 font-medium">
             {formatFanCount(seller.totalFans)}
           </span>
@@ -368,16 +370,10 @@ function SellerGridCard({ seller }: { seller: Seller }) {
         </div>
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50">
           <span className="text-[10px] text-gray-400 flex items-center gap-1">
-            <Icon name="Wishlist" size={10} strokeWidth={2} className="text-gray-300" />
+            <Icon name="Users" size={10} strokeWidth={1.5} className="text-gray-300" />
             {formatFanCount(seller.totalFans)}
           </span>
-          {typeof seller.startPrice === "number" ? (
-            <span className="text-[10px] text-gray-500">
-              <span className="font-bold text-gray-900">{seller.startPrice.toLocaleString()}원</span> 부터
-            </span>
-          ) : seller._count.shopProducts > 0 ? (
-            <span className="text-[10px] text-gray-400">상담상품 {seller._count.shopProducts}</span>
-          ) : null}
+          <PickSellerButton sellerId={seller.id} sellerName={seller.shopName} variant="icon" />
         </div>
       </div>
     </Link>

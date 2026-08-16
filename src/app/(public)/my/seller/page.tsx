@@ -11,16 +11,12 @@ import { pickSajuAvatar } from "@/lib/defaults";
 import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
 import LiveStatusPoller from "@/components/shared/LiveStatusPoller";
 import { LIVE_RING_CLASS, OnAirBadge } from "@/components/shared/LiveBadge";
-import { getFeatureFlags } from "@/lib/settings";
-
 export const dynamic = "force-dynamic";
 
 // "내 픽" 은 역할과 무관하게 모든 로그인 사용자가 접근 가능 (상담사/관리자/브랜드 포함).
 export default async function MySellerPage() {
   const session = await auth();
   if (!session?.user) redirect(getShopAwareLoginPath());
-  const { seller: FEATURE_SELLER } = await getFeatureFlags();
-
   const profile = await prisma.buyerProfile.findUnique({
     where: { userId: session.user!.id },
     include: {
@@ -108,7 +104,7 @@ export default async function MySellerPage() {
               메인에서 상담사 이름을 검색해 단골로 등록할 수 있어요
             </p>
             <Link
-              href={FEATURE_SELLER ? "/sellers" : "/"}
+              href="/sellers"
               className="mt-5 inline-block px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800"
             >
               상담사 찾기
