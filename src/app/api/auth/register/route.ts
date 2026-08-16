@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
     if (!nameTrimmed) return NextResponse.json({ error: "이름을 입력해주세요." }, { status: 400 });
     if (!emailTrimmed) return NextResponse.json({ error: "이메일을 입력해주세요." }, { status: 400 });
     if (typeof password !== "string" || !password) return NextResponse.json({ error: "비밀번호를 입력해주세요." }, { status: 400 });
+    if (password.length < 8) return NextResponse.json({ error: "비밀번호는 8자 이상이어야 합니다" }, { status: 400 });
     if (fieldSettings.phone === "required" && !phoneDigits) return NextResponse.json({ error: "휴대전화번호를 입력해주세요." }, { status: 400 });
     if (fieldSettings.gender === "required" && gender !== "male" && gender !== "female") return NextResponse.json({ error: "성별을 선택해주세요." }, { status: 400 });
     if (fieldSettings.birthday === "required" && (typeof birthday !== "string" || !birthday.trim())) return NextResponse.json({ error: "생년월일을 입력해주세요." }, { status: 400 });
@@ -43,6 +44,17 @@ export async function POST(request: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
     const userRole = role === "CONSULTANT" ? "CONSULTANT" : "CUSTOMER";
+
+    // 상담사 slug — 이메일 앞부분 기반. 이미 사용 중이면 타임스탬프 suffix 로 충돌(P2002) 방지
+    let consultantSlug: string | null = null;
+    if (userRole === "CONSULTANT") {
+      const baseSlug = emailTrimmed.split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, "-");
+      const slugTaken = await prisma.sellerProfile.findUnique({
+        where: { slug: baseSlug },
+        select: { id: true },
+      });
+      consultantSlug = slugTaken ? `${baseSlug}-${Date.now().toString(36)}` : baseSlug;
+    }
 
     const genderPick = gender === "male" || gender === "female"
       ? gender
@@ -75,7 +87,7 @@ export async function POST(request: NextRequest) {
         ...(userRole === "CONSULTANT" && {
           sellerProfile: {
             create: {
-              slug: emailTrimmed.split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, "-"),
+              slug: consultantSlug!,
               shopName: `${nameTrimmed}의 점집`,
               isApproved: false,
             },
