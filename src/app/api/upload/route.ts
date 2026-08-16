@@ -1,9 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
+import { join, resolve } from "path";
 import { existsSync } from "fs";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+
+// Next.js 프로젝트 루트 탐색 (pm2 cwd가 달라도 안전하게 동작)
+function getNextJsRoot(): string {
+  let dir = process.cwd();
+  for (let i = 0; i < 8; i++) {
+    if (
+      existsSync(join(dir, "next.config.js")) ||
+      existsSync(join(dir, "next.config.ts")) ||
+      existsSync(join(dir, "next.config.mjs"))
+    ) {
+      return dir;
+    }
+    const parent = resolve(dir, "..");
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return process.cwd();
+}
 
 // CRITICAL: Increase body size limit for file uploads
 // Next.js 14 App Router default is ~4MB, we need 25MB for large images
@@ -144,7 +162,7 @@ export async function POST(req: NextRequest) {
     const useS3 = !!s3Client;
     let uploadDir = "";
     if (!useS3) {
-      uploadDir = join(process.cwd(), "public", "uploads");
+      uploadDir = join(getNextJsRoot(), "public", "uploads");
       if (!existsSync(uploadDir)) {
         await mkdir(uploadDir, { recursive: true });
       }
