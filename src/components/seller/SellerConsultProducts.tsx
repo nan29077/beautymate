@@ -370,7 +370,7 @@ export default function SellerConsultProducts({ initialProducts }: { initialProd
                 <label className="text-xs font-semibold text-gray-700 mb-1.5 block">
                   이미지 <span className="text-gray-400 font-normal">(선택, 최대 5장)</span>
                 </label>
-                <ImageUploader images={form.images} onChange={(imgs) => setForm({ ...form, images: imgs })} maxImages={5} />
+                <ImageUploader images={form.images} onChange={(imgs) => setForm(prev => ({ ...prev, images: imgs }))} maxImages={5} />
               </div>
 
               <p className="text-[11px] text-gray-400 leading-relaxed">

@@ -889,15 +889,13 @@ export default function SellerLivePage() {
                   <label className="text-xs font-bold text-gray-700 flex items-center gap-1"><Icon name="ShortDescription_icon" size={14} /> 설명</label>
                   <textarea className="input-field mt-1.5 h-20 resize-none" placeholder="예: 오늘 방송에서 받을 상담 종류와 특이사항을 적어주세요" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
                 </div>
-                {/* 썸네일 이미지 — 인앱 라이브 시스템 복원 시(FEATURE_LIVE_COMMERCE=true) 자동 노출 */}
-                {FEATURE_LIVE_COMMERCE && (
-                  <div>
-                    <label className="text-xs font-bold text-gray-700 flex items-center gap-1"><Icon name="ProductThumbnail_icon" size={14} /> 썸네일 이미지</label>
-                    <div className="mt-1.5">
-                      <ImageUploader images={form.thumbnailImage ? [form.thumbnailImage] : []} onChange={urls => setForm({ ...form, thumbnailImage: urls[0] || "" })} maxImages={1} compact />
-                    </div>
+                {/* 썸네일 이미지 */}
+                <div>
+                  <label className="text-xs font-bold text-gray-700 flex items-center gap-1"><Icon name="ProductThumbnail_icon" size={14} /> 썸네일 이미지</label>
+                  <div className="mt-1.5">
+                    <ImageUploader images={form.thumbnailImage ? [form.thumbnailImage] : []} onChange={urls => setForm({ ...form, thumbnailImage: urls[0] || "" })} maxImages={1} compact />
                   </div>
-                )}
+                </div>
                 <div>
                   <label className="text-xs font-bold text-gray-700 flex items-center gap-1"><Icon name="Calendar" size={12} /> 예정 시간</label>
                   <ScheduledTimePicker value={form.scheduledAt} onChange={(v) => setForm({ ...form, scheduledAt: v })} />
