@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Clock, User, Calendar, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import { useAppDialog } from "@/components/shared/AppDialog";
 
 interface Product {
   id: string;
@@ -73,6 +74,7 @@ export default function BookingFlow({
     consultingContent: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const { appAlert } = useAppDialog();
   const [doneReservationId, setDoneReservationId] = useState<string | null>(null);
   const [payProviders, setPayProviders] = useState<PayProvider[]>([]);
   const [payAmount, setPayAmount] = useState(0);
@@ -194,7 +196,7 @@ export default function BookingFlow({
     } else {
       const data = await res.json();
       setSubmitting(false);
-      alert(data.error || "예약에 실패했습니다.");
+      appAlert(data.error || "예약에 실패했습니다.");
     }
   };
 
@@ -212,7 +214,7 @@ export default function BookingFlow({
         });
         const data = await res.json();
         if (!res.ok || !data.checkoutUrl) {
-          alert(data.error || "결제창 호출에 실패했습니다.");
+          appAlert(data.error || "결제창 호출에 실패했습니다.");
           return;
         }
         window.location.href = data.checkoutUrl;
@@ -222,7 +224,7 @@ export default function BookingFlow({
         window.location.href = provider.checkoutUrl;
         return;
       }
-      alert("사용할 수 없는 결제 수단입니다.");
+      appAlert("사용할 수 없는 결제 수단입니다.");
     } finally {
       setPayLaunching(null);
     }
@@ -519,7 +521,7 @@ export default function BookingFlow({
             <button
               onClick={() => {
                 if (!form.customerName || !form.customerPhone) {
-                  alert("이름과 연락처는 필수입니다.");
+                  appAlert("이름과 연락처는 필수입니다.");
                   return;
                 }
                 setStep("confirm");

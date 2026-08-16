@@ -32,6 +32,9 @@ export async function POST(request: Request) {
     });
   }
 
+  // 결제(PG) 연동 전까지는 충전 요청을 PENDING 으로만 생성한다.
+  // 실제 크레딧 적립은 결제 확인 후 관리자 승인(PATCH /api/admin/alimtalk/[sellerId])을 통해서만 이뤄진다.
+  // (기존에는 요청 즉시 PAID 처리 + 잔액 증가 — 결제 없이 무한 충전 가능하던 구멍을 막는다)
   const charge = await prisma.alimtalkCharge.create({
     data: {
       accountId: account.id,
@@ -40,19 +43,15 @@ export async function POST(request: Request) {
       totalAmount,
       credits,
       payMethod: payMethod || "card",
-      payStatus: "PAID",
-      pgTid: `SIM_${Date.now()}`,
+      payStatus: "PENDING",
     },
   });
 
-  await prisma.alimtalkAccount.update({
-    where: { id: account.id },
-    data: { balance: { increment: credits } },
+  return NextResponse.json({
+    chargeId: charge.id,
+    credits,
+    balance: account.balance,
+    pending: true,
+    message: `충전 요청이 접수되었습니다. 결제(입금) 확인 후 ${credits.toLocaleString()}건이 적립됩니다.`,
   });
-
-  const updated = await prisma.alimtalkAccount.findUnique({
-    where: { id: account.id },
-  });
-
-  return NextResponse.json({ chargeId: charge.id, credits, balance: updated?.balance ?? 0 });
 }

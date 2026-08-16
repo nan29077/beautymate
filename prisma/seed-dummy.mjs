@@ -54,6 +54,14 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
+// ── 운영 DB 보호 가드 ──
+// app/.env 의 DATABASE_URL 은 실서버(운영) RDS 를 직접 가리킨다.
+// 운영 DB 로 판단되면 더미 시드 실행을 즉시 거부한다. (CLAUDE.md DB 안전 수칙)
+if (process.env.DATABASE_URL?.includes("rds.amazonaws.com")) {
+  console.error("❌ 운영 DB(RDS)에서 실행 불가. 중단합니다.");
+  process.exit(1);
+}
+
 const { PrismaClient } = require("../src/generated/prisma");
 const bcrypt = require("bcryptjs");
 

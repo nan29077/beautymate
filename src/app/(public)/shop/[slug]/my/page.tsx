@@ -57,7 +57,7 @@ export default async function ShopMyPage({
           reservationDate: true,
           reservationTime: true,
           createdAt: true,
-          product: { select: { name: true } },
+          items: { select: { productName: true }, take: 1 },
         },
       }),
     [] as {
@@ -66,9 +66,20 @@ export default async function ShopMyPage({
       reservationDate: Date;
       reservationTime: string;
       createdAt: Date;
-      product: { name: string } | null;
+      items: { productName: string }[];
     }[],
   );
+
+  // ConsultDetailSheet 가 기대하는 형태(product.name)로 매핑 — Reservation 에는
+  // product 관계가 없으므로 첫 ReservationItem 의 productName 을 사용한다.
+  const shopReservationList = shopReservations.map((r) => ({
+    id: r.id,
+    status: r.status,
+    reservationDate: r.reservationDate,
+    reservationTime: r.reservationTime,
+    createdAt: r.createdAt,
+    product: r.items[0] ? { name: r.items[0].productName } : null,
+  }));
 
   // 이 점집 단골(회원) 여부 · 예약 통계 · 다가오는 예약 (모두 드리프트-안전)
   const isMember = await isShopMember(seller.id, userId);
@@ -100,7 +111,7 @@ export default async function ShopMyPage({
           status: true,
           reservationDate: true,
           reservationTime: true,
-          product: { select: { name: true } },
+          items: { select: { productName: true }, take: 1 },
         },
       }),
     null as null | {
@@ -108,8 +119,61 @@ export default async function ShopMyPage({
       status: string;
       reservationDate: Date;
       reservationTime: string;
-      product: { name: string } | null;
+      items: { productName: string }[];
     },
+  );
+  const upcomingProductName = upcoming?.items?.[0]?.productName ?? null;
+
+  // 이 점집 스코프의 내 리뷰 수 (점집 소유 상담상품 + 점집에 담긴 상담상품)
+  const shopReviewCount = await safeQuery(
+    "shop my page review count",
+    () =>
+      prisma.review.count({
+        where: {
+          userId,
+          product: {
+            OR: [
+              { sellerId: seller.id },
+              { sellerProducts: { some: { sellerId: seller.id } } },
+            ],
+          },
+        },
+      }),
+    0,
+  );
+
+  // 확정된 영상 상담 세션 (입장 가능 상태만) — 테이블 미반영 환경에서는 빈 배열 폴백
+  const videoSessions = await safeQuery(
+    "shop my page video sessions",
+    () =>
+      prisma.consultingSession.findMany({
+        where: {
+          status: { in: ["WAITING", "ACTIVE"] },
+          reservation: { userId, sellerId: seller.id, status: "CONFIRMED" },
+        },
+        select: {
+          id: true,
+          status: true,
+          reservation: {
+            select: {
+              reservationDate: true,
+              reservationTime: true,
+              items: { select: { productName: true }, take: 1 },
+            },
+          },
+        },
+        orderBy: { createdAt: "asc" },
+        take: 3,
+      }),
+    [] as {
+      id: string;
+      status: string;
+      reservation: {
+        reservationDate: Date;
+        reservationTime: string;
+        items: { productName: string }[];
+      };
+    }[],
   );
 
   // AI 상담 요약 — 이 상담사의 라이브 채팅에서 AI 봇 메시지 추출
@@ -219,8 +283,8 @@ export default async function ShopMyPage({
             <p className="text-lg font-bold text-green-600">{completedCount}</p>
             <p className="text-[10px] text-gray-400">상담 완료</p>
           </div>
-          <Link href="/my/reservations" className="text-center py-1">
-            <p className="text-lg font-bold text-gray-900">{user._count.reviews}</p>
+          <Link href="/my/reviews" className="text-center py-1">
+            <p className="text-lg font-bold text-gray-900">{shopReviewCount}</p>
             <p className="text-[10px] text-gray-400">리뷰</p>
           </Link>
         </div>
@@ -233,13 +297,50 @@ export default async function ShopMyPage({
             <p className="text-[11px] font-semibold text-white/80 mb-1 flex items-center gap-1">
               <Icon name="Calendar" size={12} /> 다가오는 예약
             </p>
-            <p className="text-base font-bold">{upcoming.product?.name || "상담 예약"}</p>
+            <p className="text-base font-bold">{upcomingProductName || "상담 예약"}</p>
             <p className="text-sm text-white/90 mt-0.5">
               {formatReservationDate(upcoming.reservationDate)} · {upcoming.reservationTime}
             </p>
             <span className="absolute top-3 right-3 text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full">
               {RESERVATION_STATUS[upcoming.status]?.label ?? upcoming.status}
             </span>
+          </div>
+        </div>
+      )}
+
+      {/* 영상 상담 입장 — 확정된 예약 중 입장 가능한 세션 */}
+      {videoSessions.length > 0 && (
+        <div className="px-4 mb-4">
+          <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+            <div className="px-4 pt-4 pb-2">
+              <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
+                <Icon name="Video" size={14} className="text-brand-600" />
+                영상 상담 입장
+              </h2>
+            </div>
+            <div className="px-4 pb-4 space-y-2">
+              {videoSessions.map((vs) => (
+                <div
+                  key={vs.id}
+                  className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-bold text-gray-900 truncate">
+                      {vs.reservation.items[0]?.productName || "영상 상담"}
+                    </p>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      {formatReservationDate(vs.reservation.reservationDate)} · {vs.reservation.reservationTime}
+                    </p>
+                  </div>
+                  <Link
+                    href={`/my/sessions/${vs.id}`}
+                    className="flex-shrink-0 px-3 py-2 rounded-lg text-[12px] font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors"
+                  >
+                    세션 입장
+                  </Link>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -274,6 +375,33 @@ export default async function ShopMyPage({
             </div>
             <p className="text-xs font-medium text-gray-800">설정</p>
           </Link>
+          <Link
+            href="/my/wishlist"
+            className="flex flex-col items-center gap-2 p-4 bg-white rounded-xl border border-gray-100"
+          >
+            <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center">
+              <Icon name="Wishlist" size={20} />
+            </div>
+            <p className="text-xs font-medium text-gray-800">찜 목록</p>
+          </Link>
+          <Link
+            href="/my/reviews"
+            className="flex flex-col items-center gap-2 p-4 bg-white rounded-xl border border-gray-100"
+          >
+            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+              <Icon name="Star" size={20} />
+            </div>
+            <p className="text-xs font-medium text-gray-800">내 리뷰</p>
+          </Link>
+          <Link
+            href="/my/points"
+            className="flex flex-col items-center gap-2 p-4 bg-white rounded-xl border border-gray-100"
+          >
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+              <Icon name="Wallet" size={20} />
+            </div>
+            <p className="text-xs font-medium text-gray-800">포인트</p>
+          </Link>
         </div>
       </div>
 
@@ -285,14 +413,14 @@ export default async function ShopMyPage({
               <Icon name="File" size={14} className="text-violet-500" />
               {consultantName} 상담 내역
             </h2>
-            {shopReservations.length > 0 && (
+            {shopReservationList.length > 0 && (
               <Link href="/my/reservations" className="text-xs text-violet-600 hover:underline">
-                전체보기 ({shopReservations.length})
+                전체보기 ({totalReservations})
               </Link>
             )}
           </div>
           <ConsultDetailSheet
-            reservations={shopReservations as any}
+            reservations={shopReservationList as any}
             aiSummaries={consultSummaries as any}
             consultantName={consultantName}
             sellerSlug={slug}

@@ -9,6 +9,9 @@ import { isMissingSchemaError } from "@/lib/safeDb";
 
 // B방식(OBS/PRISM → YouTube 송출)용 고정 RTMP 서버 주소
 const YOUTUBE_RTMP_URL = "rtmp://a.rtmp.youtube.com/live2";
+// 자체 RTMP 수집 서버 — 운영 도메인 변경 시 env(RTMP_INGEST_URL)로 덮어쓸 수 있다.
+// (구 사주메이트 도메인 잔재 정리 — 실제 자체 RTMP 서버 도메인이 다르면 env 로 지정)
+const SELF_RTMP_URL = process.env.RTMP_INGEST_URL || "rtmp://live.sajunara.co.kr/live";
 
 function generateShareCode(): string {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -257,7 +260,7 @@ export async function POST(req: NextRequest) {
         platform,
         externalUrl,
         shareCode,
-        rtmpUrl: isYoutube ? YOUTUBE_RTMP_URL : "rtmp://live.sajumate.com/live",
+        rtmpUrl: isYoutube ? YOUTUBE_RTMP_URL : SELF_RTMP_URL,
         streamKey: isYoutube ? youtubeStreamKey : `sk_${seller.id}_${Date.now()}`,
       },
     });

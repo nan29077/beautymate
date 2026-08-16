@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { safeQuery, isMissingSchemaError } from "@/lib/safeDb";
+import { getPlatformFees, productSettlementRecipient } from "@/lib/settlement";
 import { generateOrderNumber } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -112,7 +113,7 @@ export async function POST(request: Request) {
       // 대상 상담사 확인 — body의 sellerId 는 신뢰하지 않고 슬롯·상품과의 정합성을 검증한다
       const sellerProfile = await tx.sellerProfile.findUnique({
         where: { id: sellerId },
-        select: { id: true, userId: true },
+        select: { id: true, userId: true, commissionRate: true },
       });
       if (!sellerProfile) throw new Error("상담사를 찾을 수 없습니다.");
 
@@ -184,6 +185,16 @@ export async function POST(request: Request) {
       const amount = Number(product.basePrice);
       const reservationNumber = generateOrderNumber();
 
+      // ─── 정산 스냅샷 (예약 시점 고정) ───
+      // orders/route.ts 와 동일하게 요율·공급가·수취인을 저장해, 이후 요율·상품 변경이
+      // 이 예약의 정산액을 소급 변경하지 못하게 한다.
+      const platformFees = await getPlatformFees();
+      const sellerFeeRateSnap =
+        sellerProfile.commissionRate != null
+          ? Number(sellerProfile.commissionRate)
+          : platformFees.sellerFeeRate;
+      const recipient = productSettlementRecipient(product);
+
       // 예약 생성
       const reservation = await tx.reservation.create({
         data: {
@@ -204,6 +215,7 @@ export async function POST(request: Request) {
           birthTime: birthTime || null,
           gender: gender || null,
           consultingContent: consultingContent || null,
+          sellerFeeRateSnap,
           items: {
             create: {
               itemType: "PRODUCT",
@@ -212,6 +224,15 @@ export async function POST(request: Request) {
               price: amount,
               quantity: 1,
               totalPrice: amount,
+              supplyPriceSnap: product.supplyPrice != null ? Number(product.supplyPrice) : null,
+              priceModelSnap: String(product.priceModel),
+              productCommissionRateSnap:
+                product.commissionRate != null ? Number(product.commissionRate) : null,
+              sellerFeeRateSnap,
+              supplierFeeRateSnap: platformFees.sellerFeeRate,
+              isSellerProductSnap: product.sellerId === sellerId,
+              recipientRole: recipient?.role ?? null,
+              recipientId: recipient?.id ?? null,
             },
           },
         },

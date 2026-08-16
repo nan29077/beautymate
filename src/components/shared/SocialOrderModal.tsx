@@ -49,16 +49,8 @@ export default function SocialOrderModal({ open, onClose, productId, sellerId, p
     if (fallback) setDepositorName((prev) => prev || fallback);
   }, [open, session]);
 
-  useEffect(() => {
-    if (!open || !sellerId) return;
-    fetch(`/api/seller/bank-account?sellerId=${encodeURIComponent(sellerId)}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data && (data.bankName || data.bankAccount || data.bankHolder)) setBank(data);
-        else setBank(null);
-      })
-      .catch(() => setBank(null));
-  }, [open, sellerId]);
+  // 입금 계좌는 예약서 제출(/api/social-orders POST) 응답으로만 전달된다.
+  // (계좌 임의 수집 방지를 위해 공개 조회 API 는 차단됨 — 제출 완료 화면에서 안내)
 
   useEffect(() => {
     if (!open) return;
@@ -131,6 +123,10 @@ export default function SocialOrderModal({ open, onClose, productId, sellerId, p
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "제출에 실패했습니다.");
       }
+      const data = await res.json().catch(() => ({}));
+      if (data?.bank && (data.bank.bankName || data.bank.bankAccount || data.bank.bankHolder)) {
+        setBank(data.bank);
+      }
       setDone(true);
     } catch (e: any) {
       setError(e.message || "제출에 실패했습니다.");
@@ -159,6 +155,29 @@ export default function SocialOrderModal({ open, onClose, productId, sellerId, p
             </div>
             <p className="text-[15px] font-bold text-gray-900">계좌 입금 예약서가 제출되었습니다</p>
             <p className="text-[13px] text-gray-500 mt-1.5">상담사가 확인 후 연락드릴 예정입니다.</p>
+            {bank && (bank.bankName || bank.bankAccount) && (
+              <div className="mt-4 w-full bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-left space-y-2">
+                <p className="text-[12px] font-bold text-amber-800">아래 계좌로 입금해 주세요</p>
+                <div>
+                  <p className="text-[11px] text-amber-600 font-semibold mb-0.5 flex items-center gap-1"><Icon name="CreditCard_icon" size={13} /> 입금 계좌</p>
+                  <p className="text-[13px] font-bold text-gray-800">
+                    {bank.bankName && bank.bankAccount ? `${bank.bankName} ${bank.bankAccount}` : bank.bankAccount || bank.bankName}
+                  </p>
+                </div>
+                {bank.bankHolder && (
+                  <div>
+                    <p className="text-[11px] text-amber-600 font-semibold mb-0.5 flex items-center gap-1"><Icon name="MyPage_icon" size={13} /> 예금주</p>
+                    <p className="text-[13px] text-gray-800">{bank.bankHolder}</p>
+                  </div>
+                )}
+                {productPrice ? (
+                  <div>
+                    <p className="text-[11px] text-amber-600 font-semibold mb-0.5 flex items-center gap-1"><Icon name="PriceTag_icon" size={13} /> 입금액</p>
+                    <p className="text-[14px] font-bold text-amber-700">{productPrice.toLocaleString("ko-KR")}원</p>
+                  </div>
+                ) : null}
+              </div>
+            )}
             <button
               onClick={handleClose}
               className="mt-6 w-full h-11 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl transition-colors"
@@ -170,9 +189,9 @@ export default function SocialOrderModal({ open, onClose, productId, sellerId, p
           <>
             <div className="bg-amber-500 px-5 py-3">
               <p className="text-sm font-bold text-white text-center leading-relaxed">
-                아래 내용을 모두 기입하신 후
+                아래 내용을 모두 기입해 제출하시면
                 <br />
-                고객님께서 직접 입금계좌에 입금액을 입금해 주세요
+                입금하실 계좌 정보가 안내됩니다
               </p>
             </div>
 
@@ -193,13 +212,15 @@ export default function SocialOrderModal({ open, onClose, productId, sellerId, p
                     <p className="text-[13px] text-gray-800">
                       {bank?.bankName && bank?.bankAccount
                         ? `${bank.bankName} ${bank.bankAccount}`
-                        : "계좌 정보 없음"}
+                        : "예약서 제출 시 안내됩니다"}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-[11px] text-amber-600 font-semibold mb-1 flex items-center gap-1"><Icon name="MyPage_icon" size={13} /> 예금주</p>
-                    <p className="text-[13px] text-gray-800">{bank?.bankHolder || "-"}</p>
-                  </div>
+                  {bank?.bankHolder && (
+                    <div>
+                      <p className="text-[11px] text-amber-600 font-semibold mb-1 flex items-center gap-1"><Icon name="MyPage_icon" size={13} /> 예금주</p>
+                      <p className="text-[13px] text-gray-800">{bank.bankHolder}</p>
+                    </div>
+                  )}
                   <div>
                     <p className="text-[11px] text-amber-600 font-semibold mb-1 flex items-center gap-1"><Icon name="PriceTag_icon" size={13} /> 입금액 (상담상품금액)</p>
                     <p className="text-[15px] font-bold text-amber-700">

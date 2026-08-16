@@ -87,16 +87,21 @@ export async function POST(request: Request) {
 
   const expectedSign = buildSignVerifyHash(tid, mId, ediDate, amount, orderId);
   if (signData && signData !== expectedSign) {
-    console.warn("[seedpay/result] signData 불일치", { received: signData, expected: expectedSign });
+    // 위·변조 의심 — 승인 진행 없이 즉시 실패 처리한다.
+    console.warn("[seedpay/result] signData 불일치 — 결제 차단", { received: signData, expected: expectedSign });
+    if (order) {
+      await markOrderFailed(order.id, "signData 불일치 (위·변조 의심)");
+    }
     await logPayment({
       orderId: order?.id ?? null,
       provider: "seedpay",
       stage: "result",
-      status: "warn",
-      message: "signData 불일치 (위·변조 의심)",
+      status: "fail",
+      message: "signData 불일치 (위·변조 의심) — 결제 차단",
       pgTid: tid || null,
       payload: { received: signData, expected: expectedSign },
     });
+    return htmlRedirect(failRedirect(order?.id ?? null, "결제 검증에 실패했습니다."));
   }
 
   if (!order) {

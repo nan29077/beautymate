@@ -125,3 +125,33 @@ export async function notifyOrderPaid(orderId: string): Promise<void> {
     console.error("[notifications] 예약 완료 알림 생성 실패:", e);
   }
 }
+
+/**
+ * 예약 취소(결제취소 승인 등) 시, 고객에게 인앱 알림을 생성한다.
+ * - notifyOrder(예약·상담 방식 알림 수신 동의)가 켜진 경우에만 저장.
+ */
+export async function notifyOrderCancelled(orderId: string): Promise<void> {
+  try {
+    const order = await prisma.reservation.findUnique({
+      where: { id: orderId },
+      select: {
+        reservationNumber: true,
+        userId: true,
+        seller: { select: { shopName: true } },
+        user: { select: { buyerProfile: { select: { notifyOrder: true } } } },
+      },
+    });
+    if (!order) return;
+    if (order.user?.buyerProfile && order.user.buyerProfile.notifyOrder === false) return;
+
+    await createNotification({
+      userId: order.userId,
+      title: "예약이 취소되었습니다",
+      message: `${order.seller.shopName} 예약(${order.reservationNumber})이 취소 처리되었습니다. 환불은 결제 수단에 따라 영업일 기준 수일 내 완료됩니다.`,
+      type: "order",
+      linkUrl: "/my/orders",
+    });
+  } catch (e) {
+    console.error("[notifications] 예약 취소 알림 생성 실패:", e);
+  }
+}

@@ -137,9 +137,9 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
         >
           {loading ? "로그인 중..." : "로그인"}
         </button>
-        {/* 테스트 계정으로 로그인 — 개발/프로덕션 어디서든 동작한다.
-            이 점집 회원(고객)으로 계정을 준비(귀속)한 뒤 로그인한다.
-            ⚠️ 실서비스 정식 오픈 전에는 이 블록을 제거하세요. */}
+        {/* 테스트 계정으로 로그인 — 개발 환경(NODE_ENV=development)에서만 노출된다.
+            이 점집 회원(고객)으로 계정을 준비(귀속)한 뒤 로그인한다. */}
+        {process.env.NODE_ENV === "development" && (
         <div className="space-y-1.5">
           <button
             type="button"
@@ -184,6 +184,7 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
           </button>
           <p className="text-center text-[10px] text-gray-300">이 점집 회원(고객)으로 로그인해 화면을 확인합니다</p>
         </div>
+        )}
         <p className="text-center text-xs text-gray-400">
           아직 회원이 아니신가요?{" "}
           <Link href={`/shop/${shop.slug}/join`} className="text-amber-600 font-semibold hover:underline">

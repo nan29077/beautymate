@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import SafeImage from "@/components/shared/SafeImage";
 import NotificationBell from "@/components/shared/NotificationBell";
+import { OnAirBadge } from "@/components/shared/LiveBadge";
 import { pickSajuAvatar } from "@/lib/defaults";
 
 // 점집 전용 상단 바.
@@ -51,7 +52,18 @@ export default function SellerShopHeader({
           </Link>
         </div>
 
-        {/* 우측: 비로그인 → 점집 전용 로그인/회원가입, 로그인 → 알림 */}
+        {/* 우측: 라이브 중이면 라이브 진입 배지 + (비로그인 → 로그인/회원가입, 로그인 → 알림) */}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+        {showLive && liveHref &&
+          (/^https?:\/\//i.test(liveHref) ? (
+            <a href={liveHref} target="_blank" rel="noopener noreferrer" aria-label="라이브 방송 보러가기">
+              <OnAirBadge />
+            </a>
+          ) : (
+            <Link href={liveHref} aria-label="라이브 방송 보러가기">
+              <OnAirBadge />
+            </Link>
+          ))}
         {session ? (
           <div className="flex items-center gap-0.5 flex-shrink-0">
             {/* 알림 버튼 — 모든 사용자 노출 */}
@@ -74,6 +86,7 @@ export default function SellerShopHeader({
             </Link>
           </div>
         )}
+        </div>
       </div>
     </header>
   );

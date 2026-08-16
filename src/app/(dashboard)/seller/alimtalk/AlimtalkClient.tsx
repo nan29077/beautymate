@@ -102,7 +102,10 @@ export default function AlimtalkClient() {
       });
       const json = await res.json();
       if (res.ok) {
-        setChargeMsg(`충전 완료: ${json.credits.toLocaleString()}건 추가 (잔여 ${json.balance.toLocaleString()}건)`);
+        setChargeMsg(
+          json.message ||
+            `충전 완료: ${json.credits.toLocaleString()}건 추가 (잔여 ${json.balance.toLocaleString()}건)`,
+        );
         fetchData();
       } else {
         setChargeMsg(json.error || "충전에 실패했습니다.");

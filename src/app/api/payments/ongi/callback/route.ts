@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
   isOngiCallbackSuccess,
+  verifyOngiCallbackToken,
   type OngiCallbackPayload,
 } from "@/lib/ongi";
 import { logPayment } from "@/lib/paymentLog";
@@ -19,6 +20,20 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   const url = new URL(request.url);
   const orderIdFromQuery = url.searchParams.get("orderId");
+  const tokenFromQuery = url.searchParams.get("token");
+
+  // 콜백 위조 방지 — prepare 단계에서 callback_url 에 심은 HMAC 토큰 검증.
+  // orderId 만 알면 가짜 성공 통지로 예약을 결제완료 처리할 수 있는 구멍을 막는다.
+  if (orderIdFromQuery && !verifyOngiCallbackToken(orderIdFromQuery, tokenFromQuery)) {
+    await logPayment({
+      provider: "ongi",
+      stage: "callback",
+      status: "fail",
+      message: "INVALID_CALLBACK_TOKEN (서명 검증 실패 — 위조 의심)",
+      payload: { orderIdFromQuery },
+    });
+    return NextResponse.json({ ok: false, error: "INVALID_CALLBACK_TOKEN" }, { status: 401 });
+  }
 
   let payload: OngiCallbackPayload;
   let rawBody: string | null = null;

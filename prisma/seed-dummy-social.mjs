@@ -58,6 +58,12 @@ if (!process.env.DATABASE_URL) {
   process.exit(1);
 }
 
+// ── 운영 DB 보호 가드 ── (CLAUDE.md DB 안전 수칙)
+if (process.env.DATABASE_URL?.includes("rds.amazonaws.com")) {
+  console.error("❌ 운영 DB(RDS)에서 실행 불가. 중단합니다.");
+  process.exit(1);
+}
+
 const { PrismaClient } = require("../src/generated/prisma");
 const prisma = new PrismaClient();
 

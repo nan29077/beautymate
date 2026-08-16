@@ -51,7 +51,27 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ id: created.id, success: true }, { status: 201 });
+    // 입금 계좌 안내 — 예약서를 실제 제출한 고객에게만 응답으로 전달한다.
+    // (GET /api/seller/bank-account 공개 조회는 계좌 임의 수집 방지를 위해 차단됨)
+    const sellerBank = await prisma.sellerProfile.findUnique({
+      where: { id: String(sellerId) },
+      select: {
+        user: { select: { bankName: true, bankAccount: true, bankHolder: true } },
+      },
+    });
+
+    return NextResponse.json(
+      {
+        id: created.id,
+        success: true,
+        bank: {
+          bankName: sellerBank?.user?.bankName ?? null,
+          bankAccount: sellerBank?.user?.bankAccount ?? null,
+          bankHolder: sellerBank?.user?.bankHolder ?? null,
+        },
+      },
+      { status: 201 },
+    );
   } catch (e: any) {
     console.error("[social-orders POST]", e?.message || e);
     return NextResponse.json({ error: "소셜예약서 저장에 실패했습니다." }, { status: 500 });

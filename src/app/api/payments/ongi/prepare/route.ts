@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { buildOngiCheckoutUrl, ensureOngiConfigured } from "@/lib/ongi";
+import { buildOngiCallbackToken, buildOngiCheckoutUrl, ensureOngiConfigured } from "@/lib/ongi";
 import { logPayment } from "@/lib/paymentLog";
 
 export const dynamic = "force-dynamic";
@@ -77,7 +77,11 @@ export async function POST(request: Request) {
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.AUTH_URL ||
     new URL(request.url).origin;
-  const callbackUrl = `${baseUrl}/api/payments/ongi/callback?orderId=${encodeURIComponent(order.id)}`;
+  // 콜백 위조 방지 — orderId 에 대한 HMAC 토큰을 함께 심는다 (callback 에서 검증)
+  const callbackToken = buildOngiCallbackToken(order.id);
+  const callbackUrl =
+    `${baseUrl}/api/payments/ongi/callback?orderId=${encodeURIComponent(order.id)}` +
+    (callbackToken ? `&token=${encodeURIComponent(callbackToken)}` : "");
   const returnUrl = `${baseUrl}/checkout/complete?orderId=${encodeURIComponent(order.id)}`;
 
   const name = order.customerName || order.user.name || "고객";

@@ -1,7 +1,10 @@
 // ONGI(온기) 간편 계좌결제 연동.
 // 결제창 URL은 해시 라우터(/#/qr/{QR}) + ?checkout=pg 형식.
 // 결제 완료 후 서버 통지(callback_url)는 JSON POST 로 전달되고,
-// HMAC 서명이 없으므로 payment_code 기준 멱등 처리 + 금액 교차 검증을 사용한다.
+// ONGI 자체 HMAC 서명이 없으므로 우리가 callback_url 에 심어 보내는
+// HMAC 토큰(buildOngiCallbackToken) + payment_code 멱등 처리 + 금액 교차 검증을 사용한다.
+
+import crypto from "crypto";
 
 const MID = process.env.ONGI_MID || "";
 const API_KEY = process.env.ONGI_API_KEY || "";
@@ -20,6 +23,41 @@ export const ongiConfig = {
 export function ensureOngiConfigured() {
   if (!QR_CODE) {
     throw new Error("ONGI 환경변수가 설정되지 않았습니다. (ONGI_QR_CODE)");
+  }
+}
+
+// ── 콜백 위조 방지 토큰 ─────────────────────────────
+// ONGI 통지에는 자체 서명이 없어, 예약 id 만 알면 가짜 성공 통지를 보낼 수 있다.
+// prepare 단계에서 callback_url 에 HMAC(orderId) 토큰을 심어 보내고,
+// callback 단계에서 동일 토큰인지 검증한다. 시크릿은 서버에만 존재한다.
+function ongiCallbackSecret(): string {
+  return (
+    process.env.ONGI_CALLBACK_SECRET ||
+    process.env.ONGI_API_KEY ||
+    process.env.AUTH_SECRET ||
+    process.env.NEXTAUTH_SECRET ||
+    ""
+  );
+}
+
+export function buildOngiCallbackToken(orderId: string): string {
+  const secret = ongiCallbackSecret();
+  if (!secret) return "";
+  return crypto.createHmac("sha256", secret).update(orderId, "utf8").digest("hex");
+}
+
+export function verifyOngiCallbackToken(orderId: string, token: string | null): boolean {
+  const expected = buildOngiCallbackToken(orderId);
+  if (!expected) {
+    // 시크릿 미설정 환경 — 검증 불가. 경고만 남기고 통과 (기존 동작 유지)
+    console.warn("[ongi] 콜백 토큰 시크릿 미설정 — 서명 검증 생략");
+    return true;
+  }
+  if (!token || token.length !== expected.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(token, "utf8"), Buffer.from(expected, "utf8"));
+  } catch {
+    return false;
   }
 }
 

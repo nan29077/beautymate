@@ -276,6 +276,27 @@ export default async function SellerShopPage({
 
   const bookHref = `/shop/${seller.slug}/book`;
 
+  // 라이브 중이면 아바타·배지를 라이브 화면으로 연결한다.
+  // 외부 URL(http/https)은 새 탭 <a>, 내부 경로는 <Link> 사용.
+  const isExternalLive = !!liveHref && /^https?:\/\//i.test(liveHref);
+  const liveClickable = showLive && !!liveHref;
+
+  const avatarCircle = (
+    <div
+      className={`relative w-[72px] h-[72px] rounded-full overflow-hidden ring-4 bg-white shadow-md ${
+        showLive ? LIVE_RING_CLASS : "ring-white"
+      }`}
+    >
+      <SafeImage
+        src={avatar}
+        alt={seller.shopName}
+        width={72}
+        height={72}
+        fallbackText={seller.shopName.charAt(0)}
+      />
+    </div>
+  );
+
   return (
     <div className="animate-fade-in bg-[#f7f6fb] min-h-screen">
       <ShopContextSync shop={{ slug: seller.slug, name: seller.shopName, logo: avatar }} />
@@ -310,25 +331,38 @@ export default async function SellerShopPage({
           <div className="bg-white/95 backdrop-blur-sm rounded-[26px] shadow-[0_12px_36px_rgba(35,22,67,0.12)] border border-white p-[18px] pb-5">
             <div className="flex items-start gap-3">
               <div className="flex flex-col items-center flex-shrink-0 -mt-9">
-                <div
-                  className={`relative w-[72px] h-[72px] rounded-full overflow-hidden ring-4 bg-white shadow-md ${
-                    showLive ? LIVE_RING_CLASS : "ring-white"
-                  }`}
-                >
-                  <SafeImage
-                    src={avatar}
-                    alt={seller.shopName}
-                    width={72}
-                    height={72}
-                    fallbackText={seller.shopName.charAt(0)}
-                  />
-                </div>
+                {liveClickable ? (
+                  isExternalLive ? (
+                    <a href={liveHref!} target="_blank" rel="noopener noreferrer" aria-label="라이브 방송 보러가기">
+                      {avatarCircle}
+                    </a>
+                  ) : (
+                    <Link href={liveHref!} aria-label="라이브 방송 보러가기">
+                      {avatarCircle}
+                    </Link>
+                  )
+                ) : (
+                  avatarCircle
+                )}
               </div>
 
               <div className="flex-1 min-w-0 pt-0.5">
                 <div className="flex items-center gap-2">
                   <h1 className="text-[18px] font-extrabold tracking-[-0.02em] text-gray-950 truncate">{seller.shopName}</h1>
-                  {showLive && <OnAirBadge />}
+                  {showLive &&
+                    (liveClickable ? (
+                      isExternalLive ? (
+                        <a href={liveHref!} target="_blank" rel="noopener noreferrer" aria-label="라이브 방송 보러가기">
+                          <OnAirBadge />
+                        </a>
+                      ) : (
+                        <Link href={liveHref!} aria-label="라이브 방송 보러가기">
+                          <OnAirBadge />
+                        </Link>
+                      )
+                    ) : (
+                      <OnAirBadge />
+                    ))}
                 </div>
                 {seller.user.name && seller.user.name !== seller.shopName && (
                   <p className="mt-0.5 text-[11px] font-medium text-gray-400">{seller.user.name} 상담사</p>

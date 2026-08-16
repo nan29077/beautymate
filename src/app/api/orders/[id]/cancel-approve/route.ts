@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { notifyOrderCancelled } from "@/lib/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -75,6 +76,20 @@ export async function POST(
         data: { status: "CANCELLED" },
       }),
     ]);
+
+    // 이 예약이 점유한 시간 슬롯 해제 — 다른 고객이 다시 예약할 수 있게 연다.
+    // time_slots 테이블 미반영 환경에서도 취소 승인 자체는 실패하지 않도록 분리 처리.
+    try {
+      await prisma.timeSlot.updateMany({
+        where: { reservationId: orderId },
+        data: { isAvailable: true, reservationId: null },
+      });
+    } catch (e: any) {
+      console.warn("[cancel-approve] TimeSlot 해제 실패(스키마 미반영 가능):", e?.message || e);
+    }
+
+    // 고객에게 예약취소 인앱 알림 (실패해도 취소 처리 흐름은 막지 않음)
+    await notifyOrderCancelled(orderId).catch(() => {});
 
     return NextResponse.json({ cancelStatus: finalCancelStatus, message: "결제취소가 완료되었습니다." });
   } catch (e: any) {

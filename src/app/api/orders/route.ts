@@ -464,6 +464,36 @@ export async function POST(request: Request) {
       include: { items: true },
     });
 
+    // ─── 예약 시간 슬롯 점유 ───
+    // 해당 상담사의 같은 날짜·시간에 열린 슬롯이 있으면 이 예약에 연결하고 닫는다.
+    // 슬롯 없이 접수된 예약(슬롯 미운영 점집·수기 예약)은 그대로 진행.
+    // time_slots 테이블 미반영 환경(P2021)에서는 조용히 건너뛴다.
+    try {
+      const slotDayStart = new Date(reservationDateValue);
+      slotDayStart.setHours(0, 0, 0, 0);
+      const slotDayEnd = new Date(slotDayStart);
+      slotDayEnd.setDate(slotDayEnd.getDate() + 1);
+      const openSlot = await tx.timeSlot.findFirst({
+        where: {
+          consultantId: seller.userId,
+          date: { gte: slotDayStart, lt: slotDayEnd },
+          startTime: reservationTime,
+          isAvailable: true,
+          reservationId: null,
+        },
+        select: { id: true },
+      });
+      if (openSlot) {
+        await tx.timeSlot.update({
+          where: { id: openSlot.id },
+          data: { isAvailable: false, reservationId: created.id },
+        });
+      }
+    } catch (e) {
+      if (!isMissingSchemaError(e)) throw e;
+      // 슬롯 테이블 미반영 — 점유 없이 진행
+    }
+
     if (campaignId) {
       await tx.groupBuyCampaign.update({
         where: { id: campaignId },

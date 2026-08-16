@@ -77,10 +77,29 @@ export interface SeedpayApprovalResult {
   [k: string]: any;
 }
 
+// SSRF 방지 — 결제창 콜백(form)으로 전달되는 approvalUrl/netCancelUrl 은 클라이언트가
+// 조작할 수 있으므로, SeedPay 공식 도메인(https)일 때만 서버에서 fetch 를 허용한다.
+export function isAllowedSeedpayUrl(rawUrl: string): boolean {
+  try {
+    const u = new URL(rawUrl);
+    if (u.protocol !== "https:") return false;
+    return (
+      u.hostname === "pay.seedpayments.co.kr" ||
+      u.hostname === "devpay.seedpayments.co.kr" ||
+      u.hostname.endsWith(".seedpayments.co.kr")
+    );
+  } catch {
+    return false;
+  }
+}
+
 export async function requestApproval(
   approvalUrl: string,
   params: Record<string, string>,
 ): Promise<SeedpayApprovalResult> {
+  if (!isAllowedSeedpayUrl(approvalUrl)) {
+    throw new Error("허용되지 않은 승인 URL 입니다. (SSRF 차단)");
+  }
   const body = new URLSearchParams(params).toString();
   const res = await fetch(approvalUrl, {
     method: "POST",
@@ -95,6 +114,10 @@ export async function requestApproval(
 
 export async function requestNetCancel(netCancelUrl: string, tid: string, mid: string) {
   try {
+    if (!isAllowedSeedpayUrl(netCancelUrl)) {
+      console.warn("[seedpay] 허용되지 않은 망취소 URL — 무시 (SSRF 차단)", netCancelUrl);
+      return;
+    }
     const body = new URLSearchParams({ tid, mid }).toString();
     await fetch(netCancelUrl, {
       method: "POST",
