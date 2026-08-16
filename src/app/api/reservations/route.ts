@@ -136,12 +136,17 @@ export async function POST(request: Request) {
       });
       if (!product || !product.isActive) throw new Error("상담 상품을 찾을 수 없습니다.");
       // 상품 ↔ 상담사 정합성: 상담사 직접 등록 상품이거나, 해당 점집에 담긴 상품이어야 한다
+      // 점집에 담긴 상품은 상담사가 직접 설정한 판매가(sellerPrice)가 있으면 그 가격으로 청구한다
+      // (클라이언트 BookingFlow 표시 가격: sellerPrice ?? basePrice 와 일치시킴)
+      let sellerPriceOverride: number | null = null;
       if (product.sellerId !== sellerId) {
         const shopProduct = await tx.sellerShopProduct.findFirst({
           where: { sellerId, productId, isActive: true },
-          select: { id: true },
+          select: { id: true, sellerPrice: true },
         });
         if (!shopProduct) throw new Error("해당 상담사의 상담 상품이 아닙니다.");
+        sellerPriceOverride =
+          shopProduct.sellerPrice != null ? Number(shopProduct.sellerPrice) : null;
       }
 
       // 라이브 방송 유래 예약: 방송 검증 + 당일 슬롯 제한 확인
@@ -182,7 +187,8 @@ export async function POST(request: Request) {
         }
       }
 
-      const amount = Number(product.basePrice);
+      // 청구 금액: 점집 판매가(sellerPrice)가 있으면 우선, 없으면 기본가(basePrice)
+      const amount = sellerPriceOverride ?? Number(product.basePrice);
       const reservationNumber = generateOrderNumber();
 
       // ─── 정산 스냅샷 (예약 시점 고정) ───
