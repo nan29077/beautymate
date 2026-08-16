@@ -27,6 +27,7 @@ interface Seller {
   category: string | null;
   mood: string | null;
   totalFans: number;
+  referralCode?: string | null; // 상담사 코드 검색용
   _count: {
     campaigns: number;
     shopProducts: number;
@@ -70,11 +71,14 @@ export default function SellerSearchClient({
 
   const filteredSellers = useMemo(() => {
     return sellers.filter((s) => {
-      const matchSearch = !search || s.shopName.toLowerCase().includes(search.toLowerCase())
-        || s.shopDescription?.toLowerCase().includes(search.toLowerCase())
-        || s.category?.toLowerCase().includes(search.toLowerCase())
-        || s.mood?.toLowerCase().includes(search.toLowerCase())
-        || s.tags?.some(t => t.toLowerCase().includes(search.toLowerCase()));
+      const q = search.toLowerCase();
+      const matchSearch = !search
+        || s.shopName.toLowerCase().includes(q)
+        || s.shopDescription?.toLowerCase().includes(q)
+        || s.category?.toLowerCase().includes(q)
+        || s.mood?.toLowerCase().includes(q)
+        || s.referralCode?.toLowerCase().includes(q)  // 상담사 코드 검색
+        || s.tags?.some(t => t.toLowerCase().includes(q));
       const matchCategory = !selectedCategory || s.category === selectedCategory;
       return matchSearch && matchCategory;
     });

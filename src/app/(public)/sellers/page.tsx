@@ -115,6 +115,7 @@ export default async function SellersPage({
       shopDescription: s.shopDescription,
       category: s.category,
       mood: s.mood,
+      referralCode: s.referralCode, // 상담사 코드 검색용
       totalFans: s.totalFans,
       _count: {
         campaigns: s._count.campaigns,
