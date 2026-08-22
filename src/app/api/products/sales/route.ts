@@ -21,13 +21,13 @@ export async function GET(req: NextRequest) {
 
     const isBrand = false;
 
-    // 상담상품 정보 조회 (판매가/공급가 — 매출 산정 기준에 사용)
+    // 뷰티 서비스 정보 조회 (판매가/공급가 — 매출 산정 기준에 사용)
     const productInfo = await prisma.product.findUnique({
       where: { id: productId },
       select: { id: true, name: true, thumbnail: true, basePrice: true, supplyPrice: true, soldCount: true },
     });
     if (!productInfo) {
-      return NextResponse.json({ error: "상담상품을 찾을 수 없습니다" }, { status: 404 });
+      return NextResponse.json({ error: "뷰티 서비스를 찾을 수 없습니다" }, { status: 404 });
     }
 
     // Verify product ownership for brand admin
@@ -149,7 +149,7 @@ export async function GET(req: NextRequest) {
       (a, b) => b.totalRevenue - a.totalRevenue
     );
 
-    // 응답 상담상품 정보 — 판매가 비노출: 브랜드에는 basePrice를 내려보내지 않음
+    // 응답 뷰티 서비스 정보 — 판매가 비노출: 브랜드에는 basePrice를 내려보내지 않음
     const product = {
       id: productInfo.id,
       name: productInfo.name,

@@ -126,8 +126,8 @@ export default function AdminTaxClient({ sellerBusiness, sellerNonBusiness, bran
   const tabLabel =
     mainTab === "seller"
       ? sellerSub === "biz"
-        ? "사업자상담사"
-        : "비사업자상담사"
+        ? "사업자뷰티 전문가"
+        : "비사업자뷰티 전문가"
       : mainTab === "brand"
         ? "브랜드"
         : "중간관리자";
@@ -222,7 +222,7 @@ export default function AdminTaxClient({ sellerBusiness, sellerNonBusiness, bran
       <div className="flex gap-1 mb-4 bg-gray-100 rounded-xl p-1 w-fit">
         {(
           [
-            { key: "seller", label: "상담사", icon: "Store" },
+            { key: "seller", label: "뷰티 전문가", icon: "Store" },
             { key: "brand", label: "브랜드", icon: "Official" },
             { key: "middle", label: "중간관리자", icon: "Settings" },
           ] as const
@@ -240,13 +240,13 @@ export default function AdminTaxClient({ sellerBusiness, sellerNonBusiness, bran
         ))}
       </div>
 
-      {/* 상담사 서브탭 */}
+      {/* 뷰티 전문가 서브탭 */}
       {mainTab === "seller" && (
         <div className="flex gap-1 mb-4">
           {(
             [
-              { key: "biz", label: "사업자 상담사" },
-              { key: "nonbiz", label: "비사업자 상담사" },
+              { key: "biz", label: "사업자 뷰티 전문가" },
+              { key: "nonbiz", label: "비사업자 뷰티 전문가" },
             ] as const
           ).map((t) => (
             <button

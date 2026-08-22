@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// POST: 라이브 채널(상담사) 팔로우/언팔로우 토글
+// POST: 라이브 채널(뷰티 전문가) 팔로우/언팔로우 토글
 export async function POST(
   _req: NextRequest,
   { params }: { params: { code: string } }

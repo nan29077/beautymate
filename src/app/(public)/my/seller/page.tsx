@@ -7,13 +7,13 @@ import { getShopAwareLoginPath } from "@/lib/shopLoginRedirect";
 import { Users } from "lucide-react";
 import SafeImage from "@/components/shared/SafeImage";
 import PickSellerButton from "@/components/shared/PickSellerButton";
-import { pickSajuAvatar } from "@/lib/defaults";
+import { pickBeautyMateAvatar } from "@/lib/defaults";
 import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
 import LiveStatusPoller from "@/components/shared/LiveStatusPoller";
 import { LIVE_RING_CLASS, OnAirBadge } from "@/components/shared/LiveBadge";
 export const dynamic = "force-dynamic";
 
-// "내 픽" 은 역할과 무관하게 모든 로그인 사용자가 접근 가능 (상담사/관리자/브랜드 포함).
+// "내 픽" 은 역할과 무관하게 모든 로그인 사용자가 접근 가능 (뷰티 전문가/관리자/브랜드 포함).
 export default async function MySellerPage() {
   const session = await auth();
   if (!session?.user) redirect(getShopAwareLoginPath());
@@ -76,7 +76,7 @@ export default async function MySellerPage() {
             />
           </Link>
           <h1 className="text-base font-bold text-gray-900">
-            내 단골 상담사
+            내 단골 뷰티 전문가
           </h1>
           {uniqueSellers.length > 0 && (
             <span className="text-xs text-brand-600 font-bold bg-brand-50 px-2 py-0.5 rounded-full">
@@ -95,19 +95,19 @@ export default async function MySellerPage() {
               className="mx-auto mb-3 opacity-30"
             />
             <p className="text-sm font-medium text-gray-500">
-              아직 단골 상담사가 없습니다
+              아직 단골 뷰티 전문가가 없습니다
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              마음에 드는 상담사를 단골로 등록하고 소식을 받아보세요!
+              마음에 드는 뷰티 전문가를 단골로 등록하고 소식을 받아보세요!
             </p>
             <p className="text-[11px] text-gray-400 mt-3">
-              메인에서 상담사 이름을 검색해 단골로 등록할 수 있어요
+              메인에서 뷰티 전문가 이름을 검색해 단골로 등록할 수 있어요
             </p>
             <Link
               href="/sellers"
               className="mt-5 inline-block px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800"
             >
-              상담사 찾기
+              뷰티 전문가 찾기
             </Link>
           </div>
         ) : (
@@ -133,7 +133,7 @@ export default async function MySellerPage() {
                       >
                         <SafeImage
                           src={sellerProfileImage(seller)}
-                          placeholder={pickSajuAvatar(seller.id)}
+                          placeholder={pickBeautyMateAvatar(seller.id)}
                           alt={seller.user.name || seller.shopName}
                           width={56}
                           height={56}
@@ -158,7 +158,7 @@ export default async function MySellerPage() {
                           <Icon name="Users" size={10} /> 단골 {seller._count.fans}명
                         </span>
                         <span className="flex items-center gap-0.5">
-                          <Icon name="Gem" size={10} /> 상담상품{" "}
+                          <Icon name="Gem" size={10} /> 뷰티 서비스{" "}
                           {seller._count.shopProducts}개
                         </span>
                       </div>
@@ -191,7 +191,7 @@ export default async function MySellerPage() {
                       href={`/shop/${seller.slug}`}
                       className="w-full inline-flex items-center justify-center gap-1.5 bg-gray-100 text-gray-700 text-xs font-medium py-2 rounded-lg hover:bg-gray-200 transition-colors"
                     >
-                      라이브 점집 바로가기
+                      라이브 뷰티샵 바로가기
                     </Link>
                   </div>
                 </div>

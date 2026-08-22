@@ -11,7 +11,7 @@ function maskEmail(email: string): string {
 }
 
 // 아이디 찾기 — 이름 + 전화번호로 CUSTOMER 계정 조회
-// 상담사/관리자 계정은 보안상 고객센터를 통해서만 안내한다.
+// 뷰티 전문가/관리자 계정은 보안상 고객센터를 통해서만 안내한다.
 export async function POST(request: NextRequest) {
   try {
     const { name, phone } = await request.json();
@@ -44,13 +44,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 상담사/관리자 계정만 있는 경우 고객센터 안내
+    // 뷰티 전문가/관리자 계정만 있는 경우 고객센터 안내
     const buyers = matched.filter((u) => u.role === "CUSTOMER");
     if (buyers.length === 0) {
       return NextResponse.json(
         {
           error:
-            "상담사 계정은 보안을 위해 고객센터를 통해서만 아이디 찾기가 가능합니다.",
+            "뷰티 전문가 계정은 보안을 위해 고객센터를 통해서만 아이디 찾기가 가능합니다.",
           isSeller: true,
         },
         { status: 403 },

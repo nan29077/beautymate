@@ -1,4 +1,4 @@
-// 상담사 정산 집계 서버 유틸.
+// 뷰티 전문가 정산 집계 서버 유틸.
 // - 예약(Order) 데이터에서 "영업일 기준 N일 후" 규칙으로 정산일을 계산해
 //   '정산 가능 금액'(정산일 도래)과 '정산 예정 금액'(정산일 전)을 집계한다.
 // - N은 최고관리자 권한설정(settlementBusinessDays, 기본 5)을 읽어 사용한다.
@@ -14,7 +14,7 @@ import { getSettlementDate, startOfDay, toYmd } from "@/lib/businessDays";
 import { withVatRate } from "@/lib/utils";
 
 // ───── 정산 수취인 판정 ─────
-// A. 상담사 본인 등록 (sellerId 有) → 상담사
+// A. 뷰티 전문가 본인 등록 (sellerId 有) → 뷰티 전문가
 // B. 최고관리자 등록 (sellerId 無)  → 플랫폼(수취인 없음)
 export type SettlementRole = "CONSULTANT" | "SUPER_ADMIN";
 export type SettlementRecipient = { role: SettlementRole; id: string } | null;
@@ -35,17 +35,17 @@ export interface SettlementOrder {
   settlementYmd: string; // 정산일 YYYY-MM-DD
   saleYmd: string; // 판매일 YYYY-MM-DD
   grossAmount: number; // 결제 금액(정산 기준 매출)
-  supplyAmount: number; // 공급가 합계 (B타입 상담상품만, 브랜드 정산액)
+  supplyAmount: number; // 공급가 합계 (B타입 뷰티 서비스만, 브랜드 정산액)
   effectiveAmount: number; // 실효 매출 = grossAmount - supplyAmount (수수료 산정 기준)
   commissionRate: number; // 적용 수수료율(%)
   commissionAmount: number; // 수수료
-  settlementAmount: number; // 정산액(세전) = effectiveAmount - 수수료 - 장바구니 할인(상담사 부담)
-  cartDiscountAmount: number; // 장바구니 할인액(상담사 부담분, 정산에서 차감됨)
+  settlementAmount: number; // 정산액(세전) = effectiveAmount - 수수료 - 장바구니 할인(뷰티 전문가 부담)
+  cartDiscountAmount: number; // 장바구니 할인액(뷰티 전문가 부담분, 정산에서 차감됨)
   available: boolean; // 정산일 도래 여부
   campaignTitle: string | null;
   type: "groupbuy" | "normal"; // 캠페인 예약 / 일반 예약
-  productType: "seller" | "supply" | "mixed"; // A타입(상담사등록), B타입(공급), 혼합
-  productNames?: string[]; // 예약에 포함된 상담상품명(상세내역 표시용)
+  productType: "seller" | "supply" | "mixed"; // A타입(뷰티 전문가등록), B타입(공급), 혼합
+  productNames?: string[]; // 예약에 포함된 뷰티 서비스명(상세내역 표시용)
 }
 
 export interface PayoutSummary {
@@ -89,7 +89,7 @@ function isSettleableOrder(paymentStatus: string, status: string): boolean {
 const round = (n: number) => Math.round(n);
 
 // ───── 역할별 플랫폼 수수료율 ─────
-// PlatformFeeSettings(단일 레코드)에서 상담사 수수료율(%)을 읽어 정산 계산에 사용한다.
+// PlatformFeeSettings(단일 레코드)에서 뷰티 전문가 수수료율(%)을 읽어 정산 계산에 사용한다.
 export interface PlatformFees {
   sellerFeeRate: number; // % 단위 (예: 5.0)
 }
@@ -119,7 +119,7 @@ export async function getSellerSettlementSummary(
 ): Promise<SellerSettlementSummary> {
   const businessDays = await getSettlementBusinessDays();
   const today = startOfDay(new Date());
-  // 상담사 개별 수수료율(SellerProfile.commissionRate, 관리자 상담사관리에서 설정)을 우선 적용하고,
+  // 뷰티 전문가 개별 수수료율(SellerProfile.commissionRate, 관리자 뷰티 전문가관리에서 설정)을 우선 적용하고,
   // 값이 없으면 전역 플랫폼 수수료율(sellerFeeRate)로 폴백한다. 표시는 실효율(rate × 1.1) 기준.
   const profile = await prisma.sellerProfile.findUnique({
     where: { id: sellerId },
@@ -174,7 +174,7 @@ export async function getSellerSettlementSummary(
     }),
   ]);
 
-  // 예약 아이템에서 상담상품 ID 수집 → 공급가/등록자 정보 일괄 조회
+  // 예약 아이템에서 뷰티 서비스 ID 수집 → 공급가/등록자 정보 일괄 조회
   const allProductIds = [...new Set(rawOrders.flatMap((o) => o.items.map((i) => i.productId)))];
   const productInfoMap = new Map<
     string,
@@ -183,7 +183,7 @@ export async function getSellerSettlementSummary(
       isSellerProduct: boolean;
       name: string;
       priceModel: string;
-      commissionRate: number | null; // 수수료(COMMISSION) 제공 시 상담사 수수료율(%)
+      commissionRate: number | null; // 수수료(COMMISSION) 제공 시 뷰티 전문가 수수료율(%)
     }
   >();
   if (allProductIds.length > 0) {
@@ -194,7 +194,7 @@ export async function getSellerSettlementSummary(
     for (const p of prods) {
       productInfoMap.set(p.id, {
         supplyPrice: p.supplyPrice != null ? Number(p.supplyPrice) : null,
-        // A타입: 이 상담사가 직접 등록한 상담상품, B타입: 그 외(브랜드/관리자/중간관리자 등록)
+        // A타입: 이 뷰티 전문가가 직접 등록한 뷰티 서비스, B타입: 그 외(브랜드/관리자/중간관리자 등록)
         isSellerProduct: p.sellerId === sellerId,
         name: p.name,
         priceModel: String(p.priceModel),
@@ -213,17 +213,17 @@ export async function getSellerSettlementSummary(
   for (const o of rawOrders) {
     if (!isSettleableOrder(o.paymentStatus, o.status)) continue;
 
-    // 아이템별 정산 계산 — 상담상품 유형(Case 1/2A/2B)에 따라 상담사 정산액을 산정한다.
-    let supplyAmount = 0; // 공급자 몫(상담사 정산에서 빠지는 금액, 표시용)
-    let effBase = 0; // 상담사 정산 기준액(플랫폼 수수료 차감 전)
-    let sellerSettle = 0; // 상담사 정산액(플랫폼 수수료 차감 후)
+    // 아이템별 정산 계산 — 뷰티 서비스 유형(Case 1/2A/2B)에 따라 뷰티 전문가 정산액을 산정한다.
+    let supplyAmount = 0; // 공급자 몫(뷰티 전문가 정산에서 빠지는 금액, 표시용)
+    let effBase = 0; // 뷰티 전문가 정산 기준액(플랫폼 수수료 차감 전)
+    let sellerSettle = 0; // 뷰티 전문가 정산액(플랫폼 수수료 차감 후)
     let hasSellerProduct = false;
     let hasSupplyProduct = false;
     const productNames: string[] = [];
     for (const item of o.items) {
       const live = productInfoMap.get(item.productId);
 
-      // 예약 시점 스냅샷이 있으면 그것만으로 계산한다(요율 변경·상담상품 삭제에 영향받지 않음).
+      // 예약 시점 스냅샷이 있으면 그것만으로 계산한다(요율 변경·뷰티 서비스 삭제에 영향받지 않음).
       // 스냅샷 도입(2026-07-12) 이전 예약만 live 값으로 폴백한다.
       const hasSnap = item.sellerFeeRateSnap != null && item.isSellerProductSnap != null;
       const info = hasSnap
@@ -235,11 +235,11 @@ export async function getSellerSettlementSummary(
               item.productCommissionRateSnap != null
                 ? Number(item.productCommissionRateSnap)
                 : null,
-            // 상담사 일반상담상품(DirectProduct)은 Product 조회가 빗나가므로 예약 시점 상담상품명을 쓴다.
+            // 뷰티 전문가 일반 뷰티 서비스(DirectProduct)은 Product 조회가 빗나가므로 예약 시점 뷰티 서비스명을 쓴다.
             name: live?.name ?? item.productName ?? "",
           }
         : live;
-      if (!info) continue; // 스냅샷도 없고 상담상품도 삭제된 예약 — 기존 동작 유지(0원)
+      if (!info) continue; // 스냅샷도 없고 뷰티 서비스도 삭제된 예약 — 기존 동작 유지(0원)
 
       // 수수료율도 스냅샷 우선. 예약마다 다를 수 있으므로 아이템 단위로 적용한다.
       const itemFeeMul = hasSnap
@@ -250,19 +250,19 @@ export async function getSellerSettlementSummary(
       const itemSale = Number(item.totalPrice); // 판매가 × 수량
 
       if (info.isSellerProduct) {
-        // Case 1 — 상담사 직접 등록 상담상품: 판매가 × (1 - sellerFeeRate × 1.1 / 100)
+        // Case 1 — 뷰티 전문가 직접 등록 뷰티 서비스: 판매가 × (1 - sellerFeeRate × 1.1 / 100)
         hasSellerProduct = true;
         effBase += itemSale;
         sellerSettle += itemSale * itemFeeMul;
       } else if (info.priceModel === "COMMISSION" && info.commissionRate != null) {
-        // Case 2B — 수수료(COMMISSION) 기반 상담사 신청 상담상품
+        // Case 2B — 수수료(COMMISSION) 기반 뷰티 전문가 신청 뷰티 서비스
         hasSupplyProduct = true;
         const sellerPortion = itemSale * (info.commissionRate / 100);
         effBase += sellerPortion;
         sellerSettle += sellerPortion * itemFeeMul;
         supplyAmount += itemSale - sellerPortion; // 공급자 몫(수수료 전)
       } else {
-        // Case 2A — 공급가(SUPPLY) 기반 상담사 신청 상담상품
+        // Case 2A — 공급가(SUPPLY) 기반 뷰티 전문가 신청 뷰티 서비스
         hasSupplyProduct = true;
         const supply = (info.supplyPrice ?? 0) * item.quantity;
         const margin = Math.max(0, itemSale - supply);
@@ -272,9 +272,9 @@ export async function getSellerSettlementSummary(
       }
     }
 
-    // 아이템이 없는 예약(소셜 예약서 등 상담상품 매핑 없이 결제된 수기 예약)은
-    // 공급가/커미션 산정이 불가능하므로 예약 결제액 전액을 상담사 정산 기준으로 삼는다.
-    // (상담사 직접 등록 상담상품과 동일하게 플랫폼 수수료만 차감)
+    // 아이템이 없는 예약(소셜 예약서 등 뷰티 서비스 매핑 없이 결제된 수기 예약)은
+    // 공급가/커미션 산정이 불가능하므로 예약 결제액 전액을 뷰티 전문가 정산 기준으로 삼는다.
+    // (뷰티 전문가 직접 등록 뷰티 서비스와 동일하게 플랫폼 수수료만 차감)
     // 요율은 예약 단위 스냅샷(Order.sellerFeeRateSnap) 우선 — 아이템이 없어 아이템 단위
     // 스냅샷을 쓸 수 없으므로, 이게 없으면 요율 변경 시 정산액이 소급 변동한다.
     if (o.items.length === 0) {
@@ -291,8 +291,8 @@ export async function getSellerSettlementSummary(
     const saleDate = o.paidAt ?? o.createdAt;
     const settlementDate = getSettlementDate(saleDate, businessDays);
     const gross = Number(o.finalAmount); // 표시용 판매금액(예약 결제액)
-    const effectiveAmount = round(effBase); // 수수료 산정 기준(상담사 몫)
-    // 장바구니 할인(상담사 부담) — 플랫폼 수수료는 할인 전 기준으로 계산하고,
+    const effectiveAmount = round(effBase); // 수수료 산정 기준(뷰티 전문가 몫)
+    // 장바구니 할인(뷰티 전문가 부담) — 플랫폼 수수료는 할인 전 기준으로 계산하고,
     // 수수료 차감 후 정산액에서 할인액을 그대로 뺀다 (마진 초과 시 0원 하한).
     const cartDiscountAmount = Number((o as any).cartDiscountAmount ?? 0);
     const settlementBeforeCartDiscount = round(sellerSettle);

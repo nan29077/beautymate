@@ -87,7 +87,7 @@ export default async function CampaignDetailPage({
           <Link href="/campaigns" className="text-gray-900 hover:opacity-60 transition-opacity">
             <Icon name="ArrowRight" size={22} strokeWidth={1.5} className="rotate-180" />
           </Link>
-          <p className="text-sm font-medium text-gray-900">단체 상담</p>
+          <p className="text-sm font-medium text-gray-900">공동 프로모션</p>
           <div className="w-[22px]" />
         </div>
       </div>
@@ -115,7 +115,7 @@ export default async function CampaignDetailPage({
 
       {/* 캠페인 정보 */}
       <div className="px-4 py-4">
-        {/* 상담사 */}
+        {/* 뷰티 전문가 */}
         <Link
           href={`/shop/${campaign.seller.slug}`}
           className="inline-flex items-center gap-2 mb-3 hover:opacity-80"
@@ -225,7 +225,7 @@ export default async function CampaignDetailPage({
               예상 상담일:{" "}
               {campaign.estimatedDelivery
                 ? new Date(campaign.estimatedDelivery).toLocaleDateString("ko-KR")
-                : "단체 상담 종료 후 7일 이내"}
+                : "공동 프로모션 종료 후 7일 이내"}
             </span>
           </div>
         </div>

@@ -144,8 +144,8 @@ interface ChannelOrder {
 }
 
 const ORDER_STATUS_LABEL: Record<string, string> = {
-  PENDING: "결제 대기", PAID: "결제 완료", PREPARING: "상담상품 준비 중",
-  SHIPPED: "상담 진행 중", DELIVERED: "상담 완료", CANCELLED: "취소됨",
+  PENDING: "결제 대기", PAID: "결제 완료", PREPARING: "뷰티 서비스 준비 중",
+  SHIPPED: "상담 진행 중", DELIVERED: "서비스 완료", CANCELLED: "취소됨",
   REFUNDED: "환불됨", CONFIRMED: "구매 확정",
 };
 
@@ -208,7 +208,7 @@ export default function LiveChannelPage() {
       const res = await fetch(`/api/live/${code}/channel`);
       const data = await res.json();
       if (data.error) { setError(data.error); return; }
-      // 이 상담사의 더 최신 LIVE 방송이 시작됐으면 해당 페이지로 이동
+      // 이 뷰티 전문가의 더 최신 LIVE 방송이 시작됐으면 해당 페이지로 이동
       if (data.channel.activeShareCode) {
         router.replace(`/live/${data.channel.activeShareCode}`);
         return;
@@ -405,7 +405,7 @@ export default function LiveChannelPage() {
 
         {/* ═══ 상단 헤더 ═══ */}
         <header className="bg-white/85 backdrop-blur-sm border-b-2 border-amber-100 sticky top-0 z-30">
-          {/* 메인 행: 프로필 + 상담사명 + 단골 버튼 */}
+          {/* 메인 행: 프로필 + 뷰티 전문가명 + 단골 버튼 */}
           <div className="px-4 py-2 h-12 flex items-center gap-3">
             <Link href={`/shop/${channel.seller.slug}`} className="flex-shrink-0">
               {channel.seller.shopLogo ? (
@@ -712,18 +712,18 @@ export default function LiveChannelPage() {
           )}
         </section>
 
-        {/* ═══ 라이브 상담상품 미리보기 ═══ */}
+        {/* ═══ 라이브 뷰티 서비스 미리보기 ═══ */}
         <section className="mx-3 mt-3 mb-4 bg-white rounded-2xl border border-amber-100 p-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="flex items-center gap-1.5 text-[13px] font-extrabold" style={{ color: BROWN }}>
-              <Sparkles size={15} strokeWidth={1.6} /> 라이브 상담상품 미리보기
+              <Sparkles size={15} strokeWidth={1.6} /> 라이브 뷰티 서비스 미리보기
             </h2>
             <span className="text-[11px] font-bold" style={{ color: GOLD }}>{channel.products.length}개</span>
           </div>
           {channel.products.length === 0 ? (
             <div className="py-6 text-center">
               <BeeIcon size={30} />
-              <p className="text-[12px] text-gray-400 mt-2">준비 중인 상담상품이 없어요</p>
+              <p className="text-[12px] text-gray-400 mt-2">준비 중인 뷰티 서비스가 없어요</p>
             </div>
           ) : (
             <div className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1" style={{ scrollbarWidth: "none" }}>
@@ -791,7 +791,7 @@ export default function LiveChannelPage() {
             )}
           </div>
 
-          {/* 사주나라 통신판매중개업 안내 */}
+          {/* 뷰티메이트 통신판매중개업 안내 */}
           <div className="rounded-xl bg-amber-50/60 border border-amber-100 overflow-hidden">
             <button
               type="button"
@@ -800,7 +800,7 @@ export default function LiveChannelPage() {
             >
               <Info size={13} className="text-gray-400 flex-shrink-0" />
               <span className="flex-1 text-[10.5px] text-gray-500 leading-snug">
-                <b className="text-gray-600 font-semibold">사주나라는 통신판매중개자</b>이며 거래의 당사자가 아닙니다.
+                <b className="text-gray-600 font-semibold">뷰티메이트는 통신판매중개자</b>이며 거래의 당사자가 아닙니다.
               </span>
               <span className="text-[9px] text-gray-400 flex items-center gap-0.5 flex-shrink-0">
                 자세히 보기
@@ -810,28 +810,28 @@ export default function LiveChannelPage() {
             {bizOpen && (
               <div className="px-3 pb-3 pt-0.5 border-t border-amber-100">
                 <p className="text-[10px] text-gray-500 leading-relaxed mt-2">
-                  사주나라는 통신판매중개자로서 통신판매의 당사자가 아니며, 상담상품의 예약·상담 방식·환불 등 거래에 대한
-                  의무와 책임은 판매자(상담사)에게 있습니다. 사주나라는 거래 시스템(플랫폼)을 제공할 뿐 개별 거래에 대해서는
+                  뷰티메이트는 통신판매중개자로서 통신판매의 당사자가 아니며, 뷰티 서비스의 예약·진행 방식·환불 등 거래에 대한
+                  의무와 책임은 판매자(뷰티 전문가)에게 있습니다. 뷰티메이트는 거래 시스템(플랫폼)을 제공할 뿐 개별 거래에 대해서는
                   책임을 지지 않습니다.
                 </p>
                 <div className="mt-3 pt-3 border-t border-amber-100 space-y-0.5 text-[10px] text-gray-400 leading-relaxed">
                   <p className="font-semibold text-gray-500 mb-1">통신판매중개자 정보</p>
-                  <p><span className="text-gray-400">상호</span> 사주나라</p>
+                  <p><span className="text-gray-400">상호</span> 뷰티메이트</p>
                   <p><span className="text-gray-400">사업자등록번호</span> 사업자 등록 준비중</p>
                   <p><span className="text-gray-400">통신판매신고번호</span> 신고 준비중</p>
-                  <p><span className="text-gray-400">이메일</span> support@sajunara.co.kr</p>
+                  <p><span className="text-gray-400">이메일</span> support@beautymate.co.kr</p>
                 </div>
               </div>
             )}
           </div>
 
           <p className="text-[10px] text-gray-400 text-center pt-1">
-            &copy; {new Date().getFullYear()} 사주나라. All rights reserved.
+            &copy; {new Date().getFullYear()} 뷰티메이트. All rights reserved.
           </p>
         </footer>
       </div>
 
-      {/* 하단 고정: 점집 바로가기 버튼 (스크롤해도 항상 보임) */}
+      {/* 하단 고정: 뷰티샵 바로가기 버튼 (스크롤해도 항상 보임) */}
       <div className="fixed bottom-0 left-0 right-0 z-30">
         <div className="mx-auto max-w-[480px] px-4 py-3 bg-white/95 backdrop-blur-sm border-t border-amber-100 shadow-[0_-4px_20px_rgba(212,160,23,0.12)]"
           style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
@@ -841,7 +841,7 @@ export default function LiveChannelPage() {
             style={{ backgroundColor: BTN_COLOR, color: BROWN }}
           >
             <Store size={15} strokeWidth={1.6} />
-            {channel.seller.shopName} 점집 바로가기
+            {channel.seller.shopName} 뷰티샵 바로가기
             <ChevronRight size={14} style={{ color: BROWN }} />
           </Link>
         </div>
@@ -1050,8 +1050,8 @@ export default function LiveChannelPage() {
             <div className="grid grid-cols-2 gap-2">
               {([
                 { label: "예약내역", href: "/my/orders", Icon: Calendar },
-                { label: "단골 상담사", href: "/my/seller", Icon: Users },
-                { label: "찜한 상담상품", href: "/my/wishlist", Icon: Heart },
+                { label: "단골 뷰티 전문가", href: "/my/seller", Icon: Users },
+                { label: "찜한 뷰티 서비스", href: "/my/wishlist", Icon: Heart },
                 { label: "마이페이지 전체", href: "/my", Icon: User },
               ] as { label: string; href: string; Icon: React.ElementType }[]).map(item => (
                 <Link key={item.label} href={item.href} onClick={() => setShowMyPage(false)}
@@ -1074,7 +1074,7 @@ export default function LiveChannelPage() {
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-[12px] font-bold truncate" style={{ color: BROWN }}>
-                          {o.items[0]?.productName || "예약 상담상품"}
+                          {o.items[0]?.productName || "예약 뷰티 서비스"}
                           {o.items.length > 1 && <span className="text-gray-400 font-normal"> 외 {o.items.length - 1}건</span>}
                         </p>
                         <p className="text-[10px] text-gray-400 mt-0.5">{new Date(o.createdAt).toLocaleDateString("ko-KR")}</p>

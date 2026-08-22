@@ -1,10 +1,10 @@
 // 예약 상세보기용 "정산 수수료 안내" 계산 서버 유틸.
-// - lib/settlement.ts 의 정산 규칙(상담상품 유형별 Case 1/2A/2B, 부가세 포함 수수료 차감)을
+// - lib/settlement.ts 의 정산 규칙(뷰티 서비스 유형별 Case 1/2A/2B, 부가세 포함 수수료 차감)을
 //   예약 1건 단위로 재구성해, 상세 모달/펼침 영역에 표시할 display 구조를 생성한다.
 // - 역할별 관점(viewpoint):
-//   · CONSULTANT   — 상담사 정산 기준 (아이템별 Case 1/2A/2B)
-//   · SUPPLIER — 브랜드/중간관리자 공급 정산 기준 (본인 공급 상담상품만)
-//   · ADMIN    — 전체 수익 구조 (상담사/공급자/플랫폼)
+//   · CONSULTANT   — 뷰티 전문가 정산 기준 (아이템별 Case 1/2A/2B)
+//   · SUPPLIER — 브랜드/중간관리자 공급 정산 기준 (본인 공급 뷰티 서비스만)
+//   · ADMIN    — 전체 수익 구조 (뷰티 전문가/공급자/플랫폼)
 // prisma 를 사용하므로 서버 컴포넌트 / route handler 에서만 사용하세요.
 
 import { prisma } from "@/lib/prisma";
@@ -54,7 +54,7 @@ export interface FeeOrderInput {
 export interface BuildOrderFeeOpts {
   viewpoint: "CONSULTANT" | "SUPPLIER" | "ADMIN";
   orders: FeeOrderInput[];
-  contextSellerId?: string; // CONSULTANT 관점: 직접등록 판정 기준 상담사
+  contextSellerId?: string; // CONSULTANT 관점: 직접등록 판정 기준 뷰티 전문가
 }
 
 // ───── 포맷 헬퍼 ─────
@@ -69,7 +69,7 @@ const TYPE_LABEL: Record<ItemType, string> = {
   commission: "수수료 기반",
 };
 
-// ───── 상담상품 정보 ─────
+// ───── 뷰티 서비스 정보 ─────
 interface ProdInfo {
   sellerId: string | null;
   priceModel: string;
@@ -93,10 +93,10 @@ interface ItemEcon {
   supplierSettle: number;
   supplierFeeAmount: number;
   supplierFeeRate: number;
-  platformRevenue: number; // 판매가 - 상담사정산 - 공급자정산
+  platformRevenue: number; // 판매가 - 뷰티 전문가정산 - 공급자정산
 }
 
-// 상담상품 유형 판정 — sellerId 가 있으면(그리고 관점 상담사 소유면) 직접등록
+// 뷰티 서비스 유형 판정 — sellerId 가 있으면(그리고 관점 뷰티 전문가 소유면) 직접등록
 function classify(info: ProdInfo, contextSellerId?: string): ItemType {
   if (info.sellerId && (!contextSellerId || info.sellerId === contextSellerId)) return "direct";
   if (info.priceModel === "COMMISSION" && info.commissionRate != null) return "commission";
@@ -112,7 +112,7 @@ function computeEcon(
   const sale = Number(item.totalPrice);
   const sellerFeeRate = fees.sellerFeeRate;
   const sellerMul = 1 - (sellerFeeRate * 1.1) / 100;
-  // 2자 구조에서 공급자는 플랫폼(최고관리자) 하나뿐이라 상담사 수수료율을 그대로 쓴다.
+  // 2자 구조에서 공급자는 플랫폼(최고관리자) 하나뿐이라 뷰티 전문가 수수료율을 그대로 쓴다.
   const supplierFeeRate = fees.sellerFeeRate;
   const supplierMul = 1 - (supplierFeeRate * 1.1) / 100;
   const type = classify(info, contextSellerId);
@@ -174,7 +174,7 @@ function statusOf(order: FeeOrderInput): { label: string; tone: FeeStatusTone } 
   return { label: "구매확정 후 정산 확정", tone: "pending" };
 }
 
-// SUPPLIER 관점에서 이 상담상품이 본인 공급 상담상품인지 판정.
+// SUPPLIER 관점에서 이 뷰티 서비스가 본인 공급 뷰티 서비스인지 판정.
 // 브랜드/중간관리자가 사라져 공급자는 플랫폼 하나뿐이므로 항상 포함한다.
 function supplierIncludes(_info: ProdInfo, _opts: BuildOrderFeeOpts): boolean {
   return true;
@@ -204,17 +204,17 @@ function buildOne(
     if (opts.viewpoint === "CONSULTANT") {
       if (e.type === "supply") {
         lines.push({ label: "공급가", value: won(e.supply) });
-        lines.push({ label: "상담사 마진 (판매가 − 공급가)", value: won(e.sellerMargin) });
+        lines.push({ label: "뷰티 전문가 마진 (판매가 − 공급가)", value: won(e.sellerMargin) });
       } else if (e.type === "commission") {
         lines.push({ label: "커미션율", value: pct(e.commissionRate!) });
-        lines.push({ label: "상담사 몫 (판매가 × 커미션율)", value: won(e.sellerPortion) });
+        lines.push({ label: "뷰티 전문가 몫 (판매가 × 커미션율)", value: won(e.sellerPortion) });
       }
       lines.push({ label: "플랫폼 수수료율", value: feeRateLabel(e.sellerFeeRate) });
       lines.push({ label: "플랫폼 수수료", value: `-${won(e.sellerFeeAmount)}`, tone: "fee" });
-      lines.push({ label: "상담사 정산 예정액", value: won(e.sellerSettle), tone: "settle", strong: true });
+      lines.push({ label: "뷰티 전문가 정산 예정액", value: won(e.sellerSettle), tone: "settle", strong: true });
     } else if (opts.viewpoint === "SUPPLIER") {
       if (e.type === "commission") {
-        lines.push({ label: "커미션율 (상담사 몫)", value: pct(e.commissionRate!) });
+        lines.push({ label: "커미션율 (뷰티 전문가 몫)", value: pct(e.commissionRate!) });
         lines.push({ label: "공급자 정산 기준액", value: won(e.supplierBase) });
       } else {
         lines.push({ label: "공급가", value: won(e.supplierBase) });
@@ -224,7 +224,7 @@ function buildOne(
       lines.push({ label: "공급자 정산 예정액", value: won(e.supplierSettle), tone: "settle", strong: true });
     } else {
       // ADMIN
-      lines.push({ label: "상담사 정산액", value: won(e.sellerSettle) });
+      lines.push({ label: "뷰티 전문가 정산액", value: won(e.sellerSettle) });
       if (e.supplierBase > 0) lines.push({ label: "공급자 정산액", value: won(e.supplierSettle) });
       lines.push({ label: "플랫폼 수익", value: won(e.platformRevenue), tone: "settle", strong: true });
     }
@@ -247,9 +247,9 @@ function buildOne(
   let viewpointLabel: string;
   let summary: OrderFeeLine[];
   if (opts.viewpoint === "CONSULTANT") {
-    viewpointLabel = "상담사 정산 기준 · 플랫폼 수수료(부가세 포함) 차감";
+    viewpointLabel = "뷰티 전문가 정산 기준 · 플랫폼 수수료(부가세 포함) 차감";
     summary = [
-      { label: "상담사 정산 예정액 합계", value: won(sumSellerSettle), tone: "settle", strong: true },
+      { label: "뷰티 전문가 정산 예정액 합계", value: won(sumSellerSettle), tone: "settle", strong: true },
     ];
   } else if (opts.viewpoint === "SUPPLIER") {
     viewpointLabel = "플랫폼 공급 정산 기준 · 공급가 기준";
@@ -257,9 +257,9 @@ function buildOne(
       { label: "공급자 정산 예정액 합계", value: won(sumSupplierSettle), tone: "settle", strong: true },
     ];
   } else {
-    viewpointLabel = "전체 수익 구조 · 상담사 / 공급자 / 플랫폼";
+    viewpointLabel = "전체 수익 구조 · 뷰티 전문가 / 공급자 / 플랫폼";
     summary = [
-      { label: "상담사 정산액 합계", value: won(sumSellerSettle) },
+      { label: "뷰티 전문가 정산액 합계", value: won(sumSellerSettle) },
       ...(supplierCount > 0
         ? [{ label: "공급자 정산액 합계", value: won(sumSupplierSettle) } as OrderFeeLine]
         : []),
@@ -276,7 +276,7 @@ function buildOne(
   };
 }
 
-// 예약 목록 → 예약별 수수료 안내 map. 관점에 해당 상담상품이 없으면 해당 예약은 제외된다.
+// 예약 목록 → 예약별 수수료 안내 map. 관점에 해당 뷰티 서비스가 없으면 해당 예약은 제외된다.
 export async function buildOrderFeeInfoMap(
   opts: BuildOrderFeeOpts,
 ): Promise<Record<string, OrderFeeInfo>> {

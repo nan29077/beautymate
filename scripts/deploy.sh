@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# sellerbricks 실서버 배포 + 재시작 스크립트.
+# beautymate 실서버 배포 + 재시작 스크립트.
 #
 # 사용 방법:
 #   1) 로컬(Windows)에서: scripts/deploy-remote.ps1 가 이 파일을 SSH stdin 으로 실행
 #   2) 서버에서 직접:    bash scripts/deploy.sh   (또는 chmod +x 후 ./scripts/deploy.sh)
 #
 # 인자/환경변수 (인자 우선):
-#   $1 / REPO_DIR       기본 /home/ubuntu/sellerbricks
+#   $1 / REPO_DIR       기본 /home/ubuntu/beautymate
 #   $2 / BRANCH         기본 main
-#   $3 / PM2_APP_NAME   기본 sellerbricks
+#   $3 / PM2_APP_NAME   기본 beautymate
 
 # `sh deploy.sh` 처럼 dash 로 호출돼도 bash 로 재실행되도록 가드 (pipefail 등 bashism 사용).
 if [ -z "${BASH_VERSION:-}" ]; then
@@ -17,9 +17,9 @@ fi
 
 set -euo pipefail
 
-REPO_DIR="${1:-${REPO_DIR:-/home/ubuntu/sellerbricks}}"
+REPO_DIR="${1:-${REPO_DIR:-/home/ubuntu/beautymate}}"
 BRANCH="${2:-${BRANCH:-main}}"
-PM2_APP_NAME="${3:-${PM2_APP_NAME:-sellerbricks}}"
+PM2_APP_NAME="${3:-${PM2_APP_NAME:-beautymate}}"
 APP_DIR="$REPO_DIR/app"
 
 log() { printf '[deploy] %s\n' "$*"; }

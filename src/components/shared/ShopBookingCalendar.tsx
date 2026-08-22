@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, CalendarDays, Clock } from "lucide-react";
 
-// 점집 공개 페이지의 예약 달력.
+// 뷰티샵 공개 페이지의 예약 달력.
 // 서버에서 내려준 "날짜별 예약 가능 시간" 맵을 그대로 그린다.
 // 날짜 클릭 → 시간 목록, 시간 클릭 → 예약 플로우(/shop/[slug]/book)로 이동.
 
@@ -155,7 +155,7 @@ export default function ShopBookingCalendar({ sellerSlug, slots, themeColor, tod
           <p className="text-[12px] text-gray-400 text-center py-4">
             아직 열린 예약 시간이 없습니다.
             <br />
-            <span className="text-[11px] text-gray-300">상담사가 시간을 열면 여기에 표시됩니다.</span>
+            <span className="text-[11px] text-gray-300">뷰티 전문가가 시간을 열면 여기에 표시됩니다.</span>
           </p>
         ) : !picked || pickedTimes.length === 0 ? (
           <p className="text-[12px] text-gray-400 text-center py-4">

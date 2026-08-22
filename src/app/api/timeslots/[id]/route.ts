@@ -11,7 +11,7 @@ export async function DELETE(
 ) {
   const session = await auth();
   if (!session?.user || session.user.role !== "CONSULTANT") {
-    return NextResponse.json({ error: "상담사만 예약 시간을 삭제할 수 있습니다." }, { status: 403 });
+    return NextResponse.json({ error: "뷰티 전문가만 예약 시간을 삭제할 수 있습니다." }, { status: 403 });
   }
 
   const { id } = await Promise.resolve(params);
@@ -38,7 +38,7 @@ export async function PATCH(
 ) {
   const session = await auth();
   if (!session?.user || session.user.role !== "CONSULTANT") {
-    return NextResponse.json({ error: "상담사만 예약 시간을 수정할 수 있습니다." }, { status: 403 });
+    return NextResponse.json({ error: "뷰티 전문가만 예약 시간을 수정할 수 있습니다." }, { status: 403 });
   }
 
   const { id } = await Promise.resolve(params);

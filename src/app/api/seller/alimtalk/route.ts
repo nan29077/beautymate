@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 // 알림톡 발신 계정(API 키)은 관리자가 플랫폼 공용으로 관리한다.
-// 상담사에게는 본인 명의로 나간 실발송 기록과 크레딧 정보만 노출한다.
+// 뷰티 전문가에게는 본인 명의로 나간 실발송 기록과 크레딧 정보만 노출한다.
 export async function GET() {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

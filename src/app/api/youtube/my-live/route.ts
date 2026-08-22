@@ -3,17 +3,17 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getValidYoutubeAccessToken, fetchMyActiveBroadcast } from "@/lib/youtubeOAuth";
 
-// GET /api/youtube/my-live — OAuth 연결된 상담사의 진행 중인 YouTube 방송 자동 감지 (B방식)
+// GET /api/youtube/my-live — OAuth 연결된 뷰티 전문가의 진행 중인 YouTube 방송 자동 감지 (B방식)
 // liveBroadcasts.list(broadcastStatus=active) 로 현재 방송 중인 videoId 를 반환.
 // OAuth 미연결 시 fallback: 저장된 youtubeChannelId + YOUTUBE_API_KEY 검색.
 
 export async function GET() {
   const session = await auth();
   if (!session || session.user?.role !== "CONSULTANT") {
-    return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+    return NextResponse.json({ error: "뷰티 전문가만 접근 가능" }, { status: 403 });
   }
   const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-  if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+  if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
   // 1) OAuth 기반 감지 (정확 — 비공개/일부공개 방송도 감지)
   const accessToken = await getValidYoutubeAccessToken(seller.id);

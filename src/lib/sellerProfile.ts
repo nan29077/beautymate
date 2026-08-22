@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-// 상담사(CONSULTANT) 계정인데 SellerProfile 이 없는 경우 최소 프로필을 자동 생성한다.
+// 뷰티 전문가(CONSULTANT) 계정인데 SellerProfile 이 없는 경우 최소 프로필을 자동 생성한다.
 // 정상 가입 흐름(register API)은 가입 시 프로필을 함께 만들므로, 여기 해당하는 건
 // 레거시 SELLER 계정·스크립트로 만든 테스트 계정뿐이다. INSERT 만 수행한다.
 // isApproved 는 true 로 둔다 — false 면 authorize() 의 미승인 차단에 걸려
@@ -43,7 +43,7 @@ export async function ensureSellerProfile(user: {
     data: {
       userId: user.id,
       slug,
-      shopName: `${user.name || "상담사"}의 점집`,
+      shopName: `${user.name || "뷰티 전문가"}의 뷰티샵`,
       isApproved: true,
     },
     select: { slug: true },

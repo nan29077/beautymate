@@ -127,7 +127,7 @@ export default function GameCouponManager({
     const val = Number(form.discountValue);
     if (!Number.isFinite(val) || val <= 0) return toast("할인 값을 입력해주세요", false);
     if (form.discountType === "PERCENT" && val > 100) return toast("정률 할인은 100%를 넘을 수 없습니다", false);
-    if (form.discountType === "PURCHASE" && !form.productId) return toast("구매권 상담상품을 선택해주세요", false);
+    if (form.discountType === "PURCHASE" && !form.productId) return toast("구매권 뷰티 서비스를 선택해주세요", false);
     setSaving(true);
     try {
       const payload: Record<string, any> = {
@@ -247,7 +247,7 @@ export default function GameCouponManager({
       </div>
 
       <p className="text-[11px] text-gray-400 mb-3 leading-relaxed">
-        게임 당첨자(로그인 시청자)에게 자동 발급됩니다. 발급된 쿠폰은 이 상담사 점집에서만 사용할 수 있습니다.
+        게임 당첨자(로그인 시청자)에게 자동 발급됩니다. 발급된 쿠폰은 이 뷰티 전문가 뷰티샵에서만 사용할 수 있습니다.
         쿠폰은 게임 진행 상태와 관계없이 언제든 추가·수정할 수 있습니다.
       </p>
 
@@ -350,16 +350,16 @@ export default function GameCouponManager({
               ))}
             </div>
 
-            {/* PURCHASE: 상담상품 선택 */}
+            {/* PURCHASE: 뷰티 서비스 선택 */}
             {form.discountType === "PURCHASE" && (
               <>
-                <label className="block text-xs font-semibold text-gray-500 mb-1.5">구매권 상담상품</label>
+                <label className="block text-xs font-semibold text-gray-500 mb-1.5">구매권 뷰티 서비스</label>
                 <select
                   value={form.productId}
                   onChange={(e) => setForm((f) => ({ ...f, productId: e.target.value }))}
                   className={inputCls + " mb-3"}
                 >
-                  <option value="">상담상품 선택</option>
+                  <option value="">뷰티 서비스 선택</option>
                   {products.map((p) => (
                     <option key={p.id} value={p.id}>{p.name}</option>
                   ))}

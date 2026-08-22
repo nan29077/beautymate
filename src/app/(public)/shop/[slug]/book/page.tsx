@@ -45,7 +45,7 @@ function sellerQuery(productSelect: object) {
 }
 
 /**
- * 상담사 + 상담상품 조회.
+ * 뷰티 전문가 + 뷰티 서비스 조회.
  * 상담 관련 컬럼(consultingType 등)이 아직 운영 DB 에 없는 환경에서도 예약 페이지가
  * 죽지 않도록, 실패하면 기본 컬럼만으로 한 번 더 조회한다. (c/[slug] 와 동일 패턴)
  */
@@ -100,7 +100,7 @@ export default async function BookingPage({
     };
   });
 
-  // 라이브 등에서 특정 상품으로 진입: 목록에 없지만 이 상담사 소유 상품이면 추가
+  // 라이브 등에서 특정 상품으로 진입: 목록에 없지만 이 뷰티 전문가 소유 상품이면 추가
   if (productParam && !products.some((p) => p.id === productParam)) {
     type ExtraProduct = BookProduct & { sellerId: string | null; isActive: boolean };
     let extra: ExtraProduct | null = null;

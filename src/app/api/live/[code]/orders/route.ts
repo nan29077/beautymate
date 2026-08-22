@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET: 이 채널(상담사)에서 내가 구매한 예약 내역
+// GET: 이 채널(뷰티 전문가)에서 내가 구매한 예약 내역
 export async function GET(
   _req: NextRequest,
   { params }: { params: { code: string } }

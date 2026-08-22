@@ -1,4 +1,4 @@
-# 사주메이트 (sajumate)
+# 뷰티메이트 (beautymate)
 
 브랜드 → 셀러(인플루언서) → 구매자를 연결하는 3자 마켓플레이스 플랫폼
 
@@ -29,12 +29,12 @@ cp .env.example .env
 `.env` 파일을 열어 본인 환경에 맞게 수정:
 
 ```env
-DATABASE_URL="mysql://user:password@localhost:3306/sellerbricks"
+DATABASE_URL="mysql://user:password@localhost:3306/beautymate"
 AUTH_SECRET="your-secret-key"
 AUTH_URL="http://localhost:3000"
 NEXTAUTH_URL="http://localhost:3000"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
-NEXT_PUBLIC_APP_NAME="사주메이트"
+NEXT_PUBLIC_APP_NAME="뷰티메이트"
 ```
 
 ### 3. 설치 및 실행
@@ -122,9 +122,9 @@ app/
 
 | 역할 | 이메일 | 비밀번호 | 용도 |
 |------|--------|----------|------|
-| `SUPER_ADMIN` (관리자) | `admin@sellerbricks.com` | `password123` | 전체 관리 |
-| `BRAND_ADMIN` (브랜드) | `brand1@sellerbricks.com` | `password123` | 상품 관리 |
-| `SELLER` (셀러) | `seller1@sellerbricks.com` | `password123` | 샵 운영 |
+| `SUPER_ADMIN` (관리자) | `admin@beautymate.com` | `password123` | 전체 관리 |
+| `BRAND_ADMIN` (브랜드) | `brand1@beautymate.com` | `password123` | 상품 관리 |
+| `SELLER` (셀러) | `seller1@beautymate.com` | `password123` | 샵 운영 |
 | `BUYER` (구매자) | `buyer1@example.com` | `password123` | 쇼핑 |
 
 > 운영/인증 환경에서는 노출하지 않도록 주의하세요. 로컬 개발·QA 전용입니다.

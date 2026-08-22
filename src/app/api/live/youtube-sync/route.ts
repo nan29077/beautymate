@@ -6,7 +6,7 @@ import { isForwardedText } from "@/lib/youtubeChatForward";
 // YouTube 라이브 채팅 → 앱 채팅(LiveChatMessage) 병합 수집 엔드포인트
 //
 // 라이브 방송 화면(시청자/방송자)이 라이브 진행 중 주기적으로 호출한다.
-// 서버가 상담사의 YouTube Data API v3 키로 liveChat/messages 를 폴링해
+// 서버가 뷰티 전문가의 YouTube Data API v3 키로 liveChat/messages 를 폴링해
 // 새 메시지를 isYoutube=true 로 저장하면, 기존 8초 채팅 폴링(/api/live?mode=detail)이
 // 모든 접속 브라우저에 그대로 전달한다. (키득마켓/레어팜의 서버 폴링 방식을 DB 저장으로 적용)
 //
@@ -69,7 +69,7 @@ async function handleSync(req: NextRequest) {
   const videoId = extractYoutubeVideoId(live.externalUrl);
   if (!videoId) return NextResponse.json({ skipped: "no_video_id" });
 
-  // 상담사가 유튜브AI챗봇 탭에서 입력한 API 키 우선, 없으면 서버 공용 키 폴백
+  // 뷰티 전문가가 유튜브AI챗봇 탭에서 입력한 API 키 우선, 없으면 서버 공용 키 폴백
   const config = await prisma.chatBotConfig.findUnique({
     where: { sellerId: live.sellerId },
     select: { youtubeApiKey: true },
@@ -122,8 +122,8 @@ async function handleSync(req: NextRequest) {
     const cData = await cRes.json();
     const nextPageToken: string | null = cData.nextPageToken ?? null;
 
-    // 사주나라가 상담사 계정 명의로 보낸 메시지("[사주나라] ...")가 폴링으로 되돌아와
-    // 사이트 채팅에 중복 표시되는 것 방지. 상담사가 YouTube에서 직접 친 일반 채팅은 프리픽스가 없어 통과한다.
+    // 뷰티메이트가 뷰티 전문가 계정 명의로 보낸 메시지("[뷰티메이트] ...")가 폴링으로 되돌아와
+    // 사이트 채팅에 중복 표시되는 것 방지. 뷰티 전문가가 YouTube에서 직접 친 일반 채팅은 프리픽스가 없어 통과한다.
     const sellerChannelId = live.seller?.youtubeChannelId || null;
     const isForwardedEcho = (it: any): boolean => {
       const author = it?.authorDetails || {};

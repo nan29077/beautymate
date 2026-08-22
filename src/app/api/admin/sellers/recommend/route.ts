@@ -10,12 +10,12 @@ export async function POST(request: Request) {
 
   const { sellerId } = await request.json();
   if (!sellerId) {
-    return NextResponse.json({ error: "상담사 ID가 필요합니다." }, { status: 400 });
+    return NextResponse.json({ error: "뷰티 전문가 ID가 필요합니다." }, { status: 400 });
   }
 
   const seller = await prisma.sellerProfile.findUnique({ where: { id: sellerId } });
   if (!seller) {
-    return NextResponse.json({ error: "상담사를 찾을 수 없습니다." }, { status: 404 });
+    return NextResponse.json({ error: "뷰티 전문가를 찾을 수 없습니다." }, { status: 404 });
   }
 
   const updated = await prisma.sellerProfile.update({

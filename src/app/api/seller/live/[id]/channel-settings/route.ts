@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// PATCH: 채널 OFF 썸네일·링크 설정 (상담사 본인 라이브만)
+// PATCH: 채널 OFF 썸네일·링크 설정 (뷰티 전문가 본인 라이브만)
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -12,13 +12,13 @@ export async function PATCH(
     if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
 
     const role = (session.user as any)?.role;
-    if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 가능합니다" }, { status: 403 });
+    if (role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가만 가능합니다" }, { status: 403 });
 
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
       select: { id: true },
     });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
     const live = await prisma.liveStream.findUnique({
       where: { id: params.id },

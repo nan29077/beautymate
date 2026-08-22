@@ -55,7 +55,7 @@ export default function SupplierSettlementTable({ orders, feeRate, supplyLabel =
             <table className="w-full text-[11px] min-w-[560px]">
               <thead>
                 <tr className="text-gray-400 border-b border-gray-100">
-                  <th className="text-left font-medium py-2 px-2">상담상품명</th>
+                  <th className="text-left font-medium py-2 px-2">뷰티 서비스명</th>
                   <th className="text-center font-medium py-2 px-2 whitespace-nowrap">판매일</th>
                   <th className="text-right font-medium py-2 px-2 whitespace-nowrap">{supplyLabel}</th>
                   <th className="text-right font-medium py-2 px-2 whitespace-nowrap">플랫폼 수수료</th>

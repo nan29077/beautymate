@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { buildYoutubeAuthUrl } from "@/lib/youtubeOAuth";
 import { absoluteUrl } from "@/lib/appUrl";
 
-// GET /api/auth/youtube/connect — Google OAuth 동의 화면으로 리다이렉트 (상담사 전용)
+// GET /api/auth/youtube/connect — Google OAuth 동의 화면으로 리다이렉트 (뷰티 전문가 전용)
 // state 값을 쿠키에 저장해 callback 에서 CSRF 검증
 
 export async function GET(req: NextRequest) {

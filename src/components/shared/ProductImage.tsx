@@ -14,7 +14,7 @@ interface ProductImageProps {
 }
 
 /**
- * 상담상품 썸네일 공통 컴포넌트.
+ * 뷰티 서비스 썸네일 공통 컴포넌트.
  * - src 없음(null/빈 문자열) -> NoImagePlaceholder
  * - src 로드 실패              -> NoImagePlaceholder
  * - src 정상                  -> <img>

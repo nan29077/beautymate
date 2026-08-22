@@ -34,17 +34,17 @@ const LIVE_STEPS = ["type", "basic", "detail", "options"] as const;
 type StepId = "type" | "basic" | "detail" | "options" | "groupbuy";
 
 const STEP_INFO: Record<StepId, { label: string; icon: any; desc: string }> = {
-  type: { label: "상담상품유형", icon: Star, desc: "상담상품 유형을 선택하세요" },
-  basic: { label: "기본정보", icon: Tag, desc: "상담상품 기본 정보를 입력하세요" },
+  type: { label: "뷰티 서비스유형", icon: Star, desc: "뷰티 서비스 유형을 선택하세요" },
+  basic: { label: "기본정보", icon: Tag, desc: "뷰티 서비스 기본 정보를 입력하세요" },
   detail: { label: "상세설명", icon: Eye, desc: "상세 설명을 작성하세요" },
   options: { label: "이미지/옵션", icon: ImagePlus, desc: "이미지와 옵션을 설정하세요" },
-  groupbuy: { label: "단체 상담", icon: BookOpen, desc: "단체 상담 설정을 입력하세요" },
+  groupbuy: { label: "공동 프로모션", icon: BookOpen, desc: "공동 프로모션 설정을 입력하세요" },
 };
 
 export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGroupBuy, marginPolicy }: Props) {
   const { appAlert } = useAppDialog();
-  // 상담상품 등록 탭 노출은 최고관리자 권한설정(기능 토글)을 따른다.
-  // - 일반상담상품: flags.regNormal / 단체 상담: flags.regGroupBuy / 라이브 상담: 항상 노출
+  // 뷰티 서비스 등록 탭 노출은 최고관리자 권한설정(기능 토글)을 따른다.
+  // - 일반 뷰티 서비스: flags.regNormal / 공동 프로모션: flags.regGroupBuy / 라이브 뷰티: 항상 노출
   const flags = useFeatureFlags();
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -53,7 +53,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
     name: "", basePrice: "", comparePrice: "", description: "", detailContent: "",
     brandId: "", categoryId: "", thumbnail: "", images: [] as string[],
     supplyPrice: "", middleAdminMargin: "", // 공급가 / 중간관리자 단가 마진
-    stock: "", // 단일 상담상품 재고 수량 (옵션 미사용 시)
+    stock: "", // 단일 뷰티 서비스 재고 수량 (옵션 미사용 시)
     variants: [] as { name: string; price: string; stock: string }[],
   });
   // 다차원 옵션 그룹
@@ -72,16 +72,16 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
     description: "", bannerImage: "", estimatedDelivery: "",
     minSalePrice: "", // 최저판매가 (드라이브)
   });
-  // 배송 상태: 사주나라는 예약(비실물) 전용 — 항상 배송 없음(무료)으로 저장. 입력 UI 없음.
+  // 배송 상태: 뷰티메이트는 예약(비실물) 전용 — 항상 배송 없음(무료)으로 저장. 입력 UI 없음.
   const [shipping, setShipping] = useState({ fee: "", freeShipping: true, freeThreshold: "", remoteFee: "" });
   // 인플루언서 커미션 (브랜드/관리자용)
   const [commissionRate, setCommissionRate] = useState("");
   // 제공 방식: SUPPLY(공급가로 제공) / COMMISSION(수수료로 제공)
   const [priceModel, setPriceModel] = useState<"SUPPLY" | "COMMISSION">("SUPPLY");
-  // 수수료 제공 시: 판매가(소비자 정가) / 상담사 수수료율(%)
+  // 수수료 제공 시: 판매가(소비자 정가) / 뷰티 전문가 수수료율(%)
   const [commissionSalePrice, setCommissionSalePrice] = useState("");
   const [sellerCommissionRate, setSellerCommissionRate] = useState("");
-  // 상담상품 문의/채팅
+  // 뷰티 서비스 문의/채팅
   const [chatMessages, setChatMessages] = useState<{ from: string; text: string; time: string }[]>([]);
   const [chatInput, setChatInput] = useState("");
 
@@ -96,9 +96,9 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
 
   // 브랜드는 공급가만 입력 (판매가·마진·커미션은 중간관리자가 결정)
   const isBrandOnly = mode === "brand";
-  // 공급가/마진 입력 노출 여부 (상담사는 판매가만 입력). 중간관리자 직접 등록도 공급가/마진 입력.
+  // 공급가/마진 입력 노출 여부 (뷰티 전문가는 판매가만 입력). 중간관리자 직접 등록도 공급가/마진 입력.
   const showSupplyFields = mode === "admin" || mode === "brand" || mode === "middle";
-  // 관리자/브랜드/중간관리자 등록 상담상품의 판매가는 상담사가 직접 입력한다 → 등록 폼에서 판매가 필드 제거
+  // 관리자/브랜드/중간관리자 등록 뷰티 서비스의 판매가는 뷰티 전문가가 직접 입력한다 → 등록 폼에서 판매가 필드 제거
   const sellerSetsPrice = mode === "admin" || mode === "brand" || mode === "middle";
   // 현재 적용할 마진 정책: 브랜드 모드는 prop, 관리자 모드는 선택된 브랜드의 정책
   const activeMarginPolicy: MarginPolicy | null =
@@ -167,7 +167,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
   const isGroupBuy = productType === "groupbuy";
   const isLive = productType === "live";
 
-  useEffect(() => { if (isGroupBuy && form.name && !groupBuy.title) setGroupBuy(p => ({ ...p, title: `${form.name} 단체 상담` })); }, [isGroupBuy, form.name]);
+  useEffect(() => { if (isGroupBuy && form.name && !groupBuy.title) setGroupBuy(p => ({ ...p, title: `${form.name} 공동 프로모션` })); }, [isGroupBuy, form.name]);
   useEffect(() => { if (isGroupBuy && form.basePrice && !groupBuy.campaignPrice) setGroupBuy(p => ({ ...p, campaignPrice: form.basePrice })); }, [isGroupBuy, form.basePrice]);
 
   const steps: StepId[] = isGroupBuy ? [...GROUPBUY_STEPS] : isLive ? [...LIVE_STEPS] : [...NORMAL_STEPS];
@@ -195,7 +195,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
   const getNextValidationMsg = (): string => {
     switch (currentStepId) {
       case "basic":
-        if (!form.name) return "상담상품명을 입력해주세요";
+        if (!form.name) return "뷰티 서비스명을 입력해주세요";
         if (sellerSetsPrice) {
           if (priceModel === "COMMISSION" && !commissionSalePrice) return "판매가(소비자 정가)를 입력해주세요";
           if (priceModel !== "COMMISSION" && !form.supplyPrice) return "공급가를 입력해주세요";
@@ -204,7 +204,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
         }
         return "필수 항목을 확인해주세요";
       case "groupbuy":
-        return "단체 상담 가격, 시작일, 종료일을 모두 입력해주세요";
+        return "공동 프로모션 가격, 시작일, 종료일을 모두 입력해주세요";
       default:
         return "필수 항목을 입력해주세요";
     }
@@ -226,13 +226,13 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
   const handleSubmit = async () => {
     // 제공 방식별 basePrice 결정
     // - 수수료 제공(COMMISSION): 브랜드/관리자가 입력한 판매가(소비자 정가)를 basePrice로 확정
-    // - 공급가 제공(SUPPLY): 공급가로 임시 저장(상담사가 점집 추가 시 판매가 확정)
-    // - 상담사 직접 등록: 상담사가 입력한 판매가
+    // - 공급가 제공(SUPPLY): 공급가로 임시 저장(뷰티 전문가가 뷰티샵 추가 시 판매가 확정)
+    // - 뷰티 전문가 직접 등록: 뷰티 전문가가 입력한 판매가
     const effectiveBasePrice = isCommissionModel
       ? commissionSalePrice
       : (sellerSetsPrice ? form.supplyPrice : form.basePrice);
     // 필수값 누락 시 조용히 종료하지 않고 사용자에게 안내 (등록이 안 되는 것처럼 보이는 문제 방지)
-    if (!form.name) { appAlert("상담상품명을 입력해주세요"); return; }
+    if (!form.name) { appAlert("뷰티 서비스명을 입력해주세요"); return; }
     if (!effectiveBasePrice) {
       appAlert(
         isCommissionModel ? "판매가(소비자 정가)를 입력해주세요"
@@ -242,7 +242,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
       return;
     }
     if (isGroupBuy && (!groupBuy.campaignPrice || !groupBuy.startDate || !groupBuy.endDate)) {
-      appAlert("단체 상담: 가격, 시작일, 종료일 필수"); return;
+      appAlert("공동 프로모션: 가격, 시작일, 종료일 필수"); return;
     }
     setLoading(true);
     try {
@@ -263,7 +263,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
           ? JSON.stringify(optionGroups)
           : null,
       };
-      // 제공 방식 (브랜드/관리자 전용, 상담사 직접 등록은 항상 SUPPLY)
+      // 제공 방식 (브랜드/관리자 전용, 뷰티 전문가 직접 등록은 항상 SUPPLY)
       body.priceModel = sellerSetsPrice ? priceModel : "SUPPLY";
       if (isCommissionModel) {
         // 수수료로 제공: 판매가는 basePrice로 확정, 공급가 개념 없음
@@ -285,7 +285,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
       if (isGroupBuy) {
         body.isGroupBuy = true;
         body.groupBuy = {
-          title: groupBuy.title || `${form.name} 단체 상담`,
+          title: groupBuy.title || `${form.name} 공동 프로모션`,
           campaignPrice: parseFloat(groupBuy.campaignPrice),
           goalQuantity: groupBuy.goalQuantity ? parseInt(groupBuy.goalQuantity) : null,
           minOrderQuantity: parseInt(groupBuy.minOrderQuantity) || 1,
@@ -319,11 +319,11 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
     ? Math.round(((parseFloat(form.basePrice) - parseFloat(groupBuy.campaignPrice)) / parseFloat(form.basePrice)) * 100) : 0;
 
   const allProductTypeTabs: { id: ProductType; label: string; icon: any; color: string; desc: string }[] = [
-    { id: "normal", label: "일반상담상품", icon: Star, color: "bg-gray-900", desc: "일반 판매 상담상품" },
-    { id: "groupbuy", label: "단체 상담", icon: BookOpen, color: "bg-emerald-500", desc: "단체 상담 캠페인 상담상품" },
-    { id: "live", label: "라이브 상담", icon: Radio, color: "bg-red-500", desc: "라이브 방송 판매 상담상품" },
+    { id: "normal", label: "일반 뷰티 서비스", icon: Star, color: "bg-gray-900", desc: "일반 판매 뷰티 서비스" },
+    { id: "groupbuy", label: "공동 프로모션", icon: BookOpen, color: "bg-emerald-500", desc: "공동 프로모션 캠페인 뷰티 서비스" },
+    { id: "live", label: "라이브 뷰티", icon: Radio, color: "bg-red-500", desc: "라이브 방송 판매 뷰티 서비스" },
   ];
-  // 권한설정 토글에 따라 노출할 유형 탭만 남긴다. (라이브 상담은 항상 노출)
+  // 권한설정 토글에 따라 노출할 유형 탭만 남긴다. (라이브 뷰티은 항상 노출)
   const productTypeTabs = allProductTypeTabs.filter((pt) => {
     if (pt.id === "normal") return flags.regNormal;
     if (pt.id === "groupbuy") return flags.regGroupBuy && !hideGroupBuy;
@@ -351,7 +351,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
   const handleSendChat = () => {
     if (!chatInput.trim()) return;
     setChatMessages(prev => [...prev, {
-      from: mode === "seller" ? "상담사" : mode === "brand" ? "브랜드" : "관리자",
+      from: mode === "seller" ? "뷰티 전문가" : mode === "brand" ? "브랜드" : "관리자",
       text: chatInput.trim(),
       time: new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" }),
     }]);
@@ -363,11 +363,11 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
   return (
     <>
       <div className="flex items-center gap-2">
-        {/* 대량 등록: 엑셀 일괄 등록. 상담상품 등록 화면에서는 계정(역할)과 무관하게 항상 노출한다.
-            (일반상담상품 탭 토글 flags.regNormal 과 무관 — 대량 등록은 별도 기능이므로 게이트하지 않음) */}
+        {/* 대량 등록: 엑셀 일괄 등록. 뷰티 서비스 등록 화면에서는 계정(역할)과 무관하게 항상 노출한다.
+            (일반 뷰티 서비스 탭 토글 flags.regNormal 과 무관 — 대량 등록은 별도 기능이므로 게이트하지 않음) */}
         <BulkProductRegister mode={mode} brands={brands} />
         <button onClick={() => { resetForm(); setShowForm(true); }} className="btn-primary text-sm flex items-center gap-1 !px-3 !py-2 sm:!px-4 sm:!py-2.5 whitespace-nowrap">
-          <Icon name="Plus" size={16} /> <span className="hidden sm:inline">{buttonLabel || "내상담상품등록"}</span><span className="sm:hidden">등록</span>
+          <Icon name="Plus" size={16} /> <span className="hidden sm:inline">{buttonLabel || "내뷰티 서비스등록"}</span><span className="sm:hidden">등록</span>
         </button>
       </div>
 
@@ -384,7 +384,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                       <Icon name="ChevronDown" size={18} className="rotate-90" />
                     </button>
                   )}
-                  <h3 className="text-lg font-bold text-gray-900">{buttonLabel || "내상담상품등록"}</h3>
+                  <h3 className="text-lg font-bold text-gray-900">{buttonLabel || "내뷰티 서비스등록"}</h3>
                 </div>
                 <button onClick={() => setShowForm(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all">
                   <X size={18} />
@@ -421,12 +421,12 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
             <div className="flex-1 overflow-y-auto overscroll-contain">
               <div className="px-4 sm:px-6 py-5 space-y-5">
 
-                {/* STEP: 상담상품 유형 선택 */}
+                {/* STEP: 뷰티 서비스 유형 선택 */}
                 {currentStepId === "type" && (
                   <div className="space-y-4 animate-fade-in">
                     <div>
-                      <h4 className="text-sm font-bold text-gray-800 mb-1">상담상품 유형 선택</h4>
-                      <p className="text-xs text-gray-400">등록할 상담상품의 유형을 선택하세요</p>
+                      <h4 className="text-sm font-bold text-gray-800 mb-1">뷰티 서비스 유형 선택</h4>
+                      <p className="text-xs text-gray-400">등록할 뷰티 서비스의 유형을 선택하세요</p>
                     </div>
                     <div className="space-y-2.5">
                       {productTypeTabs.map(pt => (
@@ -459,7 +459,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                       <div className="bg-red-50 rounded-xl p-3.5 flex items-start gap-2">
                         <Icon name="Live" size={14} className="text-red-500 mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="text-xs font-bold text-red-700">라이브 상담 상담상품</p>
+                          <p className="text-xs font-bold text-red-700">라이브 뷰티 뷰티 서비스</p>
                           <p className="text-[11px] text-red-600 mt-0.5">라이브 방송에서 판매할 수 있도록 등록됩니다.</p>
                         </div>
                       </div>
@@ -471,8 +471,8 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                 {currentStepId === "basic" && (
                   <div className="space-y-5 animate-fade-in">
                     <div>
-                      <label className="text-xs font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5"><Icon name="ProductName_icon" size={16} /> 상담상품명 <span className="text-red-500">*</span></label>
-                      <input type="text" className="input-field text-sm" placeholder="상담상품명을 입력하세요" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+                      <label className="text-xs font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5"><Icon name="ProductName_icon" size={16} /> 뷰티 서비스명 <span className="text-red-500">*</span></label>
+                      <input type="text" className="input-field text-sm" placeholder="뷰티 서비스명을 입력하세요" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
                     </div>
 
                     {/* 제공 방식 선택 — 브랜드/관리자 전용 */}
@@ -488,7 +488,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                             }`}
                           >
                             <span className={`text-xs font-bold ${priceModel === "SUPPLY" ? "text-gray-900" : "text-gray-500"}`}>공급가로 제공</span>
-                            <p className="text-[10px] text-gray-400 mt-0.5 leading-tight">상담사가 판매가 직접 설정</p>
+                            <p className="text-[10px] text-gray-400 mt-0.5 leading-tight">뷰티 전문가가 판매가 직접 설정</p>
                           </button>
                           <button
                             type="button"
@@ -504,7 +504,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                       </div>
                     )}
 
-                    {/* 수수료 제공 시: 판매가(소비자 정가) + 상담사 수수료율 */}
+                    {/* 수수료 제공 시: 판매가(소비자 정가) + 뷰티 전문가 수수료율 */}
                     {isCommissionModel && (
                       <div className="border border-brand-200 rounded-xl p-4 space-y-3.5 bg-brand-50/40">
                         <div className="grid grid-cols-2 gap-4">
@@ -517,7 +517,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                             </div>
                           </div>
                           <div>
-                            <label className="text-[11px] font-medium text-gray-700 mb-1 block">상담사 수수료율</label>
+                            <label className="text-[11px] font-medium text-gray-700 mb-1 block">뷰티 전문가 수수료율</label>
                             <div className="relative">
                               <input type="number" min="0" max="100" step="0.1" className="input-field text-sm pr-8 !bg-white" placeholder="0"
                                 value={sellerCommissionRate} onChange={e => setSellerCommissionRate(e.target.value)} />
@@ -527,22 +527,22 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                         </div>
                         {commissionSalePrice && sellerCommissionRate && (
                           <p className="text-[10px] text-brand-600">
-                            상담사 마진 예상: {Math.round((parseFloat(commissionSalePrice) || 0) * (parseFloat(sellerCommissionRate) || 0) / 100).toLocaleString()}원
+                            뷰티 전문가 마진 예상: {Math.round((parseFloat(commissionSalePrice) || 0) * (parseFloat(sellerCommissionRate) || 0) / 100).toLocaleString()}원
                             (판매가 {Number(commissionSalePrice).toLocaleString()}원 × {sellerCommissionRate}%)
                           </p>
                         )}
-                        <p className="text-[10px] text-gray-400">상담사는 지정된 판매가로만 판매하며, 마진은 수수료율로 자동 계산됩니다.</p>
+                        <p className="text-[10px] text-gray-400">뷰티 전문가는 지정된 판매가로만 판매하며, 마진은 수수료율로 자동 계산됩니다.</p>
                       </div>
                     )}
 
-                    {/* 판매가 — 관리자/브랜드는 입력하지 않음(상담사가 직접 판매가 입력) */}
+                    {/* 판매가 — 관리자/브랜드는 입력하지 않음(뷰티 전문가가 직접 판매가 입력) */}
                     {sellerSetsPrice ? (
-                      // 공급가 제공 방식일 때만 "상담사가 직접 입력" 안내 표시
+                      // 공급가 제공 방식일 때만 "뷰티 전문가가 직접 입력" 안내 표시
                       priceModel === "SUPPLY" && (
                         <div>
                           <label className="text-xs font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5"><Icon name="PriceTag_icon" size={16} /> 판매가</label>
                           <p className="text-sm text-gray-500 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5">
-                            상담사가 직접 입력
+                            뷰티 전문가가 직접 입력
                           </p>
                         </div>
                       )
@@ -609,7 +609,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                         </div>
                         {isBrandOnly ? (
                           <p className="text-[10px] text-gray-400">
-                            공급가만 입력하세요. 판매가와 마진은 중간관리자가 설정하며, 등록 후 중간관리자 승인 시 상담사에게 공개됩니다.
+                            공급가만 입력하세요. 판매가와 마진은 중간관리자가 설정하며, 등록 후 중간관리자 승인 시 뷰티 전문가에게 공개됩니다.
                           </p>
                         ) : isPercentagePolicy && activeMarginPolicy ? (
                           <p className="text-[10px] text-gray-500">
@@ -654,12 +654,12 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                           <input type="number" className="input-field text-sm pr-8" placeholder="10" value={commissionRate} onChange={e => setCommissionRate(e.target.value)} min="0" max="100" step="0.1" />
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">%</span>
                         </div>
-                        <p className="text-[10px] text-gray-400 mt-1">상담사가 이 상담상품을 판매할 때 적용되는 커미션 비율입니다</p>
+                        <p className="text-[10px] text-gray-400 mt-1">뷰티 전문가가 이 뷰티 서비스를 판매할 때 적용되는 커미션 비율입니다</p>
                       </div>
                     )}
                     <div>
                       <label className="text-xs font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5"><Icon name="ShortDescription_icon" size={16} /> 간단 설명</label>
-                      <textarea className="input-field h-20 resize-none text-sm" placeholder="상담상품에 대한 간단한 설명을 입력하세요" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+                      <textarea className="input-field h-20 resize-none text-sm" placeholder="뷰티 서비스에 대한 간단한 설명을 입력하세요" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
                     </div>
                     <div>
                       <label className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1.5"><Icon name="ProductTag_icon" size={16} /> 배지</label>
@@ -677,7 +677,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                       </div>
                     </div>
 
-                    {/* 배송 설정 제거: 사주나라는 예약(비실물) 전용 서비스 (배송비 항상 없음) */}
+                    {/* 배송 설정 제거: 뷰티메이트는 예약(비실물) 전용 서비스 (배송비 항상 없음) */}
                   </div>
                 )}
 
@@ -712,15 +712,15 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                         <textarea ref={detailRef} className="input-field h-48 resize-y font-mono text-xs rounded-t-none" placeholder="HTML 형식의 상세 정보를 입력하세요" value={form.detailContent} onChange={e => setForm({ ...form, detailContent: e.target.value })} />
                       )}
                     </div>
-                    {/* 상담상품 문의/채팅 */}
+                    {/* 뷰티 서비스 문의/채팅 */}
                     <div>
                       <label className="text-xs font-semibold text-gray-700 mb-2 block flex items-center gap-1">
-                        <Icon name="Message" size={12} /> 상담상품 문의 (브랜드/관리자 소통)
+                        <Icon name="Message" size={12} /> 뷰티 서비스 문의 (브랜드/관리자 소통)
                       </label>
                       <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
                         <div className="max-h-[120px] overflow-y-auto p-3 space-y-1.5">
                           {chatMessages.length === 0 ? (
-                            <p className="text-[11px] text-gray-400 text-center py-2">상담상품에 대한 문의사항을 입력하세요</p>
+                            <p className="text-[11px] text-gray-400 text-center py-2">뷰티 서비스에 대한 문의사항을 입력하세요</p>
                           ) : chatMessages.map((msg, i) => (
                             <div key={i} className="flex flex-col gap-0.5">
                               <span className="text-[9px] text-gray-400">{msg.from} · {msg.time}</span>
@@ -752,7 +752,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                       <label className="text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
                         <Icon name="ProductThumbnail_icon" size={20} /> 썸네일 이미지 <span className="text-gray-400 font-normal">(대표 이미지, 1장)</span>
                       </label>
-                      <p className="text-[11px] text-gray-400 mb-2">상담상품 목록·카드에서 보이는 대표 이미지입니다.</p>
+                      <p className="text-[11px] text-gray-400 mb-2">뷰티 서비스 목록·카드에서 보이는 대표 이미지입니다.</p>
                       <ImageUploader
                         images={form.thumbnail ? [form.thumbnail] : []}
                         onChange={(imgs) => setForm({ ...form, thumbnail: imgs[0] || "" })}
@@ -765,7 +765,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                       <label className="text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
                         <Icon name="ProductGallery_icon" size={20} /> 상세 이미지 <span className="text-gray-400 font-normal">(갤러리, 최대 8장)</span>
                       </label>
-                      <p className="text-[11px] text-gray-400 mb-2">상담상품 상세페이지 상단 갤러리에 표시됩니다.</p>
+                      <p className="text-[11px] text-gray-400 mb-2">뷰티 서비스 상세페이지 상단 갤러리에 표시됩니다.</p>
                       <ImageUploader
                         images={form.images}
                         onChange={(imgs) => setForm({ ...form, images: imgs })}
@@ -794,10 +794,10 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                       </div>
                     )}
 
-                    {/* 상담 방식 · 시간 · 조합별 가격 (사주나라 기본 등록 방식) */}
+                    {/* 진행 방식 · 시간 · 조합별 가격 (뷰티메이트 기본 등록 방식) */}
                     <div>
                       <label className="text-xs font-semibold text-gray-700 flex items-center gap-1 mb-2">
-                        <Icon name="ProductOption_icon" size={16} /> 상담 방식 · 시간 설정
+                        <Icon name="ProductOption_icon" size={16} /> 진행 방식 · 시간 설정
                         <span className="text-gray-400 font-normal ml-1">(방식·시간별 가격)</span>
                       </label>
                       <ConsultOptionEditor
@@ -831,7 +831,7 @@ export default function ProductRegisterForm({ brands, mode, buttonLabel, hideGro
                 ) : (
                   <button type="button" onClick={handleSubmit} disabled={loading} className="btn-primary flex-1 py-2.5 text-sm flex items-center justify-center gap-2">
                     {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-                    {loading ? "등록 중..." : "상담상품 등록"}
+                    {loading ? "등록 중..." : "뷰티 서비스 등록"}
                   </button>
                 )}
               </div>

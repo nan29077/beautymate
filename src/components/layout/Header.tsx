@@ -19,15 +19,17 @@ export default function Header() {
 
   const loggedOut = !session && status !== "loading";
 
-  // 점집 안에서는 글로벌 헤더를 숨기고 점집 전용 헤더(SellerShopHeader)만 노출한다.
+  // 뷰티샵 안에서는 글로벌 헤더를 숨기고 뷰티샵 전용 헤더(SellerShopHeader)만 노출한다.
   const isSellerShop = /^\/shop\/[^/]+/.test(pathname);
-  // 상담사 서브페이지(장바구니/내정보 등)에서는 공통 헤더 대신 상담사 전용 헤더가 노출된다.
+  const isHome = pathname === "/";
+  // 뷰티 전문가 서브페이지(장바구니/내정보 등)에서는 공통 헤더 대신 뷰티 전문가 전용 헤더가 노출된다.
   const { subpageActive } = useShopChrome();
 
   if (isSellerShop || subpageActive || embedded) return null;
 
   return (
-    <header className="sticky top-0 z-[60]">
+    <>
+    <header className={`sticky top-0 z-[60] ${isHome ? "lg:hidden" : ""}`}>
       <div className="bg-white border-b border-gray-100">
         <div className="flex items-center justify-between px-4 h-14">
           <Link href="/" prefetch={true} className="flex items-center gap-1.5">
@@ -35,14 +37,14 @@ export default function Header() {
           </Link>
 
           <div className="flex items-center gap-0.5 relative z-[70]" style={{ pointerEvents: "auto" }}>
-            {/* 상담사 찾기 — 예약 커머스의 핵심 진입점.
-                '상담사 탐색' 기능이 꺼져 있으면 /sellers 가 404이므로 버튼도 숨긴다. */}
+            {/* 뷰티 전문가 찾기 — 예약 커머스의 핵심 진입점.
+                '뷰티 전문가 탐색' 기능이 꺼져 있으면 /sellers 가 404이므로 버튼도 숨긴다. */}
             {flags.seller && (
               <Link
                 href="/sellers"
                 prefetch={true}
-                aria-label="상담사 찾기"
-                title="상담사 찾기"
+                aria-label="뷰티 전문가 찾기"
+                title="뷰티 전문가 찾기"
                 className="inline-flex items-center justify-center h-10 px-2 text-gray-900 hover:opacity-60 transition-opacity"
               >
                 <Icon name="Search" size={22} strokeWidth={1.5} />
@@ -75,5 +77,38 @@ export default function Header() {
         </div>
       </div>
     </header>
+    {isHome && (
+      <header className="sticky top-0 z-[60] hidden border-b border-rose-100/80 bg-white/95 backdrop-blur-xl lg:block">
+        <div className="mx-auto flex h-[76px] max-w-[1320px] items-center justify-between px-8">
+          <Link href="/" prefetch className="flex items-center">
+            <BrandWordmark size="lg" />
+          </Link>
+          <nav className="flex items-center gap-9 text-sm font-bold text-gray-700" aria-label="PC 메인 메뉴">
+            {flags.seller && <Link href="/sellers" className="transition hover:text-[#b44b68]">뷰티 전문가</Link>}
+            <Link href="/#experts" className="transition hover:text-[#b44b68]">추천 전문가</Link>
+            {flags.liveCommerce && <Link href="/live" className="flex items-center gap-1.5 transition hover:text-[#b44b68]"><span className="h-2 w-2 rounded-full bg-red-500" /> 라이브</Link>}
+            <Link href="/#about" className="transition hover:text-[#b44b68]">뷰티메이트 소개</Link>
+            <Link href="/#how" className="transition hover:text-[#b44b68]">이용방법</Link>
+            <Link href="/become-seller" className="transition hover:text-[#b44b68]">전문가 입점</Link>
+          </nav>
+          <div className="flex items-center gap-2">
+            {flags.seller && <Link href="/sellers" aria-label="검색" className="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition hover:bg-rose-50 hover:text-[#b44b68]"><Icon name="Search" size={20} /></Link>}
+            {loggedOut ? (
+              <>
+                <Link href="/auth/login" className="px-4 py-2.5 text-sm font-bold text-gray-700 transition hover:text-[#b44b68]">로그인</Link>
+                <Link href="/auth/register" className="rounded-full bg-[#6d2945] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#4f1d32]">회원가입</Link>
+              </>
+            ) : (
+              <>
+                <NotificationBell size={20} buttonClassName="flex h-10 w-10 items-center justify-center rounded-full hover:bg-rose-50" />
+                <Link href="/my" className="rounded-full bg-[#6d2945] px-5 py-2.5 text-sm font-bold text-white">마이페이지</Link>
+                <button type="button" onClick={() => signOut({ callbackUrl: "/" })} className="px-3 py-2 text-xs font-bold text-gray-500">로그아웃</button>
+              </>
+            )}
+          </div>
+        </div>
+      </header>
+    )}
+    </>
   );
 }

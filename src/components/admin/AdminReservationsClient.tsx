@@ -28,7 +28,7 @@ interface Seller {
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   PENDING:   { label: "예약 대기", color: "bg-yellow-50 text-yellow-700" },
   CONFIRMED: { label: "예약 확정", color: "bg-blue-50 text-blue-700" },
-  COMPLETED: { label: "상담 완료", color: "bg-green-50 text-green-700" },
+  COMPLETED: { label: "서비스 완료", color: "bg-green-50 text-green-700" },
   CANCELLED: { label: "취소됨",   color: "bg-gray-100 text-gray-500" },
   NO_SHOW:   { label: "노쇼",      color: "bg-red-50 text-red-600" },
 };
@@ -116,7 +116,7 @@ export default function AdminReservationsClient({
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4 space-y-3">
           <div className="grid grid-cols-1 min-[430px]:grid-cols-2 md:grid-cols-4 gap-3">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">상담사</label>
+              <label className="block text-xs text-gray-500 mb-1">뷰티 전문가</label>
               <select
                 value={consultantId}
                 onChange={e => setConsultantId(e.target.value)}
@@ -179,7 +179,7 @@ export default function AdminReservationsClient({
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="고객명, 연락처, 예약번호, 상담사 검색"
+          placeholder="고객명, 연락처, 예약번호, 뷰티 전문가 검색"
           className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 text-sm"
         />
         {search && (
@@ -216,9 +216,9 @@ export default function AdminReservationsClient({
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">예약번호</th>
-                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">상담사</th>
+                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">뷰티 전문가</th>
                 <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">고객명</th>
-                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">상담 상품</th>
+                <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">뷰티 서비스</th>
                 <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">날짜</th>
                 <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">시간</th>
                 <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">상태</th>

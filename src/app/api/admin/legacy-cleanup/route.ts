@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// 셀러브릭스 레거시 데이터 현황 진단 — SUPER_ADMIN 전용.
+// 뷰티메이트 레거시 데이터 현황 진단 — SUPER_ADMIN 전용.
 // GET: 현황 조회 (읽기 전용, 안전)
 // DELETE: 실제 삭제 (주의: 운영 DB 영구 삭제)
 
@@ -67,6 +67,6 @@ export async function DELETE() {
 
   return NextResponse.json({
     deleted: deleted.count,
-    message: `${deleted.count}명의 셀러브릭스 레거시 사용자 및 연관 데이터 삭제 완료`,
+    message: `${deleted.count}명의 뷰티메이트 레거시 사용자 및 연관 데이터 삭제 완료`,
   });
 }

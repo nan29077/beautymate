@@ -1,6 +1,6 @@
 "use client";
 
-// 상담사 점집 회원 목록 — 자기 점집 회원만 조회
+// 뷰티 전문가 뷰티샵 회원 목록 — 자기 뷰티샵 회원만 조회
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Search, Users, ChevronRight } from "lucide-react";
@@ -47,11 +47,11 @@ export default function SellerMembersClient() {
     <div className="animate-fade-in space-y-5">
       <div>
         <h1 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
-          <Users size={20} strokeWidth={1.6} className="text-gray-500" /> 점집 회원
+          <Users size={20} strokeWidth={1.6} className="text-gray-500" /> 뷰티샵 회원
           <span className="text-sm font-normal text-gray-400">{total}명</span>
         </h1>
         <p className="text-xs text-gray-400 mt-0.5">
-          내 점집 전용 화면으로 가입한 독립 회원 목록입니다.
+          내 뷰티샵 전용 화면으로 가입한 독립 회원 목록입니다.
         </p>
       </div>
 
@@ -77,7 +77,7 @@ export default function SellerMembersClient() {
         <div className="text-center py-16 bg-white rounded-xl border border-gray-100">
           <Users size={32} strokeWidth={1.4} className="mx-auto text-gray-200 mb-2" />
           <p className="text-sm text-gray-400">
-            아직 점집 회원이 없습니다. 점집 페이지의 회원가입으로 가입한 고객이 여기에 표시됩니다.
+            아직 뷰티샵 회원이 없습니다. 뷰티샵 페이지의 회원가입으로 가입한 고객이 여기에 표시됩니다.
           </p>
         </div>
       ) : (

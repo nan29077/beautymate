@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   const netCancelUrl = get("netCancelUrl");
 
   // nginx 가 Host 헤더를 전달하지 않을 때 request.url 이 localhost:3000 으로 평가되므로
-  // 환경변수(NEXT_PUBLIC_APP_URL=https://sajunara.co.kr) 를 우선 사용한다.
+  // 환경변수(NEXT_PUBLIC_APP_URL=https://beautymate.co.kr) 를 우선 사용한다.
   const origin =
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.AUTH_URL ||
@@ -171,7 +171,7 @@ export async function POST(request: Request) {
     await ensureConsultingSession(order.id).catch((e) =>
       console.error("[seedpay] 영상 세션 생성 오류:", e),
     );
-    // 결제 완료 → 해당 점집 상담사에게 예약접수 알림톡 (실패해도 결제 처리에 영향 없음)
+    // 결제 완료 → 해당 뷰티샵 뷰티 전문가에게 예약접수 알림톡 (실패해도 결제 처리에 영향 없음)
     await notifyOrderPlacedToSeller(order.id).catch((e) => console.error("[seedpay] 예약접수 알림톡 오류:", e));
     await logPayment({
       orderId: order.id,

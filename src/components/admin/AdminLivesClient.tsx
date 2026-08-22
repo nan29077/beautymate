@@ -83,7 +83,7 @@ export default function AdminLivesClient() {
       <DashboardPageHeader
         iconName="LiveConsulting"
         title="라이브 관리"
-        description="상담사의 라이브 방송과 예약 연결 상태를 한곳에서 확인합니다."
+        description="뷰티 전문가의 라이브 방송과 예약 연결 상태를 한곳에서 확인합니다."
         meta={`총 ${total}건`}
         actions={<button
           onClick={load}
@@ -117,7 +117,7 @@ export default function AdminLivesClient() {
           }}
           className="border border-gray-200 rounded-lg px-2.5 py-2 text-xs text-gray-600"
         >
-          <option value="">전체 점집</option>
+          <option value="">전체 뷰티샵</option>
           {sellers.map((s) => (
             <option key={s.id} value={s.id}>
               {s.shopName}
@@ -129,7 +129,7 @@ export default function AdminLivesClient() {
       {loading && rows.length === 0 ? (
         <div className="py-16 text-center text-sm text-brand-400">불러오는 중...</div>
       ) : rows.length === 0 ? (
-        <DashboardEmptyState iconName="LiveConsulting" title="등록된 라이브가 없습니다" description="상담사가 라이브를 등록하면 이곳에 표시됩니다." />
+        <DashboardEmptyState iconName="LiveConsulting" title="등록된 라이브가 없습니다" description="뷰티 전문가가 라이브를 등록하면 이곳에 표시됩니다." />
       ) : (
         <DashboardPanel className="overflow-x-auto">
           <table className="w-full text-xs min-w-[860px]">
@@ -137,7 +137,7 @@ export default function AdminLivesClient() {
               <tr className="border-b border-gray-100 text-gray-400 text-left">
                 <th className="px-4 py-3 font-medium">상태</th>
                 <th className="px-4 py-3 font-medium">방송</th>
-                <th className="px-4 py-3 font-medium">점집 / 상담사</th>
+                <th className="px-4 py-3 font-medium">뷰티샵 / 뷰티 전문가</th>
                 <th className="px-4 py-3 font-medium">일시</th>
                 <th className="px-4 py-3 font-medium text-right">시청</th>
                 <th className="px-4 py-3 font-medium text-right">예약 현황</th>

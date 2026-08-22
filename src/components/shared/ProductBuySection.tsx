@@ -113,7 +113,7 @@ export default function ProductBuySection({
                 장바구니
               </button>
               <button type="button" onClick={notifySelectOption} className={buyClass}>
-                {campaign ? "단체 상담" : "구매하기"}
+                {campaign ? "공동 프로모션" : "구매하기"}
               </button>
             </>
           ) : status === "loading" ? (
@@ -122,7 +122,7 @@ export default function ProductBuySection({
                 장바구니
               </button>
               <button type="button" disabled className={`${buyClass} opacity-50 cursor-not-allowed`}>
-                {campaign ? "단체 상담" : "구매하기"}
+                {campaign ? "공동 프로모션" : "구매하기"}
               </button>
             </>
           ) : status === "unauthenticated" ? (
@@ -131,7 +131,7 @@ export default function ProductBuySection({
                 장바구니
               </button>
               <button type="button" onClick={() => setGuestModalOpen(true)} className={buyClass}>
-                {campaign ? "단체 상담" : "구매하기"}
+                {campaign ? "공동 프로모션" : "구매하기"}
               </button>
             </>
           ) : (
@@ -151,7 +151,7 @@ export default function ProductBuySection({
                 sellerId={sellerId}
                 campaignId={campaignId}
                 fromLive={fromLive}
-                label={campaign ? "단체 상담" : "구매하기"}
+                label={campaign ? "공동 프로모션" : "구매하기"}
                 price={campaign ? formatPrice(campaign.campaignPrice) : undefined}
                 className={buyClass}
                 hideIcon
@@ -254,7 +254,7 @@ export default function ProductBuySection({
             <p className="text-xs text-amber-700 mt-0.5">수량: 1개</p>
                   </div>
         )}
-        {/* 소셜예약서 작성 버튼 (상담사가 지정된 경우에만 노출) */}
+        {/* 소셜예약서 작성 버튼 (뷰티 전문가가 지정된 경우에만 노출) */}
         {sellerId && (
           <div className="px-3 pt-3">
             <button

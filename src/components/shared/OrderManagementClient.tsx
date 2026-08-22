@@ -164,7 +164,7 @@ interface Props {
   orders: Order[];
   role: "SUPER_ADMIN" | "CONSULTANT";
   sellers?: { id: string; name: string }[];
-  canManageStatus?: boolean; // true: 예약 상태 변경 가능 (SUPER_ADMIN, 담당 상담사)
+  canManageStatus?: boolean; // true: 예약 상태 변경 가능 (SUPER_ADMIN, 담당 뷰티 전문가)
 }
 
 const formatPrice = (n: number) => n.toLocaleString("ko-KR") + "원";
@@ -461,25 +461,25 @@ function buildOrderSheetsHtml(orders: Order[], opts?: { autoPrint?: boolean; ran
       <table class="meta">
         <tr><th>예약일시</th><td>${formatDateTime(o.createdAt)}</td><th>결제일시</th><td>${formatDateTime(o.paidAt || null)}</td></tr>
         <tr><th>예약상태</th><td>${STATUS_LABEL[o.status] || escapeHtml(o.status)}</td><th>결제수단</th><td>${escapeHtml(paymentMethodLabel(o.paymentMethod))}</td></tr>
-        <tr><th>예약자</th><td>${escapeHtml(o.userName)}</td><th>상담사</th><td>${escapeHtml(o.sellerName)}</td></tr>
-        ${o.campaignTitle ? `<tr><th>단체 상담</th><td colspan="3">${escapeHtml(o.campaignTitle)}</td></tr>` : ""}
+        <tr><th>예약자</th><td>${escapeHtml(o.userName)}</td><th>뷰티 전문가</th><td>${escapeHtml(o.sellerName)}</td></tr>
+        ${o.campaignTitle ? `<tr><th>공동 프로모션</th><td colspan="3">${escapeHtml(o.campaignTitle)}</td></tr>` : ""}
       </table>
 
       <h2>예약 정보</h2>
       <table class="meta">
         <tr><th>예약자</th><td>${escapeHtml(o.customerName) || "-"}</td><th>연락처</th><td>${escapeHtml(o.customerPhone) || "-"}</td></tr>
         <tr><th>예약일시</th><td colspan="3">${escapeHtml(o.reservationDate ? new Date(o.reservationDate).toLocaleDateString("ko-KR") : "-")} ${escapeHtml(o.reservationTime) || ""}</td></tr>
-        ${o.consultingContent ? `<tr><th>상담 내용</th><td colspan="3">${escapeHtml(o.consultingContent)}</td></tr>` : ""}
+        ${o.consultingContent ? `<tr><th>요청사항</th><td colspan="3">${escapeHtml(o.consultingContent)}</td></tr>` : ""}
       </table>
 
-      <h2>예약 상담상품</h2>
+      <h2>예약 뷰티 서비스</h2>
       <table class="items">
-        <thead><tr><th>상담상품명</th><th style="width:120px">옵션</th><th style="width:50px">수량</th><th style="width:90px">단가</th><th style="width:100px">금액</th></tr></thead>
+        <thead><tr><th>뷰티 서비스명</th><th style="width:120px">옵션</th><th style="width:50px">수량</th><th style="width:90px">단가</th><th style="width:100px">금액</th></tr></thead>
         <tbody>${itemsRows}</tbody>
       </table>
 
       <table class="totals">
-        <tr><th>상담상품 합계</th><td>${formatPrice(o.totalAmount)}</td></tr>
+        <tr><th>뷰티 서비스 합계</th><td>${formatPrice(o.totalAmount)}</td></tr>
         ${o.discountAmount > 0 ? `<tr><th>할인</th><td>-${formatPrice(o.discountAmount)}</td></tr>` : ""}
         <tr class="grand"><th>최종 결제금액</th><td>${formatPrice(o.finalAmount)}</td></tr>
       </table>
@@ -557,7 +557,7 @@ export default function OrderManagementClient({
   const [cancelModalState, setCancelModalState] = useState<{ cancelType: "SAME_DAY" | "POST_DAY"; cancelStatus: string; cancelAmount: number } | null>(null);
   const [cancelUpdates, setCancelUpdates] = useState<Record<string, { cancelStatus: string; cancelType: string; cancelAmount: number; cancelFromSettlement: boolean }>>({});
   const [cancelRequesting, setCancelRequesting] = useState<string | null>(null); // 요청 중인 orderId
-  const [cancelApproving, setCancelApproving] = useState<string | null>(null); // 승인 중인 orderId (관리자) // 낙관적 상담 방식 상태 업데이트
+  const [cancelApproving, setCancelApproving] = useState<string | null>(null); // 승인 중인 orderId (관리자) // 낙관적 진행 방식 상태 업데이트
   const [cancelConfirmOrder, setCancelConfirmOrder] = useState<Order | null>(null); // 확인 모달용
   const [cancelWithdrawing, setCancelWithdrawing] = useState<string | null>(null); // 철회 처리 중인 orderId
   // ── 날짜 필터 "적용" 전 임시 상태 ──
@@ -673,7 +673,7 @@ export default function OrderManagementClient({
 
   const getTypeBadge = (order: Order) => {
     const t = classifyOrder(order);
-    if (t === "groupbuy") return <span className="text-[9px] font-bold bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-full border border-emerald-100">단체 상담</span>;
+    if (t === "groupbuy") return <span className="text-[9px] font-bold bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded-full border border-emerald-100">공동 프로모션</span>;
     if (t === "live") return <span className="text-[9px] font-bold bg-pink-50 text-pink-600 px-1.5 py-0.5 rounded-full border border-pink-100">라이브</span>;
     return <span className="text-[9px] font-bold bg-gray-50 text-gray-500 px-1.5 py-0.5 rounded-full border border-gray-200">일반</span>;
   };
@@ -684,7 +684,7 @@ export default function OrderManagementClient({
 
   const detailOrder = showDetail ? orders.find(o => o.id === showDetail) : null;
 
-  // 날짜별 예약서 일괄 출력 대상: 현재 필터(날짜·검색·상담사 등)가 적용된 목록 중 열람 권한이 있는 예약
+  // 날짜별 예약서 일괄 출력 대상: 현재 필터(날짜·검색·뷰티 전문가 등)가 적용된 목록 중 열람 권한이 있는 예약
   const sheetOrders = useMemo(() => filtered.filter(o => o.canViewDetail !== false), [filtered]);
 
   const rangeLabel = useMemo(() => {
@@ -699,7 +699,7 @@ export default function OrderManagementClient({
     [sheetOrders, rangeLabel]
   );
 
-  /* ── 결제취소 요청 핸들러 (상담사) — 확인 모달 표시 ── */
+  /* ── 결제취소 요청 핸들러 (뷰티 전문가) — 확인 모달 표시 ── */
   const handleCancelRequest = async (order: Order) => {
     setCancelConfirmOrder(order);
   };
@@ -726,7 +726,7 @@ export default function OrderManagementClient({
     }
   };
 
-  /* ── 결제취소 요청 철회 핸들러 (상담사) ── */
+  /* ── 결제취소 요청 철회 핸들러 (뷰티 전문가) ── */
   const handleCancelWithdraw = async (order: Order) => {
     setCancelWithdrawing(order.id);
     try {
@@ -789,7 +789,7 @@ export default function OrderManagementClient({
     setShowBulkSheet(true);
   };
 
-  // 예약서 엑셀(xlsx) 다운로드 — 현재 기간·필터의 예약을 상담상품 단위 행으로 내보낸다.
+  // 예약서 엑셀(xlsx) 다운로드 — 현재 기간·필터의 예약을 뷰티 서비스 단위 행으로 내보낸다.
   const handleExportExcel = async () => {
     if (sheetOrders.length === 0) {
       appAlert("내보낼 예약이 없습니다.");
@@ -803,16 +803,16 @@ export default function OrderManagementClient({
         rows.push({
           "예약번호": o.reservationNumber,
           "신청일": formatDate(o.paidAt || o.createdAt),
-          "상담상품명": it.productName,
+          "뷰티 서비스명": it.productName,
           "옵션": it.variantName || "",
           "수량": it.quantity,
-          "상담상품금액": it.totalPrice,
+          "뷰티 서비스금액": it.totalPrice,
           "예약금액(합계)": o.finalAmount,
           "예약자": o.customerName || o.userName,
           "연락처": o.customerPhone || "",
           "예약일": o.reservationDate ? new Date(o.reservationDate).toLocaleDateString("ko-KR") : "",
           "예약시간": o.reservationTime || "",
-          "상담사": o.sellerName,
+          "뷰티 전문가": o.sellerName,
           "상태": STATUS_LABEL[o.status] || o.status,
           "결제수단": paymentMethodLabel(o.paymentMethod),
         });
@@ -832,7 +832,7 @@ export default function OrderManagementClient({
 
   const handleKakaoShare = (order: Order) => {
     const orderUrl = typeof window !== "undefined" ? `${window.location.origin}/my/orders?id=${order.id}` : "";
-    const msg = `📦 예약 안내\n\n예약번호: ${order.reservationNumber}\n상담상품: ${order.items.map(i => i.productName).join(", ")}\n금액: ${formatPrice(order.finalAmount)}\n\n예약 페이지: ${orderUrl}`;
+    const msg = `📦 예약 안내\n\n예약번호: ${order.reservationNumber}\n뷰티 서비스: ${order.items.map(i => i.productName).join(", ")}\n금액: ${formatPrice(order.finalAmount)}\n\n예약 페이지: ${orderUrl}`;
     if (navigator.share) {
       navigator.share({ title: "예약 안내", text: msg, url: orderUrl }).catch(() => {});
     } else {
@@ -889,7 +889,7 @@ export default function OrderManagementClient({
           { status: "PENDING", label: "결제대기" },
           { status: "PAID", label: "결제완료" },
           { status: "SHIPPING", label: "상담 진행중" },
-          { status: "DELIVERED", label: "상담 완료" },
+          { status: "DELIVERED", label: "서비스 완료" },
         ].map(s => (
           <button
             key={s.status}
@@ -912,7 +912,7 @@ export default function OrderManagementClient({
           <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-            placeholder="예약번호, 고객, 상담사, 상담상품명 검색..."
+            placeholder="예약번호, 고객, 뷰티 전문가, 뷰티 서비스명 검색..."
             className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-200 bg-white"
           />
           {searchQuery && (
@@ -964,7 +964,7 @@ export default function OrderManagementClient({
             value={sellerFilter} onChange={e => setSellerFilter(e.target.value)}
             className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-brand-200"
           >
-            <option value="all">전체 상담사</option>
+            <option value="all">전체 뷰티 전문가</option>
             {sellers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
         )}
@@ -1061,9 +1061,9 @@ export default function OrderManagementClient({
                         );
                       })()}
                     </div>
-                    {/* 상담상품명(가장 크게 강조) */}
+                    {/* 뷰티 서비스명(가장 크게 강조) */}
                     <p className="text-sm sm:text-[15px] font-bold text-gray-900 truncate mt-0.5">
-                      {order.items[0]?.productName || "예약 상담상품"}
+                      {order.items[0]?.productName || "예약 뷰티 서비스"}
                       {order.items.length > 1 && <span className="text-xs font-normal text-gray-400"> 외 {order.items.length - 1}건</span>}
                     </p>
                     {/* 예약자(고객명) 강조 */}
@@ -1095,7 +1095,7 @@ export default function OrderManagementClient({
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="text-base font-extrabold text-gray-900">{formatPrice(order.finalAmount)}</p>
-                    <p className="text-[10px] text-gray-400">{order.items.length}개 상담상품</p>
+                    <p className="text-[10px] text-gray-400">{order.items.length}개 뷰티 서비스</p>
                   </div>
                   <Icon name="ChevronDown" size={16} className={`text-gray-300 flex-shrink-0 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
                 </div>
@@ -1112,7 +1112,7 @@ export default function OrderManagementClient({
                       )}
                       {order.discountType === "live" && (
                         <p className="text-[10px] text-pink-600 font-bold mb-2 flex items-center gap-1">
-                          <Icon name="Live" size={10} /> 라이브 상담 예약
+                          <Icon name="Live" size={10} /> 라이브 뷰티 예약
                         </p>
                       )}
                       <div className="space-y-1.5">
@@ -1173,7 +1173,7 @@ export default function OrderManagementClient({
                           💬 카카오톡 전달
                         </button>
                       )}
-                      {/* ── 상담사: 결제취소요청 버튼 ── */}
+                      {/* ── 뷰티 전문가: 결제취소요청 버튼 ── */}
                       {role === "CONSULTANT" && (() => {
                         const cs = cancelUpdates[order.id]?.cancelStatus ?? order.cancelStatus;
                         const payStatus = order.paymentStatus;
@@ -1287,7 +1287,7 @@ export default function OrderManagementClient({
                 )}
                 {detailOrder.completedAt && (
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-500">상담 완료</span>
+                    <span className="text-gray-500">서비스 완료</span>
                     <span className="text-gray-700">{formatDateTime(detailOrder.completedAt)}</span>
                   </div>
                 )}
@@ -1311,7 +1311,7 @@ export default function OrderManagementClient({
               {/* Shipping Info */}
               {detailOrder.customerName && (
                 <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-                  <p className="text-xs font-bold text-gray-700 mb-1 flex items-center gap-1"><Icon name="Truck" size={12} /> 상담 방식 정보</p>
+                  <p className="text-xs font-bold text-gray-700 mb-1 flex items-center gap-1"><Icon name="Truck" size={12} /> 진행 방식 정보</p>
                   <div className="flex justify-between text-xs">
                     <span className="text-gray-500">수령인</span>
                     <span className="text-gray-700">{detailOrder.customerName}</span>
@@ -1331,7 +1331,7 @@ export default function OrderManagementClient({
                   </div>
                   {(detailOrder.birthDate || detailOrder.birthTime) && (
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-500">생년월일시</span>
+                      <span className="text-gray-500">알레르기·시술 이력</span>
                       <span className="text-gray-700">
                         {detailOrder.birthDate || "-"} {detailOrder.birthTime || ""}
                       </span>
@@ -1339,7 +1339,7 @@ export default function OrderManagementClient({
                   )}
                   {detailOrder.consultingContent && (
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-500">상담 내용</span>
+                      <span className="text-gray-500">요청사항</span>
                       <span className="text-gray-700 text-right max-w-[200px]">{detailOrder.consultingContent}</span>
                     </div>
                   )}
@@ -1356,7 +1356,7 @@ export default function OrderManagementClient({
 
               {/* Order Items */}
               <div>
-                <p className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1"><Icon name="Gem" size={12} /> 예약 상담상품</p>
+                <p className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1"><Icon name="Gem" size={12} /> 예약 뷰티 서비스</p>
                 <div className="bg-gray-50 rounded-xl overflow-hidden">
                   {detailOrder.items.map(item => (
                     <div key={item.id} className="flex justify-between p-3 border-b border-gray-100 last:border-0">
@@ -1390,7 +1390,7 @@ export default function OrderManagementClient({
               {/* Total */}
               <div className="bg-brand-50 rounded-xl p-4 space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-600">상담상품 합계</span>
+                  <span className="text-gray-600">뷰티 서비스 합계</span>
                   <span>{formatPrice(detailOrder.totalAmount)}</span>
                 </div>
                 {detailOrder.discountAmount > 0 && (

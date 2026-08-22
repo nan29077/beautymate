@@ -21,7 +21,7 @@ const emptyForm = {
   images: [] as string[],
 };
 
-// 상담사 본인이 직접 등록한 정식 상담상품(Product) 수정 모달
+// 뷰티 전문가 본인이 직접 등록한 정식 뷰티 서비스(Product) 수정 모달
 export default function SellerProductEditModal({ productId, onClose, onSaved }: Props) {
   const { appAlert } = useAppDialog();
   const [loading, setLoading] = useState(true);
@@ -50,7 +50,7 @@ export default function SellerProductEditModal({ productId, onClose, onSaved }: 
         });
       } else {
         const d = await res.json().catch(() => ({}));
-        await appAlert(d.error || "상담상품 정보를 불러오지 못했습니다.");
+        await appAlert(d.error || "뷰티 서비스 정보를 불러오지 못했습니다.");
         onClose();
       }
     } catch {
@@ -67,7 +67,7 @@ export default function SellerProductEditModal({ productId, onClose, onSaved }: 
 
   const handleSave = async () => {
     if (!form.name.trim()) {
-      await appAlert("상담상품명을 입력해주세요.");
+      await appAlert("뷰티 서비스명을 입력해주세요.");
       return;
     }
     if (!form.basePrice || Number(form.basePrice) < 0) {
@@ -108,7 +108,7 @@ export default function SellerProductEditModal({ productId, onClose, onSaved }: 
       <div className="bg-white w-full sm:max-w-md sm:rounded-2xl sm:shadow-2xl sm:my-6 min-h-screen sm:min-h-0 flex flex-col max-h-screen sm:max-h-[90vh]">
         {/* Header */}
         <div className="flex-shrink-0 px-4 sm:px-6 pt-5 pb-3 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-gray-900">상담상품 수정</h3>
+          <h3 className="text-lg font-bold text-gray-900">뷰티 서비스 수정</h3>
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all">
             <X size={18} />
           </button>
@@ -123,8 +123,8 @@ export default function SellerProductEditModal({ productId, onClose, onSaved }: 
             {/* Body */}
             <div className="flex-1 overflow-y-auto overscroll-contain px-4 sm:px-6 py-5 space-y-5">
               <div>
-                <label className="text-xs font-semibold text-gray-700 mb-1.5 block">상담상품명 <span className="text-red-500">*</span></label>
-                <input type="text" className="input-field text-sm" placeholder="상담상품명을 입력하세요" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                <label className="text-xs font-semibold text-gray-700 mb-1.5 block">뷰티 서비스명 <span className="text-red-500">*</span></label>
+                <input type="text" className="input-field text-sm" placeholder="뷰티 서비스명을 입력하세요" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -144,7 +144,7 @@ export default function SellerProductEditModal({ productId, onClose, onSaved }: 
                 </div>
               </div>
 
-              {/* 배송비 항목 제거: 사주나라는 예약(비실물) 전용 서비스 (배송비는 항상 0으로 저장) */}
+              {/* 배송비 항목 제거: 뷰티메이트는 예약(비실물) 전용 서비스 (배송비는 항상 0으로 저장) */}
               <div>
                 <label className="text-xs font-semibold text-gray-700 mb-1.5 block">예약 가능 수량</label>
                 <div className="relative max-w-[50%]">
@@ -154,12 +154,12 @@ export default function SellerProductEditModal({ productId, onClose, onSaved }: 
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-gray-700 mb-1.5 block">상담상품설명</label>
-                <textarea className="input-field h-24 resize-none text-sm" placeholder="상담상품에 대한 설명을 입력하세요" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+                <label className="text-xs font-semibold text-gray-700 mb-1.5 block">뷰티 서비스설명</label>
+                <textarea className="input-field h-24 resize-none text-sm" placeholder="뷰티 서비스에 대한 설명을 입력하세요" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-gray-700 mb-1.5 block">상담상품 이미지 <span className="text-gray-400 font-normal">(첫 번째 이미지가 대표 이미지, 최대 8장)</span></label>
+                <label className="text-xs font-semibold text-gray-700 mb-1.5 block">뷰티 서비스 이미지 <span className="text-gray-400 font-normal">(첫 번째 이미지가 대표 이미지, 최대 8장)</span></label>
                 <ImageUploader images={form.images} onChange={(imgs) => setForm({ ...form, images: imgs })} maxImages={8} />
               </div>
             </div>

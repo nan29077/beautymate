@@ -141,7 +141,7 @@ export default function ReferralLinkManager({
               </button>
             </div>
             <p className="text-[10px] text-gray-400 mt-1">
-              이 링크로 가입한 회원이 상담상품 구매 시 {referralCommissionRate}% 커미션이 적립됩니다
+              이 링크로 가입한 회원이 뷰티 서비스 구매 시 {referralCommissionRate}% 커미션이 적립됩니다
             </p>
           </div>
         )}

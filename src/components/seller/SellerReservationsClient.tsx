@@ -34,7 +34,7 @@ interface Reservation {
 const STATUS_MAP: Record<string, { label: string; color: string; dot: string }> = {
   PENDING:   { label: "예약 대기", color: "bg-yellow-50 text-yellow-700", dot: "bg-yellow-400" },
   CONFIRMED: { label: "예약 확정", color: "bg-blue-50 text-blue-700",   dot: "bg-blue-400" },
-  COMPLETED: { label: "상담 완료", color: "bg-green-50 text-green-700", dot: "bg-green-400" },
+  COMPLETED: { label: "서비스 완료", color: "bg-green-50 text-green-700", dot: "bg-green-400" },
   CANCELLED: { label: "취소됨",   color: "bg-gray-100 text-gray-500",   dot: "bg-gray-300" },
   NO_SHOW:   { label: "노쇼",      color: "bg-red-50 text-red-600",      dot: "bg-red-400" },
 };
@@ -300,7 +300,7 @@ function ReservationDetailModal({
     nextStatuses.push({ value: "CANCELLED", label: "취소", color: "border border-gray-200 text-gray-600" });
   }
   if (r.status === "CONFIRMED") {
-    nextStatuses.push({ value: "COMPLETED", label: "상담 완료", color: "bg-green-600 text-white" });
+    nextStatuses.push({ value: "COMPLETED", label: "서비스 완료", color: "bg-green-600 text-white" });
     nextStatuses.push({ value: "NO_SHOW", label: "노쇼 처리", color: "bg-red-500 text-white" });
     nextStatuses.push({ value: "CANCELLED", label: "취소", color: "border border-gray-200 text-gray-600" });
   }
@@ -336,13 +336,12 @@ function ReservationDetailModal({
             <InfoRow icon={<User size={14} />} label="이름" value={r.customerName} />
             <InfoRow icon={<Phone size={14} />} label="연락처" value={r.customerPhone} />
             {r.birthDate && <InfoRow icon={<Clock size={14} />} label="생년월일" value={r.birthDate} />}
-            {r.birthTime && <InfoRow icon={<Clock size={14} />} label="태어난 시각" value={r.birthTime} />}
             {r.gender && <InfoRow icon={<User size={14} />} label="성별" value={r.gender === "M" ? "남성" : "여성"} />}
             {r.consultingContent && (
               <div className="flex items-start gap-2 mt-2">
                 <BookOpen size={14} className="text-gray-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <span className="text-xs text-gray-400">상담 내용</span>
+                  <span className="text-xs text-gray-400">요청사항</span>
                   <p className="text-sm text-gray-700 mt-0.5 whitespace-pre-wrap">{r.consultingContent}</p>
                 </div>
               </div>
@@ -366,7 +365,7 @@ function ReservationDetailModal({
             </Link>
           )}
 
-          {/* 상담 메모 (상담 완료 건만) */}
+          {/* 고객 메모 (서비스 완료 건만) */}
           {r.status === "COMPLETED" && <ConsultantMemoEditor reservation={r} />}
 
           {/* 상태 변경 버튼 */}
@@ -390,7 +389,7 @@ function ReservationDetailModal({
   );
 }
 
-/** 상담 완료 예약에 상담사가 남기는 내부 메모. 고객에게는 노출되지 않는다. */
+/** 서비스 완료 예약에 뷰티 전문가가 남기는 내부 메모. 고객에게는 노출되지 않는다. */
 function ConsultantMemoEditor({ reservation }: { reservation: Reservation }) {
   const [savedMemo, setSavedMemo] = useState(reservation.consultantMemo ?? "");
   const [memo, setMemo] = useState(reservation.consultantMemo ?? "");
@@ -430,7 +429,7 @@ function ConsultantMemoEditor({ reservation }: { reservation: Reservation }) {
     <div className="border-t border-gray-100 pt-3">
       <div className="flex items-center gap-1.5 mb-2">
         <NotebookPen size={14} className="text-gray-400" />
-        <span className="text-xs text-gray-400 uppercase tracking-wide">상담 메모</span>
+        <span className="text-xs text-gray-400 uppercase tracking-wide">고객 메모</span>
         <span className="text-[10px] text-gray-300">· 고객에게 보이지 않습니다</span>
       </div>
       <textarea
@@ -438,7 +437,7 @@ function ConsultantMemoEditor({ reservation }: { reservation: Reservation }) {
         onChange={(e) => { setMemo(e.target.value); setSaved(false); setError(""); }}
         rows={4}
         maxLength={5000}
-        placeholder="상담 내용, 특이사항, 다음 상담 시 참고할 내용을 기록하세요."
+        placeholder="요청사항, 특이사항, 다음 상담 시 참고할 내용을 기록하세요."
         className="w-full rounded-xl border border-gray-200 p-3 text-sm text-gray-800 placeholder:text-gray-300 focus:outline-none focus:border-gray-400 resize-none"
       />
       <div className="flex items-center justify-between mt-2">
@@ -467,4 +466,3 @@ function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string;
     </div>
   );
 }
-

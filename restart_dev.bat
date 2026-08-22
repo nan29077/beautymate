@@ -23,8 +23,8 @@ exit /b %ERRORLEVEL%
 setlocal
 cd /d "%~dp0"
 
-set "PORT=3023"
-set "ALT_PORT=3024"
+set "PORT=3028"
+set "ALT_PORT=3029"
 set "DO_CLEAN=0"
 set "DO_OPEN=1"
 
@@ -38,7 +38,7 @@ goto :PARSE_ARGS
 :ARGS_DONE
 
 echo ============================================
-echo   사주메이트 개발 서버 재시작
+echo   뷰티메이트 개발 서버 재시작
 echo ============================================
 echo.
 
@@ -46,7 +46,7 @@ echo [1/4] 포트 %PORT% / %ALT_PORT% 점유 프로세스 종료 중...
 call :KILL_PORT %PORT%
 call :KILL_PORT %ALT_PORT%
 
-rem 포트가 실제로 비워질 때까지 대기. 남아 있으면 Next 가 3023 으로 밀려서
+rem 포트가 실제로 비워질 때까지 대기. 남아 있으면 Next 가 3028 로 밀려서
 rem 브라우저로 열어둔 3022 에서는 아무것도 안 보인다.
 call :WAIT_PORT_FREE %PORT%
 if errorlevel 1 (

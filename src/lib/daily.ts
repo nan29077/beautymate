@@ -1,5 +1,5 @@
 // Daily.co 영상 상담 서비스 레이어.
-// 예약 확정 시 룸을 만들고, 상담사(host)·고객(guest)용 meeting token을 발급한다.
+// 예약 확정 시 룸을 만들고, 뷰티 전문가(host)·고객(guest)용 meeting token을 발급한다.
 // DAILY_API_KEY 미설정 환경(로컬 개발 등)에서는 데모 모드로 동작해
 // 실제 API 호출 없이 세션 레코드 생성·화면 플로우를 시뮬레이션할 수 있다.
 
@@ -59,7 +59,7 @@ async function dailyFetch<T>(
 
 /** 예약 ID 기반 룸 이름 (재호출해도 동일 — 중복 생성 방지 키로 사용) */
 export function roomNameForReservation(reservationId: string): string {
-  return `saju-${reservationId}`;
+  return `beautymate-${reservationId}`;
 }
 
 /**
@@ -95,7 +95,7 @@ export async function createRoom(
         properties: {
           nbf,
           exp,
-          max_participants: 4, // 상담사+고객+여유(재접속 유령 세션 대비)
+          max_participants: 4, // 뷰티 전문가+고객+여유(재접속 유령 세션 대비)
           enable_screenshare: false,
           enable_chat: true,
           enable_knocking: false,
@@ -119,7 +119,7 @@ export async function createRoom(
 
 /**
  * 특정 룸 입장용 meeting token 발급.
- * isOwner=true(상담사)는 상대 강제 퇴장 등 owner 권한을 가진다.
+ * isOwner=true(뷰티 전문가)는 상대 강제 퇴장 등 owner 권한을 가진다.
  */
 export async function createMeetingToken(
   roomName: string,
@@ -148,7 +148,7 @@ export async function createMeetingToken(
   return token;
 }
 
-/** 상담 완료 후 룸 삭제 (실패해도 치명적이지 않으므로 호출부에서 무시 가능) */
+/** 서비스 완료 후 룸 삭제 (실패해도 치명적이지 않으므로 호출부에서 무시 가능) */
 export async function deleteRoom(roomName: string): Promise<boolean> {
   if (!isDailyConfigured()) return true;
   try {

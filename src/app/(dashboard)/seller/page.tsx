@@ -28,12 +28,12 @@ export const dynamic = "force-dynamic";
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   PENDING: { label: "예약 대기", color: "bg-yellow-50 text-yellow-700" },
   CONFIRMED: { label: "예약 확정", color: "bg-blue-50 text-blue-700" },
-  COMPLETED: { label: "상담 완료", color: "bg-green-50 text-green-700" },
+  COMPLETED: { label: "서비스 완료", color: "bg-green-50 text-green-700" },
   CANCELLED: { label: "취소", color: "bg-gray-100 text-gray-500" },
   NO_SHOW: { label: "노쇼", color: "bg-red-50 text-red-600" },
 };
 
-/** 상담 방식 배지 (영상/전화/방문) */
+/** 진행 방식 배지 (영상/전화/방문) */
 function MethodBadge({ method }: { method: string | null }) {
   if (!method) return null;
   const icon = isVideoMethod(method) ? (
@@ -114,8 +114,8 @@ export default async function SellerDashboard() {
         }), []),
     ]);
 
-  // ── 상담 방식(영상/전화/방문) 역조회 ───────────────────────────────
-  // Reservation 에는 상담 방식이 없어 첫 아이템의 Product 에서 가져온다.
+  // ── 진행 방식(영상/전화/방문) 역조회 ───────────────────────────────
+  // Reservation 에는 진행 방식이 없어 첫 아이템의 Product 에서 가져온다.
   // 명시적 select 는 전역 omit 을 우회해 P2022 가능 → safeQuery 폴백.
   const productIds = Array.from(
     new Set(
@@ -168,7 +168,7 @@ export default async function SellerDashboard() {
     <div className="animate-fade-in space-y-6">
       <DashboardPageHeader
         iconName="MoonStar"
-        title="상담사 대시보드"
+        title="뷰티 전문가 대시보드"
         description={`${seller.shopName} · ${new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })}`}
       />
 
@@ -176,7 +176,7 @@ export default async function SellerDashboard() {
       <div className="bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100 p-3.5 sm:p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-medium text-gray-500 mb-1">내 점집 주소</p>
+            <p className="text-[11px] font-medium text-gray-500 mb-1">내 뷰티샵 주소</p>
             <p className="text-xs text-gray-700 font-mono truncate">/shop/{seller.slug}</p>
           </div>
           <ShopLinkButton slug={seller.slug} />
@@ -186,7 +186,7 @@ export default async function SellerDashboard() {
       {!seller.isApproved && (
         <div className="p-3.5 bg-amber-50 border border-amber-100 rounded-xl text-xs text-amber-700 flex items-center gap-2">
           <Icon name="Clock" size={14} />
-          상담사 승인 대기 중입니다. 관리자 승인 후 점집이 공개됩니다.
+          뷰티 전문가 승인 대기 중입니다. 관리자 승인 후 뷰티샵이 공개됩니다.
         </div>
       )}
 
@@ -330,8 +330,8 @@ export default async function SellerDashboard() {
             { href: "/seller/reservations", label: "예약 관리", icon: "Calendar", desc: "확정·완료 처리" },
             { href: "/seller/timeslots", label: "예약 시간 설정", icon: "Clock", desc: "상담 가능 시간" },
             { href: "/seller/customers", label: "고객관리(CRM)", icon: "Users", desc: "상담 이력·메모" },
-            { href: "/seller/shop", label: "점집 설정", icon: "Store", desc: "내 점집 관리" },
-            { href: "/seller/members", label: "회원 관리", icon: "UserCheck", desc: "점집 회원" },
+            { href: "/seller/shop", label: "뷰티샵 설정", icon: "Store", desc: "내 뷰티샵 관리" },
+            { href: "/seller/members", label: "회원 관리", icon: "UserCheck", desc: "뷰티샵 회원" },
             { href: "/seller/settlements", label: "정산", icon: "Settlement", desc: "수익 정산·출금" },
           ].map((item) => (
             <Link

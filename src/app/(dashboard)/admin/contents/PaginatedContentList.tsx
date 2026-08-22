@@ -86,7 +86,7 @@ function AdminContentRow({
           </div>
         </div>
 
-        {/* 태그된 상담상품 미리보기 */}
+        {/* 태그된 뷰티 서비스 미리보기 */}
         {post.shoppingTags.length > 0 && (
           <div className="hidden md:flex items-center gap-1 flex-shrink-0">
             {post.shoppingTags.slice(0, 3).map((tag: any) => (
@@ -116,7 +116,7 @@ function AdminContentRow({
         <div className="mt-2 ml-[76px]">
           <div className="flex items-center gap-1 mb-1.5">
             <Icon name="Gem" size={10} className="text-brand-500" />
-            <span className="text-[10px] text-brand-500 font-medium">내 상담상품 연계 ({linkedProducts.length})</span>
+            <span className="text-[10px] text-brand-500 font-medium">내 뷰티 서비스 연계 ({linkedProducts.length})</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {linkedProducts.map((tag: any) => (

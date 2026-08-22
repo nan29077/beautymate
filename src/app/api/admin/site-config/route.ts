@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// 비로그인 공개 화면(상품 상세 정책 탭·점집 푸터·파비콘 등)에서 읽는 공개 키 목록.
+// 비로그인 공개 화면(상품 상세 정책 탭·뷰티샵 푸터·파비콘 등)에서 읽는 공개 키 목록.
 // 이 외의 키는 SUPER_ADMIN 만 조회할 수 있다 (설정 테이블 임의 키 노출 방지).
 const PUBLIC_KEYS = new Set([
   "refundPolicy",

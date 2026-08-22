@@ -11,7 +11,7 @@ interface ShopFeatureTogglesProps {
     content: boolean;
     liveCommerce: boolean;
   };
-  // 최고관리자 권한설정(Phase1) 전역 토글. OFF인 기능은 상담사 점집기능관리에서도 숨긴다(토글 존중).
+  // 최고관리자 권한설정(Phase1) 전역 토글. OFF인 기능은 뷰티 전문가 뷰티샵기능관리에서도 숨긴다(토글 존중).
   adminFlags?: {
     groupBuy: boolean;
     content: boolean;
@@ -47,8 +47,8 @@ export default function ShopFeatureToggles({ initialFeatures, adminFlags }: Shop
   const featureList = [
     {
       key: "groupBuy" as const,
-      label: "단체 상담",
-      description: "팬들과 함께하는 단체 상담 캠페인",
+      label: "공동 프로모션",
+      description: "팬들과 함께하는 공동 프로모션 캠페인",
       icon: BookOpen,
       color: "text-purple-500",
       bgColor: "bg-purple-50",
@@ -65,7 +65,7 @@ export default function ShopFeatureToggles({ initialFeatures, adminFlags }: Shop
     },
     {
       key: "liveCommerce" as const,
-      label: "라이브 상담",
+      label: "라이브 뷰티",
       description: "실시간 라이브 방송으로 판매",
       icon: Radio,
       color: "text-red-500",
@@ -74,7 +74,7 @@ export default function ShopFeatureToggles({ initialFeatures, adminFlags }: Shop
     },
   ];
 
-  // 최고관리자가 끈 기능은 상담사 화면에서도 숨긴다(토글 존중)
+  // 최고관리자가 끈 기능은 뷰티 전문가 화면에서도 숨긴다(토글 존중)
   const visibleList = featureList.filter((f) => admin[f.key]);
   const hiddenByAdmin = featureList.filter((f) => !admin[f.key]);
 
@@ -86,9 +86,9 @@ export default function ShopFeatureToggles({ initialFeatures, adminFlags }: Shop
     <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-bold text-gray-900">점집 기능 관리</h3>
+          <h3 className="text-sm font-bold text-gray-900">뷰티샵 기능 관리</h3>
           <p className="text-[11px] text-gray-400 mt-0.5">
-            활성화된 기능만 점집에 표시됩니다
+            활성화된 기능만 뷰티샵에 표시됩니다
           </p>
         </div>
         {saving ? (
@@ -125,7 +125,7 @@ export default function ShopFeatureToggles({ initialFeatures, adminFlags }: Shop
                 <p className="text-[10px] text-gray-400">{feature.description}</p>
                 {feature.key === "liveCommerce" && (
                   <p className="text-[10px] text-blue-500 mt-0.5">
-                    이 스위치를 켜야 현재 라이브 중인 상담상품이 라이브 점집에 표시됩니다.
+                    이 스위치를 켜야 현재 라이브 중인 뷰티 서비스가 라이브 뷰티샵에 표시됩니다.
                   </p>
                 )}
               </div>
@@ -143,7 +143,7 @@ export default function ShopFeatureToggles({ initialFeatures, adminFlags }: Shop
       {/* 관리자가 끈 기능 안내 */}
       {hiddenByAdmin.length > 0 && (
         <p className="text-[10px] text-gray-400 bg-gray-50 rounded-lg px-3 py-2">
-          {hiddenByAdmin.map((f) => f.label).join(", ")} 기능은 현재 운영 정책으로 비활성화되어 있어 점집에 표시되지 않습니다.
+          {hiddenByAdmin.map((f) => f.label).join(", ")} 기능은 현재 운영 정책으로 비활성화되어 있어 뷰티샵에 표시되지 않습니다.
         </p>
       )}
 

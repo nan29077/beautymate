@@ -18,14 +18,14 @@ export default async function ShopMyPage({
 }) {
   const { slug } = await Promise.resolve(params);
 
-  // 상담사 존재 확인
+  // 뷰티 전문가 존재 확인
   const seller = await prisma.sellerProfile.findUnique({
     where: { slug },
     select: { id: true, slug: true, shopName: true, shopBanner: true, isApproved: true, user: { select: { name: true } } },
   });
   if (!seller || !seller.isApproved) notFound();
 
-  // 인증 확인 (비로그인 → 점집 로그인 페이지로)
+  // 인증 확인 (비로그인 → 뷰티샵 로그인 페이지로)
   const session = await auth();
   if (!session?.user) {
     redirect(`/shop/${slug}/login`);
@@ -43,7 +43,7 @@ export default async function ShopMyPage({
 
   if (!user) redirect(`/shop/${slug}/login`);
 
-  // 이 점집에서의 예약 내역
+  // 이 뷰티샵에서의 예약 내역
   const shopReservations = await safeQuery(
     "shop my page reservations",
     () =>
@@ -81,7 +81,7 @@ export default async function ShopMyPage({
     product: r.items[0] ? { name: r.items[0].productName } : null,
   }));
 
-  // 이 점집 단골(회원) 여부 · 예약 통계 · 다가오는 예약 (모두 드리프트-안전)
+  // 이 뷰티샵 단골(회원) 여부 · 예약 통계 · 다가오는 예약 (모두 드리프트-안전)
   const isMember = await isShopMember(seller.id, userId);
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -124,7 +124,7 @@ export default async function ShopMyPage({
   );
   const upcomingProductName = upcoming?.items?.[0]?.productName ?? null;
 
-  // 이 점집 스코프의 내 리뷰 수 (점집 소유 상담상품 + 점집에 담긴 상담상품)
+  // 이 뷰티샵 스코프의 내 리뷰 수 (뷰티샵 소유 뷰티 서비스 + 뷰티샵에 담긴 뷰티 서비스)
   const shopReviewCount = await safeQuery(
     "shop my page review count",
     () =>
@@ -176,7 +176,7 @@ export default async function ShopMyPage({
     }[],
   );
 
-  // AI 상담 요약 — 이 상담사의 라이브 채팅에서 AI 봇 메시지 추출
+  // AI 상담 요약 — 이 뷰티 전문가의 라이브 채팅에서 AI 봇 메시지 추출
   const participatedStreamIds = await safeQuery(
     "shop my page stream ids",
     async () => {
@@ -235,7 +235,7 @@ export default async function ShopMyPage({
 
   return (
     <div className="animate-fade-in pb-32">
-      {/* 헤더 — 점집 홈 상단 배너와 동일한 배경 이미지로 통일 */}
+      {/* 헤더 — 뷰티샵 홈 상단 배너와 동일한 배경 이미지로 통일 */}
       <div className="relative px-4 pt-6 pb-10 overflow-hidden">
         <img
           src={resolveShopBanner(seller.shopBanner, seller.id)}
@@ -281,7 +281,7 @@ export default async function ShopMyPage({
           </div>
           <div className="text-center py-1">
             <p className="text-lg font-bold text-green-600">{completedCount}</p>
-            <p className="text-[10px] text-gray-400">상담 완료</p>
+            <p className="text-[10px] text-gray-400">서비스 완료</p>
           </div>
           <Link href="/my/reviews" className="text-center py-1">
             <p className="text-lg font-bold text-gray-900">{shopReviewCount}</p>
@@ -428,7 +428,7 @@ export default async function ShopMyPage({
         </div>
       </div>
 
-      {/* 점집 하단 네비 */}
+      {/* 뷰티샵 하단 네비 */}
       <SellerShopBottomNav sellerSlug={slug} />
     </div>
   );

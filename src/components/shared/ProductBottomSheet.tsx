@@ -92,7 +92,7 @@ export default function ProductBottomSheet({
     }
   }, [productId]);
 
-  // 상담상품 데이터 fetch
+  // 뷰티 서비스 데이터 fetch
   useEffect(() => {
     if (!productId) { setProduct(null); return; }
     setLoading(true);
@@ -224,7 +224,7 @@ export default function ProductBottomSheet({
           <div className="w-10 h-1 bg-amber-300 rounded-full mx-auto mb-3" />
           <div className="flex items-center justify-between">
             <h2 className="text-[15px] font-bold text-gray-900 truncate pr-3 max-w-[85%]">
-              {loading ? "불러오는 중..." : (product?.name || "상담상품 상세")}
+              {loading ? "불러오는 중..." : (product?.name || "뷰티 서비스 상세")}
             </h2>
             <button
               type="button"
@@ -247,7 +247,7 @@ export default function ProductBottomSheet({
           {!loading && !product && (
             <div className="text-center py-16 text-gray-400">
               <Icon name="Cart" size={36} strokeWidth={1.5} className="mx-auto mb-2 opacity-30" />
-              <p className="text-sm">상담상품 정보를 불러올 수 없습니다</p>
+              <p className="text-sm">뷰티 서비스 정보를 불러올 수 없습니다</p>
             </div>
           )}
 
@@ -357,11 +357,11 @@ export default function ProductBottomSheet({
                 )}
               </div>
 
-              {/* 상담 방식 */}
+              {/* 진행 방식 */}
               <div className="px-4 py-2">
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <Icon name="Calendar" size={13} strokeWidth={1.5} className="text-amber-400" />
-                  <span>예약 후 상담사와 일정 조율</span>
+                  <span>예약 후 뷰티 전문가와 일정 조율</span>
                 </div>
               </div>
 
@@ -470,7 +470,7 @@ export default function ProductBottomSheet({
                 </div>
               )}
 
-              {/* 상담상품 간단 설명 */}
+              {/* 뷰티 서비스 간단 설명 */}
               {product.description && (
                 <div className="px-4 pb-3">
                   <p className="text-xs text-gray-500 leading-relaxed">{product.description}</p>

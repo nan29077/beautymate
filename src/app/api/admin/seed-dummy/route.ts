@@ -17,9 +17,9 @@ export async function POST(req: NextRequest) {
     // 1. Create dummy seller users and profiles
     const sellerData = [
       { name: "김패션", email: "seller1@test.com", shopName: "패션이즈", slug: "fashion-is", category: "패션", mood: "트렌디한 스트릿 무드", desc: "트렌디한 스트릿 패션을 소개합니다. 매주 신상 업데이트!" },
-      { name: "이뷰티", email: "seller2@test.com", shopName: "뷰티랩", slug: "beauty-lab", category: "뷰티", mood: "클린뷰티 전문가", desc: "클린뷰티와 스킨케어 전문 상담사입니다." },
+      { name: "이뷰티", email: "seller2@test.com", shopName: "뷰티랩", slug: "beauty-lab", category: "뷰티", mood: "클린뷰티 전문가", desc: "클린뷰티와 스킨케어 전문 뷰티 전문가입니다." },
       { name: "박리빙", email: "seller3@test.com", shopName: "리빙스토리", slug: "living-story", category: "홈리빙", mood: "미니멀 라이프", desc: "미니멀하고 감성적인 홈 인테리어 아이템을 소개합니다." },
-      { name: "최푸드", email: "seller4@test.com", shopName: "델리셔스데이", slug: "delicious-day", category: "푸드", mood: "건강한 먹거리", desc: "건강하고 맛있는 식품을 엄선하여 단체 상담합니다." },
+      { name: "최푸드", email: "seller4@test.com", shopName: "델리셔스데이", slug: "delicious-day", category: "푸드", mood: "건강한 먹거리", desc: "건강하고 맛있는 식품을 엄선하여 공동 프로모션합니다." },
       { name: "정키즈", email: "seller5@test.com", shopName: "리틀드림", slug: "little-dream", category: "키즈", mood: "아이와 함께하는 일상", desc: "안전하고 예쁜 키즈 아이템을 큐레이션합니다." },
     ];
 
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) {
                 items: {
                   create: {
                     productId: product?.id || "dummy-product",
-                    productName: product?.name || `테스트 상담상품 ${i + 1}`,
+                    productName: product?.name || `테스트 뷰티 서비스 ${i + 1}`,
                     variantName: ["S / 블랙", "M / 화이트", "L / 네이비", "FREE", null][i % 5],
                     quantity: qty,
                     price: finalAmount,

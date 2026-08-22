@@ -66,7 +66,7 @@ export default function AdminUsersTabsClient({
           }`}
         >
           <Icon name="Sparkles" size={15} />
-          상담사 관리
+          뷰티 전문가 관리
           <span className="ml-1 text-[11px] font-bold bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full">
             {sellers.length}
           </span>

@@ -18,7 +18,7 @@ function resolveCancelType(paidAt: Date): "SAME_DAY" | "POST_DAY" {
   return paidKST === nowKST ? "SAME_DAY" : "POST_DAY";
 }
 
-// POST: 상담사가 결제취소 요청
+// POST: 뷰티 전문가가 결제취소 요청
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> | { id: string } }
@@ -30,18 +30,18 @@ export async function POST(
     }
     const role = (session.user as any).role as string;
     if (role !== "CONSULTANT") {
-      return NextResponse.json({ error: "상담사만 결제취소 요청을 할 수 있습니다." }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가만 결제취소 요청을 할 수 있습니다." }, { status: 403 });
     }
 
     const resolvedParams = await Promise.resolve(params);
     const orderId = resolvedParams.id;
 
-    // 상담사 프로필 조회
+    // 뷰티 전문가 프로필 조회
     const sellerProfile = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });
     if (!sellerProfile) {
-      return NextResponse.json({ error: "상담사 프로필을 찾을 수 없습니다." }, { status: 404 });
+      return NextResponse.json({ error: "뷰티 전문가 프로필을 찾을 수 없습니다." }, { status: 404 });
     }
 
     // 예약 조회
@@ -62,7 +62,7 @@ export async function POST(
 
     // 본인 예약인지 확인
     if (order.sellerId !== sellerProfile.id) {
-      return NextResponse.json({ error: "본인 점집의 예약만 취소 요청할 수 있습니다." }, { status: 403 });
+      return NextResponse.json({ error: "본인 뷰티샵의 예약만 취소 요청할 수 있습니다." }, { status: 403 });
     }
 
     // 결제 완료 상태인지 확인
@@ -83,12 +83,12 @@ export async function POST(
     const cancelAmount = Number(order.finalAmount);
     const now = new Date();
 
-    // POST_DAY: 상담사 정산금에서 차감 가능한지 확인
+    // POST_DAY: 뷰티 전문가 정산금에서 차감 가능한지 확인
     let cancelFromSettlement = false;
     let cancelStatus = "REQUESTED";
 
     if (cancelType === "POST_DAY") {
-      // 상담사의 미지급 정산 잔액으로 취소 금액을 감당할 수 있는지 판단한다.
+      // 뷰티 전문가의 미지급 정산 잔액으로 취소 금액을 감당할 수 있는지 판단한다.
       // (기존에는 seed 에서만 생성되는 Settlement 테이블을 조회해 운영에서 항상 0이었음
       //  — docs/SETTLEMENT_ISSUES.md #4)
       // 미지급 잔액 = 출금 가능(진행중 출금 차감 후) + 정산 예정 - 이 예약 자신의 정산액.

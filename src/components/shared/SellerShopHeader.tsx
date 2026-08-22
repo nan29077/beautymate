@@ -5,11 +5,11 @@ import { useSession } from "next-auth/react";
 import SafeImage from "@/components/shared/SafeImage";
 import NotificationBell from "@/components/shared/NotificationBell";
 import { OnAirBadge } from "@/components/shared/LiveBadge";
-import { pickSajuAvatar } from "@/lib/defaults";
+import { pickBeautyMateAvatar } from "@/lib/defaults";
 
-// 점집 전용 상단 바.
-// - 좌측 상단: 사주나라 로고 대신 "상담사 프로필 사진(또는 점집 로고) + 상담사 이름".
-// - 메인 페이지로 가는 링크는 일절 두지 않는다(상담사 세계 안에서만 이동).
+// 뷰티샵 전용 상단 바.
+// - 좌측 상단: 뷰티메이트 로고 대신 "뷰티 전문가 프로필 사진(또는 뷰티샵 로고) + 뷰티 전문가 이름".
+// - 메인 페이지로 가는 링크는 일절 두지 않는다(뷰티 전문가 세계 안에서만 이동).
 // - 우측: 구매회원용 장바구니/내정보 진입만 제공.
 export default function SellerShopHeader({
   sellerName,
@@ -31,7 +31,7 @@ export default function SellerShopHeader({
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100">
       <div className="flex items-center justify-between h-14 px-4">
-        {/* 좌측: 상담사 로고 + 이름 — 항상 점집 홈으로 이동 (라이브 여부 무관) */}
+        {/* 좌측: 뷰티 전문가 로고 + 이름 — 항상 뷰티샵 홈으로 이동 (라이브 여부 무관) */}
         <div className="flex items-center gap-2.5 min-w-0">
           <Link
             href={`/shop/${sellerSlug}`}
@@ -41,7 +41,7 @@ export default function SellerShopHeader({
             <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-50 flex-shrink-0 ring-1 ring-gray-200">
               <SafeImage
                 src={sellerLogo}
-                placeholder={pickSajuAvatar(sellerId || sellerSlug)}
+                placeholder={pickBeautyMateAvatar(sellerId || sellerSlug)}
                 alt={sellerName}
                 width={36}
                 height={36}
@@ -71,7 +71,7 @@ export default function SellerShopHeader({
           </div>
         ) : (
           <div className="flex items-center gap-1.5 flex-shrink-0">
-            {/* 점집 독립 로그인/가입 — 사주나라 메인과 분리된 점집 전용 화면 */}
+            {/* 뷰티샵 독립 로그인/가입 — 뷰티메이트 메인과 분리된 뷰티샵 전용 화면 */}
             <Link
               href={`/shop/${sellerSlug}/login`}
               className="px-3 py-1.5 text-[13px] font-medium text-gray-600 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"

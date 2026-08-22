@@ -27,7 +27,7 @@ function toMoneyOrNull(value: any): number | null {
   return isNaN(n) || n < 0 ? null : n;
 }
 
-// 상담사 일반상담상품(빠른상담상품, DirectProduct) 엑셀 대량 등록
+// 뷰티 전문가 일반 뷰티 서비스(빠른뷰티 서비스, DirectProduct) 엑셀 대량 등록
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "로그인이 필요합니다" }, { status: 401 });
     }
     if (session.user?.role !== "CONSULTANT") {
-      return NextResponse.json({ error: "상담사만 이용할 수 있습니다" }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가만 이용할 수 있습니다" }, { status: 403 });
     }
 
     const seller = await prisma.sellerProfile.findUnique({
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       select: { id: true },
     });
     if (!seller) {
-      return NextResponse.json({ error: "상담사 프로필이 없습니다" }, { status: 400 });
+      return NextResponse.json({ error: "뷰티 전문가 프로필이 없습니다" }, { status: 400 });
     }
 
     // 파일 수신
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "엑셀 파일을 읽을 수 없습니다. 양식을 확인해주세요" }, { status: 400 });
     }
 
-    // 제목(헤더) 행 찾기 — "상담상품명" 셀이 있는 행
+    // 제목(헤더) 행 찾기 — "뷰티 서비스명" 셀이 있는 행
     const markerNorm = normalizeHeader(HEADER_MARKER);
     let headerIdx = -1;
     for (let i = 0; i < rows.length; i++) {
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     }
     if (headerIdx === -1) {
       return NextResponse.json(
-        { error: "제목 행을 찾을 수 없습니다. 템플릿의 '상담상품명' 제목 행을 삭제하지 마세요" },
+        { error: "제목 행을 찾을 수 없습니다. 템플릿의 '뷰티 서비스명' 제목 행을 삭제하지 마세요" },
         { status: 400 }
       );
     }
@@ -129,9 +129,9 @@ export async function POST(req: NextRequest) {
       if (name.startsWith(EXAMPLE_PREFIX)) continue;
 
       try {
-        if (!name) throw new Error("상담상품명은 필수입니다");
+        if (!name) throw new Error("뷰티 서비스명은 필수입니다");
 
-        // 판매가 (일반상담상품 양식에서는 '판매가(원)' → basePrice 키로 매핑됨)
+        // 판매가 (일반 뷰티 서비스 양식에서는 '판매가(원)' → basePrice 키로 매핑됨)
         const price = toMoneyOrNull(rec.basePrice);
         if (price === null) throw new Error("판매가는 필수이며 0 이상 숫자여야 합니다");
 
@@ -167,7 +167,7 @@ export async function POST(req: NextRequest) {
     const failed = results.filter((r) => !r.ok).length;
     if (results.length === 0) {
       return NextResponse.json(
-        { error: "등록할 상담상품 데이터가 없습니다. 제목 행 아래에 상담상품을 입력했는지 확인해주세요" },
+        { error: "등록할 뷰티 서비스 데이터가 없습니다. 제목 행 아래에 뷰티 서비스를 입력했는지 확인해주세요" },
         { status: 400 }
       );
     }

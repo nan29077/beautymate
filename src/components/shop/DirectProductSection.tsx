@@ -1,6 +1,6 @@
 "use client";
 
-// 점집 상담상품(DirectProduct) 목록 + 시간 선택 바텀시트
+// 뷰티샵 뷰티 서비스(DirectProduct) 목록 + 시간 선택 바텀시트
 // 고객이 상품을 선택 → 시간 옵션 선택 → 결제 페이지로 이동
 
 import { useState } from "react";
@@ -166,7 +166,7 @@ export default function DirectProductSection({ products, sellerId, themeColor = 
             </div>
 
             <div className="px-5 pt-4 pb-1">
-              <p className="text-[12px] font-semibold text-gray-700">상담 시간을 선택하세요</p>
+              <p className="text-[12px] font-semibold text-gray-700">소요 시간을 선택하세요</p>
               {meta.note && (
                 <p className="text-[11px] text-gray-400 mt-0.5 leading-relaxed">{meta.note}</p>
               )}

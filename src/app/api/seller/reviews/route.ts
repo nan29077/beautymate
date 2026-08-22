@@ -13,13 +13,13 @@ export async function GET(req: NextRequest) {
     where: { userId: session!.user!.id },
     select: { id: true },
   });
-  if (!seller) return NextResponse.json({ error: "상담사 없음" }, { status: 404 });
+  if (!seller) return NextResponse.json({ error: "뷰티 전문가 없음" }, { status: 404 });
 
   const page = parseInt(req.nextUrl.searchParams.get("page") || "1");
   const limit = parseInt(req.nextUrl.searchParams.get("limit") || "10");
   const skip = (page - 1) * limit;
 
-  // 상담사 점집에 등록된 상담상품의 후기 조회
+  // 뷰티 전문가 뷰티샵에 등록된 뷰티 서비스의 후기 조회
   const shopProductIds = await prisma.sellerShopProduct.findMany({
     where: { sellerId: seller.id },
     select: { productId: true },
@@ -67,12 +67,12 @@ export async function PATCH(req: NextRequest) {
     where: { userId: session!.user!.id },
     select: { id: true },
   });
-  if (!seller) return NextResponse.json({ error: "상담사 없음" }, { status: 404 });
+  if (!seller) return NextResponse.json({ error: "뷰티 전문가 없음" }, { status: 404 });
 
   const { reviewId, sellerComment, isHidden } = await req.json();
   if (!reviewId) return NextResponse.json({ error: "reviewId 필수" }, { status: 400 });
 
-  // 해당 후기가 상담사의 상담상품 것인지 검증
+  // 해당 후기가 뷰티 전문가의 뷰티 서비스 것인지 검증
   const review = await (prisma.review as any).findUnique({
     where: { id: reviewId },
     include: { product: { include: { sellerProducts: { where: { sellerId: seller.id } } } } },

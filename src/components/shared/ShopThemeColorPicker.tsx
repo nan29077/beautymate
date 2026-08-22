@@ -53,7 +53,7 @@ export default function ShopThemeColorPicker({ currentColor, className = "" }: S
     <div className={`bg-white rounded-xl border border-gray-100 p-5 ${className}`}>
       <div className="flex items-center gap-2 mb-4">
         <Icon name="Color" size={18} strokeWidth={1.5} className="text-gray-500" />
-        <h3 className="text-sm font-bold text-gray-900">점집 테마 색상</h3>
+        <h3 className="text-sm font-bold text-gray-900">뷰티샵 테마 색상</h3>
       </div>
 
       <div className="flex flex-wrap gap-1.5 mb-3">

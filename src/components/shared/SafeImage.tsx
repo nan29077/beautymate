@@ -47,7 +47,7 @@ const CATEGORY_EMOJIS: Record<string, string> = {
   키즈: "👶",
 };
 
-// 상담상품명에서 카테고리 키워드를 감지하여 이모지 반환
+// 뷰티 서비스명에서 카테고리 키워드를 감지하여 이모지 반환
 function detectEmoji(text: string): string {
   const keywords: Record<string, string> = {
     블레이저: "🧥", 자켓: "🧥", 코트: "🧥",

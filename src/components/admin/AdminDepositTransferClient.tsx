@@ -417,7 +417,7 @@ export default function AdminDepositTransferClient() {
               <input
                 value={form.memo}
                 onChange={(e) => updateForm({ memo: e.target.value })}
-                placeholder="예: 6월 정산 지급 — 홍길동 상담사"
+                placeholder="예: 6월 정산 지급 — 홍길동 뷰티 전문가"
                 className="w-full px-3 py-2 text-[13px] border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-300"
               />
             </div>

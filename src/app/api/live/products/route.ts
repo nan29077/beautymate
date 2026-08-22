@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET: 라이브 상담용 상담상품 목록 (브랜드/관리자/상담사)
+// GET: 라이브 뷰티용 뷰티 서비스 목록 (브랜드/관리자/뷰티 전문가)
 export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
@@ -13,11 +13,11 @@ export async function GET(req: NextRequest) {
 
   if (role === "CONSULTANT") {
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
-    // 상담사가 상담상품관리에서 자기 점집에 추가한 상담상품만 노출
-    // - 상담사가 직접 등록한 상담상품(브랜드 없음) → 내 상담상품 탭
-    // - 브랜드/관리자 상담상품을 점집에 추가한 것(브랜드 있음) → 사주나라 상담상품 탭
+    // 뷰티 전문가가 뷰티 서비스 관리에서 자기 뷰티샵에 추가한 뷰티 서비스만 노출
+    // - 뷰티 전문가가 직접 등록한 뷰티 서비스(브랜드 없음) → 내 뷰티 서비스 탭
+    // - 브랜드/관리자 뷰티 서비스를 뷰티샵에 추가한 것(브랜드 있음) → 뷰티메이트 뷰티 서비스 탭
     const shopProducts = await prisma.sellerShopProduct.findMany({
       where: { sellerId: seller.id, isActive: true },
       include: { product: { include: { category: true } } },
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ products });
 }
 
-// POST: 라이브 상담 상담상품 관리 (활성/비활성 토글)
+// POST: 라이브 뷰티 뷰티 서비스 관리 (활성/비활성 토글)
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
@@ -74,9 +74,9 @@ export async function POST(req: NextRequest) {
 
   if (action === "toggle_live") {
     const product = await prisma.product.findUnique({ where: { id: productId } });
-    if (!product) return NextResponse.json({ error: "상담상품 없음" }, { status: 404 });
+    if (!product) return NextResponse.json({ error: "뷰티 서비스 없음" }, { status: 404 });
 
-    // 라이브 상담 허용 토글 (allowLiveCommerce 필드 사용)
+    // 라이브 뷰티 허용 토글 (allowLiveCommerce 필드 사용)
     await prisma.product.update({
       where: { id: productId },
       data: { allowLiveCommerce: !(product as any).allowLiveCommerce },
@@ -101,13 +101,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   }
 
-  // 라이브 방송에서 상담상품 표시/숨기기 (라이브 스트림 상담상품 isActive 토글)
+  // 라이브 방송에서 뷰티 서비스 표시/숨기기 (라이브 스트림 뷰티 서비스 isActive 토글)
   if (action === "toggle_display") {
     const { liveProductId } = body;
     if (!liveProductId) return NextResponse.json({ error: "liveProductId 필요" }, { status: 400 });
     
     const liveProduct = await prisma.liveStreamProduct.findUnique({ where: { id: liveProductId } });
-    if (!liveProduct) return NextResponse.json({ error: "라이브 상담상품 없음" }, { status: 404 });
+    if (!liveProduct) return NextResponse.json({ error: "라이브 뷰티 서비스 없음" }, { status: 404 });
 
     await prisma.liveStreamProduct.update({
       where: { id: liveProductId },

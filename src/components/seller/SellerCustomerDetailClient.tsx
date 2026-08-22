@@ -47,7 +47,7 @@ export interface ConsultingHistoryItem {
 const STATUS_MAP: Record<string, { label: string; color: string; dot: string }> = {
   PENDING: { label: "예약 대기", color: "bg-yellow-50 text-yellow-700", dot: "bg-yellow-400" },
   CONFIRMED: { label: "예약 확정", color: "bg-blue-50 text-blue-700", dot: "bg-blue-400" },
-  COMPLETED: { label: "상담 완료", color: "bg-green-50 text-green-700", dot: "bg-green-400" },
+  COMPLETED: { label: "서비스 완료", color: "bg-green-50 text-green-700", dot: "bg-green-400" },
   CANCELLED: { label: "취소됨", color: "bg-gray-100 text-gray-500", dot: "bg-gray-300" },
   NO_SHOW: { label: "노쇼", color: "bg-red-50 text-red-600", dot: "bg-red-400" },
 };
@@ -90,7 +90,6 @@ export default function SellerCustomerDetailClient({
             label="성별"
             value={customer.gender === "M" ? "남성" : customer.gender === "F" ? "여성" : "-"}
           />
-          <InfoRow icon={<Clock size={14} />} label="태어난 시각" value={customer.birthTime || "-"} />
           <InfoRow icon={<Mail size={14} />} label="이메일" value={customer.email || "-"} />
         </div>
       </div>
@@ -152,7 +151,7 @@ function HistoryCard({ item }: { item: ConsultingHistoryItem }) {
               <span className={`text-[10px] px-2 py-0.5 rounded-full ${s.color}`}>{s.label}</span>
             </div>
             <p className="text-xs text-gray-600 mt-1.5">
-              {item.productNames.length > 0 ? item.productNames.join(", ") : "상담 상품 정보 없음"}
+              {item.productNames.length > 0 ? item.productNames.join(", ") : "뷰티 서비스 정보 없음"}
             </p>
             <p className="text-[10px] text-gray-300 mt-0.5">예약번호 {item.reservationNumber}</p>
           </div>
@@ -182,7 +181,7 @@ function HistoryCard({ item }: { item: ConsultingHistoryItem }) {
   );
 }
 
-/** 상담 완료 건의 메모 조회·수정. 접혀 있다가 클릭 시 편집 모드로 전환된다. */
+/** 서비스 완료 건의 메모 조회·수정. 접혀 있다가 클릭 시 편집 모드로 전환된다. */
 function MemoBox({ reservationId, initialMemo }: { reservationId: string; initialMemo: string | null }) {
   const [savedMemo, setSavedMemo] = useState(initialMemo ?? "");
   const [memo, setMemo] = useState(initialMemo ?? "");
@@ -222,7 +221,7 @@ function MemoBox({ reservationId, initialMemo }: { reservationId: string; initia
       >
         <NotebookPen size={13} className="text-amber-500 mt-0.5 flex-shrink-0" />
         <div className="min-w-0">
-          <p className="text-[10px] text-amber-600 mb-0.5">상담 메모 {savedMemo ? "(클릭해 수정)" : ""}</p>
+          <p className="text-[10px] text-amber-600 mb-0.5">고객 메모 {savedMemo ? "(클릭해 수정)" : ""}</p>
           <p className={`text-xs whitespace-pre-wrap break-words ${savedMemo ? "text-gray-700" : "text-gray-400"}`}>
             {savedMemo || "메모를 남기려면 클릭하세요."}
           </p>
@@ -239,7 +238,7 @@ function MemoBox({ reservationId, initialMemo }: { reservationId: string; initia
         rows={4}
         maxLength={5000}
         autoFocus
-        placeholder="상담 내용, 특이사항, 다음 상담 시 참고할 내용을 기록하세요."
+        placeholder="요청사항, 특이사항, 다음 상담 시 참고할 내용을 기록하세요."
         className="w-full rounded-lg border border-gray-200 p-2.5 text-xs text-gray-800 placeholder:text-gray-300 focus:outline-none focus:border-gray-400 resize-none"
       />
       <div className="flex items-center justify-between mt-1.5">

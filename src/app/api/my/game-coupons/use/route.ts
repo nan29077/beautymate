@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 // POST: 게임 쿠폰 사용 처리 { code, orderId }
-// 해당 상담사 점집의 예약에만 사용 가능. 예약 POST 에서 자동 처리되지만,
+// 해당 뷰티 전문가 뷰티샵의 예약에만 사용 가능. 예약 POST 에서 자동 처리되지만,
 // 별도 사용 확정이 필요한 흐름을 위해 제공한다.
 export async function POST(req: NextRequest) {
   try {
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     if (coupon.usedAt) return NextResponse.json({ error: "이미 사용한 쿠폰입니다." }, { status: 400 });
     if (coupon.expiresAt < new Date()) return NextResponse.json({ error: "만료된 쿠폰입니다." }, { status: 400 });
 
-    // 예약 검증 — 본인 예약 + 쿠폰 발급 상담사 점집과 동일해야 함
+    // 예약 검증 — 본인 예약 + 쿠폰 발급 뷰티 전문가 뷰티샵과 동일해야 함
     if (orderId) {
       const order = await prisma.reservation.findUnique({
         where: { id: orderId },
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "예약을 찾을 수 없습니다." }, { status: 404 });
       }
       if (order.sellerId !== coupon.sellerId) {
-        return NextResponse.json({ error: "이 상담사 점집에서는 사용할 수 없는 쿠폰입니다." }, { status: 400 });
+        return NextResponse.json({ error: "이 뷰티 전문가 뷰티샵에서는 사용할 수 없는 쿠폰입니다." }, { status: 400 });
       }
     }
 

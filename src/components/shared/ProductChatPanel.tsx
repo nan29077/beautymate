@@ -24,7 +24,7 @@ interface Props {
 
 const ROLE_COLORS: Record<string, { bg: string; text: string; label: string }> = {
   SUPER_ADMIN: { bg: "bg-red-50", text: "text-red-600", label: "관리자" },
-  CONSULTANT: { bg: "bg-blue-50", text: "text-blue-600", label: "상담사" },
+  CONSULTANT: { bg: "bg-blue-50", text: "text-blue-600", label: "뷰티 전문가" },
 };
 
 export default function ProductChatPanel({ productId, productName, currentUserId, className, buttonOnly }: Props) {
@@ -107,7 +107,7 @@ export default function ProductChatPanel({ productId, productName, currentUserId
             </div>
             <div className="min-w-0">
               <p className="text-sm font-bold text-gray-900 truncate">{productName}</p>
-              <p className="text-[10px] text-gray-400">공급자-상담사 채팅</p>
+              <p className="text-[10px] text-gray-400">공급자-뷰티 전문가 채팅</p>
             </div>
           </div>
           <button onClick={() => setIsOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400">

@@ -27,8 +27,8 @@ export default async function AdminSettlementsPage() {
     }), []);
   const totalSales = orders.reduce((sum, o) => sum + Number(o.finalAmount), 0);
 
-  // 정산 대기/가능액은 각 상담사가 보는 정산액과 정확히 일치해야 하므로,
-  // 상담사 정산과 동일한 로직(getSellerSettlementSummary)으로 상담사별 합산한다.
+  // 정산 대기/가능액은 각 뷰티 전문가가 보는 정산액과 정확히 일치해야 하므로,
+  // 뷰티 전문가 정산과 동일한 로직(getSellerSettlementSummary)으로 뷰티 전문가별 합산한다.
   // (공급가·플랫폼 수수료 차감 후 세전 정산액 기준)
   const sellers = await prisma.sellerProfile.findMany({
     select: { id: true },
@@ -44,12 +44,12 @@ export default async function AdminSettlementsPage() {
     }),
   );
 
-  // 사주나라 수익 — /admin/revenue 와 동일한 계산(lib/revenue.ts)을 사용한다.
+  // 뷰티메이트 수익 — /admin/revenue 와 동일한 계산(lib/revenue.ts)을 사용한다.
   // 두 화면이 각자 다른 공식을 쓰면 같은 지표가 서로 다른 숫자를 내므로 하나로 모은다.
   const revenue = await getPlatformRevenue({ fees });
   const platformRevenue = revenue.netRevenue;
 
-  // 상담사 출금요청 목록
+  // 뷰티 전문가 출금요청 목록
   const rows = await prisma.payoutRequest.findMany({
     include: { seller: { select: { shopName: true } } },
     orderBy: { requestedAt: "desc" },
@@ -57,7 +57,7 @@ export default async function AdminSettlementsPage() {
 
   const payouts = rows.map((p) => ({
     id: p.id,
-    sellerName: p.seller?.shopName || "상담사",
+    sellerName: p.seller?.shopName || "뷰티 전문가",
     amount: Number(p.amount),
     netAmount: Number(p.netAmount),
     // reservationCount 컬럼은 운영 DB 미반영 — 전역 omit 으로 기본 조회에서 빠진다 (없으면 0)

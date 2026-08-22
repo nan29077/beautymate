@@ -1,9 +1,9 @@
 "use client";
 
-// 점집 독립 인증 화면 공용 셸 — 점집 브랜딩(로고+이름) 헤더
+// 뷰티샵 독립 인증 화면 공용 셸 — 뷰티샵 브랜딩(로고+이름) 헤더
 import Link from "next/link";
 import SafeImage from "@/components/shared/SafeImage";
-import { pickSajuAvatar } from "@/lib/defaults";
+import { pickBeautyMateAvatar } from "@/lib/defaults";
 
 export default function ShopAuthShell({
   shop,
@@ -23,7 +23,7 @@ export default function ShopAuthShell({
           <div className="w-16 h-16 rounded-full overflow-hidden bg-white ring-2 ring-amber-200 shadow-sm">
             <SafeImage
               src={shop.shopLogo}
-              placeholder={pickSajuAvatar(shop.id)}
+              placeholder={pickBeautyMateAvatar(shop.id)}
               alt={shop.shopName}
               width={64}
               height={64}

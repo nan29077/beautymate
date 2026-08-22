@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { normalizePhone } from "@/lib/aligo";
 import { sendTemplatedAlimtalk, type TemplatedSendResult } from "@/lib/alimtalkEngine";
 
-/** 결제 완료 시 해당 점집 상담사에게 예약 접수 알림톡 발송. 실패해도 결제 흐름에 영향 없음. */
+/** 결제 완료 시 해당 뷰티샵 뷰티 전문가에게 예약 접수 알림톡 발송. 실패해도 결제 흐름에 영향 없음. */
 export async function notifyOrderPlacedToSeller(orderId: string): Promise<TemplatedSendResult> {
   const order = await prisma.reservation.findUnique({
     where: { id: orderId },
@@ -19,7 +19,7 @@ export async function notifyOrderPlacedToSeller(orderId: string): Promise<Templa
   if (!order) return { notified: false, reason: "예약 없음" };
 
   const phone = normalizePhone(order.seller.user.phone);
-  if (!phone) return { notified: false, reason: "상담사 전화번호 없음" };
+  if (!phone) return { notified: false, reason: "뷰티 전문가 전화번호 없음" };
 
   const kstDate = new Date(order.reservationDate.getTime() + 9 * 3600 * 1000);
   const reservationYmd = `${kstDate.getUTCFullYear()}-${String(kstDate.getUTCMonth() + 1).padStart(2, "0")}-${String(kstDate.getUTCDate()).padStart(2, "0")}`;
@@ -33,7 +33,7 @@ export async function notifyOrderPlacedToSeller(orderId: string): Promise<Templa
       "예약시간": order.reservationTime,
       "결제금액": Number(order.finalAmount).toLocaleString("ko-KR"),
     },
-    recipients: [{ phone, name: order.seller.user.name || "상담사" }],
+    recipients: [{ phone, name: order.seller.user.name || "뷰티 전문가" }],
     sellerId: order.seller.id,
   });
 }
@@ -81,12 +81,12 @@ export async function notifyReservationConfirmedToCustomer(
 export async function notifySignupWelcome(opts: {
   name: string;
   phone: string | null;
-  sellerRef?: string | null; // 가입 경로 상담사 slug — 있으면 해당 점집명으로 발송
+  sellerRef?: string | null; // 가입 경로 뷰티 전문가 slug — 있으면 해당 뷰티샵명으로 발송
 }): Promise<TemplatedSendResult> {
   const phone = normalizePhone(opts.phone);
   if (!phone) return { notified: false, reason: "전화번호 없음" };
 
-  let shopName = "사주나라";
+  let shopName = "뷰티메이트";
   let sellerId: string | null = null;
   if (opts.sellerRef) {
     const seller = await prisma.sellerProfile.findUnique({

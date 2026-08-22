@@ -4,18 +4,18 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// 상담사: "점집에 바로 노출하기" / "상담상품 번호 매기기" 설정 + 상담상품별 번호 저장.
+// 뷰티 전문가: "뷰티샵에 바로 노출하기" / "뷰티 서비스 번호 매기기" 설정 + 뷰티 서비스별 번호 저장.
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (session?.user?.role !== "CONSULTANT") {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
   const seller = await prisma.sellerProfile.findUnique({ where: { userId: session!.user!.id }, select: { id: true } });
-  if (!seller) return NextResponse.json({ error: "상담사 정보를 찾을 수 없습니다." }, { status: 404 });
+  if (!seller) return NextResponse.json({ error: "뷰티 전문가 정보를 찾을 수 없습니다." }, { status: 404 });
 
   const body = await req.json().catch(() => ({}));
 
-  // 1) 상담상품 번호 저장 (중복 검증)
+  // 1) 뷰티 서비스 번호 저장 (중복 검증)
   if (Array.isArray(body.numbers)) {
     const entries: { id: string; shopNumber: number | null }[] = body.numbers
       .filter((n: any) => typeof n?.id === "string")

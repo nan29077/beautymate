@@ -11,13 +11,13 @@ export async function GET() {
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
     if (session.user.role !== "CONSULTANT") {
-      return NextResponse.json({ error: "상담사 전용" }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가 전용" }, { status: 403 });
     }
 
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 400 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 400 });
 
     // Get all active/scheduled campaigns
     const campaigns = await prisma.groupBuyCampaign.findMany({
@@ -89,13 +89,13 @@ export async function POST(req: Request) {
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
 
     if (session.user.role !== "CONSULTANT") {
-      return NextResponse.json({ error: "상담사 전용" }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가 전용" }, { status: 403 });
     }
 
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 400 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 400 });
 
     const { campaignId } = await req.json();
     if (!campaignId) {
@@ -108,7 +108,7 @@ export async function POST(req: Request) {
       include: { product: true },
     });
     if (!original) {
-      return NextResponse.json({ error: "단체 상담을 찾을 수 없습니다" }, { status: 404 });
+      return NextResponse.json({ error: "공동 프로모션을 찾을 수 없습니다" }, { status: 404 });
     }
 
     // Check if seller already has a campaign for this product
@@ -116,7 +116,7 @@ export async function POST(req: Request) {
       where: { sellerId: seller.id, productId: original.productId },
     });
     if (existing) {
-      return NextResponse.json({ error: "이미 이 상담상품의 단체 상담에 참여하고 있습니다" }, { status: 400 });
+      return NextResponse.json({ error: "이미 이 뷰티 서비스의 공동 프로모션에 참여하고 있습니다" }, { status: 400 });
     }
 
     // Ensure product is in seller's shop
@@ -153,7 +153,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       campaign,
-      message: "단체 상담에 참여했습니다. 내 단체 상담 관리에서 확인하세요.",
+      message: "공동 프로모션에 참여했습니다. 내 공동 프로모션 관리에서 확인하세요.",
     }, { status: 201 });
   } catch (error) {
     console.error("Join campaign error:", error);

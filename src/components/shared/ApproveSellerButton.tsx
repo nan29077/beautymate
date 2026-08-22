@@ -14,7 +14,7 @@ export default function ApproveSellerButton({ sellerId }: ApproveSellerButtonPro
   const { appConfirm, appAlert } = useAppDialog();
 
   const handleApprove = async () => {
-    if (!await appConfirm("이 상담사를 승인하시겠습니까?")) return;
+    if (!await appConfirm("이 뷰티 전문가를 승인하시겠습니까?")) return;
     setLoading(true);
     try {
       const res = await fetch("/api/admin/sellers/approve", {

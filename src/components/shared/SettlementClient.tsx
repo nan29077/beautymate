@@ -51,9 +51,9 @@ interface Props {
 const formatPrice = (n: number) => n.toLocaleString("ko-KR") + "원";
 
 const TYPE_LABELS: Record<string, { label: string; icon: any; color: string; bgColor: string }> = {
-  groupbuy: { label: "단체 상담", icon: BookOpen, color: "text-emerald-600", bgColor: "bg-emerald-50 border-emerald-100" },
-  normal: { label: "일반상담상품", icon: Star, color: "text-gray-600", bgColor: "bg-gray-50 border-gray-200" },
-  live: { label: "라이브 상담", icon: Radio, color: "text-pink-600", bgColor: "bg-pink-50 border-pink-100" },
+  groupbuy: { label: "공동 프로모션", icon: BookOpen, color: "text-emerald-600", bgColor: "bg-emerald-50 border-emerald-100" },
+  normal: { label: "일반 뷰티 서비스", icon: Star, color: "text-gray-600", bgColor: "bg-gray-50 border-gray-200" },
+  live: { label: "라이브 뷰티", icon: Radio, color: "text-pink-600", bgColor: "bg-pink-50 border-pink-100" },
 };
 
 export default function SettlementClient({ settlements, role, commissionRate = 10 }: Props) {
@@ -324,7 +324,7 @@ export default function SettlementClient({ settlements, role, commissionRate = 1
           <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-            placeholder="상담사명, 캠페인명, 브랜드명 검색..."
+            placeholder="뷰티 전문가명, 캠페인명, 브랜드명 검색..."
             className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-200 bg-white"
           />
           {searchQuery && (
@@ -470,7 +470,7 @@ export default function SettlementClient({ settlements, role, commissionRate = 1
               <div className="bg-gray-50 rounded-xl p-4 space-y-2">
                 <div className="flex justify-between text-xs"><span className="text-gray-500">제목</span><span className="font-bold">{detailItem.campaignTitle || "일반 판매"}</span></div>
                 <div className="flex justify-between text-xs"><span className="text-gray-500">유형</span>{getTypeBadge(detailItem.type)}</div>
-                <div className="flex justify-between text-xs"><span className="text-gray-500">상담사</span><span>{detailItem.sellerName}</span></div>
+                <div className="flex justify-between text-xs"><span className="text-gray-500">뷰티 전문가</span><span>{detailItem.sellerName}</span></div>
                 {detailItem.brandName && <div className="flex justify-between text-xs"><span className="text-gray-500">브랜드</span><span>{detailItem.brandName}</span></div>}
                 <div className="flex justify-between text-xs"><span className="text-gray-500">기간</span><span>{new Date(detailItem.periodStart).toLocaleDateString("ko-KR")} ~ {new Date(detailItem.periodEnd).toLocaleDateString("ko-KR")}</span></div>
                 <div className="flex justify-between text-xs"><span className="text-gray-500">사업자 유형</span><span>{detailItem.isBusiness ? "사업자" : "개인"}</span></div>
@@ -505,8 +505,8 @@ export default function SettlementClient({ settlements, role, commissionRate = 1
                 <div className="bg-amber-50 rounded-xl p-3 flex items-start gap-2">
                   <Icon name="Warning" size={14} className="text-amber-500 flex-shrink-0 mt-0.5" />
                   <div className="text-[11px] text-amber-700">
-                    <p className="font-medium">개인 상담사 원천징수 안내</p>
-                    <p className="mt-0.5">사업자등록이 없는 개인 상담사의 경우 소득세법에 따라 정산액의 3.3% (소득세 3% + 지방소득세 0.3%)가 원천징수됩니다.</p>
+                    <p className="font-medium">개인 뷰티 전문가 원천징수 안내</p>
+                    <p className="mt-0.5">사업자등록이 없는 개인 뷰티 전문가의 경우 소득세법에 따라 정산액의 3.3% (소득세 3% + 지방소득세 0.3%)가 원천징수됩니다.</p>
                     <p className="mt-0.5">매년 5월 종합소득세 신고 시 기 납부 세액으로 공제됩니다.</p>
                   </div>
                 </div>
@@ -517,7 +517,7 @@ export default function SettlementClient({ settlements, role, commissionRate = 1
                   <Icon name="File" size={14} className="text-blue-500 flex-shrink-0 mt-0.5" />
                   <div className="text-[11px] text-blue-700">
                     <p className="font-medium">사업자 세금계산서 안내</p>
-                    <p className="mt-0.5">사업자로 등록된 상담사/브랜드의 경우 정산 시 세금계산서가 발행됩니다.</p>
+                    <p className="mt-0.5">사업자로 등록된 뷰티 전문가/브랜드의 경우 정산 시 세금계산서가 발행됩니다.</p>
                     <p className="mt-0.5">부가가치세 신고 시 매출 세금계산서로 활용하세요.</p>
                   </div>
                 </div>
@@ -616,7 +616,7 @@ export default function SettlementClient({ settlements, role, commissionRate = 1
                   <label className="flex items-start gap-2 cursor-pointer">
                     <input type="checkbox" checked={reqAgreedDisclaimer} onChange={e => setReqAgreedDisclaimer(e.target.checked)} className="mt-0.5 accent-amber-600" />
                     <span className="text-[11px] text-amber-700">
-                      <span className="font-medium">개인 상담사 원천징수 안내 동의</span><br />
+                      <span className="font-medium">개인 뷰티 전문가 원천징수 안내 동의</span><br />
                       소득세법에 따라 정산액의 3.3% (소득세 3% + 지방소득세 0.3%)가 원천징수되며, 이에 동의합니다.
                       매년 5월 종합소득세 신고 시 기납부 세액으로 공제됩니다.
                     </span>

@@ -8,7 +8,7 @@ import SafeImage from "@/components/shared/SafeImage";
 import MyPageBottomMenu from "@/components/shared/MyPageBottomMenu";
 import { requireBuyerSession } from "@/lib/buyerGuard";
 import { safeQuery } from "@/lib/safeDb";
-import { pickBuyerAvatar, pickSajuAvatar } from "@/lib/defaults";
+import { pickBuyerAvatar, pickBeautyMateAvatar } from "@/lib/defaults";
 import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
 import { LIVE_RING_CLASS, OnAirBadge } from "@/components/shared/LiveBadge";
 
@@ -76,7 +76,7 @@ export default async function MyPage() {
 
   const menuItems = [
     { href: "/my/reservations", icon: Calendar, label: "예약 내역", count: reservationCount, color: "bg-blue-50", iconColor: "text-blue-500" },
-    { href: "/my/seller", icon: Users, label: "내 단골 상담사", count: pickedSellers.length, color: "bg-pink-50", iconColor: "text-pink-500", small: true },
+    { href: "/my/seller", icon: Users, label: "내 단골 뷰티 전문가", count: pickedSellers.length, color: "bg-pink-50", iconColor: "text-pink-500", small: true },
     { href: "/my/reviews", icon: Star, label: "상담 리뷰", count: user._count.reviews, color: "bg-yellow-50", iconColor: "text-yellow-500" },
     { href: "/my/notifications", icon: Bell, label: "알림", count: 0, color: "bg-purple-50", iconColor: "text-purple-500" },
   ];
@@ -130,14 +130,14 @@ export default async function MyPage() {
         </div>
       </div>
 
-      {/* 내 단골 상담사 미리보기 */}
+      {/* 내 단골 뷰티 전문가 미리보기 */}
       {pickedSellers.length > 0 && (
         <div className="px-4 mb-4">
           <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
             <div className="flex items-center justify-between px-4 pt-4 pb-2">
               <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
                 <Users size={14} strokeWidth={1.5} className="text-pink-500" />
-                내 단골 상담사
+                내 단골 뷰티 전문가
               </h2>
               <Link href="/my/seller" className="text-xs text-brand-600 hover:underline flex items-center gap-0.5">
                 전체보기 ({pickedSellers.length})
@@ -157,7 +157,7 @@ export default async function MyPage() {
                       <div className={`w-14 h-14 rounded-full overflow-hidden bg-gray-100 ${live ? LIVE_RING_CLASS : "ring-2 ring-gray-100"}`}>
                         <SafeImage
                           src={sellerProfileImage(seller)}
-                          placeholder={pickSajuAvatar(seller.id)}
+                          placeholder={pickBeautyMateAvatar(seller.id)}
                           alt={seller.shopName}
                           width={56}
                           height={56}
@@ -250,7 +250,7 @@ export default async function MyPage() {
                 href="/sellers"
                 className="mt-3 inline-block px-4 py-2 bg-gray-900 text-white text-xs font-semibold rounded-lg hover:bg-gray-800"
               >
-                상담사 찾기
+                뷰티 전문가 찾기
               </Link>
             </div>
           )}

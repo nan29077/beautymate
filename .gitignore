@@ -2,7 +2,7 @@
 node_modules/
 
 # Environment
-# ⚠️ 신규 저장소(sajumate)는 공개 저장소이므로 .env 계열은 절대 커밋하지 않는다.
+# ⚠️ 신규 저장소(beautymate)는 공개 저장소이므로 .env 계열은 절대 커밋하지 않는다.
 #    (운영 DATABASE_URL·AUTH_SECRET·PG 상점키 등이 들어 있음)
 .env
 .env.*
@@ -29,6 +29,7 @@ public/uploads/*
 tmp/
 output/
 _trash_temp/
+_legacy_sajunara_assets/
 logs/
 pids/
 .pm2/

@@ -191,7 +191,7 @@ export default function SellerBusinessInfoForm({ initialData }: SellerBusinessIn
 
             <div className="bg-blue-50 rounded-lg p-3 mt-2">
               <p className="text-[10px] text-blue-600 leading-relaxed">
-                💡 입력하신 사업자 정보는 라이브 점집 하단(풋터)에 판매자 정보로 표시됩니다.
+                💡 입력하신 사업자 정보는 라이브 뷰티샵 하단(풋터)에 판매자 정보로 표시됩니다.
                 정확한 정보를 입력해 주세요.
               </p>
             </div>

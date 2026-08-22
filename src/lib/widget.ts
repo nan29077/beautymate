@@ -38,7 +38,7 @@ export function normalizeWidgetDate(date?: string | null): string {
   return date && DATE_RE.test(date) ? date : todayInSeoul();
 }
 
-/** User.id → SellerProfile.id → slug 순으로 상담사를 찾는다. */
+/** User.id → SellerProfile.id → slug 순으로 뷰티 전문가를 찾는다. */
 async function findConsultant(key: string) {
   const include = { user: { select: { id: true, name: true, avatar: true } } };
 
@@ -51,7 +51,7 @@ async function findConsultant(key: string) {
   return prisma.sellerProfile.findUnique({ where: { slug: key }, include });
 }
 
-/** 상담사의 해당 날짜 슬롯 현황. 상담사를 못 찾으면 null. */
+/** 뷰티 전문가의 해당 날짜 슬롯 현황. 뷰티 전문가를 못 찾으면 null. */
 export async function getWidgetData(key: string, rawDate?: string | null): Promise<WidgetData | null> {
   const date = normalizeWidgetDate(rawDate);
   const seller = await findConsultant(key);
@@ -69,7 +69,7 @@ export async function getWidgetData(key: string, rawDate?: string | null): Promi
       select: { isAvailable: true, reservationId: true },
     });
   } catch (e) {
-    // 상담사 정보까지는 살아있으므로 QR·예약 링크는 그대로 노출한다.
+    // 뷰티 전문가 정보까지는 살아있으므로 QR·예약 링크는 그대로 노출한다.
     console.error("Widget slot query failed:", e);
     slotsUnknown = true;
   }
@@ -83,7 +83,7 @@ export async function getWidgetData(key: string, rawDate?: string | null): Promi
     date,
     totalSlots: slots.length,
     bookedSlots: slots.filter((s) => !!s.reservationId).length,
-    // 예약이 걸렸거나 상담사가 닫은 슬롯은 모두 "남은 자리"에서 제외한다.
+    // 예약이 걸렸거나 뷰티 전문가가 닫은 슬롯은 모두 "남은 자리"에서 제외한다.
     remainingSlots: slots.filter((s) => s.isAvailable && !s.reservationId).length,
     isLive: seller.isManualLive ?? false,
     slotsUnknown,

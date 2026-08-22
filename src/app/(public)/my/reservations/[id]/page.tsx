@@ -30,7 +30,7 @@ interface ReservationDetail {
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   PENDING: { label: "예약 대기", color: "bg-yellow-50 text-yellow-700 border-yellow-200" },
   CONFIRMED: { label: "예약 확정", color: "bg-blue-50 text-blue-700 border-blue-200" },
-  COMPLETED: { label: "상담 완료", color: "bg-green-50 text-green-700 border-green-200" },
+  COMPLETED: { label: "서비스 완료", color: "bg-green-50 text-green-700 border-green-200" },
   CANCELLED: { label: "취소됨", color: "bg-gray-50 text-gray-500 border-gray-200" },
   NO_SHOW: { label: "노쇼", color: "bg-red-50 text-red-600 border-red-200" },
 };
@@ -125,7 +125,7 @@ export default function MyReservationDetailPage() {
             </Link>
           )}
 
-        {/* 전화 상담 — 확정 후 상담사 연락처 공개 */}
+        {/* 전화 상담 — 확정 후 뷰티 전문가 연락처 공개 */}
         {reservation.consultantContact?.phone && (
           <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
             <p className="text-xs text-blue-500 font-semibold mb-1 flex items-center gap-1">
@@ -160,15 +160,15 @@ export default function MyReservationDetailPage() {
           </div>
         )}
 
-        {/* 상담사 정보 */}
+        {/* 뷰티 전문가 정보 */}
         <div className="bg-white rounded-xl border border-gray-100 p-4">
-          <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide">상담사</p>
+          <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide">뷰티 전문가</p>
           <p className="font-semibold text-gray-900">{reservation.seller.shopName}</p>
           <Link
             href={`/shop/${reservation.seller.slug}`}
             className="text-xs text-indigo-500 mt-1 inline-block"
           >
-            점집 홈 보기 →
+            뷰티샵 홈 보기 →
           </Link>
         </div>
 
@@ -197,9 +197,6 @@ export default function MyReservationDetailPage() {
           {reservation.birthDate && (
             <InfoRow icon={<Calendar size={14} />} label="생년월일" value={reservation.birthDate} />
           )}
-          {reservation.birthTime && (
-            <InfoRow icon={<Clock size={14} />} label="태어난 시각" value={reservation.birthTime} />
-          )}
           {reservation.gender && (
             <InfoRow icon={<User size={14} />} label="성별" value={reservation.gender === "M" ? "남성" : "여성"} />
           )}
@@ -208,7 +205,7 @@ export default function MyReservationDetailPage() {
               <div className="flex items-start gap-2">
                 <BookOpen size={14} className="text-gray-400 mt-0.5 flex-shrink-0" />
                 <div>
-                  <span className="text-xs text-gray-400 block">상담 내용</span>
+                  <span className="text-xs text-gray-400 block">요청사항</span>
                   <p className="text-sm text-gray-700 mt-0.5 whitespace-pre-wrap">{reservation.consultingContent}</p>
                 </div>
               </div>

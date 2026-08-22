@@ -4,7 +4,7 @@ import ShopJoinClient from "@/components/shop/ShopJoinClient";
 
 export const dynamic = "force-dynamic";
 
-// 점집 독립 회원가입 페이지
+// 뷰티샵 독립 회원가입 페이지
 export default async function ShopJoinPage({
   params,
 }: {

@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// PUT: 상담사 마진 정책 수정 (소속 중간관리자 + 판매가 마진율)
+// PUT: 뷰티 전문가 마진 정책 수정 (소속 중간관리자 + 판매가 마진율)
 export async function PUT(request: Request) {
   const session = await auth();
   if (session?.user?.role !== "SUPER_ADMIN") {
@@ -14,7 +14,7 @@ export async function PUT(request: Request) {
     const { sellerId, middleAdminId, middleAdminMarginRate, commissionRate } = body;
 
     if (!sellerId) {
-      return NextResponse.json({ error: "상담사 ID가 필요합니다." }, { status: 400 });
+      return NextResponse.json({ error: "뷰티 전문가 ID가 필요합니다." }, { status: 400 });
     }
 
     // 값이 넘어온 필드만 부분 업데이트
@@ -39,7 +39,7 @@ export async function PUT(request: Request) {
   } catch (error) {
     console.error("Seller margin update error:", error);
     return NextResponse.json(
-      { error: "상담사 수정에 실패했습니다." },
+      { error: "뷰티 전문가 수정에 실패했습니다." },
       { status: 500 }
     );
   }

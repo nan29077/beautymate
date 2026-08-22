@@ -1,8 +1,8 @@
-// 상담사 추천인(attribution) 쿠키 헬퍼.
+// 뷰티 전문가 추천인(attribution) 쿠키 헬퍼.
 //
 // 정책 요약:
-// - 상담사 페이지(/shop/[slug]) 또는 제품 페이지(/products/[id]?ref=<slug>)
-//   진입 시 쿠키에 상담사 slug 저장.
+// - 뷰티 전문가 페이지(/shop/[slug]) 또는 제품 페이지(/products/[id]?ref=<slug>)
+//   진입 시 쿠키에 뷰티 전문가 slug 저장.
 // - 회원가입(/auth/register) 진입 시 URL의 ref/code 가 우선, 없으면 쿠키 fallback.
 // - 만료: 7일, last-click (덮어쓰기).
 // - 쿠키는 httpOnly 이며, 클라이언트는 /api/seller/lookup 을 통해 서버에서 값을 읽는다.
@@ -21,7 +21,7 @@ export const SELLER_REF_COOKIE_OPTIONS = {
 };
 
 /**
- * 상담사 slug 정합성 검사.
+ * 뷰티 전문가 slug 정합성 검사.
  * SellerProfile.slug 는 가입 시 a-z0-9- 패턴으로 생성됨.
  */
 export function isValidSellerSlug(value: unknown): value is string {
@@ -31,11 +31,11 @@ export function isValidSellerSlug(value: unknown): value is string {
 }
 
 /**
- * 신규 구매회원 가입 시 추천인(상담사) 귀속을 처리하는 공통 헬퍼.
+ * 신규 구매회원 가입 시 추천인(뷰티 전문가) 귀속을 처리하는 공통 헬퍼.
  *
  * 호출 측이 후보값 (sellerRef = slug 또는 referralCode) 을 모아 전달하면
  * - 우선순위: referralCode → sellerRef
- * - 미승인 상담사는 매핑하지 않음
+ * - 미승인 뷰티 전문가는 매핑하지 않음
  * - BuyerProfile 의 referredBySellerId / primarySellerId / referralCode 채움
  * - 매핑 성공 시 SellerProfile.totalFans 증가
  *
@@ -45,7 +45,7 @@ export function isValidSellerSlug(value: unknown): value is string {
 export interface ReferralLinkInput {
   /** Order.id (Order 가 아님, User.id) */
   userId: string;
-  /** 상담사 slug (회원가입 URL ?ref= 또는 쿠키 sb_ref) */
+  /** 뷰티 전문가 slug (회원가입 URL ?ref= 또는 쿠키 sb_ref) */
   sellerRef?: string | null;
   /** 추천인 코드 (회원가입 폼 입력 또는 URL ?code=) */
   referralCode?: string | null;

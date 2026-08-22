@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'sajunara',
+      name: 'beautymate',
       script: 'node_modules/.bin/next',
       args: 'start -p 3000 -H 0.0.0.0',
       cwd: '/home/user/webapp/app',

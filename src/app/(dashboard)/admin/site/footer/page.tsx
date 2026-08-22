@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import { FileText, Save, X } from 'lucide-react';
 
 const SLUG_META: Record<string, { label: string; iconName: string }> = {
-  "seller-guide": { label: "상담사 신청 안내", iconName: "Consultant" },
+  "seller-guide": { label: "뷰티 전문가 신청 안내", iconName: "Consultant" },
   contact:        { label: "1대1 문의",       iconName: "Mail" },
   faq:            { label: "자주 묻는 질문",  iconName: "Help" },
-  shipping:       { label: "상담 방식 안내",       iconName: "Video" },
+  shipping:       { label: "진행 방식 안내",       iconName: "Video" },
   terms:          { label: "이용약관",        iconName: "File" },
   privacy:        { label: "개인정보처리방침", iconName: "Lock" },
 };
@@ -115,7 +115,7 @@ export default function AdminFooterPage() {
       <div className="mb-5 flex items-center justify-between">
         <div>
           <h1 className="text-lg font-bold text-gray-900">푸터 콘텐츠 관리</h1>
-          <p className="text-xs text-gray-400 mt-0.5">지원 페이지(이용약관, FAQ, 상담 방식 안내 등)의 내용을 관리합니다.</p>
+          <p className="text-xs text-gray-400 mt-0.5">지원 페이지(이용약관, FAQ, 진행 방식 안내 등)의 내용을 관리합니다.</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={load} className="p-2 text-gray-400 hover:text-gray-700">

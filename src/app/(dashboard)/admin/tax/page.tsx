@@ -11,7 +11,7 @@ export default async function AdminTaxPage() {
   const session = await auth();
   if ((session?.user as any)?.role !== "SUPER_ADMIN") redirect("/");
 
-  // ── 상담사 출금 (지급완료된 PayoutRequest) ──
+  // ── 뷰티 전문가 출금 (지급완료된 PayoutRequest) ──
   let payouts: any[] = [];
   try {
     payouts = await prisma.payoutRequest.findMany({
@@ -36,7 +36,7 @@ export default async function AdminTaxPage() {
   for (const p of payouts) {
     const rec: TaxRecord = {
       id: p.id,
-      name: p.companyName || p.seller?.shopName || "상담사",
+      name: p.companyName || p.seller?.shopName || "뷰티 전문가",
       bizNumber: p.bizNumber || p.seller?.businessRegistrationNo || "",
       repName: p.seller?.representativeName || p.accountHolder || "",
       amount: Number(p.amount),

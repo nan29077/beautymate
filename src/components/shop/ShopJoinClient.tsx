@@ -1,6 +1,6 @@
 "use client";
 
-// 점집 독립 회원가입 — 신규 계정 생성 또는 (로그인 상태) 원클릭 회원 연결
+// 뷰티샵 독립 회원가입 — 신규 계정 생성 또는 (로그인 상태) 원클릭 회원 연결
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -45,7 +45,7 @@ export default function ShopJoinClient({ shop }: { shop: Shop }) {
     }
   };
 
-  // 비로그인: 신규 가입 → 자동 로그인 → 점집 복귀
+  // 비로그인: 신규 가입 → 자동 로그인 → 뷰티샵 복귀
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -90,7 +90,7 @@ export default function ShopJoinClient({ shop }: { shop: Shop }) {
           <p className="text-sm font-semibold text-gray-800">
             {shop.shopName} 회원이 되었습니다!
           </p>
-          <p className="text-xs text-gray-400 mt-1">점집 홈으로 이동합니다...</p>
+          <p className="text-xs text-gray-400 mt-1">뷰티샵 홈으로 이동합니다...</p>
         </div>
       </ShopAuthShell>
     );
@@ -99,7 +99,7 @@ export default function ShopJoinClient({ shop }: { shop: Shop }) {
   return (
     <ShopAuthShell
       shop={shop}
-      title="점집 회원가입"
+      title="뷰티샵 회원가입"
       subtitle={`${shop.shopName}의 독립 회원으로 가입합니다`}
     >
       {status === "authenticated" && session?.user ? (
@@ -186,7 +186,7 @@ export default function ShopJoinClient({ shop }: { shop: Shop }) {
           <p className="text-center text-xs text-gray-400">
             이미 회원이신가요?{" "}
             <Link href={`/shop/${shop.slug}/login`} className="text-amber-600 font-semibold hover:underline">
-              점집 로그인
+              뷰티샵 로그인
             </Link>
           </p>
         </form>

@@ -4,13 +4,13 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import SafeImage from "@/components/shared/SafeImage";
 import {  } from 'lucide-react';
-import { pickSajuAvatar } from "@/lib/defaults";
+import { pickBeautyMateAvatar } from "@/lib/defaults";
 import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
 import { LIVE_RING_CLASS } from "@/components/shared/LiveBadge";
 
 export const dynamic = "force-dynamic";
 
-// 메인 페이지 상단: 로그인한 구매회원의 "단골" 상담사 빠른 진입 + 예약내역/내정보 바로가기.
+// 메인 페이지 상단: 로그인한 구매회원의 "단골" 뷰티 전문가 빠른 진입 + 예약내역/내정보 바로가기.
 // - 비로그인/구매회원이 아닌 경우엔 로그인 유도 또는 비노출.
 export default async function HomeMyShopBar() {
   const session = await auth();
@@ -27,8 +27,8 @@ export default async function HomeMyShopBar() {
             <Icon name="Wishlist" size={16} className="fill-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-gray-900">로그인하고 단골 상담사 설정하기</p>
-            <p className="text-[11px] text-gray-500 mt-0.5">단골 상담사가 단골가게로 모여요</p>
+            <p className="text-sm font-bold text-gray-900">로그인하고 단골 뷰티 전문가 설정하기</p>
+            <p className="text-[11px] text-gray-500 mt-0.5">단골 뷰티 전문가가 단골가게로 모여요</p>
           </div>
           <Icon name="ChevronDown" size={18} className="text-brand-400 flex-shrink-0 -rotate-90" />
         </Link>
@@ -37,7 +37,7 @@ export default async function HomeMyShopBar() {
   }
 
   const role = session.user.role;
-  // 구매회원 전용 바 (상담사/관리자/브랜드는 각자 대시보드를 쓰므로 비노출)
+  // 구매회원 전용 바 (뷰티 전문가/관리자/브랜드는 각자 대시보드를 쓰므로 비노출)
   if (role && role !== "CUSTOMER") return null;
 
   const profile = await prisma.buyerProfile.findUnique({
@@ -109,7 +109,7 @@ export default async function HomeMyShopBar() {
             {picks.map((s) => {
               const live = isSellerLive(s);
               const liveStream = s.liveStreams?.[0] as { id: string; shareCode: string; externalUrl: string | null } | undefined;
-              // 진행중 인앱 라이브는 항상 사주나라 시청페이지로 연결 (외부 URL 직접연결 금지)
+              // 진행중 인앱 라이브는 항상 뷰티메이트 시청페이지로 연결 (외부 URL 직접연결 금지)
               const inAppLiveUrl = liveStream ? `/live/${liveStream.shareCode}` : null;
               const manualLink = (s as any).liveLink || null;
               // 최종 링크: 1) 진행중 라이브 → 인앱 시청페이지 2) (인앱 라이브 없는 수동표시) 수동 liveLink
@@ -122,7 +122,7 @@ export default async function HomeMyShopBar() {
                   <div className={`w-14 h-14 rounded-full overflow-hidden bg-gray-50 ${live ? LIVE_RING_CLASS : "ring-2 ring-pink-200"}`}>
                     <SafeImage
                       src={sellerProfileImage(s)}
-                      placeholder={pickSajuAvatar(s.id)}
+                      placeholder={pickBeautyMateAvatar(s.id)}
                       alt={displayName}
                       width={56}
                       height={56}
@@ -160,8 +160,8 @@ export default async function HomeMyShopBar() {
                 <Icon name="Wishlist" size={16} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-800">아직 단골 상담사가 없어요</p>
-                <p className="text-[11px] text-gray-500 mt-0.5">위에서 상담사 이름을 검색해 단골로 설정해보세요</p>
+                <p className="text-sm font-semibold text-gray-800">아직 단골 뷰티 전문가가 없어요</p>
+                <p className="text-[11px] text-gray-500 mt-0.5">위에서 뷰티 전문가 이름을 검색해 단골로 설정해보세요</p>
               </div>
             </div>
           </div>

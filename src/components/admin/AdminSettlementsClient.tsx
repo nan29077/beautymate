@@ -32,7 +32,7 @@ export default function AdminSettlementsClient({ settlements }: { settlements: S
         <div className="relative flex-1">
           <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="상담사, 캠페인 검색..."
+            placeholder="뷰티 전문가, 캠페인 검색..."
             className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white" />
           {searchQuery && <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><X size={14} /></button>}
         </div>
@@ -49,7 +49,7 @@ export default function AdminSettlementsClient({ settlements }: { settlements: S
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="text-left px-4 py-3 font-medium text-gray-500">상담사</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">뷰티 전문가</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">캠페인</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">매출</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">수수료</th>

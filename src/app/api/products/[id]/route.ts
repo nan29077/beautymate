@@ -49,7 +49,7 @@ export async function GET(
     });
 
     if (!product) {
-      return NextResponse.json({ error: "상담상품을 찾을 수 없습니다" }, { status: 404 });
+      return NextResponse.json({ error: "뷰티 서비스를 찾을 수 없습니다" }, { status: 404 });
     }
 
     // Fetch categories for the form
@@ -61,8 +61,8 @@ export async function GET(
 
     const isSeller = role === "CONSULTANT";
 
-    // 상담사 노출 공급가 = 공급가 + 관리자 마진 (공급가 없으면 판매가로 폴백)
-    // 상담사에게는 원본 공급가·마진 내역을 숨기고 합계만 공급가로 보여준다.
+    // 뷰티 전문가 노출 공급가 = 공급가 + 관리자 마진 (공급가 없으면 판매가로 폴백)
+    // 뷰티 전문가에게는 원본 공급가·마진 내역을 숨기고 합계만 공급가로 보여준다.
     const sellerSupply =
       (product.supplyPrice != null ? Number(product.supplyPrice) : Number(product.basePrice)) +
       (product.adminMargin != null ? Number(product.adminMargin) : 0);
@@ -107,16 +107,16 @@ export async function PUT(
       where: { id: params.id },
     });
     if (!product) {
-      return NextResponse.json({ error: "상담상품을 찾을 수 없습니다" }, { status: 404 });
+      return NextResponse.json({ error: "뷰티 서비스를 찾을 수 없습니다" }, { status: 404 });
     }
 
-    // Check seller ownership — 상담사는 본인이 직접 등록한 상담상품만 수정 가능
+    // Check seller ownership — 뷰티 전문가는 본인이 직접 등록한 뷰티 서비스만 수정 가능
     if (role === "CONSULTANT") {
       const sellerProfile = await prisma.sellerProfile.findUnique({
         where: { userId: session.user!.id },
       });
       if (!sellerProfile || product.sellerId !== sellerProfile.id) {
-        return NextResponse.json({ error: "본인이 등록한 상담상품만 수정할 수 있습니다" }, { status: 403 });
+        return NextResponse.json({ error: "본인이 등록한 뷰티 서비스만 수정할 수 있습니다" }, { status: 403 });
       }
     }
 
@@ -129,13 +129,13 @@ export async function PUT(
     } = body;
 
     if (!name) {
-      return NextResponse.json({ error: "상담상품명은 필수입니다" }, { status: 400 });
+      return NextResponse.json({ error: "뷰티 서비스명은 필수입니다" }, { status: 400 });
     }
 
     // 판매가 검증·수정
     let parsedBasePrice: number | undefined;
     if (basePrice === undefined || basePrice === null || basePrice === "") {
-      return NextResponse.json({ error: "상담상품명과 가격은 필수입니다" }, { status: 400 });
+      return NextResponse.json({ error: "뷰티 서비스명과 가격은 필수입니다" }, { status: 400 });
     }
     parsedBasePrice = parseFloat(String(basePrice));
     if (isNaN(parsedBasePrice) || parsedBasePrice < 0) {
@@ -144,7 +144,7 @@ export async function PUT(
 
     const variantList = Array.isArray(variants) ? variants.filter((v: any) => v.name) : null;
 
-    // 상담상품 기본 정보 업데이트
+    // 뷰티 서비스 기본 정보 업데이트
     const updateData: any = {
       name,
       description: description || null,
@@ -170,7 +170,7 @@ export async function PUT(
         updateData.comparePrice = comparePrice ? parseFloat(String(comparePrice)) : null;
       }
     }
-    // 상담사 응답의 supplyPrice는 마진이 합산된 노출용 값이므로, 상담사 요청의 공급가는 저장하지 않는다.
+    // 뷰티 전문가 응답의 supplyPrice는 마진이 합산된 노출용 값이므로, 뷰티 전문가 요청의 공급가는 저장하지 않는다.
     if (supplyPrice !== undefined && role !== "CONSULTANT") {
       updateData.supplyPrice = toMoneyOrNull(supplyPrice);
     }

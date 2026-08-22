@@ -18,8 +18,8 @@ interface BrandRef {
 interface Props {
   mode: BulkMode;
   brands?: BrandRef[];
-  // "catalog"(기본): 일반 상담상품 카탈로그 대량 등록(/api/products/bulk-register)
-  // "direct": 상담사 일반상담상품(빠른상담상품) 대량 등록(/api/seller/direct-products/bulk-register)
+  // "catalog"(기본): 일반 뷰티 서비스 카탈로그 대량 등록(/api/products/bulk-register)
+  // "direct": 뷰티 전문가 일반 뷰티 서비스(빠른뷰티 서비스) 대량 등록(/api/seller/direct-products/bulk-register)
   kind?: "catalog" | "direct";
   // 업로드 성공 후 목록 갱신 콜백. 없으면 페이지 새로고침으로 대체.
   onSuccess?: () => void;
@@ -40,7 +40,7 @@ interface UploadResult {
 const MODE_LABEL: Record<BulkMode, string> = {
   admin: "관리자",
   brand: "브랜드",
-  seller: "상담사",
+  seller: "뷰티 전문가",
   middle: "중간관리자",
 };
 
@@ -62,7 +62,7 @@ export default function BulkProductRegister({ mode, brands = [], kind = "catalog
   const [priceType, setPriceType] = useState<PriceType>("SUPPLY_PRICE");
 
   const isDirect = kind === "direct";
-  // 상담사 직접(일반)상담상품은 항상 판매가(공급가) 방식 → 유형 선택 불필요
+  // 뷰티 전문가 직접(일반)뷰티 서비스는 항상 판매가(공급가) 방식 → 유형 선택 불필요
   const showTypeStep = !isDirect && mode !== "seller";
   const isCommission = showTypeStep && priceType === "COMMISSION";
   const columns = isDirect ? DIRECT_COLUMNS : columnsForMode(mode, isCommission ? "COMMISSION" : "SUPPLY_PRICE");
@@ -71,7 +71,7 @@ export default function BulkProductRegister({ mode, brands = [], kind = "catalog
   const uploadUrl = isDirect
     ? "/api/seller/direct-products/bulk-register"
     : "/api/products/bulk-register";
-  const fileLabel = isDirect ? "일반상담상품" : MODE_LABEL[mode];
+  const fileLabel = isDirect ? "일반 뷰티 서비스" : MODE_LABEL[mode];
 
   // ── 엑셀 템플릿 생성 & 다운로드 ──
   const downloadTemplate = async () => {
@@ -96,24 +96,24 @@ export default function BulkProductRegister({ mode, brands = [], kind = "catalog
     const nCols = columns.length;
     const lastCol = nCols - 1;
 
-    // 상단 안내(병합) 문구 — 카탈로그/일반상담상품 각각에 맞게 구성 (모두 4행)
+    // 상단 안내(병합) 문구 — 카탈로그/일반 뷰티 서비스 각각에 맞게 구성 (모두 4행)
     const notices = isDirect
       ? [
-          `📋 사주나라 일반상담상품(빠른상담상품) 대량 등록 양식`,
-          `⚠️ 노란색 안내 행은 모두 삭제하고, 파란색 '상담상품명' 제목 행 아래에 상담상품 정보만 입력하세요.  (예시)로 시작하는 행은 등록되지 않습니다.`,
+          `📋 뷰티메이트 일반 뷰티 서비스(빠른뷰티 서비스) 대량 등록 양식`,
+          `⚠️ 노란색 안내 행은 모두 삭제하고, 파란색 '뷰티 서비스명' 제목 행 아래에 뷰티 서비스 정보만 입력하세요.  (예시)로 시작하는 행은 등록되지 않습니다.`,
           `🖼 이미지는 URL로 입력합니다.  · 여러 장은 쉼표(,)로 구분하며 첫 번째 이미지가 대표 이미지로 사용됩니다.  · imgur 등 이미지 호스팅의 직접 URL(.jpg/.png)을 사용하세요.`,
-          `💡 정원 칸을 비우면 0으로 등록됩니다.  · 상담상품은 배송이 없으므로 배송비/무료배송 칸은 무시됩니다.`,
+          `💡 정원 칸을 비우면 0으로 등록됩니다.  · 뷰티 서비스는 배송이 없으므로 배송비/무료배송 칸은 무시됩니다.`,
         ]
       : isCommission
       ? [
-          `📋 사주나라 상담상품 대량 등록 양식 (수수료 제공 방식)  ·  대상 계정: ${MODE_LABEL[mode]}`,
-          `⚠️ 노란색 안내 행은 모두 삭제하고, 파란색 '상담상품명' 제목 행 아래에 상담상품 정보만 입력하세요.  (예시)로 시작하는 행은 등록되지 않습니다.`,
-          `💰 이 양식은 '수수료 제공' 방식입니다.  · 판매가(소비자가)와 상담사수수료율(%)을 입력하면 상담사 수수료 금액이 자동 계산됩니다.  · 공급가 방식이 필요하면 대량등록 시 '공급가로 제공'을 선택하세요.`,
+          `📋 뷰티메이트 뷰티 서비스 대량 등록 양식 (수수료 제공 방식)  ·  대상 계정: ${MODE_LABEL[mode]}`,
+          `⚠️ 노란색 안내 행은 모두 삭제하고, 파란색 '뷰티 서비스명' 제목 행 아래에 뷰티 서비스 정보만 입력하세요.  (예시)로 시작하는 행은 등록되지 않습니다.`,
+          `💰 이 양식은 '수수료 제공' 방식입니다.  · 판매가(소비자가)와 뷰티 전문가수수료율(%)을 입력하면 뷰티 전문가 수수료 금액이 자동 계산됩니다.  · 공급가 방식이 필요하면 대량등록 시 '공급가로 제공'을 선택하세요.`,
           `🖼 이미지는 URL로 입력합니다.  · 여러 이미지 URL은 쉼표(,)로 구분합니다.  · 옵션은 '옵션명:판매가:정원' 형식이며 여러 개는 세미콜론(;)으로 구분합니다.  · 배지는 [${badgeLabels}] 중 쉼표로 구분해 입력합니다.`,
         ]
       : [
-          `📋 사주나라 상담상품 대량 등록 양식 (공급가 제공 방식)  ·  대상 계정: ${MODE_LABEL[mode]}`,
-          `⚠️ 노란색 안내 행은 모두 삭제하고, 파란색 '상담상품명' 제목 행 아래에 상담상품 정보만 입력하세요.  (예시)로 시작하는 행은 등록되지 않습니다.`,
+          `📋 뷰티메이트 뷰티 서비스 대량 등록 양식 (공급가 제공 방식)  ·  대상 계정: ${MODE_LABEL[mode]}`,
+          `⚠️ 노란색 안내 행은 모두 삭제하고, 파란색 '뷰티 서비스명' 제목 행 아래에 뷰티 서비스 정보만 입력하세요.  (예시)로 시작하는 행은 등록되지 않습니다.`,
           `🖼 이미지는 URL로 입력합니다.  · 구글 드라이브: 파일 우클릭→공유→'링크가 있는 모든 사용자'로 변경 후, 링크의 파일ID를 이용해  https://drive.google.com/uc?export=view&id=파일ID  형식으로 변환하세요.  · 또는 imgur 등 이미지 호스팅에 업로드 후 '이미지 주소 복사'로 얻은 직접 URL(.jpg/.png)을 사용하세요.`,
           `📝 여러 이미지 URL은 쉼표(,)로 구분합니다.  · 옵션은 '옵션명:판매가:정원' 형식이며 여러 개는 세미콜론(;)으로 구분합니다.  · 배지는 [${badgeLabels}] 중 쉼표로 구분해 입력합니다.`,
         ];
@@ -196,9 +196,9 @@ export default function BulkProductRegister({ mode, brands = [], kind = "catalog
     }
 
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "상담상품등록");
+    XLSX.utils.book_append_sheet(wb, ws, "뷰티 서비스등록");
 
-    // 참고 시트 (카테고리 / 브랜드 목록) — 일반상담상품은 카테고리·브랜드가 없으므로 생략
+    // 참고 시트 (카테고리 / 브랜드 목록) — 일반 뷰티 서비스는 카테고리·브랜드가 없으므로 생략
     if (!isDirect) {
       const refAoa: any[][] = [["● 아래 값은 입력 시 정확히 일치시켜야 합니다 (참고용, 편집 불필요)"], [""]];
       refAoa.push(["[카테고리 목록]"]);
@@ -216,7 +216,7 @@ export default function BulkProductRegister({ mode, brands = [], kind = "catalog
     }
 
     const priceSuffix = isDirect ? "" : isCommission ? "_수수료방식" : showTypeStep ? "_공급가방식" : "";
-    XLSX.writeFile(wb, `상담상품_대량등록_양식_${fileLabel}${priceSuffix}.xlsx`);
+    XLSX.writeFile(wb, `뷰티 서비스_대량등록_양식_${fileLabel}${priceSuffix}.xlsx`);
   };
 
   // ── 업로드 ──
@@ -230,7 +230,7 @@ export default function BulkProductRegister({ mode, brands = [], kind = "catalog
     try {
       const fd = new FormData();
       fd.append("file", file);
-      // 카탈로그(브랜드/관리자/중간관리자) 대량등록만 제공 방식 전달 (상담사 직접상담상품은 미전달)
+      // 카탈로그(브랜드/관리자/중간관리자) 대량등록만 제공 방식 전달 (뷰티 전문가 직접 뷰티 서비스는 미전달)
       if (isCommission) fd.append("priceType", "COMMISSION");
       const res = await fetch(uploadUrl, { method: "POST", body: fd });
       const d = await res.json().catch(() => ({}));
@@ -301,7 +301,7 @@ export default function BulkProductRegister({ mode, brands = [], kind = "catalog
                 <X size={16} />
               </button>
             </div>
-            <p className="text-xs text-gray-500 mb-4">등록할 상담상품의 가격 제공 방식을 선택하세요.</p>
+            <p className="text-xs text-gray-500 mb-4">등록할 뷰티 서비스의 가격 제공 방식을 선택하세요.</p>
 
             <div className="space-y-2.5">
               {/* 공급가로 제공 */}
@@ -343,7 +343,7 @@ export default function BulkProductRegister({ mode, brands = [], kind = "catalog
                 </span>
                 <span className="flex-1">
                   <span className="block text-sm font-semibold text-gray-900">수수료로 제공</span>
-                  <span className="block text-xs text-gray-500 mt-0.5">수수료 방식 엑셀 양식 (판매가 + 상담사수수료율)</span>
+                  <span className="block text-xs text-gray-500 mt-0.5">수수료 방식 엑셀 양식 (판매가 + 뷰티 전문가수수료율)</span>
                 </span>
                 <span
                   className={`mt-1 w-4 h-4 rounded-full border-2 flex-shrink-0 ${
@@ -378,7 +378,7 @@ export default function BulkProductRegister({ mode, brands = [], kind = "catalog
             <div className="flex-shrink-0 px-4 sm:px-6 pt-5 pb-3 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-2 flex-wrap">
                 <FileSpreadsheet size={20} className="text-brand-600" />
-                <h3 className="text-lg font-bold text-gray-900">{isDirect ? "일반상담상품 대량 등록" : "상담상품 대량 등록"}</h3>
+                <h3 className="text-lg font-bold text-gray-900">{isDirect ? "일반 뷰티 서비스 대량 등록" : "뷰티 서비스 대량 등록"}</h3>
                 {showTypeStep && (
                   <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${
                     isCommission ? "bg-emerald-50 text-emerald-700" : "bg-brand-50 text-brand-700"
@@ -405,7 +405,7 @@ export default function BulkProductRegister({ mode, brands = [], kind = "catalog
                   <span className="text-sm font-semibold text-gray-800">엑셀 양식 다운로드</span>
                 </div>
                 <p className="text-xs text-gray-500 leading-relaxed pl-7">
-                  양식 상단의 노란색 안내 행에 작성 방법과 예시가 있습니다. <b>안내 행은 삭제하고</b> 제목 행 아래에 상담상품 정보만 입력하세요.
+                  양식 상단의 노란색 안내 행에 작성 방법과 예시가 있습니다. <b>안내 행은 삭제하고</b> 제목 행 아래에 뷰티 서비스 정보만 입력하세요.
                   이미지는 URL로 입력합니다.
                 </p>
                 <div className="pl-7">

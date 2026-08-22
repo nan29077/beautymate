@@ -10,8 +10,8 @@ import { isMissingSchemaError } from "@/lib/safeDb";
 // B방식(OBS/PRISM → YouTube 송출)용 고정 RTMP 서버 주소
 const YOUTUBE_RTMP_URL = "rtmp://a.rtmp.youtube.com/live2";
 // 자체 RTMP 수집 서버 — 운영 도메인 변경 시 env(RTMP_INGEST_URL)로 덮어쓸 수 있다.
-// (구 사주메이트 도메인 잔재 정리 — 실제 자체 RTMP 서버 도메인이 다르면 env 로 지정)
-const SELF_RTMP_URL = process.env.RTMP_INGEST_URL || "rtmp://live.sajunara.co.kr/live";
+// (구 뷰티메이트 도메인 잔재 정리 — 실제 자체 RTMP 서버 도메인이 다르면 env 로 지정)
+const SELF_RTMP_URL = process.env.RTMP_INGEST_URL || "rtmp://live.beautymate.co.kr/live";
 
 function generateShareCode(): string {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -21,7 +21,7 @@ function generateShareCode(): string {
 }
 
 // datetime-local 값은 timezone 정보가 없어 Node.js 에서 UTC 로 해석됨.
-// 상담사는 KST 기준으로 입력하므로 +09:00 을 명시해 파싱한다.
+// 뷰티 전문가는 KST 기준으로 입력하므로 +09:00 을 명시해 파싱한다.
 function parseKstDateTime(value: string | null | undefined): Date | null {
   if (!value) return null;
   const hasTimezone = /[zZ]|[+-]\d{2}:?\d{2}$/.test(value);
@@ -30,14 +30,14 @@ function parseKstDateTime(value: string | null | undefined): Date | null {
   return new Date(`${withSeconds}+09:00`);
 }
 
-// GET: 상담사의 라이브 목록 또는 라이브 검색
+// GET: 뷰티 전문가의 라이브 목록 또는 라이브 검색
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const mode = searchParams.get("mode"); // "seller" | "search" | "detail"
   const code = searchParams.get("code");
   const query = searchParams.get("q");
 
-  // 라이브 상세 (liveId 직접 조회 - 상담사 채팅관리용)
+  // 라이브 상세 (liveId 직접 조회 - 뷰티 전문가 채팅관리용)
   const liveId = searchParams.get("liveId");
   if (mode === "detail" && liveId) {
     const live = await prisma.liveStream.findUnique({
@@ -88,7 +88,7 @@ export async function GET(req: NextRequest) {
     const { streamKey: _sk2, ...liveSafe } = live;
     const { user: _sellerUser, ...sellerRest } = live.seller;
 
-    // 점사 예약 정보 — 설정·당일 예약 수 (테이블 미반영 환경에서는 null)
+    // 뷰티 상담 예약 정보 — 설정·당일 예약 수 (테이블 미반영 환경에서는 null)
     let reservationInfo: {
       showReservationWidget: boolean;
       dailySlotLimit: number | null;
@@ -150,7 +150,7 @@ export async function GET(req: NextRequest) {
     const lives = await prisma.liveStream.findMany({
       where: searchWhere,
       include: {
-        // id 는 sellerProfileImage() 의 동물 캐릭터 해시 시드 — 누락 시 전 상담사가 동일 캐릭터로 표시됨
+        // id 는 sellerProfileImage() 의 동물 캐릭터 해시 시드 — 누락 시 전 뷰티 전문가가 동일 캐릭터로 표시됨
         seller: { select: { id: true, shopName: true, shopLogo: true, user: { select: { avatar: true } }, slug: true } },
         products: { include: { product: { select: { name: true, thumbnail: true, basePrice: true } } }, take: 3 },
         _count: { select: { products: true } },
@@ -170,15 +170,15 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // 상담사 자신의 라이브 목록
+  // 뷰티 전문가 자신의 라이브 목록
   const session = await auth();
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
 
   const role = session.user?.role;
-  if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+  if (role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가만 접근 가능" }, { status: 403 });
 
   const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-  if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+  if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
   const lives = await prisma.liveStream.findMany({
     where: { sellerId: seller.id },
@@ -200,7 +200,7 @@ export async function GET(req: NextRequest) {
   });
 }
 
-// POST: 라이브 생성 / 시작 / 종료 / 상담상품관리 / 채팅
+// POST: 라이브 생성 / 시작 / 종료 / 뷰티 서비스 관리 / 채팅
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
@@ -208,8 +208,8 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { action } = body;
 
-  // liveId 를 대상으로 하는 조작성 액션은 라이브 소유 상담사 본인(또는 관리자)만 허용.
-  // (기존에는 세션 체크만 있어 로그인한 고객이 타 상담사 라이브를 시작/종료/삭제할 수 있었다)
+  // liveId 를 대상으로 하는 조작성 액션은 라이브 소유 뷰티 전문가 본인(또는 관리자)만 허용.
+  // (기존에는 세션 체크만 있어 로그인한 고객이 타 뷰티 전문가 라이브를 시작/종료/삭제할 수 있었다)
   const OWNER_ONLY_ACTIONS = ["start", "end", "update_products", "switch_product", "kakao_notify", "delete", "update"];
   if (OWNER_ONLY_ACTIONS.includes(action)) {
     if (!body.liveId) return NextResponse.json({ error: "liveId가 필요합니다." }, { status: 400 });
@@ -217,7 +217,7 @@ export async function POST(req: NextRequest) {
     if (role !== "SUPER_ADMIN") {
       if (role !== "CONSULTANT") return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
       const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-      if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+      if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
       const target = await prisma.liveStream.findUnique({ where: { id: body.liveId }, select: { sellerId: true } });
       if (!target || target.sellerId !== seller.id) {
         return NextResponse.json({ error: "본인 라이브만 조작할 수 있습니다." }, { status: 403 });
@@ -227,10 +227,10 @@ export async function POST(req: NextRequest) {
 
   if (action === "create") {
     const role = session.user?.role;
-    if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 라이브 생성 가능" }, { status: 403 });
+    if (role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가만 라이브 생성 가능" }, { status: 403 });
 
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
     let shareCode = generateShareCode();
     while (await prisma.liveStream.findUnique({ where: { shareCode } })) {
@@ -245,7 +245,7 @@ export async function POST(req: NextRequest) {
     const externalUrl = typeof body.externalUrl === "string" && body.externalUrl.trim().length > 0
       ? body.externalUrl.trim()
       : null;
-    // YouTube 라이브(B방식): 상담사가 입력한 YouTube 스트림 키 + 유튜브 고정 RTMP 서버 저장
+    // YouTube 라이브(B방식): 뷰티 전문가가 입력한 YouTube 스트림 키 + 유튜브 고정 RTMP 서버 저장
     const isYoutube = platform === "YOUTUBE";
     const youtubeStreamKey = typeof body.streamKey === "string" && body.streamKey.trim().length > 0
       ? body.streamKey.trim()
@@ -266,7 +266,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 상담상품 추가
+    // 뷰티 서비스 추가
     if (body.productIds?.length > 0) {
       await prisma.liveStreamProduct.createMany({
         data: body.productIds.map((pid: string, idx: number) => ({
@@ -278,7 +278,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 예약 설정 (점사 예약 방식 방송) — 테이블 미반영(P2021) 환경에서는 생략
+    // 예약 설정 (뷰티 상담 예약 방식 방송) — 테이블 미반영(P2021) 환경에서는 생략
     try {
       const dailySlotLimit =
         body.dailySlotLimit != null && !Number.isNaN(parseInt(body.dailySlotLimit))
@@ -322,7 +322,7 @@ export async function POST(req: NextRequest) {
       where: { id: body.liveId },
       data: { status: "LIVE", startedAt: new Date() },
     });
-    // 라이브 상담 시작 시 점집관리 수동 라이브 스위치 자동 OFF (중복 배지 방지)
+    // 라이브 뷰티 시작 시 뷰티샵관리 수동 라이브 스위치 자동 OFF (중복 배지 방지)
     await prisma.sellerProfile.update({
       where: { id: live.sellerId },
       data: { isManualLive: false },
@@ -348,7 +348,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (action === "update_products") {
-    // 라이브 중 상담상품 교체
+    // 라이브 중 뷰티 서비스 교체
     const { liveId, productIds, livePrices } = body;
     await prisma.liveStreamProduct.deleteMany({ where: { liveStreamId: liveId } });
     if (productIds?.length > 0) {
@@ -368,9 +368,9 @@ export async function POST(req: NextRequest) {
   if (action === "update_external_url") {
     // SCHEDULED/LIVE 상태일 때만 외부 라이브 URL(및 플랫폼) 수정 허용.
     const role = session.user?.role;
-    if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 가능" }, { status: 403 });
+    if (role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가만 가능" }, { status: 403 });
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
     const target = await prisma.liveStream.findUnique({ where: { id: body.liveId } });
     if (!target || target.sellerId !== seller.id) {
@@ -398,11 +398,11 @@ export async function POST(req: NextRequest) {
   }
 
   if (action === "update_stream_key") {
-    // B방식(OBS/PRISM → YouTube 송출)용 스트림 키 저장. 상담사 본인 라이브만 가능.
+    // B방식(OBS/PRISM → YouTube 송출)용 스트림 키 저장. 뷰티 전문가 본인 라이브만 가능.
     const role = session.user?.role;
-    if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 가능" }, { status: 403 });
+    if (role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가만 가능" }, { status: 403 });
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
     const target = await prisma.liveStream.findUnique({ where: { id: body.liveId } });
     if (!target || target.sellerId !== seller.id) {
@@ -423,7 +423,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (action === "switch_product") {
-    // 라이브 중 특정 상담상품 활성화/비활성화
+    // 라이브 중 특정 뷰티 서비스 활성화/비활성화
     await prisma.liveStreamProduct.updateMany({ where: { liveStreamId: body.liveId }, data: { isActive: false } });
     if (body.productId) {
       await prisma.liveStreamProduct.updateMany({
@@ -435,11 +435,11 @@ export async function POST(req: NextRequest) {
   }
 
   if (action === "toggle_past_in_shop") {
-    // 종료된 방송을 점집 "지난 방송 상담상품" 영역에 노출할지 상담사가 방송별로 on/off
+    // 종료된 방송을 뷰티샵 "지난 방송 뷰티 서비스" 영역에 노출할지 뷰티 전문가가 방송별로 on/off
     const role = session.user?.role;
-    if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 가능" }, { status: 403 });
+    if (role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가만 가능" }, { status: 403 });
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
     const target = await prisma.liveStream.findUnique({ where: { id: body.liveId } });
     if (!target || target.sellerId !== seller.id) {
@@ -454,7 +454,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (action === "chat") {
-    // isManager/isSystem 은 body 값을 신뢰하지 않는다 — 라이브 소유 상담사·관리자만 부여 가능
+    // isManager/isSystem 은 body 값을 신뢰하지 않는다 — 라이브 소유 뷰티 전문가·관리자만 부여 가능
     let isManager = false;
     let isSystem = false;
     if (body.isManager || body.isSystem) {
@@ -493,11 +493,11 @@ export async function POST(req: NextRequest) {
   }
 
   if (action === "toggle_yt_forward") {
-    // 사이트 채팅 → YouTube 전달 on/off (상담사 본인 라이브만)
+    // 사이트 채팅 → YouTube 전달 on/off (뷰티 전문가 본인 라이브만)
     const role = session.user?.role;
-    if (role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 가능" }, { status: 403 });
+    if (role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가만 가능" }, { status: 403 });
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
     const target = await prisma.liveStream.findUnique({ where: { id: body.liveId } });
     if (!target || target.sellerId !== seller.id) {

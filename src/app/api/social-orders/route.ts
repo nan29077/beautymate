@@ -79,7 +79,7 @@ export async function POST(request: Request) {
 }
 
 // 소셜예약서 조회 (?sellerId=xxx [&productId=xxx])
-// 이름·주소·연락처 등 PII가 포함되므로 해당 점집 상담사 본인 또는 관리자만 조회 가능
+// 이름·주소·연락처 등 PII가 포함되므로 해당 뷰티샵 뷰티 전문가 본인 또는 관리자만 조회 가능
 export async function GET(request: Request) {
   try {
     const session = await auth();
@@ -105,7 +105,7 @@ export async function GET(request: Request) {
         select: { id: true },
       });
       if (!myProfile || myProfile.id !== sellerId) {
-        return NextResponse.json({ error: "본인 점집의 예약서만 조회할 수 있습니다." }, { status: 403 });
+        return NextResponse.json({ error: "본인 뷰티샵의 예약서만 조회할 수 있습니다." }, { status: 403 });
       }
     }
 
@@ -114,7 +114,7 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
     });
 
-    // 상담상품명·가격 매핑
+    // 뷰티 서비스명·가격 매핑
     const productIds = [...new Set(rows.map((r) => r.productId))];
     const products = productIds.length
       ? await prisma.product.findMany({ where: { id: { in: productIds } }, select: { id: true, name: true, basePrice: true } })
@@ -132,7 +132,7 @@ export async function GET(request: Request) {
       return {
         id: r.id,
         productId: r.productId,
-        productName: nameMap[r.productId] || "(삭제된 상담상품)",
+        productName: nameMap[r.productId] || "(삭제된 뷰티 서비스)",
         price: priceMap[r.productId] ?? 0,
         name: r.name,
         address: r.address,
@@ -155,7 +155,7 @@ export async function GET(request: Request) {
   }
 }
 
-// 소셜예약서 삭제 (상담사 본인 것만, 선택/전체)
+// 소셜예약서 삭제 (뷰티 전문가 본인 것만, 선택/전체)
 export async function DELETE(request: Request) {
   try {
     const session = await auth();
@@ -163,7 +163,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
     }
     if ((session.user as any).role !== "CONSULTANT") {
-      return NextResponse.json({ error: "상담사만 삭제할 수 있습니다." }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가만 삭제할 수 있습니다." }, { status: 403 });
     }
 
     const seller = await prisma.sellerProfile.findUnique({
@@ -171,7 +171,7 @@ export async function DELETE(request: Request) {
       select: { id: true },
     });
     if (!seller) {
-      return NextResponse.json({ error: "상담사 정보를 찾을 수 없습니다." }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가 정보를 찾을 수 없습니다." }, { status: 403 });
     }
 
     const body = await request.json().catch(() => ({}));
@@ -180,7 +180,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "삭제할 항목이 없습니다." }, { status: 400 });
     }
 
-    // 반드시 이 상담사의 소셜예약서만 삭제 (sellerId 조건으로 소유권 보장)
+    // 반드시 이 뷰티 전문가의 소셜예약서만 삭제 (sellerId 조건으로 소유권 보장)
     const result = await prisma.socialOrder.deleteMany({
       where: { id: { in: ids }, sellerId: seller.id },
     });

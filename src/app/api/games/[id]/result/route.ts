@@ -98,7 +98,7 @@ async function issueGameCoupons(
   }
 }
 
-// SEQUENTIAL: 참여자 풀에서 1등~N등 순위 추첨. 참여자가 없으면 items(상담사 입력) 폴백.
+// SEQUENTIAL: 참여자 풀에서 1등~N등 순위 추첨. 참여자가 없으면 items(뷰티 전문가 입력) 폴백.
 function computeSequential(
   cfg: Record<string, unknown>,
   participants: Participant[],
@@ -195,7 +195,7 @@ function computeWinners(type: string, cfg: Record<string, unknown>, participants
   }
 }
 
-// POST: 게임 결과 처리 (상담사만) — 당첨자 결정 후 result 저장
+// POST: 게임 결과 처리 (뷰티 전문가만) — 당첨자 결정 후 result 저장
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> | { id: string } },
@@ -205,10 +205,10 @@ export async function POST(
     const session = await auth();
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
     if (session.user.role !== "CONSULTANT") {
-      return NextResponse.json({ error: "상담사 전용" }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가 전용" }, { status: 403 });
     }
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 400 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 400 });
 
     const game = await prisma.game.findUnique({ where: { id } });
     if (!game || game.sellerId !== seller.id) {
@@ -220,7 +220,7 @@ export async function POST(
 
     let result: Record<string, unknown>;
     if (Array.isArray(body.winners) && body.winners.length > 0) {
-      // 상담사가 직접 당첨자 지정
+      // 뷰티 전문가가 직접 당첨자 지정
       result = { winners: body.winners.map((w: unknown) => String(w)) };
     } else {
       const participants = await prisma.gameParticipant.findMany({

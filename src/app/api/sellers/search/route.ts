@@ -4,7 +4,7 @@ import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
 
 export const dynamic = "force-dynamic";
 
-// 상담사 이름 검색(자동완성) — 메인 페이지 히어로 검색에서 사용.
+// 뷰티 전문가 이름 검색(자동완성) — 메인 페이지 히어로 검색에서 사용.
 // MySQL 기본 collation 으로 대소문자 무시 검색(mode:"insensitive" 사용 불가).
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -31,9 +31,9 @@ export async function GET(request: Request) {
         {
           OR: [
             { shopName: { contains: q } },
-            { user: { name: { contains: q } } }, // 상담사 실명 검색
+            { user: { name: { contains: q } } }, // 뷰티 전문가 실명 검색
             { slug: { contains: q } },
-            { referralCode: { contains: q } }, // 상담사 코드 검색
+            { referralCode: { contains: q } }, // 뷰티 전문가 코드 검색
             { mood: { contains: q } },
             { category: { contains: q } },
           ],
@@ -41,7 +41,7 @@ export async function GET(request: Request) {
       ],
     },
     select: {
-      // id 는 sellerProfileImage() 의 동물 캐릭터 해시 시드 — 누락 시 전 상담사가 동일 캐릭터로 표시됨
+      // id 는 sellerProfileImage() 의 동물 캐릭터 해시 시드 — 누락 시 전 뷰티 전문가가 동일 캐릭터로 표시됨
       id: true,
       slug: true,
       shopName: true,
@@ -73,7 +73,7 @@ export async function GET(request: Request) {
       isLive: isSellerLive(s),
       liveHref: (() => {
         const live = s.liveStreams?.[0];
-        // 진행중 인앱 라이브는 항상 사주나라 시청페이지로 연결 (외부 URL 직접연결 금지)
+        // 진행중 인앱 라이브는 항상 뷰티메이트 시청페이지로 연결 (외부 URL 직접연결 금지)
         if (live) return `/live/${live.shareCode}`;
         if (s.liveLink) return s.liveLink;
         return null;

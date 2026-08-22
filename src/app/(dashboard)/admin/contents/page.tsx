@@ -65,7 +65,7 @@ export default async function AdminContentsPage() {
             콘텐츠 관리
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            상담사 콘텐츠 승인, 쇼핑 태그 관리
+            뷰티 전문가 콘텐츠 승인, 쇼핑 태그 관리
           </p>
         </div>
       </div>

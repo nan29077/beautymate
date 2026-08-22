@@ -64,7 +64,7 @@ export default function AdminGamesClient({ rows }: { rows: GameTypeRow[] }) {
             게임관리
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            게임 유형별 상담사 노출 여부와 오버레이 스타일을 설정합니다
+            게임 유형별 뷰티 전문가 노출 여부와 오버레이 스타일을 설정합니다
           </p>
         </div>
         <button
@@ -81,7 +81,7 @@ export default function AdminGamesClient({ rows }: { rows: GameTypeRow[] }) {
       <div className="flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-lg px-4 py-3 mb-6">
         <Icon name="Warning" size={15} className="text-amber-500 mt-0.5 shrink-0" />
         <p className="text-xs text-amber-800 leading-relaxed">
-          <b>상담사 노출</b>을 끄면 해당 게임 유형은 상담사의 게임관리 화면에서 숨겨져 새로 만들 수 없습니다.
+          <b>뷰티 전문가 노출</b>을 끄면 해당 게임 유형은 뷰티 전문가의 게임관리 화면에서 숨겨져 새로 만들 수 없습니다.
           <b>오버레이 스타일</b>은 <b>?overlay=true</b> 방송 화면의 표시 방식을 결정합니다.
           (기존 스타일 = 현재 동작 그대로, 새 카드 스타일 = 로고·제목·게임 카드 레이아웃)
         </p>
@@ -94,7 +94,7 @@ export default function AdminGamesClient({ rows }: { rows: GameTypeRow[] }) {
             <tr className="bg-gray-50 text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
               <th className="px-4 py-3">게임 유형</th>
               <th className="px-4 py-3">설명</th>
-              <th className="px-4 py-3 text-center whitespace-nowrap">상담사 노출</th>
+              <th className="px-4 py-3 text-center whitespace-nowrap">뷰티 전문가 노출</th>
               <th className="px-4 py-3">오버레이 스타일</th>
             </tr>
           </thead>
@@ -164,7 +164,7 @@ export default function AdminGamesClient({ rows }: { rows: GameTypeRow[] }) {
   );
 }
 
-/* ─── 상담사 노출 스위치 ─── */
+/* ─── 뷰티 전문가 노출 스위치 ─── */
 function Toggle({
   checked,
   onChange,
@@ -179,7 +179,7 @@ function Toggle({
       type="button"
       role="switch"
       aria-checked={checked}
-      aria-label={`${label} 상담사 노출`}
+      aria-label={`${label} 뷰티 전문가 노출`}
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
         checked ? "bg-brand-500" : "bg-gray-200"

@@ -157,7 +157,7 @@ export default function FeatureSettingsForm({
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
-            { label: "상담사 정산 주기", value: settlementDays, set: setSettlementDays },
+            { label: "뷰티 전문가 정산 주기", value: settlementDays, set: setSettlementDays },
             { label: "중간관리자 정산 주기", value: middleSettleDays, set: setMiddleSettleDays },
             { label: "브랜드사 정산 주기", value: brandSettleDays, set: setBrandSettleDays },
           ].map((f) => (

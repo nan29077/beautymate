@@ -240,13 +240,13 @@ export default function MobileImmersiveComponent({
                     <span className="text-white/30">{msg.message}</span>
                   ) : (
                     <span className="inline-flex items-baseline gap-1">
-                      {/* 출처 배지: YouTube 실시간 채팅 vs 사주나라 앱 채팅 */}
+                      {/* 출처 배지: YouTube 실시간 채팅 vs 뷰티메이트 앱 채팅 */}
                       {msg.isYoutube ? (
                         <span title="YouTube 채팅" className="inline-flex items-center justify-center h-[13px] px-0.5 rounded bg-[#FF0000] flex-shrink-0 self-center">
                           <Youtube size={9} className="text-white" />
                         </span>
                       ) : (
-                        <img src="/favicon.png" alt="사주나라" title="사주나라 채팅" className="w-[13px] h-[13px] rounded-[3px] flex-shrink-0 self-center" />
+                        <img src="/favicon.png" alt="뷰티메이트" title="뷰티메이트 채팅" className="w-[13px] h-[13px] rounded-[3px] flex-shrink-0 self-center" />
                       )}
                       <span className="font-semibold text-white/70">{msg.nickname}</span>
                       <span className="text-white/50">{msg.message}</span>
@@ -257,7 +257,7 @@ export default function MobileImmersiveComponent({
             </div>
           </div>
 
-          {/* 현재 방송 중인 상담상품 바 */}
+          {/* 현재 방송 중인 뷰티 서비스 바 */}
           {exposedProduct && (
             <div
               className="bg-white px-3 py-2.5 flex items-center gap-2.5 shadow-[0_-4px_16px_rgba(0,0,0,0.18)] cursor-pointer"
@@ -296,7 +296,7 @@ export default function MobileImmersiveComponent({
             </div>
           )}
 
-          {/* 채팅 입력창 + 라이브상담상품 버튼 (한 줄, 맨 하단) */}
+          {/* 채팅 입력창 + 라이브뷰티 서비스 버튼 (한 줄, 맨 하단) */}
           <div
             className="px-3 flex items-center gap-2"
             style={{ paddingTop: "0.5rem", paddingBottom: "max(0.625rem, env(safe-area-inset-bottom))" }}
@@ -314,14 +314,14 @@ export default function MobileImmersiveComponent({
                 <Gamepad2 size={16} className="text-white" />
               </a>
             )}
-            {/* 라이브상담상품 버튼 */}
+            {/* 라이브뷰티 서비스 버튼 */}
             <button
               onClick={onOpenMobilePurchase}
               className="h-10 px-3 rounded-full flex items-center gap-1.5 text-white relative flex-shrink-0 shadow-lg"
               style={{ backgroundColor: AMBER }}
             >
               <BookOpen size={15} />
-              <span className="text-[11px] font-bold whitespace-nowrap text-black">라이브상담상품</span>
+              <span className="text-[11px] font-bold whitespace-nowrap text-black">라이브뷰티 서비스</span>
               {products.length > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-white text-[7px] font-bold rounded-full flex items-center justify-center" style={{ color: AMBER }}>{products.length}</span>
               )}

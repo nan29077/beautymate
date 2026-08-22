@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET: 상담사 설정 통합 조회 (브랜드 설정 구조와 동일한 형태로 반환)
+// GET: 뷰티 전문가 설정 통합 조회 (브랜드 설정 구조와 동일한 형태로 반환)
 export async function GET() {
   try {
     const session = await auth();
@@ -43,7 +43,7 @@ export async function GET() {
         },
       },
     });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필이 없습니다" }, { status: 404 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필이 없습니다" }, { status: 404 });
 
     return NextResponse.json({ seller });
   } catch (error) {
@@ -52,7 +52,7 @@ export async function GET() {
   }
 }
 
-// PUT: 상담사 설정 통합 수정
+// PUT: 뷰티 전문가 설정 통합 수정
 export async function PUT(req: NextRequest) {
   try {
     const session = await auth();
@@ -64,7 +64,7 @@ export async function PUT(req: NextRequest) {
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필이 없습니다" }, { status: 404 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필이 없습니다" }, { status: 404 });
 
     const body = await req.json();
     const {
@@ -77,7 +77,7 @@ export async function PUT(req: NextRequest) {
     const normalizedBusinessType = businessType || "non_business";
 
     if (!shopName) {
-      return NextResponse.json({ error: "상담사명은 필수입니다" }, { status: 400 });
+      return NextResponse.json({ error: "뷰티 전문가명은 필수입니다" }, { status: 400 });
     }
 
     await prisma.sellerProfile.update({

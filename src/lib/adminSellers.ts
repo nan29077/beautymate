@@ -4,7 +4,7 @@ import { getSettlementDate, startOfDay } from "@/lib/businessDays";
 import { safeQuery } from "@/lib/safeDb";
 
 /**
- * 관리자 화면(/admin/sellers, /admin/users 상담사 탭)에서 공용으로 쓰는 상담사 목록.
+ * 관리자 화면(/admin/sellers, /admin/users 뷰티 전문가 탭)에서 공용으로 쓰는 뷰티 전문가 목록.
  * 두 화면이 같은 AdminSellersClient 를 렌더하므로 데이터도 한 곳에서 만든다.
  */
 export async function getAdminSellers() {
@@ -26,7 +26,7 @@ export async function getAdminSellers() {
     orderBy: { createdAt: "desc" },
   });
 
-  // 상담사별 예약 건수 (reservations 테이블 미반영 시 0)
+  // 뷰티 전문가별 예약 건수 (reservations 테이블 미반영 시 0)
   const reservationCounts = await safeQuery(
     "adminSellers reservation counts",
     () => prisma.reservation.groupBy({ by: ["sellerId"], _count: { _all: true } }),

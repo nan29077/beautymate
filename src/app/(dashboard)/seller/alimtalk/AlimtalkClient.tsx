@@ -49,13 +49,13 @@ const CHARGE_OPTIONS = [
 ];
 
 const TEMPLATES = [
-  { id: "live-start", category: "방송시작", Icon: Radio, badgeColor: "bg-red-100 text-red-700", content: "{상담사명}님의 라이브 방송이 시작되었습니다! 지금 바로 참여하세요" },
-  { id: "delivery", category: "상담 시작", Icon: Clock, badgeColor: "bg-blue-100 text-blue-700", content: "{상담사명}님과의 상담이 곧 시작됩니다. 예약 시간을 확인해 주세요." },
-  { id: "campaign-success", category: "단체 상담 성공", Icon: CheckCircle, badgeColor: "bg-green-100 text-green-700", content: "{캠페인명} 단체 상담이 목표 달성에 성공했습니다! 곧 상담 방식이 시작됩니다." },
-  { id: "campaign-fail", category: "단체 상담 실패", Icon: AlertCircle, badgeColor: "bg-red-100 text-red-700", content: "{캠페인명} 단체 상담이 미달로 종료되었습니다. 결제가 취소됩니다." },
-  { id: "order-confirm", category: "예약확인", Icon: Calendar, badgeColor: "bg-purple-100 text-purple-700", content: "{상담상품명} 예약이 완료되었습니다. 예약번호: {예약번호}" },
-  { id: "review-request", category: "후기요청", Icon: Star, badgeColor: "bg-yellow-100 text-yellow-700", content: "{상담상품명} 구매 후기를 남겨주시면 포인트를 드립니다!" },
-  { id: "campaign-deadline", category: "캠페인 마감임박", Icon: Clock, badgeColor: "bg-orange-100 text-orange-700", content: "{캠페인명} 단체 상담이 {시간}후 마감됩니다. 서두르세요!" },
+  { id: "live-start", category: "방송시작", Icon: Radio, badgeColor: "bg-red-100 text-red-700", content: "{뷰티 전문가명}님의 라이브 방송이 시작되었습니다! 지금 바로 참여하세요" },
+  { id: "delivery", category: "상담 시작", Icon: Clock, badgeColor: "bg-blue-100 text-blue-700", content: "{뷰티 전문가명}님과의 상담이 곧 시작됩니다. 예약 시간을 확인해 주세요." },
+  { id: "campaign-success", category: "공동 프로모션 성공", Icon: CheckCircle, badgeColor: "bg-green-100 text-green-700", content: "{캠페인명} 공동 프로모션이 목표 달성에 성공했습니다! 곧 진행 방식이 시작됩니다." },
+  { id: "campaign-fail", category: "공동 프로모션 실패", Icon: AlertCircle, badgeColor: "bg-red-100 text-red-700", content: "{캠페인명} 공동 프로모션이 미달로 종료되었습니다. 결제가 취소됩니다." },
+  { id: "order-confirm", category: "예약확인", Icon: Calendar, badgeColor: "bg-purple-100 text-purple-700", content: "{뷰티 서비스명} 예약이 완료되었습니다. 예약번호: {예약번호}" },
+  { id: "review-request", category: "후기요청", Icon: Star, badgeColor: "bg-yellow-100 text-yellow-700", content: "{뷰티 서비스명} 구매 후기를 남겨주시면 포인트를 드립니다!" },
+  { id: "campaign-deadline", category: "캠페인 마감임박", Icon: Clock, badgeColor: "bg-orange-100 text-orange-700", content: "{캠페인명} 공동 프로모션이 {시간}후 마감됩니다. 서두르세요!" },
 ];
 
 export default function AlimtalkClient() {
@@ -188,7 +188,7 @@ export default function AlimtalkClient() {
                 <h2 className="font-semibold text-gray-800 mb-2">알림톡이란?</h2>
                 <p className="text-sm text-gray-600 leading-relaxed">
                   카카오 비즈니스 채널을 통해 고객에게 라이브 방송 시작, 예약 확인 등의 알림을 발송하는 서비스입니다.
-                  발신 계정과 템플릿은 관리자가 통합 관리하며, 여기에서는 내 점집 명의로 발송된 내역을 확인할 수 있습니다.
+                  발신 계정과 템플릿은 관리자가 통합 관리하며, 여기에서는 내 뷰티샵 명의로 발송된 내역을 확인할 수 있습니다.
                 </p>
               </div>
               <div className="bg-white rounded-lg shadow-sm p-5">

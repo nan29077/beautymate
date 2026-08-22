@@ -4,13 +4,13 @@ import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
 
 export const dynamic = "force-dynamic";
 
-// 라이브 코드(shareCode) 또는 상담사명/슬러그로 상담사를 검색해 상담사 카드 정보를 반환.
-// (지난 방송 결과는 노출하지 않고, 상담사의 "현재 라이브 여부"만 함께 내려준다.)
+// 라이브 코드(shareCode) 또는 뷰티 전문가명/슬러그로 뷰티 전문가를 검색해 뷰티 전문가 카드 정보를 반환.
+// (지난 방송 결과는 노출하지 않고, 뷰티 전문가의 "현재 라이브 여부"만 함께 내려준다.)
 export async function GET(req: NextRequest) {
   const q = (new URL(req.url).searchParams.get("q") || "").trim();
   if (!q) return NextResponse.json({ sellers: [] });
 
-  // 1) 상담사명/슬러그 매칭
+  // 1) 뷰티 전문가명/슬러그 매칭
   const byName = await prisma.sellerProfile.findMany({
     where: {
       isApproved: true,
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     take: 20,
   });
 
-  // 2) 라이브 코드(shareCode) 정확 매칭 → 해당 상담사
+  // 2) 라이브 코드(shareCode) 정확 매칭 → 해당 뷰티 전문가
   const byCode = await prisma.liveStream.findMany({
     where: { shareCode: q },
     select: {

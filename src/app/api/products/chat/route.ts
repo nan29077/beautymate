@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     // Verify the user has access to this product
     if (role === "CONSULTANT") {
       const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-      if (!seller) return NextResponse.json({ error: "상담사 정보 없음" }, { status: 403 });
+      if (!seller) return NextResponse.json({ error: "뷰티 전문가 정보 없음" }, { status: 403 });
       const shopProduct = await prisma.sellerShopProduct.findFirst({
         where: { sellerId: seller.id, productId },
       });
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     // Verify access
     if (role === "CONSULTANT") {
       const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-      if (!seller) return NextResponse.json({ error: "상담사 정보 없음" }, { status: 403 });
+      if (!seller) return NextResponse.json({ error: "뷰티 전문가 정보 없음" }, { status: 403 });
       const shopProduct = await prisma.sellerShopProduct.findFirst({
         where: { sellerId: seller.id, productId },
       });

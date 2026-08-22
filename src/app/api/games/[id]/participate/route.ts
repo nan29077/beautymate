@@ -55,7 +55,7 @@ export async function POST(
     if (!usesParticipants(game.type)) {
       return NextResponse.json({ error: "시청자 참여가 없는 게임입니다" }, { status: 400 });
     }
-    // 상담사가 '참여 열기'(RUNNING)한 동안에만 참여 가능
+    // 뷰티 전문가가 '참여 열기'(RUNNING)한 동안에만 참여 가능
     if (game.status !== "RUNNING") {
       return NextResponse.json({ error: "현재 참여 가능한 게임이 아닙니다" }, { status: 400 });
     }
@@ -174,7 +174,7 @@ export async function POST(
   }
 }
 
-// GET: 참여자 목록 (게임 오너 상담사만)
+// GET: 참여자 목록 (게임 오너 뷰티 전문가만)
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> | { id: string } },
@@ -184,10 +184,10 @@ export async function GET(
     const session = await auth();
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
     if (session.user.role !== "CONSULTANT") {
-      return NextResponse.json({ error: "상담사 전용" }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가 전용" }, { status: 403 });
     }
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 400 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 400 });
 
     const game = await prisma.game.findUnique({ where: { id }, select: { sellerId: true } });
     if (!game || game.sellerId !== seller.id) {

@@ -6,10 +6,10 @@ import { X } from 'lucide-react';
 import SavedPopup from "@/components/shared/SavedPopup";
 
 const SLUG_META: Record<string, { label: string; iconName: string }> = {
-  "seller-guide": { label: "상담사 신청 안내", iconName: "Inquiry" },
+  "seller-guide": { label: "뷰티 전문가 신청 안내", iconName: "Inquiry" },
   contact:        { label: "1대1 문의",             iconName: "Message" },
   faq:            { label: "자주 묻는 질문",         iconName: "Help" },
-  shipping:       { label: "상담 방식 안내",              iconName: "Shipping" },
+  shipping:       { label: "진행 방식 안내",              iconName: "Shipping" },
   terms:          { label: "이용약관",               iconName: "Receipt" },
   privacy:        { label: "개인정보처리방침",        iconName: "Lock" },
 };
@@ -207,7 +207,7 @@ export default function FooterContentManager() {
     <div>
       <SavedPopup show={showSavedPopup} onClose={() => setShowSavedPopup(false)} />
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-        <p className="text-xs text-gray-400">지원 페이지(이용약관, FAQ, 상담 방식 안내 등)의 내용을 관리합니다.</p>
+        <p className="text-xs text-gray-400">지원 페이지(이용약관, FAQ, 진행 방식 안내 등)의 내용을 관리합니다.</p>
         <div className="flex items-center justify-end gap-2 w-full sm:w-auto">
           <button onClick={load} className="p-2 text-gray-400 hover:text-gray-700">
             <Icon name="Reorder" size={16} />

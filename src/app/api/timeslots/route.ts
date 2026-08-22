@@ -6,19 +6,19 @@ import { safeQuery, isMissingSchemaError } from "@/lib/safeDb";
 export const dynamic = "force-dynamic";
 
 // GET /api/timeslots?consultantId=&date=YYYY-MM-DD — 가용 슬롯 조회 (공개)
-// 단, all=true(예약자 정보 포함 전체 슬롯)는 해당 상담사 본인·관리자만 허용
+// 단, all=true(예약자 정보 포함 전체 슬롯)는 해당 뷰티 전문가 본인·관리자만 허용
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const consultantId = url.searchParams.get("consultantId"); // User.id
   const date = url.searchParams.get("date"); // YYYY-MM-DD
   const month = url.searchParams.get("month"); // YYYY-MM (월별 유무 확인용)
-  const allSlots = url.searchParams.get("all") === "true"; // 상담사 관리용: 전체 슬롯
+  const allSlots = url.searchParams.get("all") === "true"; // 뷰티 전문가 관리용: 전체 슬롯
 
   if (!consultantId) {
     return NextResponse.json({ error: "consultantId가 필요합니다." }, { status: 400 });
   }
 
-  // all=true 응답에는 예약 고객명이 포함되므로 본인(상담사)·관리자 외에는 거부
+  // all=true 응답에는 예약 고객명이 포함되므로 본인(뷰티 전문가)·관리자 외에는 거부
   if (allSlots) {
     const session = await auth();
     const role = session?.user?.role;
@@ -86,11 +86,11 @@ export async function GET(request: Request) {
   return NextResponse.json({ error: "date 또는 month 파라미터가 필요합니다." }, { status: 400 });
 }
 
-// POST /api/timeslots — 슬롯 생성 (상담사 본인만)
+// POST /api/timeslots — 슬롯 생성 (뷰티 전문가 본인만)
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user || session.user.role !== "CONSULTANT") {
-    return NextResponse.json({ error: "상담사만 예약 시간을 등록할 수 있습니다." }, { status: 403 });
+    return NextResponse.json({ error: "뷰티 전문가만 예약 시간을 등록할 수 있습니다." }, { status: 403 });
   }
 
   const body = await request.json();

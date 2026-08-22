@@ -19,7 +19,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="${REPO_DIR:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 CLEANUP_SCRIPT="$REPO_DIR/scripts/cleanup-pending.sh"
 LOG_FILE="$REPO_DIR/logs/cleanup-pending.log"
-MARKER="# sellerbricks-cleanup-pending"
+MARKER="# beautymate-cleanup-pending"
 
 log() { printf '[setup-cleanup-cron] %s\n' "$*"; }
 

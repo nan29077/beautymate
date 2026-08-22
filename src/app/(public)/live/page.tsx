@@ -6,7 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Loader2 } from 'lucide-react';
 import SafeImage from "@/components/shared/SafeImage";
-import { pickSajuAvatar } from "@/lib/defaults";
+import { pickBeautyMateAvatar } from "@/lib/defaults";
 import { useFeatureFlags } from "@/components/shared/FeatureFlagsProvider";
 import { LIVE_RING_CLASS, OnAirBadge } from "@/components/shared/LiveBadge";
 
@@ -49,7 +49,7 @@ function LiveSearchInner() {
     } catch {} finally { setLoading(false); }
   };
 
-  // 마운트 시 찜한 상담사 중 현재 라이브 중인 분 조회
+  // 마운트 시 찜한 뷰티 전문가 중 현재 라이브 중인 분 조회
   useEffect(() => {
     fetch("/api/live/my-live-picks")
       .then(r => r.json())
@@ -78,7 +78,7 @@ function LiveSearchInner() {
               <Icon name="NetworkError" size={22} className="text-gray-400" />
             </div>
             <p className="text-sm font-bold text-gray-900 mb-1">라이브 링크가 연결되어 있지 않습니다</p>
-            <p className="text-xs text-gray-400 mb-5">상담사가 아직 라이브 링크를 설정하지 않았습니다.</p>
+            <p className="text-xs text-gray-400 mb-5">뷰티 전문가가 아직 라이브 링크를 설정하지 않았습니다.</p>
             <button
               onClick={() => setNoLinkPopup(false)}
               className="w-full py-2.5 rounded-xl bg-gray-900 text-white text-sm font-bold"
@@ -98,7 +98,7 @@ function LiveSearchInner() {
           <div className="flex-1 relative">
             <input
               type="text"
-              placeholder="라이브 코드 또는 상담사명으로 검색"
+              placeholder="라이브 코드 또는 뷰티 전문가명으로 검색"
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -114,12 +114,12 @@ function LiveSearchInner() {
       </div>
 
       <div className="px-4 py-4">
-        {/* 단골 상담사 라이브 중 섹션 (검색 전, 로그인한 유저에게만 표시) */}
+        {/* 단골 뷰티 전문가 라이브 중 섹션 (검색 전, 로그인한 유저에게만 표시) */}
         {!searched && !favLoading && favLiveSellers.length > 0 && (
           <div className="mb-6">
             <p className="text-xs font-bold text-gray-500 mb-3 flex items-center gap-1.5">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-              단골 상담사 라이브 중
+              단골 뷰티 전문가 라이브 중
             </p>
             <div className="space-y-3">
               {favLiveSellers.map(s => (
@@ -134,8 +134,8 @@ function LiveSearchInner() {
             <Icon name="Live" size={48} className="mx-auto text-gray-200 mb-4" />
             <h2 className="text-base font-bold text-gray-800 mb-2">라이브 찾기</h2>
             <p className="text-sm text-gray-400 leading-relaxed">
-              상담사에게 받은 라이브 코드나<br />
-              상담사 이름으로 라이브를 검색하세요.
+              뷰티 전문가에게 받은 라이브 코드나<br />
+              뷰티 전문가 이름으로 라이브를 검색하세요.
             </p>
           </div>
         ) : loading ? (
@@ -151,7 +151,7 @@ function LiveSearchInner() {
           </div>
         ) : (
           <div className="space-y-3">
-            <p className="text-xs text-gray-400 mb-3">상담사 {results.length}명을 찾았어요</p>
+            <p className="text-xs text-gray-400 mb-3">뷰티 전문가 {results.length}명을 찾았어요</p>
             {results.map(s => (
               <SellerCardItem key={s.slug} s={s} onNoLink={() => setNoLinkPopup(true)} />
             ))}
@@ -218,12 +218,12 @@ function SellerCardItem({ s, onNoLink }: { s: SellerCard; onNoLink: () => void }
         </button>
       ) : (
         <Link href={`/shop/${s.slug}`} className="mt-3 w-full inline-flex items-center justify-center gap-1.5 bg-gray-900 text-white text-sm font-bold py-2.5 rounded-xl hover:bg-gray-800">
-          상담사 점집으로 이동
+          뷰티 전문가 뷰티샵으로 이동
         </Link>
       )}
       {s.isLive && (
         <Link href={`/shop/${s.slug}`} className="mt-2 w-full inline-flex items-center justify-center gap-1.5 bg-gray-100 text-gray-700 text-sm font-bold py-2.5 rounded-xl hover:bg-gray-200">
-          라이브 점집 바로가기
+          라이브 뷰티샵 바로가기
         </Link>
       )}
     </div>
@@ -234,7 +234,7 @@ function SellerCardAvatar({ s }: { s: SellerCard }) {
   return (
     <div className="flex-shrink-0">
       <div className={`w-14 h-14 rounded-full overflow-hidden bg-gray-50 ${s.isLive ? LIVE_RING_CLASS : "ring-2 ring-brand-100"}`}>
-        <SafeImage src={s.profileImage} placeholder={pickSajuAvatar(s.id)} alt={s.name || s.shopName} width={56} height={56} fallbackText={(s.name || s.shopName).charAt(0)} />
+        <SafeImage src={s.profileImage} placeholder={pickBeautyMateAvatar(s.id)} alt={s.name || s.shopName} width={56} height={56} fallbackText={(s.name || s.shopName).charAt(0)} />
       </div>
     </div>
   );

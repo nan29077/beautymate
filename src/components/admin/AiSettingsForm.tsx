@@ -408,7 +408,7 @@ export default function AiSettingsForm({
       <div className="bg-white rounded-xl border border-gray-100 p-5">
         <h3 className="text-sm font-bold text-gray-900 mb-2">사용 위치</h3>
         <ul className="text-[12px] text-gray-500 space-y-1.5 list-disc pl-4">
-          <li>상담사 상담 화면 → 상담 종료 → 메모 입력 후 &ldquo;AI 요약&rdquo; 버튼</li>
+          <li>뷰티 전문가 상담 화면 → 상담 종료 → 메모 입력 후 &ldquo;AI 요약&rdquo; 버튼</li>
           <li>요약 결과는 예약의 AI 요약으로 저장되어 고객 이력·CRM에서 조회됩니다</li>
           <li>키가 없으면 요약 버튼이 &ldquo;관리자 설정에서 OpenAI 키를 등록해주세요&rdquo; 안내를 표시합니다</li>
         </ul>

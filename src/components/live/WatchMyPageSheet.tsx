@@ -67,7 +67,7 @@ const ORDER_STATUS_LABEL: Record<string, string> = {
   PAID: "결제완료",
   CONFIRMED: "확인됨",
   SHIPPING: "상담 진행중",
-  DELIVERED: "상담 완료",
+  DELIVERED: "서비스 완료",
   CANCELLED: "취소됨",
   REFUND_REQUESTED: "환불요청",
   REFUNDED: "환불완료",
@@ -116,8 +116,8 @@ export default function WatchMyPageSheet({ open, onClose }: Props) {
     ? [
         { href: "/my/orders", icon: Calendar, label: "예약 내역", count: data.counts.orders },
         { href: "/my/reviews", icon: Star, label: "내 후기", count: data.counts.reviews },
-        { href: "/my/wishlist", icon: Heart, label: "찜한 상담상품", count: data.counts.wishlists },
-        { href: "/my/seller", icon: Users, label: "단골 상담사", count: data.pickedSellers.length || null },
+        { href: "/my/wishlist", icon: Heart, label: "찜한 뷰티 서비스", count: data.counts.wishlists },
+        { href: "/my/seller", icon: Users, label: "단골 뷰티 전문가", count: data.pickedSellers.length || null },
         { href: "/my/game-coupons", icon: Gift, label: "게임 쿠폰", count: data.gameCouponCount || null },
       ]
     : [];
@@ -272,14 +272,14 @@ export default function WatchMyPageSheet({ open, onClose }: Props) {
                 </div>
               )}
 
-              {/* ─── 단골 상담사 미리보기 ─── */}
+              {/* ─── 단골 뷰티 전문가 미리보기 ─── */}
               {data.pickedSellers.length > 0 && (
                 <div className="px-4 mb-4">
                   <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden">
                     <div className="flex items-center justify-between px-4 pt-3 pb-2">
                       <p className="text-xs font-bold text-gray-200 flex items-center gap-1.5">
                         <Heart size={13} className="text-pink-400 fill-pink-400" />
-                        내 단골 상담사
+                        내 단골 뷰티 전문가
                       </p>
                       <Link
                         href="/my/seller"
@@ -355,13 +355,13 @@ export default function WatchMyPageSheet({ open, onClose }: Props) {
                 </div>
               </div>
 
-              {/* ─── 찜한 상담상품 ─── */}
+              {/* ─── 찜한 뷰티 서비스 ─── */}
               <div className="px-4 mb-4">
                 <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden">
                   <div className="flex items-center justify-between px-4 pt-3 pb-2">
                     <p className="text-xs font-bold text-gray-200">
                       <Heart size={13} className="inline-block mr-1 text-rose-400 fill-rose-400" />
-                      내가 찜한 상담상품
+                      내가 찜한 뷰티 서비스
                     </p>
                     {data.counts.wishlists > 0 && (
                       <Link
@@ -421,7 +421,7 @@ export default function WatchMyPageSheet({ open, onClose }: Props) {
                   ) : (
                     <div className="text-center py-8 text-gray-600 px-4">
                       <Heart size={30} strokeWidth={1.5} className="mx-auto mb-2 opacity-30" />
-                      <p className="text-xs">아직 찜한 상담상품이 없습니다.</p>
+                      <p className="text-xs">아직 찜한 뷰티 서비스가 없습니다.</p>
                     </div>
                   )}
                 </div>
@@ -445,7 +445,7 @@ export default function WatchMyPageSheet({ open, onClose }: Props) {
                         >
                           <div className="min-w-0 flex-1 pr-2">
                             <p className="text-sm font-bold text-gray-200 truncate">
-                              {order.items[0]?.productName || "예약 상담상품"}
+                              {order.items[0]?.productName || "예약 뷰티 서비스"}
                               {order.items.length > 1 && (
                                 <span className="text-[11px] font-normal text-gray-500">
                                   {" "}외 {order.items.length - 1}건
@@ -481,7 +481,7 @@ export default function WatchMyPageSheet({ open, onClose }: Props) {
                 </div>
               </div>
 
-              {/* ─── 상담사 입점 신청 ─── */}
+              {/* ─── 뷰티 전문가 입점 신청 ─── */}
               {!data.sellerApplied && (
                 <div className="px-4 mb-4">
                   <Link
@@ -491,8 +491,8 @@ export default function WatchMyPageSheet({ open, onClose }: Props) {
                   >
                     <Building2 size={18} className="text-amber-400" />
                     <div className="flex-1">
-                      <p className="text-sm font-bold text-gray-200">상담사로 활동하기</p>
-                      <p className="text-[11px] text-gray-500">상담사 입점 신청하기</p>
+                      <p className="text-sm font-bold text-gray-200">뷰티 전문가로 활동하기</p>
+                      <p className="text-[11px] text-gray-500">뷰티 전문가 입점 신청하기</p>
                     </div>
                     <ChevronRight size={16} className="text-gray-600" />
                   </Link>

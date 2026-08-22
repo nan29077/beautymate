@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ valid: false, error: "만료된 쿠폰입니다." });
       }
       if (sellerId && gameUserCoupon.sellerId !== sellerId) {
-        return NextResponse.json({ valid: false, error: "이 상담사 점집에서는 사용할 수 없는 쿠폰입니다." });
+        return NextResponse.json({ valid: false, error: "이 뷰티 전문가 뷰티샵에서는 사용할 수 없는 쿠폰입니다." });
       }
       const gc = gameUserCoupon.gameCoupon;
       const minOrder = Number(gc?.minOrderAmount ?? 0);

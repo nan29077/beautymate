@@ -110,9 +110,9 @@ export default function PendingSellerApproval({ applications, currentUserId }: P
               type="button"
               onClick={() => window.open(`/products/${app.productId}`, "_blank")}
               className="flex items-center gap-1 text-[10px] px-2.5 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg font-medium hover:bg-gray-50 transition-colors whitespace-nowrap"
-              title="상담상품 상세 보기"
+              title="뷰티 서비스 상세 보기"
             >
-              <Icon name="ArrowRight" size={12} className="shrink-0" /> 상담상품 상세 보기
+              <Icon name="ArrowRight" size={12} className="shrink-0" /> 뷰티 서비스 상세 보기
             </button>
             <ProductChatPanel
               productId={app.productId}

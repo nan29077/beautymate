@@ -21,7 +21,7 @@ export default function SellerShopFooter({ sellerInfo }: SellerShopFooterProps) 
   const [usageOpen, setUsageOpen] = useState(false);
   const [usagePolicy, setUsagePolicy] = useState<string | null>(null);
 
-  // 최고관리자 "라이브 점집 정책 > 이용 안내"(usagePolicy)를 불러와 표시
+  // 최고관리자 "라이브 뷰티샵 정책 > 이용 안내"(usagePolicy)를 불러와 표시
   useEffect(() => {
     fetch("/api/admin/site-config")
       .then((r) => r.json())
@@ -33,7 +33,7 @@ export default function SellerShopFooter({ sellerInfo }: SellerShopFooterProps) 
 
   const isBusiness = sellerInfo.businessType === "business";
 
-  // 표시할 상담사 사업자 정보 행 (값이 있는 항목만)
+  // 표시할 뷰티 전문가 사업자 정보 행 (값이 있는 항목만)
   const rows: { label: string; value: string }[] = [
     { label: "상호", value: sellerInfo.shopName },
     ...(sellerInfo.representativeName ? [{ label: "대표자", value: sellerInfo.representativeName }] : []),
@@ -46,7 +46,7 @@ export default function SellerShopFooter({ sellerInfo }: SellerShopFooterProps) 
   return (
     <footer className="mt-8 border-t border-gray-100 bg-gray-50">
       <div className="px-4 py-5 space-y-3">
-        {/* ── 판매자(상담사) 사업자 정보 ── */}
+        {/* ── 판매자(뷰티 전문가) 사업자 정보 ── */}
         <div>
           <div className="flex items-center gap-1.5 mb-2">
             <Icon name="Sparkles" size={13} className="text-gray-400" />
@@ -66,7 +66,7 @@ export default function SellerShopFooter({ sellerInfo }: SellerShopFooterProps) 
           </div>
         </div>
 
-        {/* ── 통신판매중개자(사주나라) 고지 ── */}
+        {/* ── 통신판매중개자(뷰티메이트) 고지 ── */}
         <div className="rounded-xl bg-white border border-gray-100 overflow-hidden">
           <button
             type="button"
@@ -75,7 +75,7 @@ export default function SellerShopFooter({ sellerInfo }: SellerShopFooterProps) 
           >
             <Icon name="Info" size={13} className="text-gray-400 flex-shrink-0" />
             <span className="flex-1 text-[10.5px] text-gray-500 leading-snug">
-              <b className="text-gray-600 font-semibold">사주나라는 통신판매중개자</b>이며 거래의 당사자가 아닙니다.
+              <b className="text-gray-600 font-semibold">뷰티메이트는 통신판매중개자</b>이며 거래의 당사자가 아닙니다.
             </span>
             <span className="text-[9px] text-gray-400 flex items-center gap-0.5 flex-shrink-0">
               자세히 보기
@@ -86,8 +86,8 @@ export default function SellerShopFooter({ sellerInfo }: SellerShopFooterProps) 
           {open && (
             <div className="px-3 pb-3 pt-0.5 border-t border-gray-50 animate-fade-in">
               <p className="text-[10px] text-gray-500 leading-relaxed mt-2">
-                사주나라는 통신판매중개자로서 통신판매의 당사자가 아니며, 상담상품의 예약·상담 방식·환불 등 거래에 대한
-                의무와 책임은 판매자(상담사)에게 있습니다. 사주나라는 거래 시스템(플랫폼)을 제공할 뿐 개별 거래에 대해서는
+                뷰티메이트는 통신판매중개자로서 통신판매의 당사자가 아니며, 뷰티 서비스의 예약·진행 방식·환불 등 거래에 대한
+                의무와 책임은 판매자(뷰티 전문가)에게 있습니다. 뷰티메이트는 거래 시스템(플랫폼)을 제공할 뿐 개별 거래에 대해서는
                 책임을 지지 않습니다.
               </p>
               <div className="mt-3 pt-3 border-t border-gray-50 space-y-0.5 text-[10px] text-gray-400 leading-relaxed">
@@ -128,7 +128,7 @@ export default function SellerShopFooter({ sellerInfo }: SellerShopFooterProps) 
         )}
 
         <p className="text-[10px] text-gray-400 text-center pt-1">
-          &copy; {new Date().getFullYear()} 사주나라. All rights reserved.
+          &copy; {new Date().getFullYear()} 뷰티메이트. All rights reserved.
         </p>
       </div>
     </footer>

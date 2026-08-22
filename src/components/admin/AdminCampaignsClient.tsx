@@ -43,7 +43,7 @@ export default function AdminCampaignsClient({ campaigns }: { campaigns: Campaig
     <>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">단체 상담 관리</h1>
+          <h1 className="text-xl font-bold text-gray-900">공동 프로모션 관리</h1>
           <p className="text-sm text-gray-500">총 {campaigns.length}개</p>
         </div>
       </div>
@@ -56,7 +56,7 @@ export default function AdminCampaignsClient({ campaigns }: { campaigns: Campaig
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="캠페인명, 상담사, 상담상품, 브랜드 검색..."
+            placeholder="캠페인명, 뷰티 전문가, 뷰티 서비스, 브랜드 검색..."
             className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
           />
           {searchQuery && (
@@ -70,7 +70,7 @@ export default function AdminCampaignsClient({ campaigns }: { campaigns: Campaig
       {filtered.length === 0 ? (
         <div className="text-center py-20 text-gray-400 bg-white rounded-xl border border-gray-100">
           <Icon name="Cart" size={48} strokeWidth={1.5} className="mx-auto mb-3 opacity-30" />
-          <p className="text-sm">{searchQuery ? "검색 결과가 없습니다." : "등록된 단체 상담이 없습니다."}</p>
+          <p className="text-sm">{searchQuery ? "검색 결과가 없습니다." : "등록된 공동 프로모션이 없습니다."}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -83,7 +83,7 @@ export default function AdminCampaignsClient({ campaigns }: { campaigns: Campaig
                     <p className="text-sm font-medium text-gray-900">{c.title}</p>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                       <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium">
-                        상담사: {c.sellerName}
+                        뷰티 전문가: {c.sellerName}
                       </span>
                       {c.brandName && (
                         <span className="text-[10px] text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded font-medium">

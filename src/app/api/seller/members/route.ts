@@ -5,7 +5,7 @@ import { safeQuery } from "@/lib/safeDb";
 
 export const dynamic = "force-dynamic";
 
-// GET /api/seller/members — 내 점집 회원 목록 (상담사 전용)
+// GET /api/seller/members — 내 뷰티샵 회원 목록 (뷰티 전문가 전용)
 export async function GET(request: Request) {
   const session = await auth();
   if (!session?.user || session.user.role !== "CONSULTANT") {
@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     select: { id: true },
   });
   if (!seller) {
-    return NextResponse.json({ error: "상담사 프로필이 없습니다." }, { status: 404 });
+    return NextResponse.json({ error: "뷰티 전문가 프로필이 없습니다." }, { status: 404 });
   }
 
   const url = new URL(request.url);

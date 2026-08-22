@@ -60,7 +60,7 @@ export default function SettingsClient() {
       try {
         const res = await fetch("/api/seller/settings");
         if (!res.ok) {
-          setError("상담사 정보를 불러올 수 없습니다");
+          setError("뷰티 전문가 정보를 불러올 수 없습니다");
           setLoading(false);
           return;
         }
@@ -100,7 +100,7 @@ export default function SettingsClient() {
 
   const handleSave = async () => {
     if (!form.shopName) {
-      setError("상담사명은 필수입니다");
+      setError("뷰티 전문가명은 필수입니다");
       return;
     }
     setSaving(true);
@@ -113,10 +113,10 @@ export default function SettingsClient() {
         body: JSON.stringify(form),
       });
       if (res.ok) {
-        setSuccess("상담사 정보가 수정되었습니다");
+        setSuccess("뷰티 전문가 정보가 수정되었습니다");
         setTimeout(() => setSuccess(""), 3000);
         setShowSavedPopup(true);
-        // 사이드바 상담사명 즉시 반영 (서버 컴포넌트 재렌더)
+        // 사이드바 뷰티 전문가명 즉시 반영 (서버 컴포넌트 재렌더)
         router.refresh();
       } else {
         const data = await res.json();
@@ -172,14 +172,14 @@ export default function SettingsClient() {
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-center">
           <Loader2 size={32} className="animate-spin text-brand-500 mx-auto mb-3" />
-          <p className="text-sm text-gray-400">상담사 정보를 불러오는 중...</p>
+          <p className="text-sm text-gray-400">뷰티 전문가 정보를 불러오는 중...</p>
         </div>
       </div>
     );
   }
 
   const sections = [
-    { key: "seller" as const, label: "상담사 정보", icon: Building2 },
+    { key: "seller" as const, label: "뷰티 전문가 정보", icon: Building2 },
     { key: "business" as const, label: "사업자 정보", icon: Briefcase },
     { key: "contact" as const, label: "담당자 연락처", icon: Phone },
     { key: "settlement" as const, label: "정산 계좌", icon: FileText },
@@ -213,9 +213,9 @@ export default function SettingsClient() {
         <div>
           <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
             <Icon name="Settings" size={20} className="text-gray-400" />
-            상담사 설정
+            뷰티 전문가 설정
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">상담사 정보를 관리하고 수정합니다</p>
+          <p className="text-sm text-gray-500 mt-0.5">뷰티 전문가 정보를 관리하고 수정합니다</p>
         </div>
         <div className="flex items-center gap-2">
           <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full ${isApproved ? "text-green-600 bg-green-50 border border-green-200" : "text-yellow-600 bg-yellow-50 border border-yellow-200"}`}>
@@ -258,21 +258,21 @@ export default function SettingsClient() {
         {activeSection === "seller" && (
           <div className="space-y-5">
             <div className="text-sm font-semibold text-gray-900 mb-1 flex items-center gap-2">
-              <Icon name="Sparkles" size={16} className="text-brand-500" /> 상담사 기본 정보
+              <Icon name="Sparkles" size={16} className="text-brand-500" /> 뷰티 전문가 기본 정보
             </div>
 
             {/* Shop Name */}
             <div>
-              <label className="text-xs font-medium text-gray-600">상담사명 *</label>
+              <label className="text-xs font-medium text-gray-600">뷰티 전문가명 *</label>
               <input type="text" className="input-field mt-1 text-sm" value={form.shopName}
-                onChange={e => setForm({ ...form, shopName: e.target.value })} placeholder="상담사(점집) 이름" />
+                onChange={e => setForm({ ...form, shopName: e.target.value })} placeholder="뷰티 전문가(뷰티샵) 이름" />
             </div>
 
             {/* Description */}
             <div>
-              <label className="text-xs font-medium text-gray-600">상담사 소개</label>
+              <label className="text-xs font-medium text-gray-600">뷰티 전문가 소개</label>
               <textarea className="input-field mt-1 h-28 resize-none text-sm" value={form.shopDescription}
-                onChange={e => setForm({ ...form, shopDescription: e.target.value })} placeholder="상담사를 소개해주세요..." />
+                onChange={e => setForm({ ...form, shopDescription: e.target.value })} placeholder="뷰티 전문가를 소개해주세요..." />
               <p className="text-[10px] text-gray-400 mt-1">{form.shopDescription.length}/500자</p>
             </div>
           </div>
@@ -347,7 +347,7 @@ export default function SettingsClient() {
             <div>
               <label className="text-xs font-medium text-gray-600">업태 / 업종</label>
               <input type="text" className="input-field mt-1 text-sm" value={form.businessCategory}
-                onChange={e => setForm({ ...form, businessCategory: e.target.value })} placeholder="예: 사주 / 타로 상담" />
+                onChange={e => setForm({ ...form, businessCategory: e.target.value })} placeholder="예: 뷰티 / 퍼스널 컬러 상담" />
             </div>
           </div>
         )}
@@ -413,7 +413,7 @@ export default function SettingsClient() {
             </div>
             <div className="bg-blue-50 rounded-xl p-3">
               <p className="text-[11px] text-blue-700">
-                운영 중인 SNS 채널 링크를 등록하세요. 점집 페이지에 노출됩니다.
+                운영 중인 SNS 채널 링크를 등록하세요. 뷰티샵 페이지에 노출됩니다.
               </p>
             </div>
             {snsFields.map(f => (

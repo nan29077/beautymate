@@ -1,22 +1,18 @@
 // 역할별 아바타 목록
-import { SAJU_CUSTOMER_AVATARS } from "@/lib/defaults";
+import { BEAUTYMATE_CUSTOMER_AVATARS } from "@/lib/defaults";
 
 export const AVATAR_SETS = {
   // CUSTOMER (구매회원)
-  BUYER_MALE: Array.from({ length: 13 }, (_, i) => `/avatars/남성구매회원_${i + 1}.png`),
-  BUYER_FEMALE: Array.from({ length: 13 }, (_, i) => `/avatars/여성구매회원_${i + 1}.png`),
+  BUYER_MALE: BEAUTYMATE_CUSTOMER_AVATARS,
+  BUYER_FEMALE: BEAUTYMATE_CUSTOMER_AVATARS,
 
   // SUPER_ADMIN (관리자)
-  ADMIN: Array.from({ length: 5 }, (_, i) => `/avatars/관리자_${i + 1}.png`),
-  ADMIN_MALE: [
-    "/avatars/관리자_2.png",
-    "/avatars/관리자_3.png",
-    "/avatars/관리자_5.png",
-  ],
-  ADMIN_FEMALE: ["/avatars/관리자_1.png", "/avatars/관리자_4.png"],
+  ADMIN: BEAUTYMATE_CUSTOMER_AVATARS,
+  ADMIN_MALE: BEAUTYMATE_CUSTOMER_AVATARS,
+  ADMIN_FEMALE: BEAUTYMATE_CUSTOMER_AVATARS,
 
-  // CONSULTANT (상담사) — 사주 동물 캐릭터 풀 사용 (기존 꿀벌 캐릭터 폐기)
-  CONSULTANT: SAJU_CUSTOMER_AVATARS,
+  // CONSULTANT (뷰티 전문가) — 뷰티 동물 캐릭터 풀 사용 (기존 꿀벌 캐릭터 폐기)
+  CONSULTANT: BEAUTYMATE_CUSTOMER_AVATARS,
 };
 
 function randomFrom(arr: string[]): string {

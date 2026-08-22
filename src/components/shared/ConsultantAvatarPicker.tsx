@@ -3,17 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, X, Upload, Loader2 } from "lucide-react";
-import { SAJU_CUSTOMER_AVATARS } from "@/lib/defaults";
+import { BEAUTYMATE_CUSTOMER_AVATARS } from "@/lib/defaults";
 import ImageUploader from "@/components/shared/ImageUploader";
 
-// 상담사 프로필(동물 캐릭터) 선택 UI.
-// 가입 시 랜덤 배정된 사주 동물 캐릭터를 다른 캐릭터로 바꾸거나, 직접 사진을 올릴 수 있다.
-// 저장 대상은 User.avatar (점집 로고 shopLogo 와는 별개).
+// 뷰티 전문가 프로필(동물 캐릭터) 선택 UI.
+// 가입 시 랜덤 배정된 뷰티 동물 캐릭터를 다른 캐릭터로 바꾸거나, 직접 사진을 올릴 수 있다.
+// 저장 대상은 User.avatar (뷰티샵 로고 shopLogo 와는 별개).
 
 interface Props {
   /** 현재 확정된 표시 이미지 (동물 캐릭터 또는 업로드 이미지) */
   currentImage: string;
-  /** 점집 로고가 설정돼 있으면 공개 페이지에서는 로고가 우선한다 — 안내용 */
+  /** 뷰티샵 로고가 설정돼 있으면 공개 페이지에서는 로고가 우선한다 — 안내용 */
   hasShopLogo?: boolean;
 }
 
@@ -51,8 +51,8 @@ export default function ConsultantAvatarPicker({ currentImage, hasShopLogo = fal
     <div className="bg-white rounded-xl border border-gray-100 p-5">
       <h3 className="text-sm font-bold text-gray-900 mb-1">내 프로필 캐릭터</h3>
       <p className="text-[10px] text-gray-400 mb-4">
-        대시보드와 상담사 목록에 표시됩니다.
-        {hasShopLogo && " 점집 페이지에서는 위에서 설정한 점집 로고가 우선 표시됩니다."}
+        대시보드와 뷰티 전문가 목록에 표시됩니다.
+        {hasShopLogo && " 뷰티샵 페이지에서는 위에서 설정한 뷰티샵 로고가 우선 표시됩니다."}
       </p>
 
       <div className="flex items-center gap-4">
@@ -73,7 +73,7 @@ export default function ConsultantAvatarPicker({ currentImage, hasShopLogo = fal
             </p>
           )}
           <p className="text-[10px] text-gray-400 mt-2">
-            사주나라 동물 캐릭터 {SAJU_CUSTOMER_AVATARS.length}종 중에서 고르거나 직접 올릴 수 있어요.
+            뷰티메이트 동물 캐릭터 {BEAUTYMATE_CUSTOMER_AVATARS.length}종 중에서 고르거나 직접 올릴 수 있어요.
           </p>
         </div>
       </div>
@@ -93,9 +93,9 @@ export default function ConsultantAvatarPicker({ currentImage, hasShopLogo = fal
             </div>
 
             <div className="flex-1 overflow-y-auto px-5 py-4">
-              <p className="text-[11px] font-semibold text-gray-500 mb-2">사주 동물 캐릭터</p>
+              <p className="text-[11px] font-semibold text-gray-500 mb-2">뷰티 동물 캐릭터</p>
               <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
-                {SAJU_CUSTOMER_AVATARS.map((src) => (
+                {BEAUTYMATE_CUSTOMER_AVATARS.map((src) => (
                   <button
                     key={src}
                     type="button"

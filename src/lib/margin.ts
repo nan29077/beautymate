@@ -3,11 +3,11 @@
  *
  * 정책은 최고관리자만 설정한다.
  * - 브랜드: 방식(PERCENTAGE | SUPPLY_BASE) + (퍼센트일 때) 기준가(SUPPLY | SALE) + 요율
- * - 상담사: 판매가 기준 퍼센트 요율만
+ * - 뷰티 전문가: 판매가 기준 퍼센트 요율만
  *
  * 마진 발생 경로는 두 가지이며 서로 독립적이다.
- * 1) 브랜드 마진: 브랜드 상담상품이 팔릴 때마다 발생 (상담상품 등록 시 단가 마진을 스냅샷 저장)
- * 2) 상담사 마진: 상담사가 판매할 때 판매가 대비 요율
+ * 1) 브랜드 마진: 브랜드 뷰티 서비스가 팔릴 때마다 발생 (뷰티 서비스 등록 시 단가 마진을 스냅샷 저장)
+ * 2) 뷰티 전문가 마진: 뷰티 전문가가 판매할 때 판매가 대비 요율
  */
 
 export type MarginMethod = "PERCENTAGE" | "SUPPLY_BASE";
@@ -28,8 +28,8 @@ function round(n: number): number {
 }
 
 /**
- * 브랜드 상담상품의 "단가 기준" 중간관리자 마진을 산출한다.
- * 상담상품 등록/수정 시점에 호출하여 Product.middleAdminMargin 에 스냅샷으로 저장한다.
+ * 브랜드 뷰티 서비스의 "단가 기준" 중간관리자 마진을 산출한다.
+ * 뷰티 서비스 등록/수정 시점에 호출하여 Product.middleAdminMargin 에 스냅샷으로 저장한다.
  *
  * @param method      마진 방식 (브랜드 정책)
  * @param base        퍼센트일 때 기준가
@@ -61,9 +61,9 @@ export function computeBrandUnitMargin(opts: {
 }
 
 /**
- * 상담사 채널 마진 (예약 시점, 판매가 대비 퍼센트).
- * @param saleAmount 판매가 × 수량 (해당 상담사 매출)
- * @param rate       상담사 마진율(%)
+ * 뷰티 전문가 채널 마진 (예약 시점, 판매가 대비 퍼센트).
+ * @param saleAmount 판매가 × 수량 (해당 뷰티 전문가 매출)
+ * @param rate       뷰티 전문가 마진율(%)
  */
 export function computeSellerMargin(saleAmount: number, rate: number): number {
   if (!rate || rate <= 0) return 0;

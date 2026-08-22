@@ -32,7 +32,7 @@ interface Props {
 
 const ROLE_COLORS: Record<string, { bg: string; text: string; label: string }> = {
   SUPER_ADMIN: { bg: "bg-red-50", text: "text-red-600", label: "관리자" },
-  CONSULTANT: { bg: "bg-blue-50", text: "text-blue-600", label: "상담사" },
+  CONSULTANT: { bg: "bg-blue-50", text: "text-blue-600", label: "뷰티 전문가" },
 };
 
 export default function ProductSellerChatPanel({ productId, productName, currentUserId, sellers, className }: Props) {
@@ -192,7 +192,7 @@ export default function ProductSellerChatPanel({ productId, productName, current
                             <p className="text-[10px] text-gray-400">
                               {seller.isActive !== undefined
                                 ? (seller.isActive ? "판매중" : "대기중")
-                                : "상담사"}
+                                : "뷰티 전문가"}
                             </p>
                           </div>
                           <Icon name="ChevronDown" size={16} className="text-gray-300 flex-shrink-0 -rotate-90" />

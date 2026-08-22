@@ -26,7 +26,7 @@ export default async function SellerCustomerDetailPage({
 
   const { customerId } = await Promise.resolve(params);
 
-  // 본인이 상담한 예약만 조회 — 다른 상담사의 고객 정보는 볼 수 없다.
+  // 본인이 상담한 예약만 조회 — 다른 뷰티 전문가의 고객 정보는 볼 수 없다.
   const reservations = await safeQuery("seller customer detail reservations", () =>
     prisma.reservation.findMany({
       where: { sellerId: seller.id, userId: customerId },
@@ -59,7 +59,7 @@ export default async function SellerCustomerDetailPage({
     name: latest.customerName || latest.user?.name || "-",
     phone: latest.customerPhone || latest.user?.phone || "-",
     email: latest.user?.email ?? null,
-    // 생년월일/성별/태어난 시각은 값이 입력된 가장 최근 예약 기준
+    // 선택 프로필 정보는 값이 입력된 가장 최근 예약 기준
     birthDate: reservations.find((r) => r.birthDate)?.birthDate ?? null,
     birthTime: reservations.find((r) => r.birthTime)?.birthTime ?? null,
     gender: reservations.find((r) => r.gender)?.gender ?? null,

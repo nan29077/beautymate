@@ -20,7 +20,7 @@ export async function GET() {
       },
     });
 
-    // 상담사 점집 정보 매핑 (UserGameCoupon.sellerId → SellerProfile)
+    // 뷰티 전문가 뷰티샵 정보 매핑 (UserGameCoupon.sellerId → SellerProfile)
     const sellerIds = Array.from(new Set(coupons.map((c) => c.sellerId)));
     const sellers = await prisma.sellerProfile.findMany({
       where: { id: { in: sellerIds.length ? sellerIds : ["__none__"] } },
@@ -51,7 +51,7 @@ export async function GET() {
           productId: (c.gameCoupon as any)?.productId ?? null,
           gameTitle: gameMap.get(c.gameId) ?? "게임",
           sellerId: c.sellerId,
-          sellerName: seller?.shopName ?? "상담사 점집",
+          sellerName: seller?.shopName ?? "뷰티 전문가 뷰티샵",
           sellerSlug: seller?.slug ?? null,
           usedAt: c.usedAt ? c.usedAt.toISOString() : null,
           expiresAt: c.expiresAt.toISOString(),

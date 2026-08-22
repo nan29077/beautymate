@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// GET: 콘텐츠 목록 조회 (상담사용 - 자기 콘텐츠, 관리자용 - 전체)
+// GET: 콘텐츠 목록 조회 (뷰티 전문가용 - 자기 콘텐츠, 관리자용 - 전체)
 export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 400 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 400 });
     where.sellerId = seller.id;
   } else {
     return NextResponse.json({ error: "권한 없음" }, { status: 403 });
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ posts: serialized });
 }
 
-// POST: 콘텐츠 생성 (상담사)
+// POST: 콘텐츠 생성 (뷰티 전문가)
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
@@ -77,12 +77,12 @@ export async function POST(req: NextRequest) {
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 400 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 400 });
     sellerId = seller.id;
   } else {
     // Admin: sellerId can be in body
     sellerId = body.sellerId;
-    if (!sellerId) return NextResponse.json({ error: "상담사 ID 필요" }, { status: 400 });
+    if (!sellerId) return NextResponse.json({ error: "뷰티 전문가 ID 필요" }, { status: 400 });
   }
 
   try {
@@ -139,7 +139,7 @@ export async function DELETE(req: NextRequest) {
   const post = await prisma.contentPost.findUnique({ where: { id: postId } });
   if (!post) return NextResponse.json({ error: "콘텐츠 없음" }, { status: 404 });
 
-  // 상담사는 자기 콘텐츠만 삭제 가능
+  // 뷰티 전문가는 자기 콘텐츠만 삭제 가능
   if (role === "CONSULTANT") {
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
@@ -193,7 +193,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ post: updated });
   }
 
-  // 상담사: 자기 콘텐츠만 수정
+  // 뷰티 전문가: 자기 콘텐츠만 수정
   if (role === "CONSULTANT") {
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },

@@ -9,9 +9,9 @@ import { X, Mail, Bot, User, Coffee, Loader2 } from 'lucide-react';
 const DETAIL_PATHS = [/^\/products\/[^/]+$/, /^\/campaigns\/[^/]+$/, /^\/cart$/];
 
 const DEFAULT_FAQ_DATA = [
-  { q: "상담 방식은 얼마나 걸리나요?", a: "일반 상담 방식은 결제 완료 후 2~5일 이내에 진행됩니다." },
-  { q: "교환/반품은 어떻게 하나요?", a: "상담상품 수령 후 7일 이내 마이페이지 > 예약내역에서 교환/반품 신청이 가능합니다." },
-  { q: "상담사가 되려면 어떻게 하나요?", a: "회원가입 후 상담사 신청 페이지에서 사업자 정보를 입력하시면 관리자 승인 후 상담사 활동이 가능합니다." },
+  { q: "진행 방식은 얼마나 걸리나요?", a: "일반 진행 방식은 결제 완료 후 2~5일 이내에 진행됩니다." },
+  { q: "교환/반품은 어떻게 하나요?", a: "뷰티 서비스 수령 후 7일 이내 마이페이지 > 예약내역에서 교환/반품 신청이 가능합니다." },
+  { q: "뷰티 전문가가 되려면 어떻게 하나요?", a: "회원가입 후 뷰티 전문가 신청 페이지에서 사업자 정보를 입력하시면 관리자 승인 후 뷰티 전문가 활동이 가능합니다." },
   { q: "결제 수단은 무엇이 있나요?", a: "신용카드, 체크카드, 네이버페이, 카카오페이, 토스페이 등 다양한 결제 수단을 지원합니다." },
   { q: "할인 코드는 어떻게 사용하나요?", a: "결제 시 할인 코드 입력란에 코드를 입력하면 자동으로 할인이 적용됩니다." },
 ];
@@ -91,10 +91,10 @@ export default function FloatingButtons() {
   useEffect(() => {
     if (showChat && chatMessages.length === 0) {
       const greeting = contactSettings
-        ? `안녕하세요! 사주나라 고객센터입니다.
+        ? `안녕하세요! 뷰티메이트 고객센터입니다.
 ${contactSettings.operatingHours} | ${contactSettings.lunchBreak}
 궁금한 점이 있으시면 아래 질문을 선택하거나 직접 입력해주세요.`
-        : "안녕하세요! 사주나라 고객센터입니다. 궁금한 점이 있으시면 아래 자주 묻는 질문을 선택하거나, 직접 입력해주세요.";
+        : "안녕하세요! 뷰티메이트 고객센터입니다. 궁금한 점이 있으시면 아래 자주 묻는 질문을 선택하거나, 직접 입력해주세요.";
       setChatMessages([{ role: "bot", text: greeting }]);
     }
   }, [showChat]);
@@ -118,7 +118,7 @@ ${contactSettings.operatingHours} | ${contactSettings.lunchBreak}
   const isDetailPage = DETAIL_PATHS.some((p) => p.test(pathname));
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  // 상담상품/캠페인 상세 페이지: 구매 바(bottom-14=56px + 높이~72px = ~128px)보다 위에 위치
+  // 뷰티 서비스/캠페인 상세 페이지: 구매 바(bottom-14=56px + 높이~72px = ~128px)보다 위에 위치
   // 일반 페이지: 하단 탭바(56px) + 여백
   const scrollTopBottom = isDetailPage
     ? "calc(140px + env(safe-area-inset-bottom, 0px))"
@@ -223,7 +223,7 @@ ${contactSettings.operatingHours} | ${contactSettings.lunchBreak}
             {/* Header */}
             <div className="bg-brand-600 text-white px-4 py-3 flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-2">
-                <Bot size={18} /> <span className="text-sm font-bold">사주나라 FAQ</span>
+                <Bot size={18} /> <span className="text-sm font-bold">뷰티메이트 FAQ</span>
               </div>
               <div className="flex items-center gap-1">
                 <button onClick={handleEndChat} className="p-1 hover:bg-white/20 rounded-lg text-[10px] px-2 py-1 bg-white/10">종료</button>

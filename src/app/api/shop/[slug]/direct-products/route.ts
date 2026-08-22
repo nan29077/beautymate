@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// 공개 API: 점집의 노출(isEnabled=true) + 선택된 활성 일반상담상품 목록 반환
+// 공개 API: 뷰티샵의 노출(isEnabled=true) + 선택된 활성 일반 뷰티 서비스 목록 반환
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> | { slug: string } }) {
   const { slug } = await Promise.resolve(params);
 
@@ -23,7 +23,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
     where: { sellerId: seller.id, id: { in: selectedIds }, isActive: true },
   });
 
-  // 상담사가 지정한 선택 순서 유지
+  // 뷰티 전문가가 지정한 선택 순서 유지
   const orderMap = new Map(selectedIds.map((id, idx) => [id, idx]));
   const sorted = products.sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0));
 

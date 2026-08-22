@@ -5,7 +5,7 @@ import {
   isValidSellerSlug,
   linkReferralForNewBuyer,
 } from "@/lib/referral";
-import { randomAvatar, randomSajuAvatar, pickRoleAvatar } from "@/lib/defaults";
+import { randomAvatar, randomBeautyMateAvatar, pickRoleAvatar } from "@/lib/defaults";
 import { getRegisterFieldSettings } from "@/lib/settings";
 import { notifySignupWelcome } from "@/lib/alimtalkTriggers";
 
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       sellerRef: sellerRefFromBody, referralCode,
     } = await request.json();
 
-    // 상담사 귀속은 URL ?ref= 에서 전달된 body 값만 신뢰한다.
+    // 뷰티 전문가 귀속은 URL ?ref= 에서 전달된 body 값만 신뢰한다.
     const sellerRef: string | null =
       typeof sellerRefFromBody === "string" && isValidSellerSlug(sellerRefFromBody)
         ? sellerRefFromBody
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 12);
     const userRole = role === "CONSULTANT" ? "CONSULTANT" : "CUSTOMER";
 
-    // 상담사 slug — 이메일 앞부분 기반. 이미 사용 중이면 타임스탬프 suffix 로 충돌(P2002) 방지
+    // 뷰티 전문가 slug — 이메일 앞부분 기반. 이미 사용 중이면 타임스탬프 suffix 로 충돌(P2002) 방지
     let consultantSlug: string | null = null;
     if (userRole === "CONSULTANT") {
       const baseSlug = emailTrimmed.split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, "-");
@@ -83,12 +83,12 @@ export async function POST(request: NextRequest) {
           ? pickRoleAvatar(emailTrimmed, "CONSULTANT")
           : sellerRef
             ? randomAvatar(genderPick)
-            : randomSajuAvatar(),
+            : randomBeautyMateAvatar(),
         ...(userRole === "CONSULTANT" && {
           sellerProfile: {
             create: {
               slug: consultantSlug!,
-              shopName: `${nameTrimmed}의 점집`,
+              shopName: `${nameTrimmed}의 뷰티샵`,
               isApproved: false,
             },
           },
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       userId: user.id,
       role: userRole,
       message: userRole === "CONSULTANT"
-        ? "상담사 가입이 완료되었습니다. 관리자 승인 후 서비스를 이용할 수 있습니다."
+        ? "뷰티 전문가 가입이 완료되었습니다. 관리자 승인 후 서비스를 이용할 수 있습니다."
         : "회원가입이 완료되었습니다. 바로 로그인하실 수 있습니다.",
       needsApproval: userRole === "CONSULTANT",
     });

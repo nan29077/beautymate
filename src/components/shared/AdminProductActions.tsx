@@ -152,7 +152,7 @@ export default function AdminProductActions({ type, brands, shopProductId, produ
         onClick={() => setShowMarginInput(true)}
         disabled={loading}
         className="flex items-center gap-1 px-2 py-1 rounded-lg bg-green-50 text-green-700 hover:bg-green-100 transition-colors text-[10px] font-medium"
-        title="상담상품 승인 (마진 설정)"
+        title="뷰티 서비스 승인 (마진 설정)"
       >
         <Icon name="Certified" size={10} />
         승인
@@ -168,22 +168,22 @@ export default function AdminProductActions({ type, brands, shopProductId, produ
           className="btn-primary text-sm"
         >
           <Icon name="Plus" size={16} className="mr-1" />
-          상담상품 등록
+          뷰티 서비스 등록
         </button>
 
         {showForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-              <h3 className="text-lg font-bold mb-4">새 상담상품 등록</h3>
+              <h3 className="text-lg font-bold mb-4">새 뷰티 서비스 등록</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">상담상품명 *</label>
+                  <label className="text-sm font-medium text-gray-700">뷰티 서비스명 *</label>
                   <input
                     type="text"
                     className="input-field mt-1"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="상담상품명"
+                    placeholder="뷰티 서비스명"
                   />
                 </div>
                 <div>
@@ -215,7 +215,7 @@ export default function AdminProductActions({ type, brands, shopProductId, produ
                     className="input-field mt-1 h-20 resize-none"
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    placeholder="상담상품 설명"
+                    placeholder="뷰티 서비스 설명"
                   />
                 </div>
               </div>

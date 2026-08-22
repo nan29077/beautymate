@@ -42,7 +42,7 @@ interface Props {
   shopName: string;
   defaultAccountHolder: string;
   defaultIsBusiness: boolean;
-  // 설정(상담사 정보 · 정산 계좌)에 등록해 둔 값 — 출금 폼 초기값으로 채운다
+  // 설정(뷰티 전문가 정보 · 정산 계좌)에 등록해 둔 값 — 출금 폼 초기값으로 채운다
   defaultCompanyName?: string;
   defaultBizNumber?: string;
   defaultBankName?: string;
@@ -81,7 +81,7 @@ export default function SellerSettlementClient({
 
   // 출금 요청 폼 상태
   const [reqAmount, setReqAmount] = useState<string>("");
-  // 사업자 여부는 상담사 프로필 값으로 고정된다(서버도 프로필 기준으로만 판단).
+  // 사업자 여부는 뷰티 전문가 프로필 값으로 고정된다(서버도 프로필 기준으로만 판단).
   // 여기서 임의로 바꿀 수 있으면 화면의 원천징수 미리보기가 실제 지급액과 어긋난다.
   const reqIsBusiness = defaultIsBusiness;
   const [reqBizNumber, setReqBizNumber] = useState(defaultBizNumber);
@@ -181,7 +181,7 @@ export default function SellerSettlementClient({
     return { sales, avail, scheduled, payout };
   }, [viewYear, viewMonth, salesByDate, confirmedByDate, pendingByDate, payoutsByDate]);
 
-  // 정산 예정(정산일 도래 전) 예약을 A타입(내 상담상품)/B타입(신청상담상품)으로 구분
+  // 정산 예정(정산일 도래 전) 예약을 A타입(내 뷰티 서비스)/B타입(신청뷰티 서비스)으로 구분
   const scheduledDetail = useMemo(() => {
     const scheduled = summary.orders.filter((o) => !o.available);
     const typeA = scheduled.filter((o) => o.productType === "seller");
@@ -606,10 +606,10 @@ export default function SellerSettlementClient({
                           </span>
                           {/* A/B 타입 뱃지 */}
                           {o.productType === "seller" && (
-                            <span className="text-[9px] bg-blue-50 text-blue-600 px-1 py-0.5 rounded flex-shrink-0">내 상담상품</span>
+                            <span className="text-[9px] bg-blue-50 text-blue-600 px-1 py-0.5 rounded flex-shrink-0">내 뷰티 서비스</span>
                           )}
                           {o.productType === "supply" && (
-                            <span className="text-[9px] bg-rose-50 text-rose-600 px-1 py-0.5 rounded flex-shrink-0">신청상담상품</span>
+                            <span className="text-[9px] bg-rose-50 text-rose-600 px-1 py-0.5 rounded flex-shrink-0">신청뷰티 서비스</span>
                           )}
                           {o.productType === "mixed" && (
                             <span className="text-[9px] bg-amber-50 text-amber-600 px-1 py-0.5 rounded flex-shrink-0">혼합</span>
@@ -647,7 +647,7 @@ export default function SellerSettlementClient({
                           </div>
                         )}
                         <div className="flex items-center justify-between text-[9px] font-bold text-brand-600">
-                          <span>상담사 정산액</span>
+                          <span>뷰티 전문가 정산액</span>
                           <span>{formatPrice(o.settlementAmount)}</span>
                         </div>
                       </div>
@@ -792,12 +792,12 @@ export default function SellerSettlementClient({
                 </div>
               )}
 
-              {/* A타입: 내가 직접 등록한 상담상품 (판매가 전액 기준) */}
+              {/* A타입: 내가 직접 등록한 뷰티 서비스 (판매가 전액 기준) */}
               {scheduledDetail.typeA.length > 0 && (
                 <div>
                   <div className="flex items-center gap-1.5 mb-2">
                     <span className="text-[10px] font-bold bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded flex items-center gap-1">
-                      <Icon name="Tag" size={10} /> A타입 · 내 등록 상담상품
+                      <Icon name="Tag" size={10} /> A타입 · 내 등록 뷰티 서비스
                     </span>
                     <span className="text-[10px] text-gray-400">판매가 전액이 정산 기준</span>
                   </div>
@@ -819,7 +819,7 @@ export default function SellerSettlementClient({
                             </div>
                           )}
                           <div className="flex items-center justify-between text-[11px] font-bold text-brand-600 pt-0.5">
-                            <span>상담사 정산액</span><span>{formatPrice(o.settlementAmount)}</span>
+                            <span>뷰티 전문가 정산액</span><span>{formatPrice(o.settlementAmount)}</span>
                           </div>
                         </div>
                       </div>
@@ -828,12 +828,12 @@ export default function SellerSettlementClient({
                 </div>
               )}
 
-              {/* B타입: 상담상품신청 판매 (판매가 - 공급가 기준) */}
+              {/* B타입: 뷰티 서비스 신청 판매 (판매가 - 공급가 기준) */}
               {scheduledDetail.typeB.length > 0 && (
                 <div>
                   <div className="flex items-center gap-1.5 mb-2">
                     <span className="text-[10px] font-bold bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded flex items-center gap-1">
-                      <Icon name="Gem" size={10} /> B타입 · 상담상품신청 판매
+                      <Icon name="Gem" size={10} /> B타입 · 뷰티 서비스 신청 판매
                     </span>
                     <span className="text-[10px] text-gray-400">판매가 − 공급가가 정산 기준</span>
                   </div>
@@ -858,7 +858,7 @@ export default function SellerSettlementClient({
                             </div>
                           )}
                           <div className="flex items-center justify-between text-[11px] font-bold text-brand-600 pt-0.5">
-                            <span>상담사 정산액</span><span>{formatPrice(o.settlementAmount)}</span>
+                            <span>뷰티 전문가 정산액</span><span>{formatPrice(o.settlementAmount)}</span>
                           </div>
                         </div>
                       </div>
@@ -971,7 +971,7 @@ export default function SellerSettlementClient({
                 </p>
               </div>
 
-              {/* 사업자 유형 — 상담사 정보에 등록된 값으로 고정 */}
+              {/* 사업자 유형 — 뷰티 전문가 정보에 등록된 값으로 고정 */}
               <div>
                 <label className="text-xs font-bold text-gray-700">사업자 유형</label>
                 <div
@@ -986,7 +986,7 @@ export default function SellerSettlementClient({
                 </div>
                 <p className="text-[10.5px] text-gray-500 mt-1.5 flex items-start gap-1">
                   <Icon name="Info" size={12} className="text-gray-400 flex-shrink-0 mt-0.5" />
-                  상담사 정보에 등록된 유형입니다. 변경하려면 상담사 정보에서 사업자 정보를 수정하세요.
+                  뷰티 전문가 정보에 등록된 유형입니다. 변경하려면 뷰티 전문가 정보에서 사업자 정보를 수정하세요.
                 </p>
               </div>
 
@@ -1028,8 +1028,8 @@ export default function SellerSettlementClient({
                 <div className="bg-blue-50 rounded-xl p-3 flex items-start gap-2">
                   <Building2 size={14} className="text-blue-500 flex-shrink-0 mt-0.5" />
                   <p className="text-[11px] text-blue-700">
-                    사업자 상담사에게는 원천징수 없이 정산액 전액이 지급되며,
-                    <b> 사주나라(테스트 주식회사)가 매입 세금계산서를 발행</b>합니다.
+                    사업자 뷰티 전문가에게는 원천징수 없이 정산액 전액이 지급되며,
+                    <b> 뷰티메이트(테스트 주식회사)가 매입 세금계산서를 발행</b>합니다.
                     입력하신 상호명·사업자등록번호 기준으로 발행됩니다.
                   </p>
                 </div>
@@ -1060,7 +1060,7 @@ export default function SellerSettlementClient({
                   <label className="flex items-start gap-2 cursor-pointer">
                     <input type="checkbox" checked={reqAgreed} onChange={(e) => setReqAgreed(e.target.checked)} className="mt-0.5 accent-amber-600" />
                     <span className="text-[11px] text-amber-700">
-                      <span className="font-medium">개인 상담사 원천징수 안내 동의</span><br />
+                      <span className="font-medium">개인 뷰티 전문가 원천징수 안내 동의</span><br />
                       소득세법에 따라 정산액의 3.3%(소득세 3% + 지방소득세 0.3%)가 원천징수되며, 이에 동의합니다.
                       매년 5월 종합소득세 신고 시 기납부 세액으로 공제됩니다.
                     </span>

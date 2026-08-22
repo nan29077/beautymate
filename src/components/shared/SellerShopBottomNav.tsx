@@ -6,9 +6,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
-// 점집 전용 하단 네비.
-// - 공통 하단 네비(MobileNav)는 점집에서 숨기고, 구매회원에게 필요한 기능만 노출.
-// - 메인 페이지로 가는 항목은 두지 않는다(점집홈/장바구니/예약내역/내정보).
+// 뷰티샵 전용 하단 네비.
+// - 공통 하단 네비(MobileNav)는 뷰티샵에서 숨기고, 구매회원에게 필요한 기능만 노출.
+// - 메인 페이지로 가는 항목은 두지 않는다(뷰티샵홈/장바구니/예약내역/내정보).
 export default function SellerShopBottomNav({
   sellerSlug,
 }: {

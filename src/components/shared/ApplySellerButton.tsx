@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Loader2 } from 'lucide-react';
 import { useAppDialog } from "@/components/shared/AppDialog";
 
-// 고객 마이페이지: "상담사로 입점 신청하기" 버튼.
+// 고객 마이페이지: "뷰티 전문가로 입점 신청하기" 버튼.
 // - 미신청: /seller-apply 페이지로 이동
 // - 신청 완료(대기 중): 상태 표시
 export default function ApplySellerButton({ initialApplied }: { initialApplied: boolean }) {
@@ -20,8 +20,8 @@ export default function ApplySellerButton({ initialApplied }: { initialApplied: 
           <Icon name="Clock" size={16} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-gray-900">상담사 입점 신청 완료</p>
-          <p className="text-[11px] text-gray-500 mt-0.5">최고관리자 승인 후 상담사 기능이 활성화돼요</p>
+          <p className="text-sm font-bold text-gray-900">뷰티 전문가 입점 신청 완료</p>
+          <p className="text-[11px] text-gray-500 mt-0.5">최고관리자 승인 후 뷰티 전문가 기능이 활성화돼요</p>
         </div>
       </div>
     );
@@ -36,8 +36,8 @@ export default function ApplySellerButton({ initialApplied }: { initialApplied: 
         <Icon name="Sparkles" size={16} strokeWidth={2} />
       </div>
       <div className="flex-1 min-w-0 text-left">
-        <p className="text-sm font-bold">상담사로 입점 신청하기</p>
-        <p className="text-[11px] text-white/60 mt-0.5">내 팬과 함께 나만의 점집을 열어보세요</p>
+        <p className="text-sm font-bold">뷰티 전문가로 입점 신청하기</p>
+        <p className="text-[11px] text-white/60 mt-0.5">내 팬과 함께 나만의 뷰티샵을 열어보세요</p>
       </div>
       <Icon name="ChevronDown" size={18} className="text-white/50 flex-shrink-0 -rotate-90" />
     </Link>

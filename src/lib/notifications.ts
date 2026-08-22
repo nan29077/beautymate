@@ -1,9 +1,9 @@
 // 인앱 알림(Notification) 생성 헬퍼 — 서버 전용.
 // 알림 종류(type)
-//  - live_start : 단골 상담사의 라이브 시작 알림 (수신 설정: BuyerProfile.liveAlimtalkOptIn)
-//  - order      : 예약·상담 방식 관련 알림 (수신 설정: BuyerProfile.notifyOrder)
+//  - live_start : 단골 뷰티 전문가의 라이브 시작 알림 (수신 설정: BuyerProfile.liveAlimtalkOptIn)
+//  - order      : 예약·진행 방식 관련 알림 (수신 설정: BuyerProfile.notifyOrder)
 //  - channel    : 채널 구독 인증 결과 (항상 발송)
-//  - payout_rejected : 상담사 출금 요청 반려 (사유 포함, 항상 발송)
+//  - payout_rejected : 뷰티 전문가 출금 요청 반려 (사유 포함, 항상 발송)
 import { prisma } from "@/lib/prisma";
 
 export type NotificationType = "live_start" | "order" | "channel" | "payout_rejected" | "system";
@@ -86,7 +86,7 @@ export async function createLiveStartNotifications(liveId: string): Promise<numb
     );
     return await createNotificationsForUsers(userIds, {
       title: `${live.seller.shopName} 라이브 시작`,
-      message: `단골 상담사 ${live.seller.shopName}님이 "${live.title}" 라이브를 시작했어요. 지금 입장해 보세요!`,
+      message: `단골 뷰티 전문가 ${live.seller.shopName}님이 "${live.title}" 라이브를 시작했어요. 지금 입장해 보세요!`,
       type: "live_start",
       linkUrl: `/live/${live.shareCode}`,
     });
@@ -98,7 +98,7 @@ export async function createLiveStartNotifications(liveId: string): Promise<numb
 
 /**
  * 예약 결제 완료 시, 고객에게 인앱 알림을 생성한다.
- * - notifyOrder(예약·상담 방식 알림 수신 동의)가 켜진 경우에만 저장.
+ * - notifyOrder(예약·진행 방식 알림 수신 동의)가 켜진 경우에만 저장.
  */
 export async function notifyOrderPaid(orderId: string): Promise<void> {
   try {
@@ -117,7 +117,7 @@ export async function notifyOrderPaid(orderId: string): Promise<void> {
     await createNotification({
       userId: order.userId,
       title: "예약이 완료되었습니다",
-      message: `${order.seller.shopName} 예약(${order.reservationNumber})이 정상 결제되었습니다. 상담 방식이 시작되면 다시 알려드릴게요.`,
+      message: `${order.seller.shopName} 예약(${order.reservationNumber})이 정상 결제되었습니다. 진행 방식이 시작되면 다시 알려드릴게요.`,
       type: "order",
       linkUrl: "/my/orders",
     });
@@ -128,7 +128,7 @@ export async function notifyOrderPaid(orderId: string): Promise<void> {
 
 /**
  * 예약 취소(결제취소 승인 등) 시, 고객에게 인앱 알림을 생성한다.
- * - notifyOrder(예약·상담 방식 알림 수신 동의)가 켜진 경우에만 저장.
+ * - notifyOrder(예약·진행 방식 알림 수신 동의)가 켜진 경우에만 저장.
  */
 export async function notifyOrderCancelled(orderId: string): Promise<void> {
   try {

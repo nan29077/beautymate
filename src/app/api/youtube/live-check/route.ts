@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // 상담사가 유튜브AI챗봇 탭에 등록한 API 키 우선, 없으면 서버 공용 키 폴백
+  // 뷰티 전문가가 유튜브AI챗봇 탭에 등록한 API 키 우선, 없으면 서버 공용 키 폴백
   let apiKey = process.env.YOUTUBE_API_KEY || "";
   try {
     const seller = await prisma.sellerProfile.findUnique({
@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "channelId 또는 channelUrl 파라미터가 필요합니다." }, { status: 400 });
   }
 
-  // 상담사 페이지의 키 설정 여부 프로브 — 실제 YouTube API 호출 없이 즉시 응답 (쿼터 보호)
+  // 뷰티 전문가 페이지의 키 설정 여부 프로브 — 실제 YouTube API 호출 없이 즉시 응답 (쿼터 보호)
   if (channelInput === "_check_only_") {
     return NextResponse.json({ ok: true });
   }

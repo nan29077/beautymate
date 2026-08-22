@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
       where: { userId: session.user!.id },
     });
     if (!seller) {
-      return NextResponse.json({ error: "상담사 프로필을 찾을 수 없습니다" }, { status: 404 });
+      return NextResponse.json({ error: "뷰티 전문가 프로필을 찾을 수 없습니다" }, { status: 404 });
     }
 
     const updateData: any = {};

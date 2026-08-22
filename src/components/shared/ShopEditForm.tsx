@@ -32,21 +32,20 @@ interface ShopData {
 }
 
 const CATEGORY_OPTIONS = [
-  "사주", "신점", "타로", "작명", "궁합", "관상",
-  "택일", "풍수", "점성술", "꿈해몽", "부적", "굿/의식",
-  "심리상담", "기타",
+  "스킨케어", "메이크업", "헤어", "네일", "퍼스널 컬러",
+  "바디케어", "왁싱", "브로우", "이미지 컨설팅", "기타",
 ];
 
 const MOOD_OPTIONS = [
   "따뜻한", "직설적인", "차분한", "유쾌한", "섬세한", "단호한",
-  "공감형", "현실조언형", "영적인", "논리적인", "친근한", "기타",
+  "감각적인", "트렌디한", "내추럴한", "논리적인", "친근한", "기타",
 ];
 
 /** 상담 분야 태그 추천 목록 — 클릭으로 추가/제거, 직접 입력도 가능 */
 const TAG_SUGGESTIONS = [
-  "연애운", "결혼운", "재물운", "취업운", "이직운", "사업운",
-  "건강운", "학업운", "가족관계", "인간관계", "이별/재회", "속마음",
-  "올해운세", "신년운세", "택일", "작명",
+  "민감성 피부", "여드름 케어", "웨딩 메이크업", "데일리 메이크업", "브로우",
+  "헤어 컬러", "두피 케어", "젤 네일", "바디케어", "퍼스널 컬러",
+  "왁싱", "이미지 컨설팅",
 ];
 
 export default function ShopEditForm({
@@ -112,7 +111,7 @@ export default function ShopEditForm({
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
       setShowSavedPopup(true);
-      // 사이드바 점집이름 즉시 반영 (서버 컴포넌트 재렌더)
+      // 사이드바 뷰티샵이름 즉시 반영 (서버 컴포넌트 재렌더)
       router.refresh();
     } catch (e: any) {
       setError(e.message || "저장에 실패했습니다.");
@@ -126,14 +125,14 @@ export default function ShopEditForm({
       <SavedPopup show={showSavedPopup} onClose={() => setShowSavedPopup(false)} />
       {/* Header with Save button */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-base font-bold text-gray-900">점집 기본 정보</h2>
+        <h2 className="text-base font-bold text-gray-900">뷰티샵 기본 정보</h2>
         <div className="flex items-center gap-2">
           <Link
             href={`/shop/${initial.slug}`}
             className="px-3 py-1.5 text-xs font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors flex items-center gap-1.5"
           >
             <Icon name="ArrowRight" size={13} strokeWidth={1.5} />
-            점집 바로가기
+            뷰티샵 바로가기
           </Link>
           <button
             onClick={handleSave}
@@ -181,17 +180,17 @@ export default function ShopEditForm({
 
       {/* Form Fields */}
       <div className="space-y-4">
-        {/* 점집 이미지 */}
+        {/* 뷰티샵 이미지 */}
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-5">
-          <h3 className="text-sm font-bold text-gray-900">점집 이미지</h3>
+          <h3 className="text-sm font-bold text-gray-900">뷰티샵 이미지</h3>
 
-          {/* 점집 로고 */}
+          {/* 뷰티샵 로고 */}
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-2">점집 로고 (프로필 이미지)</label>
+            <label className="block text-xs font-medium text-gray-600 mb-2">뷰티샵 로고 (프로필 이미지)</label>
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-xl bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
                 {form.shopLogo ? (
-                  <img src={form.shopLogo} alt="점집 로고" className="w-full h-full object-cover" />
+                  <img src={form.shopLogo} alt="뷰티샵 로고" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-300">
                     <Icon name="Camera" size={20} />
@@ -214,14 +213,14 @@ export default function ShopEditForm({
                   </button>
                 )}
                 <p className="text-[10px] text-gray-400 mt-1">권장: 200x200px, JPG/PNG</p>
-                <p className="text-[10px] text-blue-500 mt-0.5">점집 상단 헤더 및 프로필 원형 이미지로 표시됩니다.</p>
+                <p className="text-[10px] text-blue-500 mt-0.5">뷰티샵 상단 헤더 및 프로필 원형 이미지로 표시됩니다.</p>
               </div>
             </div>
           </div>
 
-          {/* 점집 배너 */}
+          {/* 뷰티샵 배너 */}
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-2">점집 배너 이미지</label>
+            <label className="block text-xs font-medium text-gray-600 mb-2">뷰티샵 배너 이미지</label>
             {form.shopBanner ? (
               <div className="relative w-full h-32 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 mb-2">
                 <img src={form.shopBanner} alt="배너" className="w-full h-full object-cover" />
@@ -247,13 +246,13 @@ export default function ShopEditForm({
               compact
             />
             <p className="text-[10px] text-gray-400 mt-1">권장: 1200x400px, JPG/PNG</p>
-            <p className="text-[10px] text-blue-500 mt-0.5">점집 페이지 상단 전체 너비 배너 영역에 표시됩니다.</p>
+            <p className="text-[10px] text-blue-500 mt-0.5">뷰티샵 페이지 상단 전체 너비 배너 영역에 표시됩니다.</p>
           </div>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">점집 이름</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">뷰티샵 이름</label>
             <input
               type="text"
               className="input-field"
@@ -262,22 +261,22 @@ export default function ShopEditForm({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">점집 ID</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">뷰티샵 ID</label>
             <input type="text" className="input-field bg-gray-50 text-gray-500" defaultValue={initial.slug} readOnly />
-            <p className="text-[10px] text-gray-400 mt-1">점집 주소: /shop/{initial.slug}</p>
+            <p className="text-[10px] text-gray-400 mt-1">뷰티샵 주소: /shop/{initial.slug}</p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">점집 한줄 소개</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">뷰티샵 한줄 소개</label>
             <input
               type="text"
               className="input-field"
               value={form.tagline}
               maxLength={SHOP_TAGLINE_MAX}
               onChange={e => handleChange("tagline", e.target.value)}
-              placeholder="예: 30년 경력, 사주로 풀어내는 인생의 방향"
+              placeholder="예: 30년 경력, 뷰티로 풀어내는 인생의 방향"
             />
             <p className="text-[10px] text-gray-400 mt-1">
-              점집 페이지에서 점집 이름 바로 아래에 표시됩니다. ({form.tagline.length}/{SHOP_TAGLINE_MAX})
+              뷰티샵 페이지에서 뷰티샵 이름 바로 아래에 표시됩니다. ({form.tagline.length}/{SHOP_TAGLINE_MAX})
             </p>
           </div>
           <div>
@@ -319,12 +318,12 @@ export default function ShopEditForm({
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">점집 설명 (요약)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">뷰티샵 설명 (요약)</label>
             <textarea
               className="input-field h-24 resize-none"
               value={form.shopDescription}
               onChange={e => handleChange("shopDescription", e.target.value)}
-              placeholder="점집에 대한 소개를 작성해주세요"
+              placeholder="뷰티샵에 대한 소개를 작성해주세요"
             />
             <p className="text-[10px] text-gray-400 mt-1">프로필 카드와 검색 결과에 요약으로 노출됩니다.</p>
           </div>
@@ -335,7 +334,7 @@ export default function ShopEditForm({
           <div>
             <h3 className="text-sm font-bold text-gray-900">상담 분야 태그</h3>
             <p className="text-[10px] text-gray-400 mt-0.5">
-              점집 페이지 프로필 카드에 표시됩니다. 최대 {SHOP_TAGS_MAX}개 ({tags.length}/{SHOP_TAGS_MAX})
+              뷰티샵 페이지 프로필 카드에 표시됩니다. 최대 {SHOP_TAGS_MAX}개 ({tags.length}/{SHOP_TAGS_MAX})
             </p>
           </div>
 
@@ -382,7 +381,7 @@ export default function ShopEditForm({
                   addTagInput();
                 }
               }}
-              placeholder="직접 입력 후 Enter (예: 사업궁합)"
+              placeholder="직접 입력 후 Enter (예: 사업이미지 컨설팅)"
             />
             <button
               type="button"
@@ -397,16 +396,16 @@ export default function ShopEditForm({
 
         {/* 상세 소개 */}
         <div className="bg-white rounded-xl border border-gray-100 p-5">
-          <label className="block text-sm font-bold text-gray-900 mb-1">점집 상세 소개</label>
+          <label className="block text-sm font-bold text-gray-900 mb-1">뷰티샵 상세 소개</label>
           <p className="text-[10px] text-gray-400 mb-2">
-            점집 페이지 하단 &ldquo;소개&rdquo; 섹션에 전체 내용이 표시됩니다. 줄바꿈이 그대로 반영됩니다.
+            뷰티샵 페이지 하단 &ldquo;소개&rdquo; 섹션에 전체 내용이 표시됩니다. 줄바꿈이 그대로 반영됩니다.
           </p>
           <textarea
             className="input-field h-48 resize-y leading-relaxed"
             value={form.intro}
             maxLength={SHOP_INTRO_MAX}
             onChange={e => handleChange("intro", e.target.value)}
-            placeholder={"상담 경력, 상담 방식, 예약 전 안내사항 등을 자유롭게 적어주세요.\n\n예)\n· 사주명리 20년, 누적 상담 1만 건\n· 연애·재물·직업 상담을 주로 봅니다\n· 상담 전 생년월일시를 준비해주세요"}
+            placeholder={"상담 경력, 진행 방식, 예약 전 안내사항 등을 자유롭게 적어주세요.\n\n예)\n· 뷰티스킨케어 20년, 누적 상담 1만 건\n· 연애·재물·직업 상담을 주로 봅니다\n· 서비스 전 알레르기·시술 이력를 준비해주세요"}
           />
           <p className="text-[10px] text-gray-400 mt-1 text-right">
             {form.intro.length}/{SHOP_INTRO_MAX}

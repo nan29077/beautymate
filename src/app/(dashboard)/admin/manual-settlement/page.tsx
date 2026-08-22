@@ -10,7 +10,7 @@ export default async function AdminManualSettlementPage() {
   const session = await auth();
   if ((session?.user as any)?.role !== "SUPER_ADMIN") redirect("/");
 
-  // 상담사 목록
+  // 뷰티 전문가 목록
   const nodeUsers = await prisma.user.findMany({
     where: { role: "CONSULTANT", isActive: true },
     select: { id: true, name: true, email: true },

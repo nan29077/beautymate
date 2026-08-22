@@ -3,12 +3,12 @@
 /**
  * ConsultOptionEditor
  * ───────────────────
- * 상담 상품 전용 "상담 방식 × 상담 시간 → 조합별 가격" 편집 UI.
+ * 뷰티 서비스 전용 "진행 방식 × 소요 시간 → 조합별 가격" 편집 UI.
  *
  * 저장은 기존 옵션-조합(OptionGroup/Variant) 구조를 그대로 재사용한다:
  *   optionGroups = [
- *     { groupName: "상담 방식", options: [선택된 방식들] },
- *     { groupName: "상담 시간", options: [선택된 시간들] },
+ *     { groupName: "진행 방식", options: [선택된 방식들] },
+ *     { groupName: "소요 시간", options: [선택된 시간들] },
  *   ]
  *   variants = 방식×시간 조합마다 { name: "영상 상담/1시간", price, stock } (조합별 독립 가격)
  *
@@ -22,8 +22,8 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import type { Variant, OptionGroup } from "@/components/shared/OptionGroupEditor";
 
-export const CONSULT_METHOD_GROUP = "상담 방식";
-export const CONSULT_TIME_GROUP = "상담 시간";
+export const CONSULT_METHOD_GROUP = "진행 방식";
+export const CONSULT_TIME_GROUP = "소요 시간";
 
 const METHOD_PRESETS = ["영상 상담", "전화 상담", "방문 상담"] as const;
 const TIME_PRESETS = ["30분", "1시간", "1시간 30분", "2시간", "2시간 30분", "3시간"] as const;
@@ -103,10 +103,10 @@ export default function ConsultOptionEditor({
 
   return (
     <div className="space-y-5">
-      {/* ── 상담 방식 ── */}
+      {/* ── 진행 방식 ── */}
       <div>
         <label className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
-          <Icon name="Video" size={14} /> 상담 방식 <span className="text-gray-400 font-normal">(복수 선택)</span>
+          <Icon name="Video" size={14} /> 진행 방식 <span className="text-gray-400 font-normal">(복수 선택)</span>
         </label>
         <div className="flex flex-wrap gap-2">
           {METHOD_PRESETS.map((m) => (
@@ -118,10 +118,10 @@ export default function ConsultOptionEditor({
         </div>
       </div>
 
-      {/* ── 상담 시간 ── */}
+      {/* ── 소요 시간 ── */}
       <div>
         <label className="text-xs font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
-          <Icon name="Clock" size={14} /> 상담 시간 <span className="text-gray-400 font-normal">(복수 선택 · 직접 추가 가능)</span>
+          <Icon name="Clock" size={14} /> 소요 시간 <span className="text-gray-400 font-normal">(복수 선택 · 직접 추가 가능)</span>
         </label>
         <div className="flex flex-wrap gap-2 mb-2">
           {TIME_PRESETS.map((t) => (
@@ -209,7 +209,7 @@ export default function ConsultOptionEditor({
       ) : (
         <div className="border border-dashed border-gray-200 rounded-xl p-4 text-center">
           <p className="text-xs text-gray-400">
-            상담 방식과 시간을 하나 이상씩 선택하면
+            진행 방식과 시간을 하나 이상씩 선택하면
             <br />
             조합별 가격 입력표가 나타납니다.
           </p>

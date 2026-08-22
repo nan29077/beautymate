@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// 미승인 상담사 전체 일괄 승인 — SUPER_ADMIN 전용 1회성 유틸리티.
+// 미승인 뷰티 전문가 전체 일괄 승인 — SUPER_ADMIN 전용 1회성 유틸리티.
 // 사용 후 삭제 예정.
 export async function POST() {
   const session = await auth();

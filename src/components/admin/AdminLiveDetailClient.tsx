@@ -166,7 +166,7 @@ export default function AdminLiveDetailClient({ liveId }: { liveId: string }) {
           <span className="inline-flex items-center gap-1">
             <Heart size={13} /> 좋아요 {live.likeCount}
           </span>
-          {live.products.length > 0 && <span>상담상품 {live.products.length}개</span>}
+          {live.products.length > 0 && <span>뷰티 서비스 {live.products.length}개</span>}
         </div>
       </div>
 

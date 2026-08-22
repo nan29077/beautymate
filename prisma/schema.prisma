@@ -16,7 +16,7 @@ datasource db {
 // 사용자 & 역할
 // ─────────────────────────────────────────────
 
-// 2자 구조: 상담사(CONSULTANT) ↔ 고객(CUSTOMER)
+// 2자 구조: 뷰티 전문가(CONSULTANT) ↔ 고객(CUSTOMER)
 //
 // ⚠️ 아래 레거시 값(SELLER/BUYER/NODE/MIDDLE_ADMIN/BRAND_ADMIN)은 초기 서비스 운영 당시 데이터가
 // 운영 DB 의 users.role 컬럼에 그대로 남아 있어서 선언해 둔 것이다. 선언이 없으면 Prisma Client 가
@@ -35,10 +35,10 @@ enum Role {
   BRAND_ADMIN
 }
 
-// 상담 상품 제공 방식
+// 뷰티 서비스 제공 방식
 enum PriceModel {
-  SUPPLY // 공급가로 제공: 관리자는 공급가만 지정, 상담사가 판매가 직접 결정
-  COMMISSION // 수수료로 제공: 관리자가 판매가·수수료 지정, 상담사는 고정 판매가로만 판매
+  SUPPLY // 공급가로 제공: 관리자는 공급가만 지정, 뷰티 전문가가 판매가 직접 결정
+  COMMISSION // 수수료로 제공: 관리자가 판매가·수수료 지정, 뷰티 전문가는 고정 판매가로만 판매
 }
 
 model User {
@@ -59,14 +59,14 @@ model User {
   isActive      Boolean   @default(true)
   // 임시 비밀번호(비밀번호 초기화) 발급 시 true → 로그인 직후 강제 재설정
   mustResetPassword Boolean @default(false)
-  // 상담사 정산 계좌 정보
+  // 뷰티 전문가 정산 계좌 정보
   bankName      String?
   bankAccount   String?
   bankHolder    String?
-  // 상담사 추천인(멘토-멘티) 시스템
-  sellerReferralCode String?  @unique // 상담사가입 추천인코드 (상담사 계정 생성 시 자동 발급, 예: SB4K9M2X)
-  referredBySellerCode String?         // 가입 시 입력한 상담사가입 추천인코드
-  mentorId       String?               // 추천인(멘토) 상담사의 userId
+  // 뷰티 전문가 추천인(멘토-멘티) 시스템
+  sellerReferralCode String?  @unique // 뷰티 전문가가입 추천인코드 (뷰티 전문가 계정 생성 시 자동 발급, 예: SB4K9M2X)
+  referredBySellerCode String?         // 가입 시 입력한 뷰티 전문가가입 추천인코드
+  mentorId       String?               // 추천인(멘토) 뷰티 전문가의 userId
   mentor         User?   @relation("MentorMentee", fields: [mentorId], references: [id])
   mentees        User[]  @relation("MentorMentee")
   emailVerified DateTime?
@@ -101,14 +101,14 @@ model User {
   packageProducts         PackageProduct[]     @relation("PackageCreator")
   // 패키지 발주서 수신자
   packagePurchaseOrders   PackagePurchaseOrder[] @relation("PackagePurchaseOrderRecipient")
-  // 점집 독립 회원 멤버십
+  // 뷰티샵 독립 회원 멤버십
   shopMemberships         ShopMembership[]       @relation("ShopMemberships")
 
   @@map("users")
 }
 
 // ─────────────────────────────────────────────
-// 고객 프로필 (상담사 귀속)
+// 고객 프로필 (뷰티 전문가 귀속)
 // ─────────────────────────────────────────────
 
 model BuyerProfile {
@@ -132,7 +132,7 @@ model BuyerProfile {
 }
 
 // ─────────────────────────────────────────────
-// 상담사 프로필 (역술가/점술가)
+// 뷰티 전문가 프로필 (뷰티가/뷰티가)
 // ─────────────────────────────────────────────
 
 model SellerProfile {
@@ -224,7 +224,7 @@ model SellerProfile {
   directProducts DirectProduct[]
   shopExposure   ShopDirectProductExposure?
 
-  // 점집 독립 회원 멤버십
+  // 뷰티샵 독립 회원 멤버십
   shopMembers ShopMembership[] @relation("ShopMembers")
 
   @@map("seller_profiles")
@@ -359,7 +359,7 @@ model Category {
 }
 
 // ─────────────────────────────────────────────
-// 상담 상품 (관리자/상담사가 등록)
+// 뷰티 서비스 (관리자/뷰티 전문가가 등록)
 // ─────────────────────────────────────────────
 
 model Product {
@@ -372,10 +372,10 @@ model Product {
   comparePrice      Decimal?      @db.Decimal(12, 2)
   supplyPrice       Decimal?      @db.Decimal(12, 2)
   adminMargin       Int           @default(0)           // 관리자가 설정한 마진 금액 (원)
-  // 제공 방식: SUPPLY(공급가 제공 - 상담사가 판매가 결정) / COMMISSION(수수료 제공 - 판매가·수수료 고정)
+  // 제공 방식: SUPPLY(공급가 제공 - 뷰티 전문가가 판매가 결정) / COMMISSION(수수료 제공 - 판매가·수수료 고정)
   priceModel        PriceModel    @default(SUPPLY)
-  commissionRate    Decimal?      @db.Decimal(5, 2)  // 수수료 제공 시 상담사 수수료율(%)
-  sellerCommissionAmount Decimal? @db.Decimal(12, 2) // 수수료 제공 시 상담사 수수료 금액(정액)
+  commissionRate    Decimal?      @db.Decimal(5, 2)  // 수수료 제공 시 뷰티 전문가 수수료율(%)
+  sellerCommissionAmount Decimal? @db.Decimal(12, 2) // 수수료 제공 시 뷰티 전문가 수수료 금액(정액)
   categoryId        String?
   category          Category?     @relation(fields: [categoryId], references: [id])
   sellerId          String?
@@ -386,12 +386,12 @@ model Product {
   allowLiveCommerce Boolean       @default(false)
   badges            String?
 
-  // ── 상담 상품 속성 ────────────────────────────
-  // 상담 종류: 사주 | 신점 | 타로 | 궁합 | 작명 | 사업운 | 연애운 | 택일
-  consultingType   String @default("사주")
-  // 상담 방식: 영상통화 | 전화 | 방문 | 채팅
+  // ── 뷰티 서비스 속성 ────────────────────────────
+  // 서비스 종류: 스킨케어 | 메이크업 | 헤어 | 네일 | 퍼스널 컬러 | 바디케어 | 왁싱 | 이미지 컨설팅
+  consultingType   String @default("스킨케어")
+  // 진행 방식: 영상통화 | 전화 | 방문 | 채팅
   consultingMethod String @default("영상통화")
-  // 상담 시간(분): 30 | 60 | 90 | 120
+  // 소요 시간(분): 30 | 60 | 90 | 120
   durationMinutes  Int    @default(30)
   // 하루 최대 예약 가능 건수
   maxDailySlots    Int    @default(5)
@@ -547,8 +547,8 @@ model GroupBuyCampaign {
 
 enum ReservationStatus {
   PENDING // 예약 신청 (결제/확정 대기)
-  CONFIRMED // 상담사 확정
-  COMPLETED // 상담 완료
+  CONFIRMED // 뷰티 전문가 확정
+  COMPLETED // 서비스 완료
   CANCELLED // 취소
   NO_SHOW // 노쇼
 }
@@ -565,7 +565,7 @@ model Reservation {
   reservationNumber String            @unique
   userId            String
   user              User              @relation(fields: [userId], references: [id])
-  // 상담을 진행하는 상담사
+  // 상담을 진행하는 뷰티 전문가
   sellerId        String
   seller          SellerProfile     @relation("ConsultantReservations", fields: [sellerId], references: [id])
   campaignId      String?
@@ -579,7 +579,7 @@ model Reservation {
   totalAmount     Decimal           @db.Decimal(12, 2)
   discountAmount  Decimal           @default(0) @db.Decimal(12, 2)
   discountType    String?
-  // 장바구니 할인액(상담사 부담) — discountAmount(회사 부담 추천인/픽)와 분리해 정산에서 차감
+  // 장바구니 할인액(뷰티 전문가 부담) — discountAmount(회사 부담 추천인/픽)와 분리해 정산에서 차감
   cartDiscountAmount Decimal        @default(0) @db.Decimal(12, 2)
   finalAmount     Decimal           @db.Decimal(12, 2)
 
@@ -587,15 +587,15 @@ model Reservation {
   reservationDate DateTime // 예약 날짜
   reservationTime String // 예약 시간 ("14:00")
 
-  // ── 신청자 정보 (사주 상담용) ──────────────────
+  // ── 신청자 정보 (개인화 서비스에 필요한 선택 정보) ──────────────────
   customerName      String
   customerPhone     String
   birthDate         String? // 생년월일 (YYYY-MM-DD)
-  birthTime         String? // 태어난 시간 ("23:30", 모를 경우 null)
+  birthTime         String? // 레거시 호환 필드, 신규 뷰티 예약에서는 사용하지 않음
   gender            String? // "M" | "F"
-  consultingContent String? @db.Text // 상담 내용/문의
+  consultingContent String? @db.Text // 요청사항/문의
 
-  // 상담사가 상담 후 남기는 내부 메모 (고객에게 노출되지 않음, CRM 이력에 표시)
+  // 뷰티 전문가가 서비스 후 남기는 내부 메모 (고객에게 노출되지 않음, CRM 이력에 표시)
   consultantMemo    String? @db.Text
 
   snsAccounts     String?           @db.Text
@@ -604,15 +604,15 @@ model Reservation {
   pgTid           String?
   pgAuthData      String?           @db.Text
   paidAt          DateTime?
-  confirmedAt     DateTime? // 상담사가 예약을 확정한 시각
-  completedAt     DateTime? // 상담 완료 처리 시각
+  confirmedAt     DateTime? // 뷰티 전문가가 예약을 확정한 시각
+  completedAt     DateTime? // 서비스 완료 처리 시각
   noShowAt        DateTime? // 노쇼 처리 시각
   cancelledAt     DateTime?
   refundedAt      DateTime?
 
-  // ── 결제취소 (상담사 요청 → 관리자 승인) ─────────────────────────────
+  // ── 결제취소 (뷰티 전문가 요청 → 관리자 승인) ─────────────────────────────
   cancelRequestedAt        DateTime?
-  cancelRequestedBy        String?            // 요청한 상담사 userId
+  cancelRequestedBy        String?            // 요청한 뷰티 전문가 userId
   cancelReason             String?            @db.Text
   cancelType               String?            // "SAME_DAY" | "POST_DAY"
   cancelStatus             String?            // "REQUESTED" | "DEPOSIT_CONFIRMED" | "APPROVED" | "COMPLETED"
@@ -621,7 +621,7 @@ model Reservation {
   cancelApprovedAt         DateTime?
   cancelFromSettlement     Boolean            @default(false) // 정산금 차감 여부
 
-  // 예약 시점 상담사 플랫폼 수수료율(%) 스냅샷.
+  // 예약 시점 뷰티 전문가 플랫폼 수수료율(%) 스냅샷.
   // ReservationItem 이 없는 예약(수기 예약 등 상품 매핑 없이 결제된 건)은 아이템 단위
   // 스냅샷을 저장할 곳이 없어, 요율을 바꾸면 과거 정산액이 소급 변동한다. 그 구멍을 막는다.
   sellerFeeRateSnap        Decimal?           @db.Decimal(5, 2)
@@ -644,8 +644,8 @@ model ReservationItem {
   reservationId String
   reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
   // productId 는 FK 가 아니다. itemType 에 따라 가리키는 테이블이 다르다.
-  //   PRODUCT → Product.id  (관리자/상담사가 등록한 카탈로그 상담 상품)
-  //   DIRECT  → DirectProduct.id (상담사가 직접 등록한 자체 상품)
+  //   PRODUCT → Product.id  (관리자/뷰티 전문가가 등록한 카탈로그 뷰티 서비스)
+  //   DIRECT  → DirectProduct.id (뷰티 전문가가 직접 등록한 자체 상품)
   // 따라서 productId 로 Product 를 조회하는 코드는 반드시 itemType 을 먼저 확인할 것.
   itemType    String          @default("PRODUCT")
   productId   String
@@ -664,11 +664,11 @@ model ReservationItem {
   // 아래 값이 있으면 settlement.ts 가 Product 를 다시 읽지 않고 이 값만으로 계산한다.
   // 덕분에 상품이 하드 삭제돼도 정산액이 0원으로 사라지지 않는다.
   supplyPriceSnap           Decimal? @db.Decimal(12, 2) // 그때의 공급가(단가)
-  priceModelSnap            String? // 그때의 priceModel (SUPPLY | COMMISSION | DIRECT=상담사 자체 상품)
-  productCommissionRateSnap Decimal? @db.Decimal(5, 2) // COMMISSION 상품의 상담사 커미션율(%)
-  sellerFeeRateSnap         Decimal? @db.Decimal(5, 2) // 그때의 상담사 플랫폼 수수료율(%)
+  priceModelSnap            String? // 그때의 priceModel (SUPPLY | COMMISSION | DIRECT=뷰티 전문가 자체 상품)
+  productCommissionRateSnap Decimal? @db.Decimal(5, 2) // COMMISSION 상품의 뷰티 전문가 커미션율(%)
+  sellerFeeRateSnap         Decimal? @db.Decimal(5, 2) // 그때의 뷰티 전문가 플랫폼 수수료율(%)
   supplierFeeRateSnap       Decimal? @db.Decimal(5, 2) // 그때의 공급자 플랫폼 수수료율(%)
-  isSellerProductSnap       Boolean? // 상담을 진행하는 상담사가 직접 등록한 상품인지(Case 1 판정)
+  isSellerProductSnap       Boolean? // 상담을 진행하는 뷰티 전문가가 직접 등록한 상품인지(Case 1 판정)
   recipientRole             String? // 공급분 정산 수취인 역할: CONSULTANT | SUPER_ADMIN
   recipientId               String? // 공급분 정산 수취인 ID
 
@@ -676,7 +676,7 @@ model ReservationItem {
 }
 
 // ─────────────────────────────────────────────
-// 상담 시간 슬롯 (상담사가 열어둔 예약 가능 시간)
+// 소요 시간 슬롯 (뷰티 전문가가 열어둔 예약 가능 시간)
 // ─────────────────────────────────────────────
 
 model TimeSlot {
@@ -698,10 +698,10 @@ model TimeSlot {
 }
 
 // ─────────────────────────────────────────────
-// 점집 독립 회원 (ShopMembership)
-// 점집(SellerProfile) 단위의 자체 회원 체계. 점집 전용 가입/로그인 화면을 통해
-// 가입한 고객이 어느 점집 소속인지 기록한다. 인증 자체는 공용 User 를 쓰되,
-// 멤버십으로 점집별 회원을 완전히 분리 조회한다.
+// 뷰티샵 독립 회원 (ShopMembership)
+// 뷰티샵(SellerProfile) 단위의 자체 회원 체계. 뷰티샵 전용 가입/로그인 화면을 통해
+// 가입한 고객이 어느 뷰티샵 소속인지 기록한다. 인증 자체는 공용 User 를 쓰되,
+// 멤버십으로 뷰티샵별 회원을 완전히 분리 조회한다.
 // ⚠️ 운영 DB에는 아직 없는 테이블 — 조회는 safeQuery, 생성은 try-catch 폴백 필수.
 // ─────────────────────────────────────────────
 
@@ -711,7 +711,7 @@ model ShopMembership {
   shop         SellerProfile @relation("ShopMembers", fields: [shopId], references: [id], onDelete: Cascade)
   userId       String
   user         User          @relation("ShopMemberships", fields: [userId], references: [id], onDelete: Cascade)
-  consultantId String // 점집 상담사 User.id (조회 편의 비정규화)
+  consultantId String // 뷰티샵 뷰티 전문가 User.id (조회 편의 비정규화)
   joinedAt     DateTime      @default(now())
 
   @@unique([shopId, userId])
@@ -739,7 +739,7 @@ model ConsultingSession {
   reservation   Reservation             @relation(fields: [reservationId], references: [id], onDelete: Cascade)
   roomName      String                  @unique // Daily.co room name
   roomUrl       String // Daily.co room URL
-  hostToken     String                  @db.Text // 상담사용 meeting token
+  hostToken     String                  @db.Text // 뷰티 전문가용 meeting token
   guestToken    String                  @db.Text // 고객용 meeting token
   status        ConsultingSessionStatus @default(WAITING)
   startedAt     DateTime?
@@ -1145,7 +1145,7 @@ model LiveStream {
   products     LiveStreamProduct[]
   chatMessages LiveChatMessage[]
   coupons      LiveCoupon[]
-  // 점사 예약 방식 라이브 — 예약 설정과 방송 유래 예약
+  // 뷰티 상담 예약 방식 라이브 — 예약 설정과 방송 유래 예약
   reservationSettings LiveReservationSettings?
   reservations        Reservation[]
 
@@ -1156,7 +1156,7 @@ model LiveStream {
 }
 
 // ─────────────────────────────────────────────
-// 라이브 예약 설정 (점사 예약 방식 방송)
+// 라이브 예약 설정 (뷰티 상담 예약 방식 방송)
 // live_streams 는 운영 DB에 이미 존재하므로 컬럼을 추가하지 않고 별도 테이블로 확장한다.
 // ⚠️ 운영 DB에는 아직 없는 테이블 — 조회는 safeQuery, 생성은 try-catch 폴백 필수.
 // ─────────────────────────────────────────────
@@ -1421,7 +1421,7 @@ model Setting {
 // 시스템 전역 스위치 (노드 시스템 ON/OFF 등, 단일 레코드 id=1)
 model SystemConfig {
   id            Int      @id @default(1)
-  sellerOnlyFee Boolean  @default(false) // true: 플랫폼 수수료 전액 상담사 부담 (공급자 수수료 없음)
+  sellerOnlyFee Boolean  @default(false) // true: 플랫폼 수수료 전액 뷰티 전문가 부담 (공급자 수수료 없음)
   updatedAt     DateTime @updatedAt
 
   @@map("system_config")
@@ -1430,8 +1430,8 @@ model SystemConfig {
 // 역할별 플랫폼 수수료율 설정 (최고관리자 전용, 단일 레코드)
 model PlatformFeeSettings {
   id                   Int      @id @default(autoincrement())
-  sellerFeeRate        Decimal  @default(5.00) @db.Decimal(5, 2) // 상담사 플랫폼 수수료율
-  mentorCommissionRate Decimal  @default(1.00) @db.Decimal(5, 2) // 멘토 상담사 추천인 커미션율 (기본 1%)
+  sellerFeeRate        Decimal  @default(5.00) @db.Decimal(5, 2) // 뷰티 전문가 플랫폼 수수료율
+  mentorCommissionRate Decimal  @default(1.00) @db.Decimal(5, 2) // 멘토 뷰티 전문가 추천인 커미션율 (기본 1%)
   updatedAt            DateTime @updatedAt
 
   @@map("platform_fee_settings")

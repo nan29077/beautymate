@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 셀러브릭스 DB 백업을 매일 자정(한국시간)에 실행하도록 crontab 에 등록.
+# 뷰티메이트 DB 백업을 매일 자정(한국시간)에 실행하도록 crontab 에 등록.
 #
 # - CRON_TZ=Asia/Seoul 로 서버 타임존(보통 UTC)과 무관하게 KST 00:00 실행
 # - 마커 주석으로 기존 등록을 찾아 교체하므로 여러 번 실행해도 중복되지 않음(멱등)
@@ -20,7 +20,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="${REPO_DIR:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 BACKUP_SCRIPT="$REPO_DIR/scripts/backup-db.sh"
 LOG_FILE="$REPO_DIR/backups/backup.log"
-MARKER="# sellerbricks-db-backup"
+MARKER="# beautymate-db-backup"
 
 log() { printf '[setup-cron] %s\n' "$*"; }
 

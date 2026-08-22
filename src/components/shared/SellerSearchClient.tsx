@@ -27,7 +27,7 @@ interface Seller {
   category: string | null;
   mood: string | null;
   totalFans: number;
-  referralCode?: string | null; // 상담사 코드 검색용
+  referralCode?: string | null; // 뷰티 전문가 코드 검색용
   _count: {
     campaigns: number;
     shopProducts: number;
@@ -39,7 +39,7 @@ interface Seller {
   isNew?: boolean;
   isLive?: boolean;
   liveInfo?: { shareCode: string; title: string; viewerCount: number } | null;
-  /** 노출 상담상품 중 최저가 (상담상품이 없으면 null) */
+  /** 노출 뷰티 서비스 중 최저가 (뷰티 서비스가 없으면 null) */
   startPrice?: number | null;
 }
 
@@ -54,7 +54,7 @@ export default function SellerSearchClient({
   baseCategories,
 }: {
   sellers: Seller[];
-  /** 등록 상담사가 없어도 항상 노출할 기본 분야 칩 (사주·신점·타로 등) */
+  /** 등록 뷰티 전문가가 없어도 항상 노출할 기본 분야 칩 (뷰티·스킨케어·퍼스널 컬러 등) */
   baseCategories?: string[];
 }) {
   const [viewMode, setViewMode] = useState<"ranking" | "grid">("ranking");
@@ -63,7 +63,7 @@ export default function SellerSearchClient({
 
   const categories = useMemo(() => {
     const fromSellers = sellers.map((s) => s.category).filter(Boolean) as string[];
-    // 기본 분야를 먼저(정해진 순서대로) 두고, 그 외 상담사가 실제로 쓰는 분야를 뒤에 붙인다.
+    // 기본 분야를 먼저(정해진 순서대로) 두고, 그 외 뷰티 전문가가 실제로 쓰는 분야를 뒤에 붙인다.
     const base = baseCategories ?? [];
     const extra = Array.from(new Set(fromSellers.filter((c) => !base.includes(c)))).sort();
     return [...base, ...extra];
@@ -77,7 +77,7 @@ export default function SellerSearchClient({
         || s.shopDescription?.toLowerCase().includes(q)
         || s.category?.toLowerCase().includes(q)
         || s.mood?.toLowerCase().includes(q)
-        || s.referralCode?.toLowerCase().includes(q)  // 상담사 코드 검색
+        || s.referralCode?.toLowerCase().includes(q)  // 뷰티 전문가 코드 검색
         || s.tags?.some(t => t.toLowerCase().includes(q));
       const matchCategory = !selectedCategory || s.category === selectedCategory;
       return matchSearch && matchCategory;
@@ -93,7 +93,7 @@ export default function SellerSearchClient({
           <Icon name="Search" size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="상담사 이름, 카테고리로 검색..."
+            placeholder="뷰티 전문가 이름, 카테고리로 검색..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:bg-white border border-gray-100 focus:border-brand-200 transition-all"
@@ -153,10 +153,10 @@ export default function SellerSearchClient({
 
       {/* 결과 수 */}
       <div className="px-4 py-2">
-        <span className="text-[11px] text-gray-400">{filteredSellers.length}명의 상담사</span>
+        <span className="text-[11px] text-gray-400">{filteredSellers.length}명의 뷰티 전문가</span>
       </div>
 
-      {/* 상담사 목록 */}
+      {/* 뷰티 전문가 목록 */}
       {filteredSellers.length === 0 ? (
         <div className="text-center py-20 text-gray-400 px-4">
           <Icon name="Search" size={32} strokeWidth={1.5} className="mx-auto mb-3 opacity-30" />
@@ -249,7 +249,7 @@ function SellerRankingCard({ seller, rank }: { seller: Seller; rank: number }) {
         </div>
       </div>
 
-      {/* 하단: 프로필 이미지 + 상담상품/콘텐츠 이미지 그리드 */}
+      {/* 하단: 프로필 이미지 + 뷰티 서비스/콘텐츠 이미지 그리드 */}
       <Link href={sellerShopUrl(seller.slug)} className="flex items-start gap-2.5">
         {/* 프로필 이미지 (원형) - 라이브 중이면 두근두근 애니메이션 + 하단 LIVE 표시 */}
         <div className="flex flex-col items-center flex-shrink-0">

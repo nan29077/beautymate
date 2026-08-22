@@ -36,7 +36,7 @@ export default async function AdminRevenuePage({
       : {};
 
   // 수익 집계는 settlement.ts 와 동일한 규칙(스냅샷 기준)으로 계산한다.
-  // 상담사 몫에는 상담사 요율, 공급가(브랜드/중간관리자 몫)에는 공급자 요율을 적용하며,
+  // 뷰티 전문가 몫에는 뷰티 전문가 요율, 공급가(브랜드/중간관리자 몫)에는 공급자 요율을 적용하며,
   // 예약 수 제한 없이 전체를 집계한다. (lib/revenue.ts)
   const revenue = await getPlatformRevenue({ dateFilter });
 

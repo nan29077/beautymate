@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 // 방치된 PENDING 예약 정리용 크론 엔드포인트.
 // EC2 crontab 등에서 주기적으로 호출한다. 예) 5분마다:
-//   */5 * * * * curl -s -H "Authorization: Bearer $CRON_SECRET" https://sajunara.co.kr/api/cron/cleanup-pending
+//   */5 * * * * curl -s -H "Authorization: Bearer $CRON_SECRET" https://beautymate.co.kr/api/cron/cleanup-pending
 // CRON_SECRET 환경변수로 보호한다(미설정 시 비활성).
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;

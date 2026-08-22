@@ -26,7 +26,7 @@ export default function ReservationCountdown({
       const now = new Date();
       const diff = reservationTime.getTime() - now.getTime();
       if (diff <= 0) {
-        setLabel("상담 시간입니다!");
+        setLabel("소요 시간입니다!");
         setTimeLeft("00:00:00");
         return;
       }

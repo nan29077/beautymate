@@ -5,7 +5,7 @@ import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
 
 export const dynamic = "force-dynamic";
 
-// 로그인한 구매자가 찜(픽)한 상담사 중 현재 라이브 중인 상담사 목록 반환
+// 로그인한 구매자가 찜(픽)한 뷰티 전문가 중 현재 라이브 중인 뷰티 전문가 목록 반환
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) {

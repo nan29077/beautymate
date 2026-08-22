@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { X, Loader2 } from 'lucide-react';
 import ProductImage from "@/components/shared/ProductImage";
 import SafeImage from "@/components/shared/SafeImage";
-import { pickSajuAvatar } from "@/lib/defaults";
+import { pickBeautyMateAvatar } from "@/lib/defaults";
 
 interface SellerSale {
   sellerId: string;
@@ -94,7 +94,7 @@ export default function ProductSalesDetail({ productId, productName, thumbnail, 
                 </div>
                 <div className="min-w-0">
                   <h3 className="text-[15px] font-bold text-gray-900 truncate">{productName}</h3>
-                  <p className="text-[10px] text-gray-400">상담사별 판매내역</p>
+                  <p className="text-[10px] text-gray-400">뷰티 전문가별 판매내역</p>
                 </div>
               </div>
               <button onClick={() => setIsOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400">
@@ -111,7 +111,7 @@ export default function ProductSalesDetail({ productId, productName, thumbnail, 
               ) : !data || data.sellerSales.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">
                   <Icon name="Gem" size={36} className="mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">판매 상담사가 없습니다</p>
+                  <p className="text-sm">판매 뷰티 전문가가 없습니다</p>
                 </div>
               ) : (
                 <>
@@ -120,7 +120,7 @@ export default function ProductSalesDetail({ productId, productName, thumbnail, 
                     <div className="bg-blue-50 rounded-xl p-3 text-center">
                       <Icon name="Users" size={14} className="mx-auto text-blue-500 mb-1" />
                       <p className="text-lg font-bold text-blue-700">{data.totalSellers}</p>
-                      <p className="text-[9px] text-blue-500">상담사</p>
+                      <p className="text-[9px] text-blue-500">뷰티 전문가</p>
                     </div>
                     <div className="bg-emerald-50 rounded-xl p-3 text-center">
                       <Icon name="Cart" size={14} className="mx-auto text-emerald-500 mb-1" />
@@ -148,7 +148,7 @@ export default function ProductSalesDetail({ productId, productName, thumbnail, 
                               alt={seller.shopName}
                               width={40}
                               height={40}
-                              placeholder={pickSajuAvatar(seller.sellerId)}
+                              placeholder={pickBeautyMateAvatar(seller.sellerId)}
                               fallbackText={seller.shopName.charAt(0)}
                             />
                           </div>
@@ -164,7 +164,7 @@ export default function ProductSalesDetail({ productId, productName, thumbnail, 
                             )}
                             {seller.campaignCount > 0 && (
                               <span className="text-[9px] bg-emerald-100 text-emerald-600 px-1.5 py-0.5 rounded-full">
-                                단체 상담 {seller.campaignCount}건
+                                공동 프로모션 {seller.campaignCount}건
                               </span>
                             )}
                           </div>

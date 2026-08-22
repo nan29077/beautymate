@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 /**
  * GET /api/products/public-detail?id=xxx&sellerId=yyy&ref=slug
- * 인증 불필요 — 점집 바텀시트 등 고객 노출용 상담상품 상세
+ * 인증 불필요 — 뷰티샵 바텀시트 등 고객 노출용 뷰티 서비스 상세
  */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -32,12 +32,12 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    if (!product) return NextResponse.json({ error: "상담상품 없음" }, { status: 404 });
+    if (!product) return NextResponse.json({ error: "뷰티 서비스 없음" }, { status: 404 });
 
     const basePrice = Number(product.basePrice);
     const comparePrice = product.comparePrice ? Number(product.comparePrice) : null;
 
-    // ref(slug) 또는 sellerId 기준으로 상담사 판매가 결정
+    // ref(slug) 또는 sellerId 기준으로 뷰티 전문가 판매가 결정
     const refSellerProduct = ref
       ? product.sellerProducts.find((sp: any) => sp.seller?.slug === ref)
       : sellerId

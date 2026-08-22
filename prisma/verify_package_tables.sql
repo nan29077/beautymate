@@ -1,6 +1,6 @@
 SELECT TABLE_NAME, CREATE_TIME
 FROM information_schema.TABLES
-WHERE TABLE_SCHEMA = 'sellerbricks'
+WHERE TABLE_SCHEMA = 'beautymate'
   AND TABLE_NAME IN (
     'package_products',
     'package_items',

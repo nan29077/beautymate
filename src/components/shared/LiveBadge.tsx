@@ -1,8 +1,8 @@
-// 라이브 상태 표시 공통 컴포넌트 — 점집/단골픽/내픽/라이브검색에서 동일하게 재사용.
+// 라이브 상태 표시 공통 컴포넌트 — 뷰티샵/단골픽/내픽/라이브검색에서 동일하게 재사용.
 // - LIVE_RING_CLASS: 프로필 사진(아바타) 링에 적용하는 "두근두근" 펄스 (globals.css 의 animate-heartbeat).
 // - <LiveBadge />: Radio 라인 아이콘 + "상담 중" 배지.
 //
-// 사주나라 톤: 커머스식 빨강 "LIVE" 대신 딥 퍼플 + 상담 문구를 쓴다.
+// 뷰티메이트 톤: 커머스식 빨강 "LIVE" 대신 딥 퍼플 + 상담 문구를 쓴다.
 
 import { Radio } from "lucide-react";
 
@@ -32,7 +32,7 @@ export default function LiveBadge({
 }: {
   className?: string;
   size?: "xs" | "sm";
-  /** 문구 교체용 — 기본 "상담 중" (예: "라이브 상담 중") */
+  /** 문구 교체용 — 기본 "상담 중" (예: "라이브 뷰티 중") */
   label?: string;
 }) {
   const sized =

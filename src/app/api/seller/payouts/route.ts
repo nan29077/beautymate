@@ -6,7 +6,7 @@ import { getPayoutFeeRate } from "@/lib/settings";
 import { calcPayoutBreakdown } from "@/lib/payout";
 import { safeQuery, isMissingSchemaError } from "@/lib/safeDb";
 
-// GET: 상담사 정산 요약 + 출금요청 내역 + 출금 수수료율/사업자 여부 조회
+// GET: 뷰티 전문가 정산 요약 + 출금요청 내역 + 출금 수수료율/사업자 여부 조회
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id || session.user.role !== "CONSULTANT") {
@@ -18,7 +18,7 @@ export async function GET() {
     select: { id: true, commissionRate: true, businessType: true, isBusinessOperator: true },
   });
   if (!seller) {
-    return NextResponse.json({ error: "상담사 정보를 찾을 수 없습니다." }, { status: 404 });
+    return NextResponse.json({ error: "뷰티 전문가 정보를 찾을 수 없습니다." }, { status: 404 });
   }
 
   const [fees, payoutFeeRate] = await Promise.all([getPlatformFees(), getPayoutFeeRate()]);
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       select: { id: true, commissionRate: true, businessType: true, isBusinessOperator: true },
     });
     if (!seller) {
-      return NextResponse.json({ error: "상담사 정보를 찾을 수 없습니다." }, { status: 404 });
+      return NextResponse.json({ error: "뷰티 전문가 정보를 찾을 수 없습니다." }, { status: 404 });
     }
 
     const body = await request.json();
@@ -56,8 +56,8 @@ export async function POST(request: Request) {
       agreedDisclaimer,
       amount: requestedAmountRaw,
     } = body ?? {};
-    // 사업자 여부는 반드시 상담사 프로필에서만 도출한다. 클라이언트가 보낸 isBusiness 를
-    // 신뢰하면 비사업자 상담사가 "사업자"로 신청해 원천징수 3.3%를 건너뛸 수 있고,
+    // 사업자 여부는 반드시 뷰티 전문가 프로필에서만 도출한다. 클라이언트가 보낸 isBusiness 를
+    // 신뢰하면 비사업자 뷰티 전문가가 "사업자"로 신청해 원천징수 3.3%를 건너뛸 수 있고,
     // 그 세금은 플랫폼이 대신 부담하게 된다. (docs/SETTLEMENT_ISSUES.md #9)
     const requestedAsBusiness = seller.isBusinessOperator || seller.businessType === "business";
 
@@ -66,10 +66,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "입금 계좌/사업자 정보를 모두 입력하세요." }, { status: 400 });
     }
     if (requestedAsBusiness && !companyName) {
-      return NextResponse.json({ error: "사업자 상담사는 상호명을 입력하세요." }, { status: 400 });
+      return NextResponse.json({ error: "사업자 뷰티 전문가는 상호명을 입력하세요." }, { status: 400 });
     }
     if (!requestedAsBusiness && !agreedDisclaimer) {
-      return NextResponse.json({ error: "개인 상담사 원천징수 안내에 동의해야 합니다." }, { status: 400 });
+      return NextResponse.json({ error: "개인 뷰티 전문가 원천징수 안내에 동의해야 합니다." }, { status: 400 });
     }
 
     // 서버에서 실제 출금 가능 금액을 다시 계산 (클라이언트 값 신뢰하지 않음)
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
     const netAmount = actualPayoutAmount;
     const availableOrderCount = summary.orders.filter((o) => o.available).length;
 
-    // 트랜잭션 + 상담사 행 잠금(FOR UPDATE)으로 동시 출금 신청을 직렬화하고,
+    // 트랜잭션 + 뷰티 전문가 행 잠금(FOR UPDATE)으로 동시 출금 신청을 직렬화하고,
     // 잠금 이후 미반려 출금 합계를 다시 조회해 가용 금액을 재검증한다.
     // (잠금 없이는 두 요청이 동일한 잔액을 보고 둘 다 통과할 수 있음 — docs/SETTLEMENT_ISSUES.md #1)
     const EXCEEDS = "PAYOUT_EXCEEDS_AVAILABLE";

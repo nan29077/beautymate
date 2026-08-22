@@ -19,14 +19,14 @@ const ITEMS: { key: Key; icon: any; label: string; desc: string; color: string }
     key: "liveAlimtalkOptIn",
     icon: Radio,
     label: "라이브 시작 알림",
-    desc: "단골 상담사가 라이브를 시작하면 알림(앱·카카오 알림톡)을 받아요",
+    desc: "단골 뷰티 전문가가 라이브를 시작하면 알림(앱·카카오 알림톡)을 받아요",
     color: "text-rose-500",
   },
   {
     key: "notifyOrder",
     icon: Star,
-    label: "예약·상담 방식 알림",
-    desc: "예약 완료, 상담 방식 상태 변경 등 예약 관련 소식을 받아요",
+    label: "예약·진행 방식 알림",
+    desc: "예약 완료, 진행 방식 상태 변경 등 예약 관련 소식을 받아요",
     color: "text-blue-500",
   },
 ];

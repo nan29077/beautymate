@@ -17,7 +17,7 @@ function maskName(name: string): string {
 export async function GET(request: Request) {
   const session = await auth();
   if (!session?.user || session.user.role !== "CONSULTANT") {
-    return NextResponse.json({ error: "상담사만 조회할 수 있습니다." }, { status: 403 });
+    return NextResponse.json({ error: "뷰티 전문가만 조회할 수 있습니다." }, { status: 403 });
   }
 
   const seller = await prisma.sellerProfile.findUnique({
@@ -25,7 +25,7 @@ export async function GET(request: Request) {
     select: { id: true },
   });
   if (!seller) {
-    return NextResponse.json({ error: "상담사 프로필이 없습니다." }, { status: 404 });
+    return NextResponse.json({ error: "뷰티 전문가 프로필이 없습니다." }, { status: 404 });
   }
 
   // 클라이언트(브라우저) 로컬 기준 오늘 날짜를 그대로 사용한다.

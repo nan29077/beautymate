@@ -195,13 +195,13 @@ export default function GameCouponsClient() {
                   </div>
                 </div>
 
-                {/* 점집으로 이동 */}
+                {/* 뷰티샵으로 이동 */}
                 {c.status === "available" && c.sellerSlug && (
                   <Link
                     href={`/shop/${c.sellerSlug}`}
                     className="block text-center py-2.5 bg-brand-500 hover:bg-brand-600 text-gray-900 text-xs font-bold transition-colors"
                   >
-                    이 상담사 점집에서 사용하기
+                    이 뷰티 전문가 뷰티샵에서 사용하기
                   </Link>
                 )}
               </div>

@@ -110,21 +110,21 @@ export async function POST(request: Request) {
 
   try {
     const result = await prisma.$transaction(async (tx) => {
-      // 대상 상담사 확인 — body의 sellerId 는 신뢰하지 않고 슬롯·상품과의 정합성을 검증한다
+      // 대상 뷰티 전문가 확인 — body의 sellerId 는 신뢰하지 않고 슬롯·상품과의 정합성을 검증한다
       const sellerProfile = await tx.sellerProfile.findUnique({
         where: { id: sellerId },
         select: { id: true, userId: true, commissionRate: true },
       });
-      if (!sellerProfile) throw new Error("상담사를 찾을 수 없습니다.");
+      if (!sellerProfile) throw new Error("뷰티 전문가를 찾을 수 없습니다.");
 
       // 슬롯 가용 여부 확인 (비관적 잠금 대신 트랜잭션 내 재확인)
       const slot = await tx.timeSlot.findUnique({
         where: { id: timeSlotId },
       });
       if (!slot) throw new Error("존재하지 않는 예약 시간입니다.");
-      // 슬롯 소유자(consultantId=User.id)와 예약 대상 상담사가 일치해야 한다
+      // 슬롯 소유자(consultantId=User.id)와 예약 대상 뷰티 전문가가 일치해야 한다
       if (slot.consultantId !== sellerProfile.userId) {
-        throw new Error("해당 상담사의 예약 시간이 아닙니다.");
+        throw new Error("해당 뷰티 전문가의 예약 시간이 아닙니다.");
       }
       if (!slot.isAvailable || slot.reservationId) {
         throw new Error("SLOT_TAKEN");
@@ -134,9 +134,9 @@ export async function POST(request: Request) {
       const product = await tx.product.findUnique({
         where: { id: productId },
       });
-      if (!product || !product.isActive) throw new Error("상담 상품을 찾을 수 없습니다.");
-      // 상품 ↔ 상담사 정합성: 상담사 직접 등록 상품이거나, 해당 점집에 담긴 상품이어야 한다
-      // 점집에 담긴 상품은 상담사가 직접 설정한 판매가(sellerPrice)가 있으면 그 가격으로 청구한다
+      if (!product || !product.isActive) throw new Error("뷰티 서비스를 찾을 수 없습니다.");
+      // 상품 ↔ 뷰티 전문가 정합성: 뷰티 전문가 직접 등록 상품이거나, 해당 뷰티샵에 담긴 상품이어야 한다
+      // 뷰티샵에 담긴 상품은 뷰티 전문가가 직접 설정한 판매가(sellerPrice)가 있으면 그 가격으로 청구한다
       // (클라이언트 BookingFlow 표시 가격: sellerPrice ?? basePrice 와 일치시킴)
       let sellerPriceOverride: number | null = null;
       if (product.sellerId !== sellerId) {
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
           where: { sellerId, productId, isActive: true },
           select: { id: true, sellerPrice: true },
         });
-        if (!shopProduct) throw new Error("해당 상담사의 상담 상품이 아닙니다.");
+        if (!shopProduct) throw new Error("해당 뷰티 전문가의 뷰티 서비스가 아닙니다.");
         sellerPriceOverride =
           shopProduct.sellerPrice != null ? Number(shopProduct.sellerPrice) : null;
       }
@@ -156,7 +156,7 @@ export async function POST(request: Request) {
           where: { id: liveStreamId },
           select: { id: true, sellerId: true },
         });
-        // 방송이 존재하고 예약 대상 상담사의 방송일 때만 연결 (아니면 조용히 무시)
+        // 방송이 존재하고 예약 대상 뷰티 전문가의 방송일 때만 연결 (아니면 조용히 무시)
         if (live && live.sellerId === sellerId) {
           liveId = live.id;
           // 당일 예약 가능 슬롯 수 제한 (설정 테이블 미반영 시 무제한)
@@ -187,7 +187,7 @@ export async function POST(request: Request) {
         }
       }
 
-      // 청구 금액: 점집 판매가(sellerPrice)가 있으면 우선, 없으면 기본가(basePrice)
+      // 청구 금액: 뷰티샵 판매가(sellerPrice)가 있으면 우선, 없으면 기본가(basePrice)
       const amount = sellerPriceOverride ?? Number(product.basePrice);
       const reservationNumber = generateOrderNumber();
 

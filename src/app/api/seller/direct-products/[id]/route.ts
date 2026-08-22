@@ -4,20 +4,20 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// 일반상담상품 소유권 검증 후 상담사 프로필 id 반환
+// 일반 뷰티 서비스 소유권 검증 후 뷰티 전문가 프로필 id 반환
 async function getOwnedProduct(userId: string, productId: string) {
   const seller = await prisma.sellerProfile.findUnique({ where: { userId }, select: { id: true } });
-  if (!seller) return { error: "상담사 프로필을 찾을 수 없습니다.", status: 404 as const };
+  if (!seller) return { error: "뷰티 전문가 프로필을 찾을 수 없습니다.", status: 404 as const };
   const product = await prisma.directProduct.findUnique({ where: { id: productId }, select: { id: true, sellerId: true } });
-  if (!product || product.sellerId !== seller.id) return { error: "상담상품을 찾을 수 없습니다.", status: 404 as const };
+  if (!product || product.sellerId !== seller.id) return { error: "뷰티 서비스를 찾을 수 없습니다.", status: 404 as const };
   return { sellerId: seller.id };
 }
 
-// 일반상담상품 수정
+// 일반 뷰티 서비스 수정
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> | { id: string } }) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
-  if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+  if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가만 접근 가능" }, { status: 403 });
 
   const { id } = await Promise.resolve(params);
   const owned = await getOwnedProduct(session.user!.id, id);
@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   if (typeof body.name === "string") {
     const name = body.name.trim();
-    if (!name) return NextResponse.json({ error: "상담상품명을 입력해주세요." }, { status: 400 });
+    if (!name) return NextResponse.json({ error: "뷰티 서비스명을 입력해주세요." }, { status: 400 });
     data.name = name;
   }
   if (body.price !== undefined) {
@@ -51,11 +51,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   return NextResponse.json({ success: true });
 }
 
-// 일반상담상품 삭제
+// 일반 뷰티 서비스 삭제
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> | { id: string } }) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
-  if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+  if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가만 접근 가능" }, { status: 403 });
 
   const { id } = await Promise.resolve(params);
   const owned = await getOwnedProduct(session.user!.id, id);

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { useFeatureFlags } from "@/components/shared/FeatureFlagsProvider";
 import { useShopChrome } from "@/components/shared/ShopChromeProvider";
 
-// 비고객(상담사/관리자/브랜드/중간관리자)의 "마이페이지" 목적지는 본인 대시보드.
+// 비고객(뷰티 전문가/관리자/브랜드/중간관리자)의 "마이페이지" 목적지는 본인 대시보드.
 // /my 로 보내면 서버에서 다시 대시보드로 리다이렉트되며 플래시가 생기므로, 처음부터 대시보드로 연결한다.
 function myPageHref(role?: string): string {
   switch (role) {
@@ -25,7 +25,7 @@ const HIDDEN_PATHS = [
   /^\/campaigns\/[^/]+$/,
   /^\/cart$/,
   /^\/live\/[^/]+$/,
-  // 점집은 공통 하단 네비를 숨기고 점집 전용 하단 네비(SellerShopBottomNav)를 사용.
+  // 뷰티샵은 공통 하단 네비를 숨기고 뷰티샵 전용 하단 네비(SellerShopBottomNav)를 사용.
   /^\/shop\/[^/]+/,
 ];
 
@@ -42,21 +42,21 @@ export default function MobileNav() {
   const embedded = searchParams?.get("embedded") === "true" || searchParams?.get("from") === "live";
   const flags = useFeatureFlags();
   const { data: session } = useSession();
-  // 상담사 서브페이지에서는 공통 하단바 대신 상담사 전용 하단바(SellerShopBottomNav)를 사용한다.
+  // 뷰티 전문가 서브페이지에서는 공통 하단바 대신 뷰티 전문가 전용 하단바(SellerShopBottomNav)를 사용한다.
   const { subpageActive } = useShopChrome();
 
   // "마이페이지"는 역할에 따라 본인 대시보드 또는 /my 로 연결 (비고객 /my 리다이렉트 플래시 방지)
   const myHref = myPageHref(session?.user?.role);
 
-  // 메인(고객) 하단 메뉴: 홈 · 라이브 · 예약 · 상담사 · 마이페이지
-  // ('상담사 탐색'이 꺼져 있으면 /sellers 가 404이므로 대신 내 단골 상담사(/my/seller)를 연결한다)
+  // 메인(고객) 하단 메뉴: 홈 · 라이브 · 예약 · 뷰티 전문가 · 마이페이지
+  // ('뷰티 전문가 탐색'이 꺼져 있으면 /sellers 가 404이므로 대신 내 단골 뷰티 전문가(/my/seller)를 연결한다)
   const navItems: { href: string; icon: string; label: string; matchExact?: boolean }[] = [
     { href: "/", icon: "Home", label: "홈", matchExact: true },
     ...(flags.liveCommerce ? [{ href: "/live", icon: "Live", label: "라이브" }] : []),
     { href: "/my/reservations", icon: "Calendar", label: "예약" },
     flags.seller
-      ? { href: "/sellers", icon: "Users", label: "상담사" }
-      : { href: "/my/seller", icon: "Users", label: "상담사" },
+      ? { href: "/sellers", icon: "Users", label: "뷰티 전문가" }
+      : { href: "/my/seller", icon: "Users", label: "뷰티 전문가" },
     { href: myHref, icon: "MyPage", label: "마이페이지", matchExact: true },
   ];
 
@@ -69,7 +69,7 @@ export default function MobileNav() {
     const isActive = matchExact || href === "/" ? pathname === href : pathname.startsWith(href);
     if (isActive) return;
     setTappedHref(href);
-    // 홈('/') 버튼: 비고객 역할(상담사/관리자)은 /?main=1 로 이동하여 대시보드 자동 리다이렉트 우회
+    // 홈('/') 버튼: 비고객 역할(뷰티 전문가/관리자)은 /?main=1 로 이동하여 대시보드 자동 리다이렉트 우회
     const role = (session?.user as any)?.role;
     const pushHref = href === "/" && role && role !== "CUSTOMER" ? "/?main=1" : href;
     startTransition(() => {
@@ -146,7 +146,7 @@ export default function MobileNav() {
 
       {/* PC(lg+): 앱 컨테이너 바로 오른쪽 세로 사이드바 */}
       {/* 앱 컨테이너는 max-w-[480px] mx-auto → 오른쪽 끝: calc(50% + 240px). 사이드바는 그 바로 우측에 배치 */}
-      <nav
+      {pathname !== "/" && <nav
         className="hidden lg:flex fixed top-1/2 -translate-y-1/2 z-[60] flex-col items-center gap-1 py-4 px-2 bg-white/90 backdrop-blur-sm border border-gray-100 rounded-2xl shadow-md"
         style={{ left: "calc(50% + 248px)" }}
       >
@@ -200,7 +200,7 @@ export default function MobileNav() {
             <span className="text-[9px] leading-tight font-medium">로그아웃</span>
           </button>
         )}
-      </nav>
+      </nav>}
     </>
   );
 }

@@ -16,7 +16,7 @@ export default function RejectSellerButton({ sellerId, sellerName }: RejectSelle
 
   const handleReject = async () => {
     const ok = await appConfirm({
-      message: `${sellerName ? `'${sellerName}' ` : ""}상담사 입점 신청을 거절하시겠습니까?\n신청 계정이 삭제됩니다.`,
+      message: `${sellerName ? `'${sellerName}' ` : ""}뷰티 전문가 입점 신청을 거절하시겠습니까?\n신청 계정이 삭제됩니다.`,
       type: "warning",
       confirmText: "거절",
     });

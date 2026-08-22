@@ -6,7 +6,7 @@ import { ensureShopMembership } from "@/lib/shopMembership";
 
 export const dynamic = "force-dynamic";
 
-// GET /api/admin/memberships — 전체 점집 회원 조회 (관리자 전용)
+// GET /api/admin/memberships — 전체 뷰티샵 회원 조회 (관리자 전용)
 // query: shopId, search(이름/이메일/전화), page, limit
 export async function GET(request: Request) {
   const session = await auth();
@@ -70,7 +70,7 @@ export async function GET(request: Request) {
   });
 }
 
-// POST /api/admin/memberships — 관리자가 고객을 점집 회원으로 등록
+// POST /api/admin/memberships — 관리자가 고객을 뷰티샵 회원으로 등록
 // body: { userId, shopId }
 export async function POST(request: Request) {
   const session = await auth();
@@ -88,13 +88,13 @@ export async function POST(request: Request) {
     prisma.sellerProfile.findUnique({ where: { id: shopId }, select: { id: true, userId: true } }),
   ]);
   if (!user || !shop) {
-    return NextResponse.json({ error: "고객 또는 점집을 찾을 수 없습니다." }, { status: 404 });
+    return NextResponse.json({ error: "고객 또는 뷰티샵을 찾을 수 없습니다." }, { status: 404 });
   }
 
   const membership = await ensureShopMembership(shop.id, userId, shop.userId);
   if (!membership) {
     return NextResponse.json(
-      { error: "점집 회원 기능이 아직 준비 중입니다. (DB 스키마 미반영)" },
+      { error: "뷰티샵 회원 기능이 아직 준비 중입니다. (DB 스키마 미반영)" },
       { status: 503 },
     );
   }
@@ -119,7 +119,7 @@ export async function DELETE(request: Request) {
   } catch (e) {
     if (isMissingSchemaError(e)) {
       return NextResponse.json(
-        { error: "점집 회원 기능이 아직 준비 중입니다." },
+        { error: "뷰티샵 회원 기능이 아직 준비 중입니다." },
         { status: 503 },
       );
     }

@@ -1,5 +1,5 @@
 -- ─────────────────────────────────────────────────────────────
--- 사주메이트 상담 예약 테이블 DDL
+-- 뷰티메이트 상담 예약 테이블 DDL
 --
 -- 운영 DB(RDS)에 직접 실행하기 위한 파일.
 -- prisma migrate / prisma db push 는 사용하지 말 것 (다른 테이블까지 건드림).
@@ -34,7 +34,7 @@
 CREATE TABLE IF NOT EXISTS `Reservation` (
   `id` VARCHAR(191) NOT NULL,
   `buyerId` VARCHAR(191) NOT NULL,        -- User.id (고객)
-  `sellerId` VARCHAR(191) NOT NULL,       -- User.id (상담사)
+  `sellerId` VARCHAR(191) NOT NULL,       -- User.id (뷰티 전문가)
   `productId` VARCHAR(191) NOT NULL,      -- DirectProduct.id
   `status` ENUM('PENDING','CONFIRMED','COMPLETED','CANCELLED') NOT NULL DEFAULT 'PENDING',
   `consultType` ENUM('VIDEO','PHONE','VISIT') NOT NULL,
@@ -44,12 +44,12 @@ CREATE TABLE IF NOT EXISTS `Reservation` (
   `cancelledAt` DATETIME(3) NULL,
   `dailyRoomName` VARCHAR(191) NULL,      -- Daily.co 방 이름
   `dailyRoomUrl` VARCHAR(191) NULL,       -- Daily.co 방 URL
-  `dailySellerToken` TEXT NULL,           -- 상담사 토큰
+  `dailySellerToken` TEXT NULL,           -- 뷰티 전문가 토큰
   `dailyBuyerToken` TEXT NULL,            -- 고객 토큰
   `orderId` VARCHAR(191) NULL,            -- Order.id (결제 연결)
   `paidAt` DATETIME(3) NULL,              -- 결제 완료 시각 (NULL = 미결제 → 30분 뒤 크론이 취소)
   `price` DECIMAL(10,2) NOT NULL,
-  `memo` TEXT NULL,                       -- 상담사 메모
+  `memo` TEXT NULL,                       -- 뷰티 전문가 메모
   `aiSummary` TEXT NULL,                  -- AI 요약
   `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updatedAt` DATETIME(3) NOT NULL,
@@ -59,10 +59,10 @@ CREATE TABLE IF NOT EXISTS `Reservation` (
   KEY `Reservation_orderId_idx` (`orderId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 상담사 가능 시간 (상담사당 요일별 1행 · isActive=false 면 그 요일은 휴무)
+-- 뷰티 전문가 가능 시간 (뷰티 전문가당 요일별 1행 · isActive=false 면 그 요일은 휴무)
 CREATE TABLE IF NOT EXISTS `TimeSlot` (
   `id` VARCHAR(191) NOT NULL,
-  `sellerId` VARCHAR(191) NOT NULL,       -- User.id (상담사)
+  `sellerId` VARCHAR(191) NOT NULL,       -- User.id (뷰티 전문가)
   `dayOfWeek` INT NOT NULL,               -- 0=일, 1=월 ... 6=토
   `startHour` INT NOT NULL,               -- 시작 시 (0-23)
   `startMinute` INT NOT NULL,             -- 시작 분

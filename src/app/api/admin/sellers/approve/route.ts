@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
   const { sellerId } = await request.json();
   if (!sellerId) {
-    return NextResponse.json({ error: "상담사 ID가 필요합니다." }, { status: 400 });
+    return NextResponse.json({ error: "뷰티 전문가 ID가 필요합니다." }, { status: 400 });
   }
 
   const seller = await prisma.sellerProfile.update({
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     select: { id: true, userId: true },
   });
 
-  // 고객이 상담사 역할로 전환되도록 user.role 도 CONSULTANT 로 변경
+  // 고객이 뷰티 전문가 역할로 전환되도록 user.role 도 CONSULTANT 로 변경
   await prisma.user.update({
     where: { id: seller.userId },
     data: { role: "CONSULTANT" },

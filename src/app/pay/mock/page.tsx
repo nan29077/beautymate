@@ -68,7 +68,7 @@ export default async function MockPayPage({
         amount: Math.round(Number(reservation.finalAmount)),
         customerName: reservation.customerName,
         shopName: reservation.seller.shopName,
-        productName: reservation.items[0]?.productName ?? "상담 상품",
+        productName: reservation.items[0]?.productName ?? "뷰티 서비스",
       }}
       successPayload={successPayload}
       failPayload={failPayload}

@@ -23,7 +23,7 @@ export async function POST() {
     const products = await prisma.product.findMany({ take: 20 });
 
     if (sellers.length === 0) {
-      return NextResponse.json({ error: "상담사가 없습니다. 먼저 상담사를 등록하세요." }, { status: 400 });
+      return NextResponse.json({ error: "뷰티 전문가가 없습니다. 먼저 뷰티 전문가를 등록하세요." }, { status: 400 });
     }
 
     const statuses: any[] = ["PENDING", "CONFIRMED", "COMPLETED"];

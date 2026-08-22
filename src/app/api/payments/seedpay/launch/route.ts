@@ -81,8 +81,8 @@ export async function GET(request: Request) {
   const firstItem = order.items[0];
   const goodsNm =
     order.items.length > 1
-      ? `${firstItem?.productName ?? "상담상품"} 외 ${order.items.length - 1}건`
-      : firstItem?.productName ?? "상담상품";
+      ? `${firstItem?.productName ?? "뷰티 서비스"} 외 ${order.items.length - 1}건`
+      : firstItem?.productName ?? "뷰티 서비스";
 
   // returnUrl: SeedPay 가 인증 결과를 보낼 URL.
   // - PC iframe(full 아님): pgAsistant.js 의 returnData 가 부모 window 에서 form.action 으로
@@ -138,7 +138,7 @@ export async function GET(request: Request) {
     const testFields: Record<string, string> = {
       mid: seedpayConfig.mid,
       method: "ALL",
-      goodsNm: "테스트상담상품",
+      goodsNm: "테스트뷰티 서비스",
       ordNo: "TEST" + ediDate,
       goodsAmt: testGoodsAmt,
       ordNm: "홍길동",

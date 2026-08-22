@@ -2,15 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// 해당 라이브가 요청 상담사의 소유인지 검증 후 상담사 프로필/라이브 반환
+// 해당 라이브가 요청 뷰티 전문가의 소유인지 검증 후 뷰티 전문가 프로필/라이브 반환
 async function resolveOwnedLive(liveId: string) {
   const session = await auth();
   if (!session || session.user?.role !== "CONSULTANT") {
-    return { error: NextResponse.json({ error: "상담사만 가능" }, { status: 403 }) };
+    return { error: NextResponse.json({ error: "뷰티 전문가만 가능" }, { status: 403 }) };
   }
   const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
   if (!seller) {
-    return { error: NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 }) };
+    return { error: NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 }) };
   }
   const live = await prisma.liveStream.findUnique({ where: { id: liveId } });
   if (!live || live.sellerId !== seller.id) {

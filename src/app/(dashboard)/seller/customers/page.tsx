@@ -76,7 +76,7 @@ export default async function SellerCustomersPage() {
     if (!row.gender && r.gender) row.gender = r.gender;
   }
 
-  // 이 점집으로 가입 귀속된 고객 (예약 이력이 없어도 목록에 노출)
+  // 이 뷰티샵으로 가입 귀속된 고객 (예약 이력이 없어도 목록에 노출)
   const referred = await safeQuery("seller referred customers", () =>
     prisma.buyerProfile.findMany({
       where: { referredBySellerId: seller.id },

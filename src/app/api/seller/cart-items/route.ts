@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// 상담사가 자신의 점집에 담긴 장바구니 항목을 삭제 (선택/전체)
+// 뷰티 전문가가 자신의 뷰티샵에 담긴 장바구니 항목을 삭제 (선택/전체)
 export async function DELETE(request: Request) {
   try {
     const session = await auth();
@@ -12,7 +12,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
     }
     if ((session.user as any).role !== "CONSULTANT") {
-      return NextResponse.json({ error: "상담사만 삭제할 수 있습니다." }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가만 삭제할 수 있습니다." }, { status: 403 });
     }
 
     const seller = await prisma.sellerProfile.findUnique({
@@ -20,7 +20,7 @@ export async function DELETE(request: Request) {
       select: { id: true },
     });
     if (!seller) {
-      return NextResponse.json({ error: "상담사 정보를 찾을 수 없습니다." }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가 정보를 찾을 수 없습니다." }, { status: 403 });
     }
 
     const body = await request.json().catch(() => ({}));
@@ -29,7 +29,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "삭제할 항목이 없습니다." }, { status: 400 });
     }
 
-    // 반드시 이 상담사의 항목만 삭제 (sellerId 조건으로 소유권 보장)
+    // 반드시 이 뷰티 전문가의 항목만 삭제 (sellerId 조건으로 소유권 보장)
     const result = await prisma.cartItem.deleteMany({
       where: { id: { in: ids }, sellerId: seller.id },
     });

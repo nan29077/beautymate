@@ -21,10 +21,10 @@ export default function HomeStartTabs() {
             <Icon name="Rocket" size={13} /> <span className="text-[11px] font-bold tracking-wide">START NOW</span>
           </div>
           <h2 className="text-[24px] font-extrabold text-white leading-tight">
-            지금 바로<br />사주나라를 시작하세요
+            지금 바로<br />뷰티메이트를 시작하세요
           </h2>
           <p className="mt-3 text-[13px] text-gray-300 leading-relaxed">
-            좋아하는 상담사의 라이브를 즐기거나,<br />나만의 점집을 열어 판매를 시작해보세요.
+            좋아하는 뷰티 전문가의 라이브를 즐기거나,<br />나만의 뷰티샵을 열어 판매를 시작해보세요.
           </p>
 
           {/* 탭 버튼 */}
@@ -45,7 +45,7 @@ export default function HomeStartTabs() {
                 tab === "seller" ? "bg-white text-gray-900" : "text-white/70 hover:text-white"
               }`}
             >
-              <Icon name="Sparkles" size={15} strokeWidth={1.8} /> 상담사로 시작하기
+              <Icon name="Sparkles" size={15} strokeWidth={1.8} /> 뷰티 전문가로 시작하기
             </button>
           </div>
 
@@ -53,7 +53,7 @@ export default function HomeStartTabs() {
           {tab === "signup" ? (
             <div className="mt-5">
               <p className="text-[12px] text-gray-400 mb-3">
-                고객으로 가입하고 좋아하는 상담사를 단골로 설정하세요.
+                고객으로 가입하고 좋아하는 뷰티 전문가를 단골로 설정하세요.
               </p>
               <Link
                 href="/auth/register"
@@ -93,13 +93,13 @@ export default function HomeStartTabs() {
           ) : (
             <div className="mt-5">
               <p className="text-[12px] text-gray-400 mb-4">
-                나만의 상담 서비스를 등록하고 나만의 점집을 열어보세요.
+                나만의 상담 서비스를 등록하고 나만의 뷰티샵을 열어보세요.
               </p>
               <Link
                 href="/become-seller"
                 className="flex items-center justify-center gap-1.5 w-full py-3.5 rounded-2xl bg-brand-500 text-black text-[14px] font-extrabold active:scale-[0.98] transition-transform"
               >
-                상담사 신청하기 <Icon name="ChevronDown" size={17} className="-rotate-90" />
+                뷰티 전문가 신청하기 <Icon name="ChevronDown" size={17} className="-rotate-90" />
               </Link>
             </div>
           )}

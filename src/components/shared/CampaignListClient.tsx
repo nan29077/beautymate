@@ -81,7 +81,7 @@ export default function CampaignListClient({
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2 min-w-0">
               <Icon name="Cart" size={20} strokeWidth={1.5} className="text-brand-600 flex-shrink-0" />
-              <h1 className="text-lg font-bold text-gray-900 truncate">단체 상담</h1>
+              <h1 className="text-lg font-bold text-gray-900 truncate">공동 프로모션</h1>
             </div>
             <div className="flex items-center gap-1.5 flex-shrink-0">
               {/* 검색 토글 버튼 */}
@@ -135,7 +135,7 @@ export default function CampaignListClient({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="상담상품명, 상담사명으로 검색..."
+                placeholder="뷰티 서비스명, 뷰티 전문가명으로 검색..."
                 className="w-full pl-8 pr-8 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-brand-300 focus:ring-1 focus:ring-brand-200 transition-all placeholder-gray-400"
                 autoFocus
                 style={{ fontSize: "16px", maxHeight: "40px" }}
@@ -206,10 +206,10 @@ export default function CampaignListClient({
               {searchQuery
                 ? `'${searchQuery}' 검색 결과가 없습니다`
                 : activeTab === "live"
-                  ? "진행중인 단체 상담이 없습니다"
+                  ? "진행중인 공동 프로모션이 없습니다"
                   : activeTab === "scheduled"
-                    ? "오픈 예정인 단체 상담이 없습니다"
-                    : "종료된 단체 상담이 없습니다"}
+                    ? "오픈 예정인 공동 프로모션이 없습니다"
+                    : "종료된 공동 프로모션이 없습니다"}
             </p>
             <p className="text-xs text-gray-400">
               {searchQuery ? "다른 검색어를 시도해보세요" : "새로운 딜이 곧 오픈됩니다!"}

@@ -40,7 +40,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Seller not found" }, { status: 404 });
     }
 
-    // 점집 커스터마이징(한줄 소개·상세 소개·상담 분야 태그)은 Setting 테이블에 저장한다.
+    // 뷰티샵 커스터마이징(한줄 소개·상세 소개·상담 분야 태그)은 Setting 테이블에 저장한다.
     let customization = undefined;
     if (tagline !== undefined || intro !== undefined || tags !== undefined) {
       customization = await setShopCustomization(seller.id, {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET: 특정 상담사에서 현재 고객이 받을 수 있는 할인 정보
+// GET: 특정 뷰티 전문가에서 현재 고객이 받을 수 있는 할인 정보
 // 추천인/픽(채널인증) 할인은 2026-07 폐지 — 장바구니 할인 설정만 반환한다.
 // - cartDiscount: 장바구니 할인 설정 (금액 조건은 클라이언트가 소계로 판정, 확정 계산은 api/orders)
 // - discount/potentialDiscount 키는 구버전 클라이언트 호환을 위해 null 로 유지.

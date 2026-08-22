@@ -3,9 +3,9 @@ const path = require('path');
 const fs = require('fs');
 
 const guides = [
-  { html: 'guide-warehouse.html', pdf: '셀러브릭스_서비스소개서_창고지기용.pdf' },
-  { html: 'guide-seller.html', pdf: '셀러브릭스_서비스소개서_셀러용.pdf' },
-  { html: 'guide-brand.html', pdf: '셀러브릭스_서비스소개서_브랜드사용.pdf' },
+  { html: 'guide-warehouse.html', pdf: '뷰티메이트_서비스소개서_창고지기용.pdf' },
+  { html: 'guide-seller.html', pdf: '뷰티메이트_서비스소개서_셀러용.pdf' },
+  { html: 'guide-brand.html', pdf: '뷰티메이트_서비스소개서_브랜드사용.pdf' },
 ];
 
 const BASE_URL = process.argv[2] || 'http://localhost:3000';

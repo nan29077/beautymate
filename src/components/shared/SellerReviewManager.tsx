@@ -120,7 +120,7 @@ export default function SellerReviewManager() {
             key={review.id}
             className={`bg-white border rounded-xl p-4 space-y-3 ${review.isHidden ? "border-gray-100 opacity-60" : "border-gray-100"}`}
           >
-            {/* 상담상품 정보 */}
+            {/* 뷰티 서비스 정보 */}
             <div className="flex items-center gap-2">
               {review.product.thumbnail && (
                 <SafeImage
@@ -173,10 +173,10 @@ export default function SellerReviewManager() {
               )}
             </div>
 
-            {/* 상담사 댓글 영역 */}
+            {/* 뷰티 전문가 댓글 영역 */}
             <div className="bg-gray-50 rounded-lg p-3 border border-gray-100 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-gray-600">상담사 댓글</span>
+                <span className="text-[11px] font-semibold text-gray-600">뷰티 전문가 댓글</span>
                 {review.sellerCommentedAt && !isEditing && (
                   <span className="text-[10px] text-gray-400">
                     {new Date(review.sellerCommentedAt).toLocaleDateString("ko-KR")}

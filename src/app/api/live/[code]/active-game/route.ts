@@ -4,7 +4,7 @@ import { usesParticipants } from "@/lib/gameTypes";
 
 export const dynamic = "force-dynamic";
 
-// GET: 해당 상담사의 현재 RUNNING 참여형 게임 1개 반환 (시청자 참여 버튼용, 인증 불필요)
+// GET: 해당 뷰티 전문가의 현재 RUNNING 참여형 게임 1개 반환 (시청자 참여 버튼용, 인증 불필요)
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ code: string }> | { code: string } },

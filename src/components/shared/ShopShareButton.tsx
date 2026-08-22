@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Share2, Check } from "lucide-react";
 
-// 점집 예약 URL 공유 버튼.
+// 뷰티샵 예약 URL 공유 버튼.
 // Web Share API 가 있으면 네이티브 공유 시트, 없으면 클립보드 복사로 폴백한다.
 
 export default function ShopShareButton({
@@ -20,7 +20,7 @@ export default function ShopShareButton({
   const handleShare = async () => {
     const url = typeof window !== "undefined" ? `${window.location.origin}/shop/${slug}` : `/shop/${slug}`;
     const shareData = {
-      title: `${shopName} | 사주나라`,
+      title: `${shopName} | 뷰티메이트`,
       text: `${shopName}에서 상담을 예약해 보세요.`,
       url,
     };

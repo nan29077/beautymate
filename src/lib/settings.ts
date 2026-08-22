@@ -54,18 +54,18 @@ export const FOOTER_DEFAULTS: FooterSettings = {
   mailOrderNum: "0000-테스트-0000",
   phone: "000-0000-0000",
   address: "서울특별시 테스트구 테스트로 000, 0층",
-  copyright: "2026 사주나라. All rights reserved.",
+  copyright: "2026 뷰티메이트. All rights reserved.",
 };
 
 
 // SocialLinks 타입은 featureFlags.ts에 정의됨 (클라이언트 공용)
 export type { SocialLinks };
 
-// 상담사 출금 수수료율(%) — 최고관리자 설정값, 없으면 0
+// 뷰티 전문가 출금 수수료율(%) — 최고관리자 설정값, 없으면 0
 export const PAYOUT_FEE_RATE_KEY = "payoutFeeRate";
 export const DEFAULT_PAYOUT_FEE_RATE = 0;
 
-// 역할별 정산 주기(영업일 기준 N일 후) — 상담사 외 중간관리자/브랜드사
+// 역할별 정산 주기(영업일 기준 N일 후) — 뷰티 전문가 외 중간관리자/브랜드사
 export const MIDDLE_SETTLE_DAYS_KEY = "middleSettleDays";
 export const BRAND_SETTLE_DAYS_KEY = "brandSettleDays";
 export const DEFAULT_MIDDLE_SETTLE_DAYS = 5;
@@ -145,7 +145,7 @@ export async function getBrandSettleDays(): Promise<number> {
   return parseDays(map[BRAND_SETTLE_DAYS_KEY], DEFAULT_BRAND_SETTLE_DAYS);
 }
 
-// 상담사 출금 수수료율(%) 조회 — 최고관리자가 설정한 값, 미설정/비정상 값이면 0
+// 뷰티 전문가 출금 수수료율(%) 조회 — 최고관리자가 설정한 값, 미설정/비정상 값이면 0
 export async function getPayoutFeeRate(): Promise<number> {
   const map = await getSettingsMap();
   const raw = map[PAYOUT_FEE_RATE_KEY];
@@ -171,8 +171,8 @@ export async function getSocialLinks(): Promise<import("@/lib/featureFlags").Soc
 export async function getFooterSettings(): Promise<FooterSettings> {
   const map = await getSettingsMap();
   const copyright = (map[FOOTER_COPYRIGHT_KEY] ?? FOOTER_DEFAULTS.copyright)
-    .replace(/Sellerbricks/gi, "사주나라")
-    .replace(/셀러브릭스|사주메이트/g, "사주나라");
+    .replace(/BeautyMate/gi, "뷰티메이트")
+    .replace(/뷰티메이트|뷰티메이트/g, "뷰티메이트");
   return {
     companyName: map[FOOTER_COMPANY_NAME_KEY] ?? FOOTER_DEFAULTS.companyName,
     ceoName: map[FOOTER_CEO_NAME_KEY] ?? FOOTER_DEFAULTS.ceoName,
@@ -240,15 +240,15 @@ export async function getDailyApiKey(): Promise<string | null> {
 }
 
 // ─────────────────────────────────────────────
-// 상담사 호칭(선생/선녀/도령/만신/무당) — 상담사별 지정값
+// 뷰티 전문가 호칭(선생/디자이너/아티스트/테라피스트/컨설턴트) — 뷰티 전문가별 지정값
 // 스키마 변경 없이 settings 에 JSON 으로 보관한다.
 //   key   : consultant.titles
-//   value : { "<sellerProfileId>": "만신", ... }
-// 지정값이 없는 상담사는 id 해시로 자동 선택된다 (lib/consultantTitle.ts)
+//   value : { "<sellerProfileId>": "테라피스트", ... }
+// 지정값이 없는 뷰티 전문가는 id 해시로 자동 선택된다 (lib/consultantTitle.ts)
 // ─────────────────────────────────────────────
 export const CONSULTANT_TITLES_KEY = "consultant.titles";
 
-/** 상담사별 지정 호칭 맵 (없거나 형식이 깨져 있으면 빈 맵) */
+/** 뷰티 전문가별 지정 호칭 맵 (없거나 형식이 깨져 있으면 빈 맵) */
 export async function getConsultantTitleMap(): Promise<Record<string, string>> {
   const map = await getSettingsMap();
   const raw = map[CONSULTANT_TITLES_KEY];

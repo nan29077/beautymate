@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// PATCH /api/reservations/[id]/memo — 상담사 상담 메모 저장
+// PATCH /api/reservations/[id]/memo — 뷰티 전문가 고객 메모 저장
 //
 // consultantMemo 컬럼은 스키마에만 추가되고 운영 DB 반영(db push)은 별도로 진행되므로,
 // 컬럼이 아직 없는 환경에서는 500 대신 안내 메시지를 반환한다.
@@ -43,7 +43,7 @@ export async function PATCH(
     return NextResponse.json({ error: "예약을 찾을 수 없습니다." }, { status: 404 });
   }
 
-  // 상담사는 본인이 진행하는 예약만 메모 작성 가능
+  // 뷰티 전문가는 본인이 진행하는 예약만 메모 작성 가능
   if (role === "CONSULTANT" && reservation.seller.userId !== session.user.id) {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
@@ -51,7 +51,7 @@ export async function PATCH(
   // 메모는 상담이 끝난 건에 대한 기록이다.
   if (role === "CONSULTANT" && reservation.status !== "COMPLETED") {
     return NextResponse.json(
-      { error: "상담 완료된 예약에만 메모를 남길 수 있습니다." },
+      { error: "서비스 완료된 예약에만 메모를 남길 수 있습니다." },
       { status: 400 }
     );
   }
@@ -62,7 +62,7 @@ export async function PATCH(
       data: { consultantMemo: memo || null },
     });
   } catch (err) {
-    console.error("상담 메모 저장 실패:", err);
+    console.error("고객 메모 저장 실패:", err);
     return NextResponse.json(
       { error: "메모 저장에 실패했습니다. (DB 스키마 반영 여부를 확인해 주세요)" },
       { status: 500 }

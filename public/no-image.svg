@@ -1,12 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400" fill="none" role="img" aria-label="이미지 없음">
-  <rect width="400" height="400" fill="#fdf6e3"/>
-  <!-- 이미지 프레임 (허니 노랑) -->
-  <rect x="126" y="118" width="148" height="116" rx="16" fill="#ffffff" stroke="#f5a700" stroke-width="6"/>
-  <circle cx="166" cy="156" r="13" fill="#f5a700"/>
-  <path d="M134 222 L182 174 L214 206 L238 184 L268 214 L268 234 L134 234 Z" fill="#f5a700" fill-opacity="0.9"/>
-  <!-- 대각선 슬래시 (없음 표시) -->
-  <line x1="120" y1="112" x2="286" y2="240" stroke="#111827" stroke-width="7" stroke-linecap="round"/>
-  <!-- 텍스트 -->
-  <text x="200" y="280" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800" fill="#111827" text-anchor="middle">NO IMAGE</text>
-  <text x="200" y="310" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="800" letter-spacing="2.5" text-anchor="middle"><tspan fill="#111827">SELLER</tspan><tspan fill="#d99000">BRICKS</tspan></text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="뷰티메이트 이미지 준비 중">
+  <defs>
+    <linearGradient id="bg" x1="80" y1="40" x2="720" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7F8"/>
+      <stop offset="1" stop-color="#F9D5DD"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" rx="40" fill="url(#bg)"/>
+  <g transform="translate(336 188)">
+    <path d="M64 0c18 23 27 44 27 63 0 31-21 56-27 56S37 94 37 63C37 44 46 23 64 0Z" fill="#B44B68"/>
+    <path d="M0 64c23-18 44-27 63-27 31 0 56 21 56 27s-25 27-56 27C44 91 23 82 0 64Z" fill="#7D3150" fill-opacity=".9"/>
+    <circle cx="64" cy="64" r="20" fill="#FFF7F8"/>
+    <path d="m116 3 5 12 12 5-12 5-5 12-5-12-12-5 12-5 5-12Z" fill="#EAA7B8"/>
+  </g>
+  <text x="400" y="370" text-anchor="middle" font-size="42" font-weight="800" font-family="Pretendard, Noto Sans KR, sans-serif" fill="#6D2945">뷰티메이트</text>
+  <text x="400" y="414" text-anchor="middle" font-size="22" font-weight="600" font-family="Pretendard, Noto Sans KR, sans-serif" fill="#B44B68">이미지를 준비하고 있어요</text>
 </svg>

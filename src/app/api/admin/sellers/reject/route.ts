@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// 상담사 입점 신청 거절: 승인 대기(미승인) 상태의 상담사 계정을 삭제한다.
-// 미승인 상담사는 로그인이 차단되어 상담상품/캠페인/예약을 만들 수 없으므로 안전하게 삭제 가능.
+// 뷰티 전문가 입점 신청 거절: 승인 대기(미승인) 상태의 뷰티 전문가 계정을 삭제한다.
+// 미승인 뷰티 전문가는 로그인이 차단되어 뷰티 서비스/캠페인/예약을 만들 수 없으므로 안전하게 삭제 가능.
 // (User 삭제 시 SellerProfile 은 onDelete: Cascade 로 함께 삭제됨)
 export async function POST(request: Request) {
   const session = await auth();
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
 
   const { sellerId } = await request.json();
   if (!sellerId) {
-    return NextResponse.json({ error: "상담사 ID가 필요합니다." }, { status: 400 });
+    return NextResponse.json({ error: "뷰티 전문가 ID가 필요합니다." }, { status: 400 });
   }
 
   const seller = await prisma.sellerProfile.findUnique({
@@ -26,13 +26,13 @@ export async function POST(request: Request) {
   });
 
   if (!seller) {
-    return NextResponse.json({ error: "상담사를 찾을 수 없습니다." }, { status: 404 });
+    return NextResponse.json({ error: "뷰티 전문가를 찾을 수 없습니다." }, { status: 404 });
   }
 
-  // 이미 승인된 상담사는 거절(삭제) 불가 — 활동 데이터가 있을 수 있으므로 보호.
+  // 이미 승인된 뷰티 전문가는 거절(삭제) 불가 — 활동 데이터가 있을 수 있으므로 보호.
   if (seller.isApproved) {
     return NextResponse.json(
-      { error: "이미 승인된 상담사는 거절할 수 없습니다. 회원 관리에서 처리해주세요." },
+      { error: "이미 승인된 뷰티 전문가는 거절할 수 없습니다. 회원 관리에서 처리해주세요." },
       { status: 400 },
     );
   }
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
   // 방어적 가드: 활동 데이터가 있으면 삭제하지 않음.
   if (seller._count.shopProducts > 0 || seller._count.campaigns > 0 || seller._count.reservations > 0) {
     return NextResponse.json(
-      { error: "활동 이력이 있는 상담사는 거절(삭제)할 수 없습니다." },
+      { error: "활동 이력이 있는 뷰티 전문가는 거절(삭제)할 수 없습니다." },
       { status: 400 },
     );
   }

@@ -10,7 +10,7 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
   PAID: { label: "결제완료", color: "bg-blue-50 text-blue-600" },
   CONFIRMED: { label: "확인됨", color: "bg-indigo-50 text-indigo-600" },
   SHIPPING: { label: "상담 진행중", color: "bg-cyan-50 text-cyan-600" },
-  DELIVERED: { label: "상담 완료", color: "bg-green-50 text-green-600" },
+  DELIVERED: { label: "서비스 완료", color: "bg-green-50 text-green-600" },
   CANCELLED: { label: "취소됨", color: "bg-red-50 text-red-600" },
   REFUND_REQUESTED: { label: "환불요청", color: "bg-orange-50 text-orange-600" },
   REFUNDED: { label: "환불완료", color: "bg-gray-100 text-gray-500" },
@@ -50,7 +50,7 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
         <div className="relative flex-1">
           <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="예약번호, 고객, 상담사 검색..."
+            placeholder="예약번호, 고객, 뷰티 전문가 검색..."
             className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white" />
           {searchQuery && <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><X size={14} /></button>}
         </div>
@@ -89,7 +89,7 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
                 <tr className="border-b border-gray-100 bg-gray-50">
                   <th className="text-left px-4 py-3 font-medium text-gray-500">예약번호</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">고객</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-500">상담사</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">뷰티 전문가</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">금액</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">상태</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">일시</th>

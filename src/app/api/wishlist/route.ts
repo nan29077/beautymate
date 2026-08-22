@@ -54,7 +54,7 @@ export async function POST(request: Request) {
 
   const { productId } = await request.json();
   if (!productId) {
-    return NextResponse.json({ error: "상담상품 ID가 필요합니다." }, { status: 400 });
+    return NextResponse.json({ error: "뷰티 서비스 ID가 필요합니다." }, { status: 400 });
   }
 
   // Check if already wishlisted
@@ -85,7 +85,7 @@ export async function POST(request: Request) {
   }
 }
 
-// 특정 상담상품 찜 여부 확인
+// 특정 뷰티 서비스 찜 여부 확인
 export async function PUT(request: Request) {
   const session = await auth();
   if (!session) {
@@ -94,7 +94,7 @@ export async function PUT(request: Request) {
 
   const { productIds } = await request.json();
   if (!productIds || !Array.isArray(productIds)) {
-    return NextResponse.json({ error: "상담상품 ID 배열이 필요합니다." }, { status: 400 });
+    return NextResponse.json({ error: "뷰티 서비스 ID 배열이 필요합니다." }, { status: 400 });
   }
 
   const wishlists = await prisma.wishlist.findMany({

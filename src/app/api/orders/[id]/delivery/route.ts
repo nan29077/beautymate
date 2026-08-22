@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 const RESERVATION_STATUS_LABELS: Record<string, string> = {
   PENDING: "예약 신청",
   CONFIRMED: "예약 확정",
-  COMPLETED: "상담 완료",
+  COMPLETED: "서비스 완료",
   CANCELLED: "취소",
   NO_SHOW: "노쇼",
 };
@@ -52,7 +52,7 @@ export async function GET(
   }
 }
 
-// PATCH: 예약 진행 상태 변경 (SUPER_ADMIN, 담당 상담사만 가능)
+// PATCH: 예약 진행 상태 변경 (SUPER_ADMIN, 담당 뷰티 전문가만 가능)
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> | { id: string } }
@@ -87,7 +87,7 @@ export async function PATCH(
       return NextResponse.json({ error: "예약을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // 상담사는 본인 예약만 변경 가능
+    // 뷰티 전문가는 본인 예약만 변경 가능
     if (role === "CONSULTANT" && reservation.seller?.userId !== session.user.id) {
       return NextResponse.json({ error: "본인 예약만 변경할 수 있습니다." }, { status: 403 });
     }

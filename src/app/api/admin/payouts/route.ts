@@ -15,7 +15,7 @@ const ALLOWED_FROM: Record<string, string[]> = {
   reject: ["REQUESTED", "APPROVED"],
 };
 
-// 최고관리자: 상담사 출금요청 처리 (승인 / 지급완료 / 반려)
+// 최고관리자: 뷰티 전문가 출금요청 처리 (승인 / 지급완료 / 반려)
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (session?.user?.role !== "SUPER_ADMIN") {
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "요청이 올바르지 않습니다." }, { status: 400 });
   }
 
-  // 반려 사유는 필수 — 상담사가 왜 반려됐는지 알 수 없으면 재신청 자체가 불가능하다.
+  // 반려 사유는 필수 — 뷰티 전문가가 왜 반려됐는지 알 수 없으면 재신청 자체가 불가능하다.
   const rejectReason = typeof note === "string" ? note.trim().slice(0, 500) : "";
   if (action === "reject" && !rejectReason) {
     return NextResponse.json({ error: "반려 사유를 입력해 주세요." }, { status: 400 });
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 반려 시 상담사에게 알림 — 반려 사실과 사유를 즉시 전달한다(알림 실패는 처리 결과에 영향 없음).
+  // 반려 시 뷰티 전문가에게 알림 — 반려 사실과 사유를 즉시 전달한다(알림 실패는 처리 결과에 영향 없음).
   if (action === "reject") {
     const seller = await prisma.sellerProfile.findUnique({
       where: { id: payout.sellerId },

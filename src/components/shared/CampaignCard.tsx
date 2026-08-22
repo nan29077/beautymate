@@ -78,7 +78,7 @@ export default function CampaignCard({
         {/* 정보 */}
         <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
           <div>
-            {/* 상담사 */}
+            {/* 뷰티 전문가 */}
             <div className="flex items-center gap-1.5 mb-1">
               <div className="w-4 h-4 rounded-full overflow-hidden flex-shrink-0 ring-1 ring-gray-200">
                 <SafeImage

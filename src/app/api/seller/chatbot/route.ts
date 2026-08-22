@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { DB_MIGRATION_WARNING } from "@/lib/prismaErrors";
 
-// 상담사 AI 채팅 봇 설정 조회/저장 + 봇 활동 로그
+// 뷰티 전문가 AI 채팅 봇 설정 조회/저장 + 봇 활동 로그
 // keywords/bannedWords/faqs 는 MySQL 배열 미지원으로 String @db.Text 에 JSON 직렬화 저장
 // youtubeApiKey 컬럼이 DB에 아직 없으면(P2022) 해당 필드를 제외하고 폴백 조회/저장한다.
 
@@ -75,10 +75,10 @@ const LEGACY_CONFIG_SELECT = {
 export async function GET(req: NextRequest) {
   const session = await auth();
   if (!session || session.user?.role !== "CONSULTANT") {
-    return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+    return NextResponse.json({ error: "뷰티 전문가만 접근 가능" }, { status: 403 });
   }
   const seller = await getSeller(session.user!.id);
-  if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+  if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
   const { searchParams } = new URL(req.url);
   if (searchParams.get("mode") === "logs") {
@@ -117,10 +117,10 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   const session = await auth();
   if (!session || session.user?.role !== "CONSULTANT") {
-    return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+    return NextResponse.json({ error: "뷰티 전문가만 접근 가능" }, { status: 403 });
   }
   const seller = await getSeller(session.user!.id);
-  if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+  if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "잘못된 요청입니다." }, { status: 400 });
@@ -160,9 +160,9 @@ export async function PUT(req: NextRequest) {
     statsInterval: clampInterval(body.statsInterval, 10),
     couponEnabled: Boolean(body.couponEnabled),
     couponInterval: clampInterval(body.couponInterval, 10),
-    // YouTube 전송은 OAuth 연결된 상담사만 ON 가능
+    // YouTube 전송은 OAuth 연결된 뷰티 전문가만 ON 가능
     youtubeSendEnabled: Boolean(body.youtubeSendEnabled) && Boolean(seller.youtubeAccessToken && seller.youtubeRefreshToken),
-    // 상담사 개인 YouTube Data API v3 키 (라이브 YouTube 채팅 읽기용)
+    // 뷰티 전문가 개인 YouTube Data API v3 키 (라이브 YouTube 채팅 읽기용)
     youtubeApiKey: String(body.youtubeApiKey ?? "").trim().slice(0, 200) || null,
   };
 

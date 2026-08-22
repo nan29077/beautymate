@@ -17,17 +17,12 @@ export default function BrandMark({
       className={className}
       style={style}
       role="img"
-      aria-label="사주나라 초승달"
+      aria-label="뷰티메이트"
     >
-      <path
-        d="M40.8 8.2c-12.2 2.9-21.3 13.9-21.3 27 0 11.1 6.6 20.7 16.1 25-2.1.6-4.4.9-6.7.9C14.5 61.1 3 49.6 3 35.3 3 20.9 14.6 9.2 29 9.2c4.2 0 8.2 1 11.8 2.7V8.2Z"
-        fill="currentColor"
-      />
-      <path
-        d="m47.8 9.2 2.1 5.2 5.3 2.1-5.3 2.1-2.1 5.3-2.1-5.3-5.3-2.1 5.3-2.1 2.1-5.2Z"
-        fill="#F2C66D"
-      />
-      <circle cx="55.5" cy="31" r="2.8" fill="#C9B8FF" />
+      <path d="M32 10c6.5 8.2 9.8 15.6 9.8 22.2C41.8 43.2 34.4 52 32 52s-9.8-8.8-9.8-19.8C22.2 25.6 25.5 18.2 32 10Z" fill="currentColor" />
+      <path d="M10 32c8.2-6.5 15.6-9.8 22.2-9.8C43.2 22.2 52 29.6 52 32s-8.8 9.8-19.8 9.8C25.6 41.8 18.2 38.5 10 32Z" fill="#EAA7B8" fillOpacity=".9" />
+      <circle cx="32" cy="32" r="8" fill="white" />
+      <path d="m50 8 1.8 4.2L56 14l-4.2 1.8L50 20l-1.8-4.2L44 14l4.2-1.8L50 8Z" fill="#F7D4DD" />
     </svg>
   );
 }

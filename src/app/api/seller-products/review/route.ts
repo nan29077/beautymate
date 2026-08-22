@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { resolveApprover } from "@/lib/productApprover";
 
-// POST: 승인 주체(브랜드사 / 중간관리자 / 최고관리자)가 상담사 상담상품 신청을 승인/반려한다.
+// POST: 승인 주체(브랜드사 / 중간관리자 / 최고관리자)가 뷰티 전문가 뷰티 서비스 신청을 승인/반려한다.
 // body: { shopProductId: string, action: "approve" | "reject" }
 export async function POST(req: NextRequest) {
   try {
@@ -41,10 +41,10 @@ export async function POST(req: NextRequest) {
         where: { id: shopProductId },
         data: { isApproved: true, isActive: true, rejectionReason: null },
       });
-      return NextResponse.json({ success: true, message: "상담사 상담상품 신청을 승인했습니다" });
+      return NextResponse.json({ success: true, message: "뷰티 전문가 뷰티 서비스 신청을 승인했습니다" });
     }
 
-    // reject → 삭제하지 않고 반려 상태로 표시 (상담사가 사유를 확인할 수 있도록 유지)
+    // reject → 삭제하지 않고 반려 상태로 표시 (뷰티 전문가가 사유를 확인할 수 있도록 유지)
     const reason = typeof rejectionReason === "string" ? rejectionReason.trim().slice(0, 500) : "";
     await prisma.sellerShopProduct.update({
       where: { id: shopProductId },
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
         rejectionReason: reason || "사유 미입력",
       },
     });
-    return NextResponse.json({ success: true, message: "상담사 상담상품 신청을 반려했습니다" });
+    return NextResponse.json({ success: true, message: "뷰티 전문가 뷰티 서비스 신청을 반려했습니다" });
   } catch (e) {
     console.error("seller-products review error:", e);
     return NextResponse.json({ error: "서버 오류" }, { status: 500 });

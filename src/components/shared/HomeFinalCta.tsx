@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import {  } from 'lucide-react';
 
-// 메인 최종 CTA — 회원가입 / 상담사로 시작하기 2개 탭
+// 메인 최종 CTA — 회원가입 / 뷰티 전문가로 시작하기 2개 탭
 export default function HomeFinalCta({ sellerCtaLink }: { sellerCtaLink: string }) {
   const [tab, setTab] = useState<"join" | "seller">("join");
 
@@ -35,17 +35,17 @@ export default function HomeFinalCta({ sellerCtaLink }: { sellerCtaLink: string 
                 tab === "seller" ? "bg-brand-500 text-black" : "text-white/70"
               }`}
             >
-              <Icon name="Sparkles" size={14} /> 상담사로 시작하기
+              <Icon name="Sparkles" size={14} /> 뷰티 전문가로 시작하기
             </button>
           </div>
 
           {tab === "join" ? (
             <div>
               <h2 className="text-[22px] font-extrabold text-white leading-tight">
-                지금 바로<br />사주나라를 시작하세요
+                지금 바로<br />뷰티메이트를 시작하세요
               </h2>
               <p className="mt-3 text-[13px] text-gray-300 leading-relaxed">
-                좋아하는 상담사를 단골로 설정하고<br />라이브·단체 상담을 즐겨보세요.
+                좋아하는 뷰티 전문가를 단골로 설정하고<br />라이브·공동 프로모션을 즐겨보세요.
               </p>
               <Link
                 href="/auth/register"
@@ -57,10 +57,10 @@ export default function HomeFinalCta({ sellerCtaLink }: { sellerCtaLink: string 
           ) : (
             <div>
               <h2 className="text-[22px] font-extrabold text-white leading-tight">
-                내 팬과 함께<br />나만의 점집을 열다
+                내 팬과 함께<br />나만의 뷰티샵을 열다
               </h2>
               <ul className="mt-4 space-y-1.5 text-left inline-block">
-                {["나만의 점집 · 예약/고객관리(CRM)", "상담 내용 AI 요약으로 재방문 고객 관리", "라이브 판매 채널 · 투명한 수익 정산"].map((t) => (
+                {["나만의 뷰티샵 · 예약/고객관리(CRM)", "요청사항 AI 요약으로 재방문 고객 관리", "라이브 판매 채널 · 투명한 수익 정산"].map((t) => (
                   <li key={t} className="flex items-center gap-2 text-[12.5px] text-gray-200">
                     <span className="w-4 h-4 rounded-full bg-brand-500 flex items-center justify-center flex-shrink-0">
                       <Icon name="Check" size={11} strokeWidth={3} className="text-black" />
@@ -73,9 +73,9 @@ export default function HomeFinalCta({ sellerCtaLink }: { sellerCtaLink: string 
                 href={sellerCtaLink}
                 className="mt-6 flex items-center justify-center gap-1.5 w-full py-3.5 rounded-2xl bg-brand-500 text-black text-[14px] font-extrabold active:scale-[0.98] transition-transform"
               >
-                <Icon name="Sparkles" size={16} /> 상담사 입점 신청
+                <Icon name="Sparkles" size={16} /> 뷰티 전문가 입점 신청
               </Link>
-              <p className="mt-2 text-[10px] text-gray-400">신청 후 최고관리자 승인 시 상담사 기능이 활성화돼요</p>
+              <p className="mt-2 text-[10px] text-gray-400">신청 후 최고관리자 승인 시 뷰티 전문가 기능이 활성화돼요</p>
             </div>
           )}
         </div>

@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 
 // ─────────────────────────────────────────────
-// 상담사 방송 도구 화면.
+// 뷰티 전문가 방송 도구 화면.
 // 위젯 URL / 예약 URL 복사, 예약 QR 다운로드, 실제 위젯 미리보기, 프리즘·OBS 설정 가이드.
 // ─────────────────────────────────────────────
 
@@ -154,7 +154,7 @@ export default function SellerWidgetClient({
     if (!qrDataUrl) return;
     const a = document.createElement("a");
     a.href = qrDataUrl;
-    a.download = `사주나라-예약QR-${slug}.png`;
+    a.download = `뷰티메이트-예약QR-${slug}.png`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

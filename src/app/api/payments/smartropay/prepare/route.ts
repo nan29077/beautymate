@@ -58,7 +58,7 @@ export async function POST(request: Request) {
   const EncryptData = buildEncryptData(ediDate, Amt);
 
   // 부가세 분리 — 스마트로는 TaxAmt(공급가액)+VatAmt(부가세)+TaxFreeAmt(비과세)==Amt 를 검증한다.
-  // 미전송 시 0 처리되어 합계 불일치(ResultCode 1614)가 나므로 과세 상담상품 기준으로 명시한다.
+  // 미전송 시 0 처리되어 합계 불일치(ResultCode 1614)가 나므로 과세 뷰티 서비스 기준으로 명시한다.
   // 부가세 = round(Amt/11), 공급가액 = Amt - 부가세, 비과세 = 0 → 셋의 합은 항상 Amt.
   const VatAmt = Math.round(Amt / 11);
   const TaxAmt = Amt - VatAmt;
@@ -66,8 +66,8 @@ export async function POST(request: Request) {
 
   const firstItem = order.items[0];
   const GoodsName = order.items.length > 1
-    ? `${firstItem?.productName ?? "상담상품"} 외 ${order.items.length - 1}건`
-    : firstItem?.productName ?? "상담상품";
+    ? `${firstItem?.productName ?? "뷰티 서비스"} 외 ${order.items.length - 1}건`
+    : firstItem?.productName ?? "뷰티 서비스";
 
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||

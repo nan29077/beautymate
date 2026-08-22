@@ -10,7 +10,7 @@ export function formatPrice(price: number | string): string {
   return new Intl.NumberFormat("ko-KR").format(num) + "원";
 }
 
-/** 상담사 수수료율에 부가세 10%를 포함한 표시·계산용 값 (예: 7 → 7.7). DB 원본값은 유지하고 표시/계산 시점에만 사용 */
+/** 뷰티 전문가 수수료율에 부가세 10%를 포함한 표시·계산용 값 (예: 7 → 7.7). DB 원본값은 유지하고 표시/계산 시점에만 사용 */
 export function withVatRate(rate: number | string | null | undefined): number {
   const num = typeof rate === "string" ? parseFloat(rate) : rate ?? 0;
   if (!Number.isFinite(num)) return 0;

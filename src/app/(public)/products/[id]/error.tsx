@@ -37,7 +37,7 @@ export default function ProductError({
       <div className="min-h-[60vh] bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <Loader2 size={24} className="animate-spin text-gray-400" />
-          <p className="text-sm text-gray-400">상담상품을 불러오는 중...</p>
+          <p className="text-sm text-gray-400">뷰티 서비스를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -51,7 +51,7 @@ export default function ProductError({
             <div className="w-16 h-16 rounded-2xl bg-amber-100 flex items-center justify-center mb-4">
               <Icon name="Warning" size={28} className="text-amber-500" />
             </div>
-            <h2 className="text-lg font-bold text-gray-900 mb-1">상담상품을 불러올 수 없습니다</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-1">뷰티 서비스를 불러올 수 없습니다</h2>
             <p className="text-sm text-gray-500 text-center px-6">
               일시적인 오류가 발생했습니다.<br/>잠시 후 다시 시도해 주세요.
             </p>
@@ -76,7 +76,7 @@ export default function ProductError({
               className="w-full flex items-center justify-center gap-2 px-5 py-3 text-gray-400 text-xs font-medium rounded-xl hover:text-gray-600 transition-colors"
             >
               <Icon name="Cart" size={14} />
-              상담상품 둘러보기
+              뷰티 서비스 둘러보기
             </Link>
           </div>
         </div>

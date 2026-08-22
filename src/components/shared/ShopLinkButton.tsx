@@ -45,7 +45,7 @@ export default function ShopLinkButton({ slug, className = "" }: ShopLinkButtonP
         className="flex items-center gap-1.5 px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
       >
         <Icon name="ArrowRight" size={14} strokeWidth={1.5} />
-        점집 바로가기
+        뷰티샵 바로가기
       </button>
       <button
         onClick={handleCopy}

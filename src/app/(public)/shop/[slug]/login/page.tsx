@@ -4,7 +4,7 @@ import ShopLoginClient from "@/components/shop/ShopLoginClient";
 
 export const dynamic = "force-dynamic";
 
-// 점집 독립 로그인 페이지
+// 뷰티샵 독립 로그인 페이지
 export default async function ShopLoginPage({
   params,
 }: {

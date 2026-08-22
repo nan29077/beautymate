@@ -1,6 +1,6 @@
 "use client";
 
-// 관리자 고객 귀속 관리 — 전체 고객의 귀속 상담사 조회·변경
+// 관리자 고객 귀속 관리 — 전체 고객의 귀속 뷰티 전문가 조회·변경
 import { useCallback, useEffect, useState } from "react";
 import { Search, UserRoundCheck, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -141,7 +141,7 @@ export default function AdminCustomersClient() {
                 <th className="px-4 py-3 font-medium">고객</th>
                 <th className="px-4 py-3 font-medium">연락처</th>
                 <th className="px-4 py-3 font-medium">가입일</th>
-                <th className="px-4 py-3 font-medium">귀속 상담사</th>
+                <th className="px-4 py-3 font-medium">귀속 뷰티 전문가</th>
               </tr>
             </thead>
             <tbody>

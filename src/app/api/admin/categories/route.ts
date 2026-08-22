@@ -76,6 +76,6 @@ export async function DELETE(req: NextRequest) {
     await prisma.category.delete({ where: { id } });
     return NextResponse.json({ message: "삭제 완료" });
   } catch {
-    return NextResponse.json({ error: "삭제 실패 (연결된 상담상품이 있을 수 있음)" }, { status: 500 });
+    return NextResponse.json({ error: "삭제 실패 (연결된 뷰티 서비스가 있을 수 있음)" }, { status: 500 });
   }
 }

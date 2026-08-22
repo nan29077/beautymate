@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma";
 
-// 예약관리 목록(상담사·브랜드·관리자)에 노출할 예약의 공통 필터.
+// 예약관리 목록(뷰티 전문가·브랜드·관리자)에 노출할 예약의 공통 필터.
 // - PENDING(결제 진행 중·미결제) 제외
 // - 결제 흔적이 전혀 없는 CANCELLED 제외: pgTid 가 없으면 PG 승인 이전에 이탈한
 //   예약(결제창만 띄우고 닫음/중단)이므로 목록에 노출하지 않는다.
@@ -55,9 +55,9 @@ export async function cleanupStalePendingOrders(): Promise<number> {
   for (const order of stale) {
     try {
       await prisma.$transaction(async (tx) => {
-        // 일반상담상품(DirectProduct) 재고 복원 — 예약 생성 시 차감했던 재고를 되돌린다.
+        // 일반 뷰티 서비스(DirectProduct) 재고 복원 — 예약 생성 시 차감했던 재고를 되돌린다.
         // abort 라우트(api/orders/[id]/abort)와 동일한 로직. 이 복원이 없으면 결제 없이
-        // 이탈한 예약의 차감 재고가 영구히 묶여 재고 1개짜리 상담상품이 "품절"로 굳는다.
+        // 이탈한 예약의 차감 재고가 영구히 묶여 재고 1개짜리 뷰티 서비스가 "품절"로 굳는다.
         // (아래 조건부 deleteMany 가 0건이면 throw 되어 트랜잭션 전체가 롤백되므로,
         //  '그새 결제 완료된' 예약의 재고를 잘못 되돌리는 일은 없다.)
         for (const it of order.items) {
@@ -68,7 +68,7 @@ export async function cleanupStalePendingOrders(): Promise<number> {
               data: { stock: { increment: it.quantity } },
             })
             .catch(() => {
-              /* 상담상품이 이미 삭제된 경우 무시 */
+              /* 뷰티 서비스가 이미 삭제된 경우 무시 */
             });
         }
 

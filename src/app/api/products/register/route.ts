@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const mode = searchParams.get("mode");
 
-    // 관리자 상담상품 관리 모드 — 전체 상담상품 + 플래그
+    // 관리자 뷰티 서비스 관리 모드 — 전체 뷰티 서비스 + 플래그
     if (mode === "admin-manage") {
       if (role !== "SUPER_ADMIN") {
         return NextResponse.json({ error: "권한 없음" }, { status: 403 });
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     } = body;
 
     if (!name || basePrice === undefined || basePrice === null || basePrice === "") {
-      return NextResponse.json({ error: "상담상품명과 가격은 필수입니다" }, { status: 400 });
+      return NextResponse.json({ error: "뷰티 서비스명과 가격은 필수입니다" }, { status: 400 });
     }
 
     const parsedBasePrice = parseFloat(String(basePrice));
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
     if (isGroupBuy && groupBuy) {
       if (!groupBuy.campaignPrice || !groupBuy.startDate || !groupBuy.endDate) {
         return NextResponse.json(
-          { error: "단체 상담 등록 시 가격, 시작일, 종료일은 필수입니다" },
+          { error: "공동 프로모션 등록 시 가격, 시작일, 종료일은 필수입니다" },
           { status: 400 }
         );
       }
@@ -120,10 +120,10 @@ export async function POST(req: NextRequest) {
 
     const parsedSupplyPrice = toMoneyOrNull(supplyPrice);
 
-    // 제공 방식: SUPPLY(공급가 제공) / COMMISSION(수수료 제공). 상담사 직접 등록은 항상 SUPPLY.
+    // 제공 방식: SUPPLY(공급가 제공) / COMMISSION(수수료 제공). 뷰티 전문가 직접 등록은 항상 SUPPLY.
     const resolvedPriceModel: "SUPPLY" | "COMMISSION" =
       role !== "CONSULTANT" && priceModel === "COMMISSION" ? "COMMISSION" : "SUPPLY";
-    // 수수료 제공 시: 상담사 수수료율(%)과 수수료 금액(판매가 × 수수료율)을 저장
+    // 수수료 제공 시: 뷰티 전문가 수수료율(%)과 수수료 금액(판매가 × 수수료율)을 저장
     let resolvedCommissionRate: number | null = null;
     let resolvedSellerCommissionAmount: number | null = null;
     if (resolvedPriceModel === "COMMISSION") {
@@ -140,11 +140,11 @@ export async function POST(req: NextRequest) {
         where: { userId: session.user!.id },
       });
       if (!sellerProfile) {
-        return NextResponse.json({ error: "상담사 프로필이 없습니다" }, { status: 400 });
+        return NextResponse.json({ error: "뷰티 전문가 프로필이 없습니다" }, { status: 400 });
       }
     }
 
-    // 관리자/상담사 등록 상담상품은 자동 공개
+    // 관리자/뷰티 전문가 등록 뷰티 서비스는 자동 공개
     const isApproved = true;
 
     // Create product
@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
       commissionRate: resolvedCommissionRate,
       sellerCommissionAmount: resolvedSellerCommissionAmount,
       categoryId: categoryId || null,
-      // 상담사 직접 등록 상담상품은 등록 상담사를 기록 → 다른 상담사의 '상담상품 신청' 목록에서 제외됨
+      // 뷰티 전문가 직접 등록 뷰티 서비스는 등록 뷰티 전문가를 기록 → 다른 뷰티 전문가의 '뷰티 서비스 신청' 목록에서 제외됨
       sellerId: role === "CONSULTANT" && sellerProfile ? sellerProfile.id : null,
       thumbnail: thumbnail || (images && images.length > 0 ? images[0] : null),
       isActive: true,
@@ -191,9 +191,9 @@ export async function POST(req: NextRequest) {
       } : {}),
     };
 
-    // ── 상담 상품 속성 ── 운영 DB에 아직 없는 컬럼(P2022)일 수 있어 실패 시 제외하고 재시도
+    // ── 뷰티 서비스 속성 ── 운영 DB에 아직 없는 컬럼(P2022)일 수 있어 실패 시 제외하고 재시도
     const consultingAttrs = {
-      consultingType: consultingType ? String(consultingType) : "사주",
+      consultingType: consultingType ? String(consultingType) : "스킨케어",
       consultingMethod: consultingMethod ? String(consultingMethod) : "영상통화",
       durationMinutes: Math.max(1, parseInt(String(durationMinutes ?? 30), 10) || 30),
       maxDailySlots: Math.max(1, parseInt(String(maxDailySlots ?? 5), 10) || 5),
@@ -209,7 +209,7 @@ export async function POST(req: NextRequest) {
     }
 
     // If seller, also add to their shop products (active + 승인완료 → 즉시 판매중)
-    // 이미 점집상담상품이 있으면 그대로 두고, 없으면 승인완료 상태로 생성(관리자 승인 불필요)
+    // 이미 뷰티샵 서비스이 있으면 그대로 두고, 없으면 승인완료 상태로 생성(관리자 승인 불필요)
     if (role === "CONSULTANT" && sellerProfile) {
       await prisma.sellerShopProduct.upsert({
         where: {
@@ -220,7 +220,7 @@ export async function POST(req: NextRequest) {
           sellerId: sellerProfile.id,
           productId: product.id,
           isActive: true,
-          isApproved: true, // 상담사 직접 등록 상담상품은 승인 대기 없이 즉시 판매
+          isApproved: true, // 뷰티 전문가 직접 등록 뷰티 서비스는 승인 대기 없이 즉시 판매
         },
       });
     }
@@ -252,13 +252,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, product, campaign });
   } catch (e: any) {
     // 원인 파악을 위한 상세 로깅 (Prisma 코드/메시지 포함)
-    console.error("[products/register] 상담상품 등록 실패:", {
+    console.error("[products/register] 뷰티 서비스 등록 실패:", {
       code: e?.code,
       message: e?.message,
       meta: e?.meta,
     });
     return NextResponse.json(
-      { error: "상담상품 등록 실패", detail: e?.message ?? String(e) },
+      { error: "뷰티 서비스 등록 실패", detail: e?.message ?? String(e) },
       { status: 500 }
     );
   }

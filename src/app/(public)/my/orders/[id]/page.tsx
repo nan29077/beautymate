@@ -17,7 +17,7 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
   PAID: { label: "결제완료", color: "bg-blue-50 text-blue-600" },
   CONFIRMED: { label: "확인됨", color: "bg-indigo-50 text-indigo-600" },
   SHIPPING: { label: "상담 진행중", color: "bg-cyan-50 text-cyan-600" },
-  DELIVERED: { label: "상담 완료", color: "bg-green-50 text-green-600" },
+  DELIVERED: { label: "서비스 완료", color: "bg-green-50 text-green-600" },
   CANCELLED: { label: "취소됨", color: "bg-red-50 text-red-600" },
   REFUND_REQUESTED: {
     label: "환불요청",
@@ -28,10 +28,10 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
 
 const DELIVERY_STATUS_MAP: Record<string, { label: string; color: string }> = {
   PAYMENT_COMPLETED: { label: "결제 완료", color: "bg-blue-50 text-blue-600" },
-  PREPARING: { label: "상담 방식 준비 중", color: "bg-yellow-50 text-yellow-600" },
+  PREPARING: { label: "진행 방식 준비 중", color: "bg-yellow-50 text-yellow-600" },
   SHIPPED: { label: "발송 완료", color: "bg-orange-50 text-orange-600" },
-  DELIVERING: { label: "상담 방식 중", color: "bg-purple-50 text-purple-600" },
-  DELIVERED: { label: "상담 방식 완료", color: "bg-green-50 text-green-700" },
+  DELIVERING: { label: "진행 방식 중", color: "bg-purple-50 text-purple-600" },
+  DELIVERED: { label: "진행 방식 완료", color: "bg-green-50 text-green-700" },
   CANCEL_REQUESTED: {
     label: "결제취소 요청중",
     color: "bg-amber-50 text-amber-700",
@@ -44,10 +44,10 @@ const DELIVERY_STATUS_MAP: Record<string, { label: string; color: string }> = {
 
 const DELIVERY_STEPS: Array<{ key: string; label: string }> = [
   { key: "PAYMENT_COMPLETED", label: "결제 완료" },
-  { key: "PREPARING", label: "상담 방식 준비 중" },
+  { key: "PREPARING", label: "진행 방식 준비 중" },
   { key: "SHIPPED", label: "발송 완료" },
-  { key: "DELIVERING", label: "상담 방식 중" },
-  { key: "DELIVERED", label: "상담 방식 완료" },
+  { key: "DELIVERING", label: "진행 방식 중" },
+  { key: "DELIVERED", label: "진행 방식 완료" },
 ];
 
 function fmtDateTime(d: Date | null | undefined) {
@@ -89,7 +89,7 @@ export default async function OrderDetailPage({
   if (!order || order.userId !== session.user!.id) notFound();
 
   // OrderItem 에는 product 관계가 없어 productId 로 썸네일을 별도 조회.
-  // itemType 에 따라 조회할 테이블이 다르다 — DIRECT 는 상담사 일반상담상품(DirectProduct).
+  // itemType 에 따라 조회할 테이블이 다르다 — DIRECT 는 뷰티 전문가 일반 뷰티 서비스(DirectProduct).
   const productIds = Array.from(
     new Set(order.items.filter((it) => it.itemType !== "DIRECT").map((it) => it.productId)),
   );
@@ -114,7 +114,7 @@ export default async function OrderDetailPage({
   for (const dp of directProducts) {
     thumbById.set(dp.id, parseJsonArray(dp.images)[0] ?? null);
   }
-  // 일반상담상품은 /products/[id] 상세 페이지가 없다 — 점집으로 보낸다.
+  // 일반 뷰티 서비스는 /products/[id] 상세 페이지가 없다 — 뷰티샵으로 보낸다.
   const directIdSet = new Set(directIds);
   const itemHref = (productId: string) =>
     directIdSet.has(productId) ? `/shop/${order.seller.slug}` : `/products/${productId}`;
@@ -255,7 +255,7 @@ export default async function OrderDetailPage({
           </div>
         )}
 
-        {/* 상담 방식 현황 타임라인 */}
+        {/* 진행 방식 현황 타임라인 */}
         {!isCancelled &&
           !isDeliveryHidden &&
           ds !== null &&
@@ -270,7 +270,7 @@ export default async function OrderDetailPage({
             />
           )}
 
-        {/* 상담사 */}
+        {/* 뷰티 전문가 */}
         <Link
           href={`/shop/${order.seller.slug}`}
           className="bg-white rounded-xl border border-gray-100 p-4 flex items-center gap-3 active:bg-gray-50 transition-colors"
@@ -286,7 +286,7 @@ export default async function OrderDetailPage({
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[11px] text-gray-400 flex items-center gap-1">
-              <Icon name="Sparkles" size={11} /> 라이브 점집
+              <Icon name="Sparkles" size={11} /> 라이브 뷰티샵
             </p>
             <p className="text-sm font-semibold text-gray-900 truncate">
               {order.seller.shopName}
@@ -294,14 +294,14 @@ export default async function OrderDetailPage({
           </div>
         </Link>
 
-        {/* 예약 상담상품 */}
+        {/* 예약 뷰티 서비스 */}
         <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-50 flex items-center gap-1.5">
             <Icon name="Gem" size={14} className="text-gray-400" />
-            <h2 className="text-sm font-bold text-gray-900">예약 상담상품</h2>
+            <h2 className="text-sm font-bold text-gray-900">예약 뷰티 서비스</h2>
             {order.campaign && (
               <span className="text-[10px] text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded-full ml-1">
-                단체 상담
+                공동 프로모션
               </span>
             )}
           </div>
@@ -363,7 +363,7 @@ export default async function OrderDetailPage({
                 value={`${new Date(order.reservationDate).toLocaleDateString("ko-KR")} ${order.reservationTime}`}
               />
               {order.consultingContent && (
-                <InfoRow label="상담 내용" value={order.consultingContent} />
+                <InfoRow label="요청사항" value={order.consultingContent} />
               )}
             </div>
           </div>
@@ -377,7 +377,7 @@ export default async function OrderDetailPage({
           </h2>
           <div className="space-y-2">
             <PayRow
-              label="상담상품금액"
+              label="뷰티 서비스금액"
               value={formatPrice(Number(order.totalAmount))}
             />
             {Number(order.discountAmount) > 0 && (
@@ -407,7 +407,7 @@ export default async function OrderDetailPage({
   );
 }
 
-// ─── 상담 방식 현황 타임라인 ─────────────────────────────────────────
+// ─── 진행 방식 현황 타임라인 ─────────────────────────────────────────
 function DeliveryTimeline({
   dsInfo,
   dsIdx,
@@ -427,7 +427,7 @@ function DeliveryTimeline({
     <div className="bg-white rounded-xl border border-gray-100 p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
-          <Icon name="Truck" size={14} className="text-gray-400" /> 상담 방식 현황
+          <Icon name="Truck" size={14} className="text-gray-400" /> 진행 방식 현황
         </h2>
         <span
           className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${dsInfo.color}`}

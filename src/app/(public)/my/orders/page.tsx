@@ -14,7 +14,7 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
   PAID: { label: "결제완료", color: "bg-blue-50 text-blue-600" },
   CONFIRMED: { label: "확인됨", color: "bg-indigo-50 text-indigo-600" },
   SHIPPING: { label: "상담 진행중", color: "bg-cyan-50 text-cyan-600" },
-  DELIVERED: { label: "상담 완료", color: "bg-green-50 text-green-600" },
+  DELIVERED: { label: "서비스 완료", color: "bg-green-50 text-green-600" },
   CANCELLED: { label: "취소됨", color: "bg-red-50 text-red-600" },
   REFUND_REQUESTED: {
     label: "환불요청",
@@ -25,10 +25,10 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
 
 const DELIVERY_STATUS_MAP: Record<string, { label: string; color: string }> = {
   PAYMENT_COMPLETED: { label: "결제 완료", color: "bg-blue-50 text-blue-600" },
-  PREPARING: { label: "상담 방식 준비 중", color: "bg-yellow-50 text-yellow-600" },
+  PREPARING: { label: "진행 방식 준비 중", color: "bg-yellow-50 text-yellow-600" },
   SHIPPED: { label: "발송 완료", color: "bg-orange-50 text-orange-600" },
-  DELIVERING: { label: "상담 방식 중", color: "bg-purple-50 text-purple-600" },
-  DELIVERED: { label: "상담 방식 완료", color: "bg-green-50 text-green-700" },
+  DELIVERING: { label: "진행 방식 중", color: "bg-purple-50 text-purple-600" },
+  DELIVERED: { label: "진행 방식 완료", color: "bg-green-50 text-green-700" },
   CANCEL_REQUESTED: {
     label: "결제취소 요청중",
     color: "bg-amber-50 text-amber-700",
@@ -103,7 +103,7 @@ export default async function MyOrdersPage() {
               };
               // 미결제 예약은 deliveryStatus 를 신뢰하지 않는다.
               // (기본값이 PAYMENT_COMPLETED 였던 과거 예약이 남아 있어, 결제 안 한 예약이
-              //  "결제 완료"로 표시되던 버그가 있었다. 실제 결제된 예약만 상담 방식 상태를 배지로 쓴다.)
+              //  "결제 완료"로 표시되던 버그가 있었다. 실제 결제된 예약만 진행 방식 상태를 배지로 쓴다.)
               const isPaid = order.paymentStatus === "COMPLETED";
               const ds = isPaid
                 ? ((order as any).deliveryStatus as string | null | undefined)
@@ -125,9 +125,9 @@ export default async function MyOrdersPage() {
                 >
                   <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
                     <div className="min-w-0 flex-1 pr-2">
-                      {/* 상담상품명을 크게 강조, 예약번호·날짜는 작게 */}
+                      {/* 뷰티 서비스명을 크게 강조, 예약번호·날짜는 작게 */}
                       <p className="text-[14px] font-bold text-gray-900 truncate">
-                        {order.items[0]?.productName || "예약 상담상품"}
+                        {order.items[0]?.productName || "예약 뷰티 서비스"}
                         {order.items.length > 1 && (
                           <span className="text-[11px] font-normal text-gray-400">
                             {" "}

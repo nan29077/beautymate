@@ -29,7 +29,7 @@ interface CartItem {
   freeShippingThreshold: number | null;
 }
 
-// 장바구니 할인 설정 (상담사별) — 소계가 threshold 이상이면 rate% 할인
+// 장바구니 할인 설정 (뷰티 전문가별) — 소계가 threshold 이상이면 rate% 할인
 interface CartDiscountInfo {
   threshold: number;
   rate: number;
@@ -46,7 +46,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
   const router = useRouter();
   const { appAlert } = useAppDialog();
   const { groupBuy: FEATURE_GROUP_BUY } = useFeatureFlags();
-  // 점집 컨텍스트면 "상담 둘러보기/계속하기"는 메인이 아닌 해당 점집 홈으로 보낸다.
+  // 뷰티샵 컨텍스트면 "상담 둘러보기/계속하기"는 메인이 아닌 해당 뷰티샵 홈으로 보낸다.
   const { shop } = useShopChrome();
   const shoppingHref = shop ? `/shop/${shop.slug}` : "/";
   const [items, setItems] = useState<CartItem[]>(initialItems);
@@ -112,7 +112,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
     const cartDiscount = cartDiscounts[sellerId];
     if (!cartDiscount) return;
 
-    // 장바구니 할인 — 상담사별 소계가 기준금액 이상이면 적용 (확정 계산은 서버 api/orders)
+    // 장바구니 할인 — 뷰티 전문가별 소계가 기준금액 이상이면 적용 (확정 계산은 서버 api/orders)
     if (sellerTotal >= cartDiscount.threshold) {
       const cartAmount = Math.round(sellerTotal * cartDiscount.rate / 100);
       if (cartAmount > 0) {
@@ -128,7 +128,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
     }
   });
 
-  // 라이브 점사는 배송이 없어 배송비를 더하지 않는다.
+  // 라이브 뷰티 상담는 배송이 없어 배송비를 더하지 않는다.
   const finalTotal = totalPrice - totalDiscount;
 
   const updateQuantity = async (itemId: string, newQuantity: number) => {
@@ -181,7 +181,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
 
   const handleOrder = async () => {
     if (selectedItems.length === 0) {
-      appAlert("예약할 상담상품을 선택해주세요.");
+      appAlert("예약할 뷰티 서비스를 선택해주세요.");
       return;
     }
 
@@ -273,7 +273,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
         </div>
         <h2 className="text-lg font-bold text-gray-900 mb-2">예약이 완료되었습니다!</h2>
         <p className="text-sm text-gray-500 mb-1">예약번호: {reservationNumber}</p>
-        <p className="text-xs text-gray-400 mb-6">결제 확인 후 상담 방식이 시작됩니다.</p>
+        <p className="text-xs text-gray-400 mb-6">결제 확인 후 진행 방식이 시작됩니다.</p>
         {totalDiscount > 0 && (
           <p className="text-xs text-brand-600 mb-4">
             <Sparkles size={12} className="inline mr-1" />
@@ -465,7 +465,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
           <h3 className="text-sm font-bold text-gray-900 mb-3">결제 요약</h3>
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">상담상품 금액</span>
+              <span className="text-gray-500">뷰티 서비스 금액</span>
               <span className="font-medium">{formatPrice(totalPrice)}</span>
             </div>
             {totalDiscount > 0 && (
@@ -514,7 +514,7 @@ export default function CartClient({ initialItems }: CartClientProps) {
           ) : (
             <>
               <Icon name="Cart" size={18} strokeWidth={1.5} className="mr-2" />
-              {selectedItems.length > 0 ? `선택 상담상품 예약하기 (${selectedItems.length})` : "상담상품을 선택해주세요"}
+              {selectedItems.length > 0 ? `선택 뷰티 서비스 예약하기 (${selectedItems.length})` : "뷰티 서비스를 선택해주세요"}
             </>
           )}
         </button>

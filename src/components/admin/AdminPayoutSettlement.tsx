@@ -49,10 +49,10 @@ export default function AdminPayoutSettlement({ totals, payouts }: Props) {
     let note: string | undefined;
 
     if (action === "reject") {
-      // 반려는 사유를 필수로 받는다 — 입력한 사유가 상담사 정산 화면과 알림에 그대로 노출된다.
+      // 반려는 사유를 필수로 받는다 — 입력한 사유가 뷰티 전문가 정산 화면과 알림에 그대로 노출된다.
       const reason = await appPrompt({
         title: "출금요청 반려",
-        message: "반려 사유를 입력해 주세요.\n입력한 사유는 상담사 정산 화면에 그대로 표시됩니다.",
+        message: "반려 사유를 입력해 주세요.\n입력한 사유는 뷰티 전문가 정산 화면에 그대로 표시됩니다.",
         placeholder: "예) 등록된 계좌의 예금주가 일치하지 않습니다. 계좌 정보 수정 후 다시 신청해 주세요.",
         required: true,
         maxLength: 500,
@@ -92,7 +92,7 @@ export default function AdminPayoutSettlement({ totals, payouts }: Props) {
     <div className="animate-fade-in">
       <div className="mb-5">
         <h1 className="text-lg font-bold text-gray-900">정산 관리</h1>
-        <p className="text-xs text-gray-400 mt-0.5">상담사 출금요청 처리 (정산 주기: 결제완료 후 영업일 {totals.businessDays}일)</p>
+        <p className="text-xs text-gray-400 mt-0.5">뷰티 전문가 출금요청 처리 (정산 주기: 결제완료 후 영업일 {totals.businessDays}일)</p>
       </div>
 
       {/* 요약 카드 */}
@@ -101,7 +101,7 @@ export default function AdminPayoutSettlement({ totals, payouts }: Props) {
         <SummaryCard icon={<Icon name="Clock" size={16} className="text-orange-500" />} label={`정산 대기 (영업일 ${totals.businessDays}일 이전)`} value={won(totals.pendingTotal)} tone="bg-white" />
         <SummaryCard icon={<Icon name="Wallet" size={16} className="text-emerald-600" />} label="정산 가능액" value={won(totals.availableTotal)} tone="bg-white" />
         <SummaryCard icon={<Icon name="Share" size={16} className="text-indigo-600" />} label="정산 요청금액" value={won(totals.requestedTotal)} tone="bg-indigo-50" />
-        <SummaryCard icon={<PiggyBank size={16} className="text-brand-600" />} label="사주나라 수익 (판매가 기준, PG 2.86% 제외)" value={won(totals.platformRevenue)} tone="bg-brand-50" />
+        <SummaryCard icon={<PiggyBank size={16} className="text-brand-600" />} label="뷰티메이트 수익 (판매가 기준, PG 2.86% 제외)" value={won(totals.platformRevenue)} tone="bg-brand-50" />
       </div>
 
       {/* 출금요청 리스트 */}

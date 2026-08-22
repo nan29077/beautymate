@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user || session.user.role !== "CONSULTANT") {
-    return NextResponse.json({ error: "상담사만 예약 시간을 등록할 수 있습니다." }, { status: 403 });
+    return NextResponse.json({ error: "뷰티 전문가만 예약 시간을 등록할 수 있습니다." }, { status: 403 });
   }
 
   const body = await request.json();

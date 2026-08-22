@@ -13,7 +13,7 @@ const schemaDriftResponse = () =>
   );
 
 // GET /api/sessions/[id] — 세션 상세 + 역할별 입장 토큰
-// 상담사(host)는 hostToken, 고객(guest)은 guestToken 만 받는다.
+// 뷰티 전문가(host)는 hostToken, 고객(guest)은 guestToken 만 받는다.
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> | { id: string } },
@@ -115,7 +115,7 @@ export async function GET(
         reservationDate: cs.reservation.reservationDate,
         reservationTime: cs.reservation.reservationTime,
         customerName: cs.reservation.customerName,
-        // 고객 개인정보(연락처·사주 정보)는 상담사/관리자에게만
+        // 고객 개인정보(연락처·뷰티 정보)는 뷰티 전문가/관리자에게만
         ...(isHost || isAdmin
           ? {
               customerPhone: cs.reservation.customerPhone,

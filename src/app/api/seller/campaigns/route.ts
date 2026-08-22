@@ -12,13 +12,13 @@ export async function GET(req: NextRequest) {
 
     const role = session.user.role;
     if (role !== "CONSULTANT") {
-      return NextResponse.json({ error: "상담사 전용" }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가 전용" }, { status: 403 });
     }
 
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 400 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 400 });
 
     const campaigns = await prisma.groupBuyCampaign.findMany({
       where: { sellerId: seller.id },
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     const role = session.user.role;
     if (role !== "CONSULTANT") {
-      return NextResponse.json({ error: "상담사 전용" }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가 전용" }, { status: 403 });
     }
 
     const seller = await prisma.sellerProfile.findUnique({
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!seller) {
-      return NextResponse.json({ error: "상담사 프로필이 없습니다" }, { status: 400 });
+      return NextResponse.json({ error: "뷰티 전문가 프로필이 없습니다" }, { status: 400 });
     }
 
     const body = await req.json();
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
 
     if (!productId || !campaignPrice || !startDate || !endDate) {
       return NextResponse.json(
-        { error: "상담상품, 가격, 시작일, 종료일은 필수입니다" },
+        { error: "뷰티 서비스, 가격, 시작일, 종료일은 필수입니다" },
         { status: 400 }
       );
     }
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!product) {
-      return NextResponse.json({ error: "상담상품을 찾을 수 없습니다" }, { status: 404 });
+      return NextResponse.json({ error: "뷰티 서비스를 찾을 수 없습니다" }, { status: 404 });
     }
 
     const start = new Date(startDate);
@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
 
     const campaign = await prisma.groupBuyCampaign.create({
       data: {
-        title: title || `${product.name} 단체 상담`,
+        title: title || `${product.name} 공동 프로모션`,
         sellerId: seller.id,
         productId,
         status: start <= now ? "ACTIVE" : "SCHEDULED",
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
         totalRevenue: Number(campaign.totalRevenue),
         commissionRate: Number(campaign.commissionRate),
       },
-      message: "단체 상담 캠페인이 등록되었습니다",
+      message: "공동 프로모션 캠페인이 등록되었습니다",
     }, { status: 201 });
   } catch (error) {
     console.error("Seller campaign creation error:", error);

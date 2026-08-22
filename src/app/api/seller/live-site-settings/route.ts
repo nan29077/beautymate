@@ -42,7 +42,7 @@ export async function GET() {
     where: { userId: session.user!.id },
     select: { liveSiteSettings: true },
   });
-  if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+  if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
   return NextResponse.json({ settings: parseSettings(seller.liveSiteSettings) });
 }
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     where: { userId: session.user!.id },
     select: { id: true, liveSiteSettings: true },
   });
-  if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+  if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "잘못된 요청" }, { status: 400 });

@@ -4,15 +4,15 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// 현재 상담사의 일반상담상품 노출 설정 조회
+// 현재 뷰티 전문가의 일반 뷰티 서비스 노출 설정 조회
 export async function GET() {
   try {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
-    if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+    if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가만 접근 가능" }, { status: 403 });
 
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id }, select: { id: true } });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필을 찾을 수 없습니다." }, { status: 404 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필을 찾을 수 없습니다." }, { status: 404 });
 
     const exposure = await (prisma as any).shopDirectProductExposure.findUnique({ where: { sellerProfileId: seller.id } });
     const productIds: string[] = (() => { try { return JSON.parse(exposure?.productIds || "[]"); } catch { return []; } })();
@@ -27,15 +27,15 @@ export async function GET() {
   }
 }
 
-// 노출 스위치(isEnabled) 토글 및 선택 상담상품(productIds) 업데이트
+// 노출 스위치(isEnabled) 토글 및 선택 뷰티 서비스(productIds) 업데이트
 export async function PUT(req: NextRequest) {
   try {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "인증 필요" }, { status: 401 });
-    if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+    if (session.user?.role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가만 접근 가능" }, { status: 403 });
 
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id }, select: { id: true } });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필을 찾을 수 없습니다." }, { status: 404 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필을 찾을 수 없습니다." }, { status: 404 });
 
     const body = await req.json().catch(() => ({}));
 
@@ -43,7 +43,7 @@ export async function PUT(req: NextRequest) {
     if (typeof body.isEnabled === "boolean") data.isEnabled = body.isEnabled;
     if (body.productIds !== undefined) {
       const ids = Array.isArray(body.productIds) ? body.productIds.filter((v: any) => typeof v === "string") : [];
-      // 상담사 본인 소유 상담상품만 노출 대상으로 허용
+      // 뷰티 전문가 본인 소유 뷰티 서비스만 노출 대상으로 허용
       const owned = await prisma.directProduct.findMany({
         where: { sellerId: seller.id, id: { in: ids } },
         select: { id: true },

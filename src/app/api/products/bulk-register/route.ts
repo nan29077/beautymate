@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
       const fd = await req.formData();
       const f = fd.get("file");
       if (f instanceof File) file = f;
-      // 상담사 직접 등록은 항상 공급가(판매가) 방식 → 수수료 방식은 카탈로그(브랜드/관리자/중간관리자)만
+      // 뷰티 전문가 직접 등록은 항상 공급가(판매가) 방식 → 수수료 방식은 카탈로그(브랜드/관리자/중간관리자)만
       if (fd.get("priceType") === "COMMISSION" && mode !== "seller") priceType = "COMMISSION";
     } catch {
       return NextResponse.json({ error: "파일 업로드 형식이 올바르지 않습니다" }, { status: 400 });
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "엑셀 파일을 읽을 수 없습니다. 양식을 확인해주세요" }, { status: 400 });
     }
 
-    // 제목(헤더) 행 찾기 — "상담상품명" 셀이 있는 행
+    // 제목(헤더) 행 찾기 — "뷰티 서비스명" 셀이 있는 행
     const markerNorm = normalizeHeader(HEADER_MARKER);
     let headerIdx = -1;
     for (let i = 0; i < rows.length; i++) {
@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
     }
     if (headerIdx === -1) {
       return NextResponse.json(
-        { error: "제목 행을 찾을 수 없습니다. 템플릿의 '상담상품명' 제목 행을 삭제하지 마세요" },
+        { error: "제목 행을 찾을 수 없습니다. 템플릿의 '뷰티 서비스명' 제목 행을 삭제하지 마세요" },
         { status: 400 }
       );
     }
@@ -160,11 +160,11 @@ export async function POST(req: NextRequest) {
 
     if (mode === "seller") {
       const sp = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-      if (!sp) return NextResponse.json({ error: "상담사 프로필이 없습니다" }, { status: 400 });
+      if (!sp) return NextResponse.json({ error: "뷰티 전문가 프로필이 없습니다" }, { status: 400 });
       sellerProfileId = sp.id;
     }
 
-    // 관리자·상담사 등록 상담상품은 자동 공개
+    // 관리자·뷰티 전문가 등록 뷰티 서비스는 자동 공개
     const isApproved = true;
 
     type RowResult = { row: number; name: string; ok: boolean; error?: string };
@@ -193,7 +193,7 @@ export async function POST(req: NextRequest) {
       if (name.startsWith(EXAMPLE_PREFIX)) continue;
 
       try {
-        if (!name) throw new Error("상담상품명은 필수입니다");
+        if (!name) throw new Error("뷰티 서비스명은 필수입니다");
 
         // 가격 결정 (단일 등록 폼과 동일한 의미)
         let parsedBasePrice: number;
@@ -205,19 +205,19 @@ export async function POST(req: NextRequest) {
           if (bp === null) throw new Error("판매가는 필수이며 0 이상 숫자여야 합니다");
           parsedBasePrice = bp;
         } else if (priceType === "COMMISSION") {
-          // 수수료 제공: 판매가(소비자가) + 상담사수수료율(%) → 수수료 금액 계산
+          // 수수료 제공: 판매가(소비자가) + 뷰티 전문가수수료율(%) → 수수료 금액 계산
           const bp = toMoneyOrNull(rec.basePrice);
           if (bp === null) throw new Error("판매가(소비자가)는 필수이며 0 이상 숫자여야 합니다");
           parsedBasePrice = bp;
           const cr = toMoneyOrNull(rec.sellerCommissionRate);
-          if (cr === null) throw new Error("상담사수수료율(%)은 필수이며 0 이상 숫자여야 합니다");
+          if (cr === null) throw new Error("뷰티 전문가수수료율(%)은 필수이며 0 이상 숫자여야 합니다");
           commissionRate = cr;
           sellerCommissionAmount = Math.round((bp * cr) / 100);
         } else {
           const sp = toMoneyOrNull(rec.supplyPrice);
           if (sp === null) throw new Error("공급가는 필수이며 0 이상 숫자여야 합니다");
           supplyPrice = sp;
-          parsedBasePrice = sp; // 브랜드/관리자/중간관리자: 판매가는 상담사가 확정 → 공급가로 임시 저장
+          parsedBasePrice = sp; // 브랜드/관리자/중간관리자: 판매가는 뷰티 전문가가 확정 → 공급가로 임시 저장
         }
 
         // 카테고리
@@ -245,7 +245,7 @@ export async function POST(req: NextRequest) {
         // 배지
         const badges = normalizeBadges(rec.badges);
 
-        // 상담 방식
+        // 진행 방식
         const freeShipping = /^(y|yes|true|1|무료|o|예)$/i.test((rec.freeShipping || "").trim());
 
         // slug (행 인덱스 포함으로 동일명 충돌 방지)
@@ -300,7 +300,7 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        // 상담사 직접 등록: 본인 점집에 즉시 판매 상태로 추가
+        // 뷰티 전문가 직접 등록: 본인 뷰티샵에 즉시 판매 상태로 추가
         if (mode === "seller" && sellerProfileId) {
           await prisma.sellerShopProduct.upsert({
             where: { sellerId_productId: { sellerId: sellerProfileId, productId: product.id } },
@@ -324,7 +324,7 @@ export async function POST(req: NextRequest) {
     const failed = results.filter((r) => !r.ok).length;
     if (results.length === 0) {
       return NextResponse.json(
-        { error: "등록할 상담상품 데이터가 없습니다. 제목 행 아래에 상담상품을 입력했는지 확인해주세요" },
+        { error: "등록할 뷰티 서비스 데이터가 없습니다. 제목 행 아래에 뷰티 서비스를 입력했는지 확인해주세요" },
         { status: 400 }
       );
     }

@@ -1,8 +1,8 @@
-// 상담사 추천인(attribution) 캡처 미들웨어
+// 뷰티 전문가 추천인(attribution) 캡처 미들웨어
 //
-// 다음 경로 진입 시 상담사 slug 을 쿠키(sb_ref)에 저장한다. (last-click, 7일)
-//   - /shop/[slug]                   — 상담사 페이지 직접 진입
-//   - /products/[id]?ref=<slug>      — 상담사 추천 링크로 제품 페이지 진입
+// 다음 경로 진입 시 뷰티 전문가 slug 을 쿠키(sb_ref)에 저장한다. (last-click, 7일)
+//   - /shop/[slug]                   — 뷰티 전문가 페이지 직접 진입
+//   - /products/[id]?ref=<slug>      — 뷰티 전문가 추천 링크로 제품 페이지 진입
 //   - /auth/register?ref=<slug>      — 추천 링크가 회원가입으로 바로 보낸 경우
 //
 // 회원가입 클라이언트는 URL ref/code 가 없을 때 이 쿠키를 fallback 으로 사용.
@@ -27,7 +27,7 @@ export function middleware(req: NextRequest) {
 
   let capturedSlug: string | null = null;
 
-  // 1) /shop/[slug] - 상담사 페이지 직접 진입
+  // 1) /shop/[slug] - 뷰티 전문가 페이지 직접 진입
   const shopMatch = pathname.match(SHOP_PATH);
   if (shopMatch && isValidSellerSlug(shopMatch[1])) {
     capturedSlug = shopMatch[1];
@@ -53,7 +53,7 @@ export function middleware(req: NextRequest) {
     });
   }
 
-  // 홈·내픽·라이브·콘텐츠 진입 시 점집 컨텍스트 쿠키를 서버측에서 즉시 삭제
+  // 홈·내픽·라이브·콘텐츠 진입 시 뷰티샵 컨텍스트 쿠키를 서버측에서 즉시 삭제
   // → initialShop 이 null 로 전달되어 ShopSubpageBottomNav flash 원천 차단
   if (pathname === "/" || pathname === "/my" || pathname === "/my/seller" || pathname === "/live" || pathname.startsWith("/content")) {
     res.cookies.set({ name: SB_SHOP_COOKIE, value: "", path: "/", maxAge: 0, sameSite: "lax" });

@@ -61,7 +61,7 @@ export default function GameCouponDraft({
     setProductId(""); setProductName("");
   };
 
-  // PURCHASE 타입 선택 시 상담사 상담상품 목록 로드
+  // PURCHASE 타입 선택 시 뷰티 전문가 뷰티 서비스 목록 로드
   const handleTypeChange = async (t: "PERCENT" | "AMOUNT" | "PURCHASE") => {
     setDiscountType(t);
     if (t === "PURCHASE" && products.length === 0) {
@@ -80,7 +80,7 @@ export default function GameCouponDraft({
     const v = Number(discountValue);
     if (!Number.isFinite(v) || v <= 0) return toast("할인 값을 입력해주세요", false);
     if (discountType === "PERCENT" && v > 100) return toast("정률 할인은 100%를 넘을 수 없습니다", false);
-    if (discountType === "PURCHASE" && !productId) return toast("구매권 상담상품을 선택해주세요", false);
+    if (discountType === "PURCHASE" && !productId) return toast("구매권 뷰티 서비스를 선택해주세요", false);
     onChange([
       ...value,
       {
@@ -228,13 +228,13 @@ export default function GameCouponDraft({
                 }}
                 className={inputCls}
               >
-                <option value="">상담상품 선택</option>
+                <option value="">뷰티 서비스 선택</option>
                 {products.map((p) => (
                   <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
               </select>
               {!productId && (
-                <p className="text-xs text-amber-600">구매권을 적용할 상담상품을 선택해주세요</p>
+                <p className="text-xs text-amber-600">구매권을 적용할 뷰티 서비스를 선택해주세요</p>
               )}
             </div>
           )}

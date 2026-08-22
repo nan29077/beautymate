@@ -13,11 +13,11 @@ interface Inquiry {
 
 // Dummy data for inquiries
 const DUMMY_INQUIRIES: Inquiry[] = [
-  { id: "1", name: "김민지", email: "minji@example.com", category: "상담 방식", message: "예약한 상담상품이 아직 진행되지 않았습니다. 예약번호 ORD-2024-001입니다.", reply: "안녕하세요, 김민지님. 해당 예약은 현재 상담 방식 준비 중이며, 내일 출고 예정입니다.", status: "replied", createdAt: "2024-03-25T10:30:00Z" },
-  { id: "2", name: "이수호", email: "suho@example.com", category: "상담상품", message: "상담상품 사이즈가 맞지 않아 교환하고 싶습니다.", reply: null, status: "pending", createdAt: "2024-03-26T14:20:00Z" },
+  { id: "1", name: "김민지", email: "minji@example.com", category: "진행 방식", message: "예약한 뷰티 서비스가 아직 진행되지 않았습니다. 예약번호 ORD-2024-001입니다.", reply: "안녕하세요, 김민지님. 해당 예약은 현재 진행 방식 준비 중이며, 내일 출고 예정입니다.", status: "replied", createdAt: "2024-03-25T10:30:00Z" },
+  { id: "2", name: "이수호", email: "suho@example.com", category: "뷰티 서비스", message: "뷰티 서비스 사이즈가 맞지 않아 교환하고 싶습니다.", reply: null, status: "pending", createdAt: "2024-03-26T14:20:00Z" },
   { id: "3", name: "박서연", email: "seoyeon@example.com", category: "결제", message: "결제가 두 번 되었습니다. 확인 부탁드립니다.", reply: null, status: "pending", createdAt: "2024-03-26T16:45:00Z" },
-  { id: "4", name: "정우진", email: "woojin@example.com", category: "기타", message: "상담사 등록 절차에 대해 알고 싶습니다.", reply: "안녕하세요! 상담사 등록은 회원가입 후 상담사 신청을 통해 진행됩니다. 사업자등록증과 기본 정보를 입력하시면 됩니다.", status: "replied", createdAt: "2024-03-24T09:00:00Z" },
-  { id: "5", name: "최하은", email: "haeun@example.com", category: "환불", message: "구매한 상담상품의 환불을 요청합니다. 상담상품에 하자가 있습니다.", reply: null, status: "pending", createdAt: "2024-03-27T08:15:00Z" },
+  { id: "4", name: "정우진", email: "woojin@example.com", category: "기타", message: "뷰티 전문가 등록 절차에 대해 알고 싶습니다.", reply: "안녕하세요! 뷰티 전문가 등록은 회원가입 후 뷰티 전문가 신청을 통해 진행됩니다. 사업자등록증과 기본 정보를 입력하시면 됩니다.", status: "replied", createdAt: "2024-03-24T09:00:00Z" },
+  { id: "5", name: "최하은", email: "haeun@example.com", category: "환불", message: "구매한 뷰티 서비스의 환불을 요청합니다. 뷰티 서비스에 하자가 있습니다.", reply: null, status: "pending", createdAt: "2024-03-27T08:15:00Z" },
 ];
 
 export default function AdminInquiriesPage() {

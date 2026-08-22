@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 async function getOwnedCoupon(gameId: string, couponId: string, userId: string) {
   const seller = await prisma.sellerProfile.findUnique({ where: { userId } });
-  if (!seller) return { error: "상담사 프로필 없음", status: 400 as const };
+  if (!seller) return { error: "뷰티 전문가 프로필 없음", status: 400 as const };
   const game = await prisma.game.findUnique({ where: { id: gameId }, select: { id: true, sellerId: true } });
   if (!game || game.sellerId !== seller.id) {
     return { error: "이 게임에 대한 권한이 없습니다", status: 403 as const };
@@ -27,7 +27,7 @@ export async function PATCH(
   try {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
-    if (session.user.role !== "CONSULTANT") return NextResponse.json({ error: "상담사 전용" }, { status: 403 });
+    if (session.user.role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가 전용" }, { status: 403 });
     const { id, couponId } = await Promise.resolve(params);
     const owned = await getOwnedCoupon(id, couponId, session.user!.id);
     if ("error" in owned) return NextResponse.json({ error: owned.error }, { status: owned.status });
@@ -56,7 +56,7 @@ export async function DELETE(
   try {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
-    if (session.user.role !== "CONSULTANT") return NextResponse.json({ error: "상담사 전용" }, { status: 403 });
+    if (session.user.role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가 전용" }, { status: 403 });
     const { id, couponId } = await Promise.resolve(params);
     const owned = await getOwnedCoupon(id, couponId, session.user!.id);
     if ("error" in owned) return NextResponse.json({ error: owned.error }, { status: owned.status });

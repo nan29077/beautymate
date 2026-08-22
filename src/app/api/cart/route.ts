@@ -58,7 +58,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "필수 정보가 누락되었습니다." }, { status: 400 });
   }
 
-  // upsert: 같은 상담상품+옵션+상담사+캠페인 조합이면 수량 증가
+  // upsert: 같은 뷰티 서비스+옵션+뷰티 전문가+캠페인 조합이면 수량 증가
   const existing = await prisma.cartItem.findFirst({
     where: {
       userId: session.user!.id,

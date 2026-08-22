@@ -13,7 +13,7 @@ import { Clock, Video, CalendarCheck, Sparkles, ChevronRight } from "lucide-reac
 export const dynamic = "force-dynamic";
 
 // ─────────────────────────────────────────────
-// /c/[slug] — 상담사 전용 짧은 예약 URL.
+// /c/[slug] — 뷰티 전문가 전용 짧은 예약 URL.
 // 유튜브 설명란·고정댓글·인스타 프로필에 그대로 붙여 쓰는 랜딩 페이지.
 // 위젯 QR 코드도 이 주소를 가리킨다.
 // ─────────────────────────────────────────────
@@ -58,7 +58,7 @@ function consultantQuery(productSelect: object) {
 }
 
 /**
- * 상담사 + 상담상품 조회.
+ * 뷰티 전문가 + 뷰티 서비스 조회.
  * 상담 관련 컬럼(consultingType 등)이 아직 DB에 없는 환경에서도 랜딩 페이지가 죽지 않도록,
  * 실패하면 기본 컬럼만으로 한 번 더 조회한다. (이 URL 은 유튜브 설명란 등 외부에 배포된다)
  */
@@ -89,10 +89,10 @@ export async function generateMetadata({
     where: { slug },
     select: { id: true, shopName: true, shopDescription: true, shopBanner: true },
   });
-  if (!seller) return { title: "사주나라" };
+  if (!seller) return { title: "뷰티메이트" };
 
   const custom = await getShopCustomization(seller.id);
-  const title = `${seller.shopName}의 점집 - 사주나라`;
+  const title = `${seller.shopName}의 뷰티샵 - 뷰티메이트`;
   const description =
     custom.tagline || seller.shopDescription || `${seller.shopName}에게 지금 상담을 예약하세요.`;
   const shareBaseUrl = getShareBaseUrl();
@@ -106,9 +106,9 @@ export async function generateMetadata({
       title,
       description,
       url: pageUrl,
-      siteName: "사주나라",
+      siteName: "뷰티메이트",
       type: "profile",
-      images: [{ url: image, width: 1200, height: 630, alt: `${seller.shopName}의 점집` }],
+      images: [{ url: image, width: 1200, height: 630, alt: `${seller.shopName}의 뷰티샵` }],
     },
     twitter: { card: "summary_large_image", title, description, images: [image] },
   };
@@ -137,10 +137,10 @@ export default async function ConsultantLandingPage({
     };
   });
 
-  // 점집 커스터마이징(한줄 소개·상세 소개·상담 분야 태그)
+  // 뷰티샵 커스터마이징(한줄 소개·상세 소개·상담 분야 태그)
   const customization = await getShopCustomization(seller.id);
 
-  // 상담 종류 태그 — 상담사가 지정한 분야 태그 + 등록된 상담상품의 consultingType 을 중복 없이 모은다.
+  // 서비스 종류 태그 — 뷰티 전문가가 지정한 분야 태그 + 등록된 뷰티 서비스의 consultingType 을 중복 없이 모은다.
   const consultingTags = Array.from(
     new Set([
       ...customization.tags,
@@ -153,7 +153,7 @@ export default async function ConsultantLandingPage({
 
   return (
     <div className="animate-fade-in bg-gradient-to-b from-[#1a0b33] via-[#2d1b69] to-white min-h-screen">
-      {/* ───── 상담사 프로필 헤더 ───── */}
+      {/* ───── 뷰티 전문가 프로필 헤더 ───── */}
       <section className="relative px-5 pt-8 pb-6 text-center overflow-hidden">
         {/* 별빛 장식 */}
         <Sparkles
@@ -200,7 +200,7 @@ export default async function ConsultantLandingPage({
           </p>
         )}
 
-        {/* 상담 종류 태그 */}
+        {/* 서비스 종류 태그 */}
         {consultingTags.length > 0 && (
           <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5">
             {consultingTags.map((tag) => (
@@ -224,7 +224,7 @@ export default async function ConsultantLandingPage({
         </Link>
       </section>
 
-      {/* ───── 상담 상품 목록 ───── */}
+      {/* ───── 뷰티 서비스 목록 ───── */}
       <section className="bg-white rounded-t-3xl px-4 pt-6 pb-8 min-h-[40vh]">
         <h2 className="text-base font-bold text-gray-900 mb-1">상담 메뉴</h2>
         <p className="text-[11px] text-gray-400 mb-4">
@@ -233,12 +233,12 @@ export default async function ConsultantLandingPage({
 
         {products.length === 0 ? (
           <div className="py-14 text-center">
-            <p className="text-sm text-gray-400">아직 등록된 상담 상품이 없습니다.</p>
+            <p className="text-sm text-gray-400">아직 등록된 뷰티 서비스가 없습니다.</p>
             <Link
               href={`/shop/${seller.slug}`}
               className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-[#2d1b69]"
             >
-              상담사 점집 둘러보기
+              뷰티 전문가 뷰티샵 둘러보기
               <ChevronRight size={14} strokeWidth={2} />
             </Link>
           </div>
@@ -291,7 +291,7 @@ export default async function ConsultantLandingPage({
           </ul>
         )}
 
-        {/* ───── 상담사 소개 ───── */}
+        {/* ───── 뷰티 전문가 소개 ───── */}
         {customization.intro && (
           <div className="mt-7 pt-6 border-t border-gray-100">
             <h2 className="text-base font-bold text-gray-900 mb-2">{seller.shopName} 소개</h2>

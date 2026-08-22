@@ -6,13 +6,13 @@ import { Hexagon } from 'lucide-react';
 import { useState } from "react";
 
 const FAQ_ITEMS = [
-  { q: "상담은 어떻게 진행되나요?", a: "원하는 상담사의 페이지에서 상담상품과 시간을 선택해 예약·결제하면 됩니다. 예약이 확정되면 마이페이지 > 예약내역에서 일정과 진행 상태를 확인할 수 있으며, 예약한 시간에 상담사가 안내한 방식(라이브·전화 등)으로 상담이 진행됩니다. 상담 시작 전에 알림으로 다시 안내드려요." },
-  { q: "예약 취소/환불은 어떻게 하나요?", a: "마이페이지 > 예약내역에서 해당 예약을 선택해 취소를 신청하거나 1대1 문의를 통해 접수해 주세요. 상담 시작 전 취소는 전액 환불되며, 상담 임박 시점이나 진행 이후에는 환불이 제한될 수 있습니다. 자세한 기준은 각 상담상품의 안내를 확인해 주세요. 환불은 접수 후 보통 3~5 영업일 이내에 결제 수단으로 처리됩니다." },
-  { q: "상담사가 되려면 어떻게 하나요?", a: "회원가입 시 '상담사' 유형을 선택하거나, 일반 회원으로 가입한 뒤 마이페이지에서 상담사 신청을 하면 됩니다. 운영 중인 SNS 채널(인스타그램·유튜브·틱톡 등) 정보를 함께 제출해 주시면 심사에 도움이 됩니다. 관리자 검토 후 1~3 영업일 이내에 승인 결과가 안내되며, 승인되면 나만의 점집 개설과 라이브 방송 기능이 활성화됩니다." },
+  { q: "상담은 어떻게 진행되나요?", a: "원하는 뷰티 전문가의 페이지에서 뷰티 서비스와 시간을 선택해 예약·결제하면 됩니다. 예약이 확정되면 마이페이지 > 예약내역에서 일정과 진행 상태를 확인할 수 있으며, 예약한 시간에 뷰티 전문가가 안내한 방식(라이브·전화 등)으로 상담이 진행됩니다. 상담 시작 전에 알림으로 다시 안내드려요." },
+  { q: "예약 취소/환불은 어떻게 하나요?", a: "마이페이지 > 예약내역에서 해당 예약을 선택해 취소를 신청하거나 1대1 문의를 통해 접수해 주세요. 상담 시작 전 취소는 전액 환불되며, 상담 임박 시점이나 진행 이후에는 환불이 제한될 수 있습니다. 자세한 기준은 각 뷰티 서비스의 안내를 확인해 주세요. 환불은 접수 후 보통 3~5 영업일 이내에 결제 수단으로 처리됩니다." },
+  { q: "뷰티 전문가가 되려면 어떻게 하나요?", a: "회원가입 시 '뷰티 전문가' 유형을 선택하거나, 일반 회원으로 가입한 뒤 마이페이지에서 뷰티 전문가 신청을 하면 됩니다. 운영 중인 SNS 채널(인스타그램·유튜브·틱톡 등) 정보를 함께 제출해 주시면 심사에 도움이 됩니다. 관리자 검토 후 1~3 영업일 이내에 승인 결과가 안내되며, 승인되면 나만의 뷰티샵 개설과 라이브 방송 기능이 활성화됩니다." },
   { q: "결제 수단은 무엇이 있나요?", a: "신용카드, 체크카드, 계좌이체, 간편계좌이체, 네이버페이, 카카오페이 등을 지원합니다. 결제 단계에서 원하는 수단을 선택할 수 있으며, 간편계좌이체를 이용하면 계좌번호 입력 없이 빠르게 결제할 수 있습니다. 결제 과정에서 오류가 발생하면 잠시 후 다시 시도하거나 1대1 문의로 알려 주세요." },
   { q: "비밀번호를 잊어버렸어요.", a: "로그인 페이지의 '비밀번호 찾기'를 이용해 주세요. 가입 시 사용한 이메일로 재설정 링크가 발송되며, 링크는 발송 후 일정 시간 동안만 유효합니다. 메일이 보이지 않으면 스팸함을 확인하시고, 그래도 받지 못하셨다면 1대1 문의로 알려 주시면 도와드리겠습니다." },
-  { q: "라이브 방송을 보려면 어떻게 하나요?", a: "상담사의 점집 페이지에서 LIVE 뱃지가 표시된 상담사를 클릭하면 진행 중인 실시간 방송을 바로 시청할 수 있습니다. 방송 중에는 채팅으로 상담사와 소통하거나 소개되는 상담상품을 그 자리에서 구매할 수 있습니다. 별도 앱 설치 없이 모바일 웹에서 시청 가능하며, 안정적인 시청을 위해 Wi-Fi 환경을 권장합니다." },
-  { q: "상담 후기는 어디서 작성하나요?", a: "마이페이지 > 예약내역에서 완료된 예약을 선택해 후기를 작성할 수 있습니다. 상담 완료 후 일정 기간이 지나면 자동으로 확정 처리되며, 솔직한 후기를 남기면 다른 고객에게 큰 도움이 됩니다. 작성한 후기는 마이페이지에서 언제든 수정하거나 삭제할 수 있습니다." },
+  { q: "라이브 방송을 보려면 어떻게 하나요?", a: "뷰티 전문가의 뷰티샵 페이지에서 LIVE 뱃지가 표시된 뷰티 전문가를 클릭하면 진행 중인 실시간 방송을 바로 시청할 수 있습니다. 방송 중에는 채팅으로 뷰티 전문가와 소통하거나 소개되는 뷰티 서비스를 그 자리에서 구매할 수 있습니다. 별도 앱 설치 없이 모바일 웹에서 시청 가능하며, 안정적인 시청을 위해 Wi-Fi 환경을 권장합니다." },
+  { q: "서비스 후기는 어디서 작성하나요?", a: "마이페이지 > 예약내역에서 완료된 예약을 선택해 후기를 작성할 수 있습니다. 서비스 완료 후 일정 기간이 지나면 자동으로 확정 처리되며, 솔직한 후기를 남기면 다른 고객에게 큰 도움이 됩니다. 작성한 후기는 마이페이지에서 언제든 수정하거나 삭제할 수 있습니다." },
 ];
 
 function HoneycombBg() {
@@ -132,7 +132,7 @@ const PAGE_META: Record<string, { subtitle: string; icon: React.ReactNode }> = {
   shipping:     { subtitle: "예약·취소·환불 안내", icon: <Icon name="Calendar" size={24} strokeWidth={1.5} /> },
   terms:        { subtitle: "서비스 이용 약관", icon: <Icon name="File" size={24} strokeWidth={1.5} /> },
   privacy:      { subtitle: "개인정보 보호 정책", icon: <Icon name="Certified" size={24} strokeWidth={1.5} /> },
-  "seller-guide": { subtitle: "상담사로 시작하는 방법", icon: <Icon name="Sparkles" size={24} strokeWidth={1.5} /> },
+  "seller-guide": { subtitle: "뷰티 전문가로 시작하는 방법", icon: <Icon name="Sparkles" size={24} strokeWidth={1.5} /> },
 };
 
 const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = {
@@ -144,15 +144,15 @@ const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = 
       <div className="space-y-3">
         <Card>
           <SectionHeading>예약 확정</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">결제 완료 즉시 예약이 접수되며, 상담사가 확정하면 마이페이지 &gt; 예약내역에서 확인할 수 있습니다. 확정 알림은 앱/이메일로 발송됩니다.</p>
+          <p className="text-[13px] text-gray-600 leading-relaxed">결제 완료 즉시 예약이 접수되며, 뷰티 전문가가 확정하면 마이페이지 &gt; 예약내역에서 확인할 수 있습니다. 확정 알림은 앱/이메일로 발송됩니다.</p>
         </Card>
         <Card>
           <SectionHeading>예약 취소</SectionHeading>
           <p className="text-[13px] text-gray-600 leading-relaxed">마이페이지 &gt; 예약내역에서 직접 취소하거나 1대1 문의로 접수해 주세요. 상담 시작 전에는 전액 환불이 원칙이며, 상담 임박 시점(24시간 이내)에는 환불이 제한될 수 있습니다.</p>
         </Card>
         <Card>
-          <SectionHeading>그룹 상담 캠페인 환불</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">그룹 상담 캠페인 종료 후 목표 달성 실패 시 전액 자동 환불됩니다. 목표 달성 후에는 개별 상담상품의 취소·환불 정책이 적용됩니다.</p>
+          <SectionHeading>그룹 뷰티 클래스 캠페인 환불</SectionHeading>
+          <p className="text-[13px] text-gray-600 leading-relaxed">그룹 뷰티 클래스 캠페인 종료 후 목표 달성 실패 시 전액 자동 환불됩니다. 목표 달성 후에는 개별 뷰티 서비스의 취소·환불 정책이 적용됩니다.</p>
         </Card>
         <Card>
           <SectionHeading>환불 처리 기간</SectionHeading>
@@ -167,7 +167,7 @@ const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = 
       <div className="space-y-3">
         <Card>
           <SectionHeading>제1조 (목적)</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">이 약관은 사주나라(이하 "회사")가 운영하는 마켓플레이스 서비스(이하 "서비스")의 이용 조건 및 절차, 회사와 회원 간의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+          <p className="text-[13px] text-gray-600 leading-relaxed">이 약관은 뷰티메이트(이하 "회사")가 운영하는 마켓플레이스 서비스(이하 "서비스")의 이용 조건 및 절차, 회사와 회원 간의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.</p>
         </Card>
         <Card>
           <SectionHeading>제2조 (정의)</SectionHeading>
@@ -210,20 +210,20 @@ const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = 
     ),
   },
   "seller-guide": {
-    title: "상담사 신청 안내",
+    title: "뷰티 전문가 신청 안내",
     body: () => (
       <div className="space-y-3">
         <Card>
-          <SectionHeading>상담사란?</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">상담사는 사주·타로·운세 등 자신만의 상담 서비스를 나만의 점집에 등록하고 고객에게 제공하는 전문가입니다. 예약·결제·라이브 방송 기능을 모두 플랫폼에서 지원합니다.</p>
+          <SectionHeading>뷰티 전문가란?</SectionHeading>
+          <p className="text-[13px] text-gray-600 leading-relaxed">뷰티 전문가는 뷰티·퍼스널 컬러·뷰티 트렌드 등 자신만의 상담 서비스를 나만의 뷰티샵에 등록하고 고객에게 제공하는 전문가입니다. 예약·결제·라이브 방송 기능을 모두 플랫폼에서 지원합니다.</p>
         </Card>
         <Card>
           <SectionHeading>신청 자격</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">사주·타로·운세·심리상담 등 역술·상담 분야에서 활동 중이거나 준비 중인 누구나 신청 가능합니다. SNS 채널이 있으면 심사에 도움이 됩니다.</p>
+          <p className="text-[13px] text-gray-600 leading-relaxed">뷰티·퍼스널 컬러·뷰티 트렌드·심리상담 등 뷰티·상담 분야에서 활동 중이거나 준비 중인 누구나 신청 가능합니다. SNS 채널이 있으면 심사에 도움이 됩니다.</p>
         </Card>
         <Card>
           <SectionHeading>신청 방법</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">회원가입 시 '상담사'를 선택하거나, 일반 회원으로 가입 후 마이페이지에서 상담사 신청을 할 수 있습니다. 관리자 검토 후 1~3 영업일 내 결과가 안내됩니다.</p>
+          <p className="text-[13px] text-gray-600 leading-relaxed">회원가입 시 '뷰티 전문가'를 선택하거나, 일반 회원으로 가입 후 마이페이지에서 뷰티 전문가 신청을 할 수 있습니다. 관리자 검토 후 1~3 영업일 내 결과가 안내됩니다.</p>
         </Card>
         <Card>
           <SectionHeading>상담료 수익</SectionHeading>
@@ -232,7 +232,7 @@ const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = 
         <a href="/seller-apply"
           className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-amber-500 text-white text-sm font-bold hover:bg-amber-600 transition-colors shadow-md shadow-amber-200 mt-2">
           <Icon name="Sparkles" size={15} strokeWidth={1.5} />
-          상담사 신청하기
+          뷰티 전문가 신청하기
         </a>
       </div>
     ),
@@ -307,7 +307,7 @@ export default function SupportContent({
   }
 
   const title = dbContent?.title || hardcoded?.title || "고객센터";
-  const subtitle = meta?.subtitle ?? "사주나라 고객센터";
+  const subtitle = meta?.subtitle ?? "뷰티메이트 고객센터";
   const icon = meta?.icon ?? <Icon name="File" size={24} strokeWidth={1.5} />;
 
   return (

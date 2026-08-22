@@ -19,38 +19,23 @@ const ICON_REGISTRY: Record<string, LucideIcon> = {
 
 // ─── 슬러그 키워드 → 아이콘 자동 매핑 ───
 const SLUG_TO_ICON: Record<string, string> = {
-  saju: "Sun", sinjeom: "Sparkles", tarot: "Star", gunghap: "Heart",
-  jakmyeong: "Paintbrush", gwansang: "Glasses", taegil: "Flag", pungsu: "Compass",
-  astrology: "Globe", dream: "Moon", bujeok: "Ribbon", gut: "Theater",
-  counseling: "Stethoscope", fortune: "Zap", love: "Heart", money: "Gem",
-  career: "Trophy", health: "Stethoscope", family: "HomeIcon", study: "BookOpen",
-  newyear: "Sun", naming: "Paintbrush", relationship: "Heart", business: "Trophy",
+  skincare: "Sparkles", makeup: "Paintbrush", hair: "Scissors", nail: "Gem",
+  color: "Palette", body: "Heart", waxing: "Leaf", image: "Camera",
+  brow: "Brush", spa: "Flower2", wellness: "Leaf", beauty: "Sparkles",
 };
 
 // ─── 이름 키워드 → 아이콘 자동 매핑 (한국어) ───
 const NAME_TO_ICON: Record<string, string> = {
-  "사주": "Sun", "명리": "Sun", "사주팔자": "Sun",
-  "신점": "Sparkles", "무속": "Sparkles", "점사": "Sparkles",
-  "타로": "Star", "카드": "Star",
-  "궁합": "Heart", "연애": "Heart", "결혼": "Heart", "이별": "Heart", "재회": "Heart",
-  "작명": "Paintbrush", "개명": "Paintbrush", "이름": "Paintbrush",
-  "관상": "Glasses", "손금": "Glasses",
-  "택일": "Flag", "날짜": "Flag",
-  "풍수": "Compass", "묘자리": "Compass", "이사": "Compass",
-  "점성": "Globe", "별자리": "Globe", "서양점성술": "Globe",
-  "꿈": "Moon", "해몽": "Moon",
-  "부적": "Ribbon", "굿": "Theater", "의식": "Theater", "제사": "Theater",
-  "심리": "Stethoscope", "상담": "Stethoscope", "마음": "Stethoscope",
-  "운세": "Zap", "신년": "Zap", "토정비결": "Zap",
-  "재물": "Gem", "금전": "Gem", "투자": "Gem",
-  "취업": "Trophy", "직업": "Trophy", "사업": "Trophy", "이직": "Trophy",
-  "건강": "Stethoscope", "가족": "HomeIcon", "학업": "BookOpen", "시험": "BookOpen",
+  "뷰티": "Sparkles", "스킨케어": "Sparkles", "메이크업": "Paintbrush",
+  "헤어": "Scissors", "네일": "Gem", "퍼스널 컬러": "Palette",
+  "바디케어": "Heart", "왁싱": "Leaf", "이미지 컨설팅": "Camera",
+  "브로우": "Brush", "스파": "Flower2", "웰니스": "Leaf",
 };
 
 // 아이콘 카테고리별 그룹핑
 const ICON_GROUPS: { label: string; icons: string[] }[] = [
-  { label: "점술 분야", icons: ["Sun", "Moon", "Star", "Sparkles", "Globe", "Compass", "Glasses", "Ribbon", "Theater"] },
-  { label: "상담 주제", icons: ["Heart", "Gem", "Trophy", "HomeIcon", "BookOpen", "Stethoscope", "Zap", "Flag"] },
+  { label: "뷰티 분야", icons: ["Sparkles", "Palette", "Scissors", "Paintbrush", "Brush", "Gem", "Flower2", "Leaf", "Camera"] },
+  { label: "서비스 유형", icons: ["Heart", "HomeIcon", "Stethoscope", "Crown", "Ribbon", "Star"] },
   { label: "일반", icons: ["Tag", "Gift", "Flower2", "Leaf", "Crown", "Rocket", "Map", "Music", "Camera"] },
 ];
 
@@ -197,7 +182,7 @@ export default function CategoryManager({ initialCategories }: { initialCategori
   };
 
   const handleDelete = async (cat: Category) => {
-    if (cat.productCount > 0) { appAlert({ message: `이 카테고리에 연결된 상담상품이 ${cat.productCount}개 있어 삭제할 수 없습니다.`, type: "honeybee" }); return; }
+    if (cat.productCount > 0) { appAlert({ message: `이 카테고리에 연결된 뷰티 서비스가 ${cat.productCount}개 있어 삭제할 수 없습니다.`, type: "honeybee" }); return; }
     if (!await appConfirm({ message: `'${cat.name}' 카테고리를 삭제하시겠습니까?`, type: "warning", confirmText: "삭제" })) return;
     setLoading(true);
     try {
@@ -337,7 +322,7 @@ export default function CategoryManager({ initialCategories }: { initialCategori
                       {!cat.isActive && <span className="text-[10px] text-red-500 bg-red-50 px-1.5 py-0.5 rounded">비활성</span>}
                     </div>
                     {cat.description && <p className="text-[11px] text-gray-400 truncate mt-0.5">{cat.description}</p>}
-                    <p className="text-[10px] text-gray-300 mt-0.5">상담상품 {cat.productCount}개 · 하위 {cat.children?.length || 0}개</p>
+                    <p className="text-[10px] text-gray-300 mt-0.5">뷰티 서비스 {cat.productCount}개 · 하위 {cat.children?.length || 0}개</p>
                   </div>
 
                   {/* 액션 버튼 */}
@@ -353,7 +338,7 @@ export default function CategoryManager({ initialCategories }: { initialCategori
                       <Icon name="Edit" size={16} />
                     </button>
                     <button onClick={() => handleDelete(cat)} className="p-1.5 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
-                      title={cat.productCount > 0 ? "연결된 상담상품이 있어 삭제 불가" : "삭제"}>
+                      title={cat.productCount > 0 ? "연결된 뷰티 서비스가 있어 삭제 불가" : "삭제"}>
                       <Icon name="Delete" size={16} />
                     </button>
                   </div>
@@ -373,7 +358,7 @@ export default function CategoryManager({ initialCategories }: { initialCategori
                               <p className="text-xs font-medium text-gray-700">{sub.name}</p>
                               <span className="text-[9px] text-gray-400 bg-gray-50 px-1 py-0.5 rounded">{sub.slug}</span>
                             </div>
-                            <p className="text-[9px] text-gray-300">상담상품 {sub.productCount}개</p>
+                            <p className="text-[9px] text-gray-300">뷰티 서비스 {sub.productCount}개</p>
                           </div>
                           <div className="flex items-center gap-0.5 flex-shrink-0">
                             <button onClick={() => openEdit(sub)} className="p-1 rounded text-gray-300 hover:text-brand-600"><Icon name="Edit" size={12} /></button>
@@ -485,7 +470,7 @@ export default function CategoryManager({ initialCategories }: { initialCategori
 
               <div>
                 <label className="text-xs font-medium text-gray-600">설명</label>
-                <input type="text" className="input-field mt-1 text-sm" placeholder="패션 관련 상담상품 카테고리" value={description} onChange={e => setDescription(e.target.value)} />
+                <input type="text" className="input-field mt-1 text-sm" placeholder="패션 관련 뷰티 서비스 카테고리" value={description} onChange={e => setDescription(e.target.value)} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>

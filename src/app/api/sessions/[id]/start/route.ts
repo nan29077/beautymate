@@ -6,7 +6,7 @@ import { isMissingSchemaError } from "@/lib/safeDb";
 export const dynamic = "force-dynamic";
 
 // POST /api/sessions/[id]/start — 상담 시작 (WAITING → ACTIVE)
-// 상담사·고객 중 먼저 입장해 통화가 시작될 때 호출한다. 멱등.
+// 뷰티 전문가·고객 중 먼저 입장해 통화가 시작될 때 호출한다. 멱등.
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> | { id: string } },

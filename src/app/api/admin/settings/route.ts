@@ -54,7 +54,7 @@ export async function PUT(req: NextRequest) {
       }
     });
 
-    // 정산일 (영업일 기준 N일 후) — 상담사/중간관리자/브랜드
+    // 정산일 (영업일 기준 N일 후) — 뷰티 전문가/중간관리자/브랜드
     const dayFields: { bodyKey: string; settingKey: string }[] = [
       { bodyKey: "settlementBusinessDays", settingKey: SETTLEMENT_BUSINESS_DAYS_KEY },
       { bodyKey: "middleSettleDays", settingKey: MIDDLE_SETTLE_DAYS_KEY },

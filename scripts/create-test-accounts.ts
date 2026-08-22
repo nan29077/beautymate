@@ -28,14 +28,14 @@ interface TestAccount {
 
 const ACCOUNTS: TestAccount[] = [
   {
-    email: "test-admin@sajumate.com",
+    email: "test-admin@beautymate.com",
     name: "테스트 관리자",
     password: "TestAdmin123!",
     rolePreference: ["SUPER_ADMIN"],
   },
   {
-    email: "test-consultant@sajumate.com",
-    name: "테스트 상담사",
+    email: "test-consultant@beautymate.com",
+    name: "테스트 뷰티 전문가",
     password: "TestConsult123!",
     // 앱 코드는 CONSULTANT 를 기대하지만 현재 DB enum 에는 SELLER 만 있다.
     // enum 이 확장되면 CONSULTANT 가 자동으로 선택된다.

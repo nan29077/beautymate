@@ -20,7 +20,7 @@ export async function GET() {
   if (role === "CUSTOMER") {
     where.userId = session.user!.id;
   } else if (role === "CONSULTANT") {
-    // 상담사: 자신의 점집(자신이 등록·판매한 상담상품)의 예약만
+    // 뷰티 전문가: 자신의 뷰티샵(자신이 등록·판매한 뷰티 서비스)의 예약만
     const seller = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });
@@ -109,12 +109,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "연락처를 입력해 주세요." }, { status: 400 });
   }
 
-  // 상담사 존재 확인 (할인/커미션 계산에도 재사용)
+  // 뷰티 전문가 존재 확인 (할인/커미션 계산에도 재사용)
   const seller = await prisma.sellerProfile.findUnique({
     where: { id: sellerId },
   });
   if (!seller) {
-    return NextResponse.json({ error: "상담사를 찾을 수 없습니다." }, { status: 404 });
+    return NextResponse.json({ error: "뷰티 전문가를 찾을 수 없습니다." }, { status: 404 });
   }
 
   // ─── 캠페인 검증 (가격은 서버 campaignPrice 만 신뢰) ───
@@ -132,7 +132,7 @@ export async function POST(request: Request) {
     const started = campaign.startDate <= nowTs;
     const notEnded = campaign.endDate >= nowTs;
     if (campaign.status !== "ACTIVE" || !started || !notEnded) {
-      return NextResponse.json({ error: "진행 중인 단체 상담이 아닙니다." }, { status: 400 });
+      return NextResponse.json({ error: "진행 중인 공동 프로모션이 아닙니다." }, { status: 400 });
     }
   }
 
@@ -141,15 +141,15 @@ export async function POST(request: Request) {
   const reservationNumber = `SB${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
   // ─── 정산 스냅샷용 요율 (예약 시점 고정) ───
-  // 상담사 개별 요율이 있으면 우선, 없으면 전역 플랫폼 요율. settlement.ts 의 판정과 동일하게 맞춘다.
+  // 뷰티 전문가 개별 요율이 있으면 우선, 없으면 전역 플랫폼 요율. settlement.ts 의 판정과 동일하게 맞춘다.
   const platformFees = await getPlatformFees();
   const sellerFeeRateSnap =
     seller.commissionRate != null ? Number(seller.commissionRate) : platformFees.sellerFeeRate;
 
-  // ─── 금액 계산: 가격·상담상품명은 전부 서버 DB 기준. 클라이언트 price/productName 무시. ───
+  // ─── 금액 계산: 가격·뷰티 서비스명은 전부 서버 DB 기준. 클라이언트 price/productName 무시. ───
   let totalAmount = 0;
   const orderItems: any[] = [];
-  // 일반상담상품(DirectProduct) 재고 차감 대상 — 예약 생성 트랜잭션 안에서 원자적으로 차감한다.
+  // 일반 뷰티 서비스(DirectProduct) 재고 차감 대상 — 예약 생성 트랜잭션 안에서 원자적으로 차감한다.
 
   for (const item of items) {
     // 수량 검증 — 양의 정수만 허용 (API 직접 호출 방어)
@@ -158,26 +158,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "예약 수량이 올바르지 않습니다." }, { status: 400 });
     }
     if (!item.productId) {
-      return NextResponse.json({ error: "상담상품 정보가 올바르지 않습니다." }, { status: 400 });
+      return NextResponse.json({ error: "뷰티 서비스 정보가 올바르지 않습니다." }, { status: 400 });
     }
 
-    // ─── 상담사 일반상담상품(DirectProduct) ───
+    // ─── 뷰티 전문가 일반 뷰티 서비스(DirectProduct) ───
     // 카탈로그 Product 가 아닌 별도 모델이라 조회·검증·정산 스냅샷 경로가 다르다.
-    // 옵션(variant)·단체 상담·공급자가 존재하지 않는다.
+    // 옵션(variant)·공동 프로모션·공급자가 존재하지 않는다.
     if (item.itemType === "DIRECT") {
       const direct = await prisma.directProduct.findUnique({
         where: { id: item.productId },
         select: { id: true, name: true, price: true, stock: true, isActive: true, sellerId: true },
       });
       if (!direct || !direct.isActive) {
-        return NextResponse.json({ error: "판매 중이 아닌 상담상품이 포함되어 있습니다." }, { status: 400 });
+        return NextResponse.json({ error: "판매 중이 아닌 뷰티 서비스가 포함되어 있습니다." }, { status: 400 });
       }
-      // 소유권 검증 — 다른 상담사의 일반상담상품을 이 상담사 예약으로 태우면 정산이 엉뚱한 상담사에게 귀속된다.
+      // 소유권 검증 — 다른 뷰티 전문가의 일반 뷰티 서비스를 이 뷰티 전문가 예약으로 태우면 정산이 엉뚱한 뷰티 전문가에게 귀속된다.
       if (direct.sellerId !== sellerId) {
-        return NextResponse.json({ error: "상담상품 정보가 올바르지 않습니다." }, { status: 400 });
+        return NextResponse.json({ error: "뷰티 서비스 정보가 올바르지 않습니다." }, { status: 400 });
       }
       if (campaign) {
-        return NextResponse.json({ error: "일반상담상품은 단체 상담으로 예약할 수 없습니다." }, { status: 400 });
+        return NextResponse.json({ error: "일반 뷰티 서비스는 공동 프로모션으로 예약할 수 없습니다." }, { status: 400 });
       }
       // 상담 서비스라 재고 개념이 없다. (DirectProduct.stock 컬럼은 남아 있으나 검증·차감하지 않음)
 
@@ -185,8 +185,8 @@ export async function POST(request: Request) {
       const itemTotal = price * quantity;
       totalAmount += itemTotal;
 
-      // 정산 스냅샷 — 상담사가 직접 등록·판매하는 상담상품이므로 settlement.ts 의 Case 1 로 계산된다.
-      // (정산액 = 판매가 × (1 - 상담사 플랫폼 수수료율 × 1.1 / 100), 공급자 몫 없음)
+      // 정산 스냅샷 — 뷰티 전문가가 직접 등록·판매하는 뷰티 서비스가므로 settlement.ts 의 Case 1 로 계산된다.
+      // (정산액 = 판매가 × (1 - 뷰티 전문가 플랫폼 수수료율 × 1.1 / 100), 공급자 몫 없음)
       orderItems.push({
         itemType: "DIRECT",
         productId: direct.id,
@@ -237,10 +237,10 @@ export async function POST(request: Request) {
       product = base ? { ...base, maxDailySlots: 5 } : null;
     }
     if (!product || !product.isActive) {
-      return NextResponse.json({ error: "판매 중이 아닌 상담상품이 포함되어 있습니다." }, { status: 400 });
+      return NextResponse.json({ error: "판매 중이 아닌 뷰티 서비스가 포함되어 있습니다." }, { status: 400 });
     }
 
-    // variant 검증 — 존재 + 해당 상담상품 소속 + 재고
+    // variant 검증 — 존재 + 해당 뷰티 서비스 소속 + 재고
     let variant: { id: string; name: string; price: any; isActive: boolean } | null = null;
     if (item.variantId) {
       const v = await prisma.productVariant.findUnique({
@@ -253,9 +253,9 @@ export async function POST(request: Request) {
       variant = v;
     }
 
-    // 캠페인 상담상품 정합성 — 캠페인의 productId 와 예약 상담상품이 일치해야 함
+    // 캠페인 뷰티 서비스 정합성 — 캠페인의 productId 와 예약 뷰티 서비스가 일치해야 함
     if (campaign && campaign.productId !== product.id) {
-      return NextResponse.json({ error: "단체 상담 상담상품 정보가 올바르지 않습니다." }, { status: 400 });
+      return NextResponse.json({ error: "공동 프로모션 뷰티 서비스 정보가 올바르지 않습니다." }, { status: 400 });
     }
 
     // 하루 예약 정원 검증 — 같은 날짜에 이미 잡힌 예약 수가 maxDailySlots 를 넘지 못한다.
@@ -287,7 +287,7 @@ export async function POST(request: Request) {
     totalAmount += itemTotal;
 
     // 정산 스냅샷 — 이 시점의 요율·공급가·수취인을 고정 저장한다.
-    // 이후 상담상품의 공급가/요율/소유자가 바뀌거나 상담상품이 삭제돼도 이 예약의 정산액은 불변.
+    // 이후 뷰티 서비스의 공급가/요율/소유자가 바뀌거나 뷰티 서비스가 삭제돼도 이 예약의 정산액은 불변.
     const recipient = productSettlementRecipient(product);
     orderItems.push({
       itemType: "PRODUCT",
@@ -312,7 +312,7 @@ export async function POST(request: Request) {
   }
 
   // ─── 할인 계산 ───
-  // 추천인/픽(채널인증) 할인은 2026-07 폐지 — 장바구니 할인(상담사 부담)만 적용한다.
+  // 추천인/픽(채널인증) 할인은 2026-07 폐지 — 장바구니 할인(뷰티 전문가 부담)만 적용한다.
   // discountAmount/discountType 변수는 쿠폰 로직과 예약 저장 형식 호환을 위해 유지.
   // (buyerProfile 은 추천인 커미션 산정에 계속 사용된다)
   let discountAmount = 0;
@@ -322,9 +322,9 @@ export async function POST(request: Request) {
     where: { userId: session.user!.id },
   });
 
-  // ─── 장바구니 할인 (상담사 부담) ───
-  // 상담사별 소계(배송비 제외)가 기준금액 이상이면 % 할인.
-  // 할인액은 별도 컬럼(cartDiscountAmount)에 기록해 상담사 정산에서 차감한다 (lib/settlement.ts).
+  // ─── 장바구니 할인 (뷰티 전문가 부담) ───
+  // 뷰티 전문가별 소계(배송비 제외)가 기준금액 이상이면 % 할인.
+  // 할인액은 별도 컬럼(cartDiscountAmount)에 기록해 뷰티 전문가 정산에서 차감한다 (lib/settlement.ts).
   let cartDiscountAmount = 0;
   if (
     seller.cartDiscountEnabled &&
@@ -390,7 +390,7 @@ export async function POST(request: Request) {
       gc.userId === session.user!.id &&
       !gc.usedAt &&
       gc.expiresAt >= new Date() &&
-      gc.sellerId === sellerId // 발급 상담사 점집에서만 사용 가능
+      gc.sellerId === sellerId // 발급 뷰티 전문가 뷰티샵에서만 사용 가능
     ) {
       const minOrder = Number(gc.gameCoupon?.minOrderAmount ?? 0);
       if (!minOrder || totalAmount >= minOrder) {
@@ -409,7 +409,7 @@ export async function POST(request: Request) {
   const finalAmount = totalAmount - totalDiscountAmount - cartDiscountAmount;
   const totalQty = orderItems.reduce((acc: number, i: any) => acc + i.quantity, 0);
 
-  // 커미션 대상 상담사는 트랜잭션 밖에서 미리 조회 (읽기) — 쓰기만 원자적으로 묶는다.
+  // 커미션 대상 뷰티 전문가는 트랜잭션 밖에서 미리 조회 (읽기) — 쓰기만 원자적으로 묶는다.
   let commission: {
     sellerId: string;
     commRate: number;
@@ -439,7 +439,7 @@ export async function POST(request: Request) {
         campaignId: campaignId || null,
         totalAmount,
         // discountAmount 는 표시용 총할인(추천인/픽 + 쿠폰 + 장바구니).
-        // cartDiscountAmount 는 그중 상담사 부담분만 별도 기록 — 정산 차감(lib/settlement.ts)에 사용.
+        // cartDiscountAmount 는 그중 뷰티 전문가 부담분만 별도 기록 — 정산 차감(lib/settlement.ts)에 사용.
         discountAmount: totalDiscountAmount + cartDiscountAmount,
         discountType: anyCouponApplied
           ? (discountType ? `${discountType}+coupon` : "coupon")
@@ -465,8 +465,8 @@ export async function POST(request: Request) {
     });
 
     // ─── 예약 시간 슬롯 점유 ───
-    // 해당 상담사의 같은 날짜·시간에 열린 슬롯이 있으면 이 예약에 연결하고 닫는다.
-    // 슬롯 없이 접수된 예약(슬롯 미운영 점집·수기 예약)은 그대로 진행.
+    // 해당 뷰티 전문가의 같은 날짜·시간에 열린 슬롯이 있으면 이 예약에 연결하고 닫는다.
+    // 슬롯 없이 접수된 예약(슬롯 미운영 뷰티샵·수기 예약)은 그대로 진행.
     // time_slots 테이블 미반영 환경(P2021)에서는 조용히 건너뛴다.
     try {
       const slotDayStart = new Date(reservationDateValue);

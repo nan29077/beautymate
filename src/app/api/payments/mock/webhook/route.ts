@@ -110,7 +110,7 @@ export async function POST(request: Request) {
     console.error(`[mock/webhook] 영상 세션 생성 실패 (${order.id}):`, e);
   }
 
-  // 상담사 알림톡 + 고객 인앱 알림 (실제 PG 흐름과 동일)
+  // 뷰티 전문가 알림톡 + 고객 인앱 알림 (실제 PG 흐름과 동일)
   await notifyOrderPlacedToSeller(order.id).catch((e) =>
     console.error("[mock] 예약접수 알림톡 오류:", e),
   );

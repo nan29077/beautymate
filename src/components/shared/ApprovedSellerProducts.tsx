@@ -18,12 +18,12 @@ export interface ApprovedSellerItem {
 
 const formatPrice = (n: number) => n.toLocaleString("ko-KR") + "원";
 
-// 브랜드/중간관리자/최고관리자가 승인하여 현재 상담사가 판매 중인 상담상품 목록
+// 브랜드/중간관리자/최고관리자가 승인하여 현재 뷰티 전문가가 판매 중인 뷰티 서비스 목록
 export default function ApprovedSellerProducts({ items }: { items: ApprovedSellerItem[] }) {
   if (!items || items.length === 0) {
     return (
       <div className="text-center py-8 text-gray-400 bg-white rounded-xl border border-gray-100">
-        <p className="text-xs">현재 판매 중인 상담사 상담상품이 없습니다.</p>
+        <p className="text-xs">현재 판매 중인 뷰티 전문가 뷰티 서비스가 없습니다.</p>
       </div>
     );
   }
@@ -61,9 +61,9 @@ export default function ApprovedSellerProducts({ items }: { items: ApprovedSelle
           <button
             onClick={() => window.open(`/products/${it.productId}`, "_blank")}
             className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap flex-shrink-0"
-            title="상담상품 상세 보기"
+            title="뷰티 서비스 상세 보기"
           >
-            <Icon name="ArrowRight" size={12} className="shrink-0" /> 상담상품 상세 보기
+            <Icon name="ArrowRight" size={12} className="shrink-0" /> 뷰티 서비스 상세 보기
           </button>
         </div>
       ))}

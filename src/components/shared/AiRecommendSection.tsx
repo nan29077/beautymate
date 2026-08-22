@@ -164,7 +164,7 @@ export default function AiRecommendSection({ products }: AiRecommendSectionProps
 
       {!hasHistory && (
         <p className="text-[10px] text-gray-400 px-4 -mt-1 mb-2">
-          상담상품을 탐색하면 더 정확한 추천을 받을 수 있어요
+          뷰티 서비스를 탐색하면 더 정확한 추천을 받을 수 있어요
         </p>
       )}
 

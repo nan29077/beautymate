@@ -42,21 +42,21 @@ export default async function DashboardLayout({
       { href: "/admin/users", iconName: "Users", label: "회원 관리", group: "회원 관리" },
       { href: "/admin/customers", iconName: "UserCheck", label: "고객 귀속 관리", group: "회원 관리" },
       { href: "/admin/members", iconName: "Users", label: "단골 회원 관리", group: "회원 관리" },
-      { href: "/admin/sellers", iconName: "Consultant", label: "상담사 관리", group: "회원 관리" },
-      // 상담상품 관리
-      { href: "/admin/products", iconName: "Gem", label: "상담상품 관리", group: "상담상품 관리" },
-      { href: "/admin/categories", iconName: "Category", label: "카테고리 관리", group: "상담상품 관리" },
+      { href: "/admin/sellers", iconName: "Consultant", label: "뷰티 전문가 관리", group: "회원 관리" },
+      // 뷰티 서비스 관리
+      { href: "/admin/products", iconName: "Gem", label: "뷰티 서비스 관리", group: "뷰티 서비스 관리" },
+      { href: "/admin/categories", iconName: "Category", label: "카테고리 관리", group: "뷰티 서비스 관리" },
       // 예약·정산
       { href: "/admin/reservations", iconName: "Reservation", label: "예약 관리", group: "예약·정산" },
       { href: "/admin/sessions", iconName: "Video", label: "영상 세션 관리", group: "예약·정산" },
-      { href: "/admin/campaigns", iconName: "Event", label: "단체 상담 관리", group: "예약·정산" },
+      { href: "/admin/campaigns", iconName: "Event", label: "공동 프로모션 관리", group: "예약·정산" },
       { href: "/admin/settlements", iconName: "Settlement", label: "정산·재무 관리", group: "예약·정산" },
       // 콘텐츠
       { href: "/admin/banners", iconName: "Globe", label: "사이트 관리", group: "콘텐츠" },
       { href: "/admin/contents", iconName: "Content", label: "콘텐츠 관리", group: "콘텐츠" },
       { href: "/admin/games", iconName: "Play", label: "게임관리", group: "콘텐츠" },
       { href: "/admin/lives", iconName: "LiveConsulting", label: "라이브 관리", group: "콘텐츠" },
-      { href: "/admin/live-products", iconName: "LiveProduct", label: "라이브 상담상품관리", group: "콘텐츠" },
+      { href: "/admin/live-products", iconName: "LiveProduct", label: "라이브 뷰티 서비스 관리", group: "콘텐츠" },
       // 알림톡
       { href: "/admin/alimtalk", iconName: "Notification", label: "알림톡 관리", group: "알림톡" },
       // 고객지원
@@ -67,13 +67,13 @@ export default async function DashboardLayout({
     ],
     CONSULTANT: [
       { href: "/seller", iconName: "Dashboard", label: "대시보드", group: "메인" },
-      // 점집 관리
-      { href: "/seller/shop", iconName: "MoonStar", label: "내 점집 관리", group: "점집 관리" },
-      // 상담상품 관리
-      { href: "/seller/products", iconName: "Gem", label: "상담상품 관리", group: "상담상품 관리" },
-      // 판매·라이브 (콘텐츠/단체 상담/게임 메뉴는 점집 운영에 쓰지 않아 제거)
+      // 뷰티샵 관리
+      { href: "/seller/shop", iconName: "MoonStar", label: "내 뷰티샵 관리", group: "뷰티샵 관리" },
+      // 뷰티 서비스 관리
+      { href: "/seller/products", iconName: "Gem", label: "뷰티 서비스 관리", group: "뷰티 서비스 관리" },
+      // 판매·라이브 (콘텐츠/공동 프로모션/게임 메뉴는 뷰티샵 운영에 쓰지 않아 제거)
       { href: "/seller/live-mode", iconName: "Reservation", label: "예약 현황", group: "판매·라이브" },
-      { href: "/seller/live", iconName: "LiveConsulting", label: "라이브 상담", group: "판매·라이브" },
+      { href: "/seller/live", iconName: "LiveConsulting", label: "라이브 뷰티", group: "판매·라이브" },
       { href: "/seller/widget", iconName: "BroadcastTool", label: "방송 도구", group: "판매·라이브" },
       // 예약·정산
       { href: "/seller/timeslots", iconName: "Clock", label: "예약 시간 설정", group: "예약·정산" },
@@ -99,7 +99,7 @@ export default async function DashboardLayout({
     { match: (h) => h.endsWith("/games"), key: "game" },
   ];
   const items = (navItems[role] || navItems.CUSTOMER).filter((item) => {
-    // 라이브 상담상품관리: 라이브 상담 또는 단체 상담 중 하나라도 꺼져 있으면 숨김
+    // 라이브 뷰티 서비스 관리: 라이브 뷰티 또는 공동 프로모션 중 하나라도 꺼져 있으면 숨김
     if (item.href === "/admin/live-products") return flags.liveCommerce && flags.groupBuy;
     const gate = MENU_FEATURE_GATE.find((g) => g.match(item.href));
     return gate ? flags[gate.key] : true;
@@ -124,13 +124,13 @@ export default async function DashboardLayout({
     console.error("Profile image fetch error:", e);
     // Continue with default image
   }
-  // 사이드바에 표시할 이름: CONSULTANT는 shopName(상담사명), 그 외는 User.name
+  // 사이드바에 표시할 이름: CONSULTANT는 shopName(뷰티 전문가명), 그 외는 User.name
   const sidebarName = sellerShopName || session.user.name;
 
   // 역할 기반 랜덤 캐릭터 아바타 (기존 프로필 이미지 우선, 없으면 역할별 캐릭터)
   // 제외 목록(예: 천송이 쇼핑/김혜선)은 아바타를 적용하지 않음
-  // CONSULTANT 는 점집 로고/업로드 이미지를 우선하고, 없거나 레거시 꿀벌 캐릭터면
-  // 사주 동물 캐릭터로 교체한다. (아바타 제외 계정은 기존 동작 유지)
+  // CONSULTANT 는 뷰티샵 로고/업로드 이미지를 우선하고, 없거나 레거시 꿀벌 캐릭터면
+  // 뷰티 동물 캐릭터로 교체한다. (아바타 제외 계정은 기존 동작 유지)
   const resolvedProfileImage = role === "SUPER_ADMIN"
     ? resolveAdminDashboardAvatar(session.user.id, profileImage || userAvatar)
     : role === "CONSULTANT"
@@ -146,7 +146,7 @@ export default async function DashboardLayout({
 
   const roleConfig: Record<string, { label: string; labelEn: string; icon: any; color: string; gradient: string }> = {
     SUPER_ADMIN: { label: "최고관리자", labelEn: "Admin Console", icon: Shield, color: "text-brand-700 bg-brand-50 border border-brand-100", gradient: "from-brand-700 to-brand-500" },
-    CONSULTANT: { label: "상담사", labelEn: "Consultant Studio", icon: UserRoundCog, color: "text-brand-700 bg-moon-50 border border-moon-100", gradient: "from-brand-600 to-moon-500" },
+    CONSULTANT: { label: "뷰티 전문가", labelEn: "Consultant Studio", icon: UserRoundCog, color: "text-brand-700 bg-moon-50 border border-moon-100", gradient: "from-brand-600 to-moon-500" },
     CUSTOMER: { label: "고객", labelEn: "My Page", icon: User, color: "text-brand-700 bg-brand-50 border border-brand-100", gradient: "from-brand-600 to-brand-400" },
   };
   const rc = roleConfig[role] || roleConfig.CUSTOMER;

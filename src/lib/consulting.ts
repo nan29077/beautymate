@@ -46,9 +46,9 @@ export function consultTypeMeta(type: string) {
 }
 
 /**
- * 상담 방식 추론 (폴백 경로).
+ * 진행 방식 추론 (폴백 경로).
  *
- * 상담 상품명("[화상] 사주 정통풀이 60분")에서 방식을 읽어낸다.
+ * 뷰티 서비스명("[화상] 뷰티 정통풀이 60분")에서 방식을 읽어낸다.
  * 매칭되는 표현이 없으면 화상(VIDEO)으로 본다.
  *
  * ※ DirectProduct.consultType 컬럼이 채워져 있으면 그 값이 우선이다
@@ -61,11 +61,11 @@ export function inferConsultType(productName: string | null | undefined): Consul
   return "VIDEO";
 }
 
-/** 상담 상품 카드에 표시할 방식 + 소요 시간 */
+/** 뷰티 서비스 카드에 표시할 방식 + 소요 시간 */
 export type ConsultMeta = { type: ConsultTypeKey; durationMinutes: number | null };
 
 /**
- * 상담 상품의 방식·소요시간을 뽑아낸다.
+ * 뷰티 서비스의 방식·소요시간을 뽑아낸다.
  *
  * 1순위: description 이 `{"type":"VIDEO","duration":60}` 형태의 JSON 이면 그 값을 쓴다.
  * 2순위: 상품명에서 방식을 추론하고(`inferConsultType`) "60분" 같은 표기에서 시간을 읽는다.
@@ -102,7 +102,7 @@ export function parseConsultMeta(
 }
 
 /**
- * 상담 상품의 방식·소요시간 확정.
+ * 뷰티 서비스의 방식·소요시간 확정.
  *
  * 우선순위: DirectProduct.consultType / durationMinutes 컬럼 → 상품명·description 추론.
  * 두 컬럼은 운영 DB 반영 전까지 전부 null 이므로(docs/DDL_CONSULTING.sql ②)
@@ -149,7 +149,7 @@ export type SlotMinutes = (typeof SLOT_MINUTE_OPTIONS)[number];
 /** 0=일 ~ 6=토 */
 export const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"] as const;
 
-/** 상담사 요일별 가능 시간 1행 */
+/** 뷰티 전문가 요일별 가능 시간 1행 */
 export type TimeSlotRule = {
   dayOfWeek: number; // 0=일 ~ 6=토
   startHour: number;
@@ -220,7 +220,7 @@ export type TakenInterval = { startMinute: number; endMinute: number };
  * 예약 목록 → 점유 구간 목록.
  *
  * 예약에는 종료 시각이 없으므로 소요 시간으로 끝을 계산한다.
- * 우선순위: 그 예약의 상담 소요 시간(durationMinutes) → 상담사의 단위 시간(slotMinutes).
+ * 우선순위: 그 예약의 상담 소요 시간(durationMinutes) → 뷰티 전문가의 단위 시간(slotMinutes).
  *
  * @param reservations scheduledAt(+선택적 durationMinutes)을 가진 예약들
  * @param defaultMinutes durationMinutes 가 없을 때 쓸 기본 소요 시간 (보통 rule.slotMinutes)
@@ -257,7 +257,7 @@ export function toTakenIntervals(
  *
  * 겹침 판정은 **시작 시각 일치가 아니라 구간 겹침**으로 한다.
  *   기존예약시작 < 슬롯종료  AND  기존예약종료 > 슬롯시작
- * 시작 시각만 비교하면 상담사가 단위 시간을 30분에서 60분으로 바꾼 뒤
+ * 시작 시각만 비교하면 뷰티 전문가가 단위 시간을 30분에서 60분으로 바꾼 뒤
  * 14:00(60분) 예약이 있는데도 14:30 슬롯이 예약 가능으로 열리는 문제가 생긴다.
  */
 export function buildDaySlots(

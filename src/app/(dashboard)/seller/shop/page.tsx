@@ -36,13 +36,13 @@ export default async function SellerShopPage() {
 
   if (!seller) redirect("/");
 
-  // 점집 커스터마이징(한줄 소개·상세 소개·상담 분야 태그) — Setting 테이블 저장분
+  // 뷰티샵 커스터마이징(한줄 소개·상세 소개·상담 분야 태그) — Setting 테이블 저장분
   const customization = await getShopCustomization(seller.id);
-  // 프로필 캐릭터 / 배너 — 미설정 시 상담사 id 기반 기본값
+  // 프로필 캐릭터 / 배너 — 미설정 시 뷰티 전문가 id 기반 기본값
   const displayAvatar = resolveSellerDisplayImage(seller);
   const displayBanner = resolveShopBanner(seller.shopBanner, seller.id);
 
-  // 지난 방송(종료된 라이브) 목록 — 점집 노출 스위치용. 라이브 상담이 운영 정책상 켜진 경우에만 노출.
+  // 지난 방송(종료된 라이브) 목록 — 뷰티샵 노출 스위치용. 라이브 뷰티이 운영 정책상 켜진 경우에만 노출.
   const endedLives = flags.liveCommerce
     ? await prisma.liveStream.findMany({
         where: { sellerId: seller.id, status: "ENDED" },
@@ -98,29 +98,29 @@ export default async function SellerShopPage() {
         <ConsultantAvatarPicker currentImage={displayAvatar} hasShopLogo={!!seller.shopLogo} />
       </div>
 
-      {/* 현재 점집 배너 미리보기 */}
+      {/* 현재 뷰티샵 배너 미리보기 */}
       <div className="bg-white rounded-xl border border-gray-100 p-5 mt-4">
-        <h3 className="text-sm font-bold text-gray-900 mb-1">현재 점집 배너</h3>
+        <h3 className="text-sm font-bold text-gray-900 mb-1">현재 뷰티샵 배너</h3>
         <p className="text-[10px] text-gray-400 mb-3">
           {seller.shopBanner
-            ? "직접 등록하신 배너입니다. 위 '점집 배너 이미지'에서 변경할 수 있어요."
-            : "배너를 등록하지 않아 사주나라 기본 배너가 자동 적용됐습니다. 직접 등록하면 교체됩니다."}
+            ? "직접 등록하신 배너입니다. 위 '뷰티샵 배너 이미지'에서 변경할 수 있어요."
+            : "배너를 등록하지 않아 뷰티메이트 기본 배너가 자동 적용됐습니다. 직접 등록하면 교체됩니다."}
         </p>
         <div className="w-full h-32 rounded-xl overflow-hidden border border-gray-200 bg-gray-50">
-          <img src={displayBanner} alt="점집 배너 미리보기" className="w-full h-full object-cover" />
+          <img src={displayBanner} alt="뷰티샵 배너 미리보기" className="w-full h-full object-cover" />
         </div>
       </div>
 
-      {/* 점집 테마 색상 (배너 그라디언트·강조색에 반영) */}
+      {/* 뷰티샵 테마 색상 (배너 그라디언트·강조색에 반영) */}
       <div className="mt-4">
         <ShopThemeColorPicker currentColor={seller.shopThemeColor || "#f5a700"} />
       </div>
 
-      {/* 점집 링크 & 통계 */}
+      {/* 뷰티샵 링크 & 통계 */}
       <div className="bg-white rounded-xl border border-gray-100 p-4 mb-4 mt-4">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h3 className="text-sm font-bold text-gray-900">내 점집 주소</h3>
+            <h3 className="text-sm font-bold text-gray-900">내 뷰티샵 주소</h3>
             <p className="text-xs text-gray-400 mt-0.5">/shop/{seller.slug}</p>
           </div>
         </div>
@@ -134,24 +134,24 @@ export default async function SellerShopPage() {
           </div>
           <div className="flex items-center gap-1.5 text-xs text-gray-500">
             <Icon name="Cart" size={14} strokeWidth={1.5} className="text-brand-500" />
-            <span className="font-semibold">{seller._count.shopProducts}</span> 상담상품
+            <span className="font-semibold">{seller._count.shopProducts}</span> 뷰티 서비스
           </div>
           <div className="flex items-center gap-1.5 text-xs text-gray-500">
             <Icon name="Star" size={14} strokeWidth={1.5} className="text-brand-500" />
             <span className="font-semibold">{seller._count.campaigns}</span> 캠페인
           </div>
-          {/* 사주나라: 추천인 통계 미사용 */}
+          {/* 뷰티메이트: 추천인 통계 미사용 */}
         </div>
       </div>
 
-      {/* 점집 바로가기 & QR코드 */}
+      {/* 뷰티샵 바로가기 & QR코드 */}
       <ShopQRSection slug={seller.slug} />
     </>
   );
 
   const liveContent = (
     <>
-      {/* 점집 기능 관리 */}
+      {/* 뷰티샵 기능 관리 */}
       <ShopFeatureToggles
         initialFeatures={{
           groupBuy: seller.featureGroupBuy ?? true,
@@ -179,7 +179,7 @@ export default async function SellerShopPage() {
         />
       </div>
 
-      {/* 지난 방송 상담상품 노출 스위치 */}
+      {/* 지난 방송 뷰티 서비스 노출 스위치 */}
             {flags.liveCommerce && (
         <div className="mt-4">
           <PastBroadcastToggles initialItems={pastBroadcastItems} />

@@ -13,7 +13,7 @@ import ProductChatPanel from "@/components/shared/ProductChatPanel";
 import ProductSellerChatPanel from "@/components/shared/ProductSellerChatPanel";
 import { useAppDialog } from "@/components/shared/AppDialog";
 import SafeImage from "@/components/shared/SafeImage";
-import { pickSajuAvatar } from "@/lib/defaults";
+import { pickBeautyMateAvatar } from "@/lib/defaults";
 
 type RegistrarType = "CONSULTANT" | "BRAND" | "ADMIN";
 
@@ -56,7 +56,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
   const [bulkLoading, setBulkLoading] = useState(false);
   const { appConfirm, appAlert } = useAppDialog();
 
-  // 승인 대기(미승인) 상담상품 — 브랜드/관리자 등록 후 최고관리자 승인 대기
+  // 승인 대기(미승인) 뷰티 서비스 — 브랜드/관리자 등록 후 최고관리자 승인 대기
   const unapproved = useMemo(() => products.filter((p) => !p.isApproved), [products]);
   const toggleSelect = (id: string) =>
     setSelectedIds((prev) => {
@@ -69,7 +69,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
 
   const handleBulkApprove = useCallback(async (ids: string[]) => {
     if (ids.length === 0) return;
-    if (!await appConfirm({ message: `${ids.length}개 상담상품을 승인할까요?\n승인 시 상담사에게 노출됩니다.` })) return;
+    if (!await appConfirm({ message: `${ids.length}개 뷰티 서비스를 승인할까요?\n승인 시 뷰티 전문가에게 노출됩니다.` })) return;
     setBulkLoading(true);
     try {
       const res = await fetch("/api/admin/products/approve", {
@@ -143,7 +143,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
   }, [products]);
 
   const handleReject = useCallback(async (productId: string) => {
-    if (!await appConfirm({ message: "이 상담상품을 반려하시겠습니까?\n반려 시 상담상품이 삭제됩니다.", type: "warning", confirmText: "반려" })) return;
+    if (!await appConfirm({ message: "이 뷰티 서비스를 반려하시겠습니까?\n반려 시 뷰티 서비스가 삭제됩니다.", type: "warning", confirmText: "반려" })) return;
     setActionLoading(productId);
     try {
       const res = await fetch("/api/admin/products/approve", {
@@ -163,7 +163,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
       if (!await appConfirm({ message: "정말 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.", type: "warning", confirmText: "삭제" })) return;
     }
     if (action === "pauseSale" || action === "stopSale") {
-      if (!await appConfirm("상담상품 판매를 중지하시겠습니까?")) return;
+      if (!await appConfirm("뷰티 서비스 판매를 중지하시겠습니까?")) return;
     }
     setActionLoading(productId);
     try {
@@ -188,25 +188,25 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
     <>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
         <div>
-          <h1 className="text-lg sm:text-xl font-bold text-gray-900">상담상품 관리</h1>
-          <p className="text-xs sm:text-sm text-gray-500">총 {products.length}개 상담상품</p>
+          <h1 className="text-lg sm:text-xl font-bold text-gray-900">뷰티 서비스 관리</h1>
+          <p className="text-xs sm:text-sm text-gray-500">총 {products.length}개 뷰티 서비스</p>
         </div>
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <ProductRegisterForm brands={brands} mode="admin" hideGroupBuy />
         </div>
       </div>
 
-      {/* 상담상품 승인 대기 */}
+      {/* 뷰티 서비스 승인 대기 */}
       {unapproved.length > 0 && (
         <div className="bg-white rounded-xl border border-amber-200 overflow-hidden mb-5">
           <div className="flex items-center gap-2 border-b border-amber-100 bg-amber-50 px-4 py-3">
             <Icon name="Warning" size={14} className="text-amber-500" />
-            <p className="text-sm font-bold text-amber-700">상담상품 승인 대기</p>
+            <p className="text-sm font-bold text-amber-700">뷰티 서비스 승인 대기</p>
             <span className="text-[11px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">{unapproved.length}</span>
           </div>
           <>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 sm:px-4 py-2.5">
-                <p className="text-[11px] text-gray-400">브랜드/관리자가 등록한 상담상품. 승인 시 상담사에게 노출됩니다.</p>
+                <p className="text-[11px] text-gray-400">브랜드/관리자가 등록한 뷰티 서비스. 승인 시 뷰티 전문가에게 노출됩니다.</p>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={toggleSelectAll}
@@ -227,7 +227,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
               {unapproved.length === 0 ? (
                 <div className="text-center py-8 text-gray-400">
                   <Star size={32} className="mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">승인 대기 상담상품이 없습니다.</p>
+                  <p className="text-sm">승인 대기 뷰티 서비스가 없습니다.</p>
                 </div>
               ) : (
                 <div className="divide-y divide-gray-50 px-2 py-2">
@@ -273,7 +273,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
         <div className="relative flex-1">
           <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input type="text" value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-            placeholder="상담상품명, 브랜드, 카테고리, 상담사 검색..."
+            placeholder="뷰티 서비스명, 브랜드, 카테고리, 뷰티 전문가 검색..."
             className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white" />
           {searchQuery && (
             <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><X size={14} /></button>
@@ -286,7 +286,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
             <Icon name="Warning" size={16} strokeWidth={1.5} className="text-yellow-500" />
-            <h2 className="text-sm font-bold text-gray-700">상담사 상담상품 신청 대기 ({pendingShopProducts.length})</h2>
+            <h2 className="text-sm font-bold text-gray-700">뷰티 전문가 뷰티 서비스 신청 대기 ({pendingShopProducts.length})</h2>
           </div>
           <div className="bg-yellow-50 rounded-xl border border-yellow-100 overflow-hidden divide-y divide-yellow-100">
             {pendingShopProducts.map((sp) => (
@@ -297,7 +297,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">{sp.productName}</p>
                   <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                    <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">상담사: {sp.sellerName}</span>
+                    <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">뷰티 전문가: {sp.sellerName}</span>
                     {sp.brandName && <span className="text-[10px] text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded">{sp.brandName}</span>}
                     {sp.sellerPrice != null && <span className="text-[10px] text-brand-600 bg-brand-50 px-1.5 py-0.5 rounded font-medium">판매가 {sp.sellerPrice.toLocaleString("ko-KR")}원</span>}
                     {sp.createdAt && <span className="text-[10px] text-gray-400">{new Date(sp.createdAt).toLocaleDateString("ko-KR", { month: "short", day: "numeric" })}</span>}
@@ -307,9 +307,9 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                   <button
                     onClick={() => window.open(`/products/${sp.productId}`, "_blank")}
                     className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors whitespace-nowrap"
-                    title="상담상품 상세 보기"
+                    title="뷰티 서비스 상세 보기"
                   >
-                    <Icon name="ArrowRight" size={12} className="shrink-0" /> 상담상품 상세 보기
+                    <Icon name="ArrowRight" size={12} className="shrink-0" /> 뷰티 서비스 상세 보기
                   </button>
                   {currentUserId && (
                     <ProductChatPanel
@@ -333,7 +333,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
             { v: "ALL", l: "전체" },
             { v: "SELLING", l: "판매중" },
             { v: "BRAND", l: "브랜드" },
-            { v: "CONSULTANT", l: "상담사" },
+            { v: "CONSULTANT", l: "뷰티 전문가" },
             { v: "ADMIN", l: "관리자" },
           ] as const).map((t) => (
             <button
@@ -373,7 +373,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
           {filtered.length === 0 ? (
             <div className="text-center py-12 text-gray-400">
               <Icon name="Gem" size={36} className="mx-auto mb-2 opacity-30" />
-              <p className="text-sm">{searchQuery ? "검색 결과가 없습니다." : "등록된 상담상품이 없습니다."}</p>
+              <p className="text-sm">{searchQuery ? "검색 결과가 없습니다." : "등록된 뷰티 서비스가 없습니다."}</p>
             </div>
           ) : paged.map((product) => {
             const rt = REGISTRAR_BADGE[product.registrarType || "ADMIN"];
@@ -394,14 +394,14 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                       </span>
                     )}
                     {product.categoryName && <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">{product.categoryName}</span>}
-                    {/* 판매중 탭에서는 활성 상담사 이름 표시 */}
+                    {/* 판매중 탭에서는 활성 뷰티 전문가 이름 표시 */}
                     {showSellers ? (
                       <span className="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-medium">
-                        판매중 {(product.activeSellers || []).length}개 점집
+                        판매중 {(product.activeSellers || []).length}개 뷰티샵
                       </span>
                     ) : product.sellerNames.length > 0 && (
                       <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium">
-                        판매 상담사 {product.sellerCount}
+                        판매 뷰티 전문가 {product.sellerCount}
                       </span>
                     )}
                     {product.campaignCount > 0 && (
@@ -411,13 +411,13 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                       <span className="text-[10px] text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded font-medium">판매 {product.soldCount}</span>
                     )}
                   </div>
-                  {/* 판매중 탭: 판매 점집 목록 표시 */}
+                  {/* 판매중 탭: 판매 뷰티샵 목록 표시 */}
                   {showSellers && (
                     <div className="flex flex-wrap gap-1 mt-1.5">
                       {(product.activeSellers || []).map((s) => (
                         <div key={s.id} className="flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 border border-emerald-100 rounded-full">
                           <div className="w-3.5 h-3.5 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-                            <SafeImage src={s.shopLogo} placeholder={pickSajuAvatar(s.id)} alt={s.shopName} width={14} height={14} fallbackText={s.shopName.charAt(0)} className="w-full h-full object-cover" />
+                            <SafeImage src={s.shopLogo} placeholder={pickBeautyMateAvatar(s.id)} alt={s.shopName} width={14} height={14} fallbackText={s.shopName.charAt(0)} className="w-full h-full object-cover" />
                           </div>
                           <span className="text-[10px] text-emerald-700 font-medium">{s.shopName}</span>
                         </div>
@@ -463,7 +463,7 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
                   <button
                     onClick={() => window.open(`/products/${product.id}`, "_blank")}
                     className="p-2 sm:p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-                    title="상담상품 상세 보기 (새 창)"
+                    title="뷰티 서비스 상세 보기 (새 창)"
                   >
                     <Icon name="Info" size={14} />
                   </button>
@@ -542,6 +542,6 @@ export default function AdminProductsClient({ products, pendingShopProducts, sol
 // 등록자 유형 배지 스타일
 const REGISTRAR_BADGE: Record<RegistrarType, { label: string; cls: string; icon: any }> = {
   BRAND: { label: "브랜드", cls: "text-purple-600 bg-purple-50", icon: Crown },
-  CONSULTANT: { label: "상담사", cls: "text-blue-600 bg-blue-50", icon: Building2 },
+  CONSULTANT: { label: "뷰티 전문가", cls: "text-blue-600 bg-blue-50", icon: Building2 },
   ADMIN: { label: "관리자", cls: "text-gray-600 bg-gray-100", icon: Shield },
 };

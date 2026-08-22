@@ -57,7 +57,7 @@ export default function LiveWidgetClient({
       );
       if (!res.ok) return;
       const next: WidgetData = await res.json();
-      // 자리가 줄었을 때만 펄스 (늘어난 경우는 상담사가 슬롯을 추가한 것)
+      // 자리가 줄었을 때만 펄스 (늘어난 경우는 뷰티 전문가가 슬롯을 추가한 것)
       if (!next.slotsUnknown && next.remainingSlots < remainingRef.current) {
         setPulsing(true);
         window.setTimeout(() => setPulsing(false), PULSE_MS);
@@ -88,10 +88,10 @@ export default function LiveWidgetClient({
         {/* 브랜딩 */}
         <div className="sm-brand">
           <span className="sm-brand-mark">✦</span>
-          <span className="sm-brand-text">사주나라</span>
+          <span className="sm-brand-text">뷰티메이트</span>
         </div>
 
-        {/* 상담사명 */}
+        {/* 뷰티 전문가명 */}
         <p className="sm-consultant">{data.consultantName}</p>
 
         {/* LIVE 라벨 */}

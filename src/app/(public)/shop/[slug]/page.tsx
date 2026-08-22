@@ -24,7 +24,7 @@ import { auth } from "@/lib/auth";
 export const dynamic = "force-dynamic";
 
 // ─────────────────────────────────────────────────────────────
-// /shop/[slug] — 상담사 점집 공개 페이지 (예약 커머스)
+// /shop/[slug] — 뷰티 전문가 뷰티샵 공개 페이지 (예약 커머스)
 //
 // 구성: 프로필 헤더 → 오늘의 예약 현황 → 상담 메뉴 → 상세 소개 → 예약 달력 → 콘텐츠
 // 커머스(장바구니·배송·구매 버튼·구매 리뷰·팔로우 마케팅 UI)는 제거되었다.
@@ -87,7 +87,7 @@ async function getSeller(slug: string) {
     });
     return { seller: full, hasConsultingFields: true as const };
   } catch (e) {
-    console.error("점집 페이지: 상담 컬럼 조회 실패, 기본 컬럼으로 폴백", e);
+    console.error("뷰티샵 페이지: 상담 컬럼 조회 실패, 기본 컬럼으로 폴백", e);
     const basic = await prisma.sellerProfile.findUnique({
       where: { slug },
       include: sellerInclude(BASE_PRODUCT_SELECT),
@@ -126,7 +126,7 @@ export async function generateMetadata({
     where: { slug },
     select: { id: true, shopName: true, shopDescription: true, shopBanner: true },
   });
-  if (!seller) return { title: "점집을 찾을 수 없습니다 | 사주나라" };
+  if (!seller) return { title: "뷰티샵을 찾을 수 없습니다 | 뷰티메이트" };
 
   const custom = await getShopCustomization(seller.id);
   const description =
@@ -135,8 +135,8 @@ export async function generateMetadata({
   const shareBaseUrl = getShareBaseUrl();
   const pageUrl = new URL(`/shop/${encodeURIComponent(slug)}`, shareBaseUrl).toString();
   const imageUrl = toAbsoluteShareUrl(image, shareBaseUrl);
-  const pageTitle = seller.shopName.endsWith("점집") ? seller.shopName : `${seller.shopName}의 점집`;
-  const title = `${pageTitle} - 사주나라`;
+  const pageTitle = seller.shopName.endsWith("뷰티샵") ? seller.shopName : `${seller.shopName}의 뷰티샵`;
+  const title = `${pageTitle} - 뷰티메이트`;
 
   return {
     title,
@@ -145,9 +145,9 @@ export async function generateMetadata({
       title,
       description,
       url: pageUrl,
-      siteName: "사주나라",
+      siteName: "뷰티메이트",
       type: "profile",
-      images: [{ url: imageUrl, width: 1200, height: 630, alt: `${seller.shopName}의 점집` }],
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: `${seller.shopName}의 뷰티샵` }],
     },
     twitter: { card: "summary_large_image", title, description, images: [imageUrl] },
   };
@@ -183,7 +183,7 @@ export default async function SellerShopPage({
     };
   });
 
-  // ─── 상담 분야 태그 (상담사 지정 > 상품 consultingType > 카테고리) ───
+  // ─── 상담 분야 태그 (뷰티 전문가 지정 > 상품 consultingType > 카테고리) ───
   const consultTags = customization.tags.length > 0
     ? customization.tags
     : Array.from(new Set(products.map((p) => p.consultingType).filter((t): t is string => !!t))).length > 0
@@ -270,7 +270,7 @@ export default async function SellerShopPage({
       )
     : [];
 
-  // ─── 상담상품(DirectProduct) — shopExposure 기준 ───
+  // ─── 뷰티 서비스(DirectProduct) — shopExposure 기준 ───
   const directProducts: DirectProductItem[] = await safeQuery(
     "shop page direct products",
     async () => {
@@ -340,7 +340,7 @@ export default async function SellerShopPage({
         liveHref={liveHref}
       />
 
-      {/* ───── 1. 상담사 프로필 헤더 ───── */}
+      {/* ───── 1. 뷰티 전문가 프로필 헤더 ───── */}
       <section className="relative pb-1">
         <div className="h-44 overflow-hidden bg-[#171029] relative">
           <img
@@ -395,7 +395,7 @@ export default async function SellerShopPage({
                     ))}
                 </div>
                 {seller.user.name && seller.user.name !== seller.shopName && (
-                  <p className="mt-0.5 text-[11px] font-medium text-gray-400">{seller.user.name} 상담사</p>
+                  <p className="mt-0.5 text-[11px] font-medium text-gray-400">{seller.user.name} 뷰티 전문가</p>
                 )}
                 {customization.tagline && (
                   <p className="text-[12px] text-gray-500 mt-1 leading-relaxed line-clamp-2">{customization.tagline}</p>
@@ -535,7 +535,7 @@ export default async function SellerShopPage({
                 </ul>
               )}
 
-              {/* 시간 선택 상담상품 (DirectProduct) */}
+              {/* 시간 선택 뷰티 서비스 (DirectProduct) */}
               {directProducts.length > 0 && (
                 <>
                   {products.length > 0 && (
@@ -587,7 +587,7 @@ export default async function SellerShopPage({
         <section className="px-4 mt-4">
           <div className="bg-white rounded-3xl border border-gray-100/80 shadow-sm p-[18px]">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-bold text-gray-900">상담사 콘텐츠</h2>
+              <h2 className="text-sm font-bold text-gray-900">뷰티 전문가 콘텐츠</h2>
               <Link href="/content" className="text-[11px] text-gray-400 hover:text-gray-600 flex items-center gap-0.5">
                 더보기 <ChevronRight size={12} />
               </Link>

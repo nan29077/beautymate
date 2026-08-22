@@ -13,12 +13,12 @@
 @layer base {
   :root {
     --brand: 255 75% 62%;
-    --saju-night: #17102d;
-    --saju-ink: #241445;
-    --saju-violet: #6849d8;
-    --saju-lavender: #c9b8ff;
-    --saju-gold: #f2c66d;
-    --saju-cream: #fbf8ff;
+    --beautymate-night: #17102d;
+    --beautymate-ink: #241445;
+    --beautymate-violet: #6849d8;
+    --beautymate-lavender: #c9b8ff;
+    --beautymate-gold: #f2c66d;
+    --beautymate-cream: #fbf8ff;
   }
   
   body {
@@ -63,7 +63,7 @@
   }
 }
 
-/* ── 사주나라 대시보드 디자인 시스템 ─────────────────────────────── */
+/* ── 뷰티메이트 대시보드 디자인 시스템 ─────────────────────────────── */
 .dashboard-shell {
   --dashboard-primary: #6849d8;
   --dashboard-primary-dark: #3b2977;
@@ -324,34 +324,70 @@
   }
 }
 
-/* 공개 앱의 PC 좌우 여백 전용 초승달·궤도 패턴.
-   OBS/PRISM 위젯과 독립 라이브 화면에는 적용하지 않는다. */
+/* 공개 앱의 PC 좌우 여백 전용 뷰티 플로럴 패턴.
+   모바일 앱 프레임은 그대로 두고 데스크톱 배경에만 적용한다. */
 @media (min-width: 1024px) {
-  .sajunara-public-shell {
+  .beautymate-public-shell {
     position: relative;
     isolation: isolate;
-    background-color: #f7f4fc;
+    overflow: hidden;
+    background-color: #fff8f9;
     background-image:
-      radial-gradient(circle at 18% 16%, rgba(139, 108, 246, 0.17), transparent 28rem),
-      radial-gradient(circle at 82% 78%, rgba(242, 198, 109, 0.13), transparent 25rem),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none'%3E%3Ccircle cx='28' cy='34' r='20' stroke='%236849d8' stroke-opacity='.07'/%3E%3Ccircle cx='36' cy='28' r='20' fill='%23f7f4fc'/%3E%3Cpath d='M128 32l2.6 6.4L137 41l-6.4 2.6L128 50l-2.6-6.4L119 41l6.4-2.6z' fill='%23d1b164' fill-opacity='.13'/%3E%3Ccircle cx='142' cy='126' r='32' stroke='%236849d8' stroke-opacity='.055'/%3E%3Cpath d='M38 137a48 48 0 0 1 65-45' stroke='%236849d8' stroke-opacity='.05' stroke-dasharray='3 8'/%3E%3Ccircle cx='103' cy='92' r='2.5' fill='%236849d8' fill-opacity='.1'/%3E%3C/g%3E%3C/svg%3E");
+      radial-gradient(circle at 12% 12%, rgba(225, 130, 151, 0.22), transparent 28rem),
+      radial-gradient(circle at 88% 78%, rgba(109, 41, 69, 0.12), transparent 30rem),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 238, 242, 0.58)),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cg transform='translate(44 48)' stroke='%23b44b68' stroke-opacity='.12' stroke-width='1.4'%3E%3Cellipse cx='0' cy='-16' rx='8' ry='17'/%3E%3Cellipse cx='0' cy='16' rx='8' ry='17'/%3E%3Cellipse cx='-16' cy='0' rx='17' ry='8'/%3E%3Cellipse cx='16' cy='0' rx='17' ry='8'/%3E%3Ccircle r='4' fill='%23b44b68' fill-opacity='.08'/%3E%3C/g%3E%3Cpath d='M168 148c-17 8-30 24-34 43M156 166c-8-10-18-14-28-13M151 174c10-3 20-1 28 5' stroke='%236d2945' stroke-opacity='.1' stroke-width='1.5'/%3E%3Cpath d='M189 40l2.5 6.5L198 49l-6.5 2.5L189 58l-2.5-6.5L180 49l6.5-2.5z' stroke='%23c98c9d' stroke-opacity='.18'/%3E%3Ccircle cx='205' cy='112' r='3' fill='%23b44b68' fill-opacity='.1'/%3E%3Ccircle cx='103' cy='92' r='1.6' fill='%236d2945' fill-opacity='.12'/%3E%3C/g%3E%3C/svg%3E");
     background-attachment: fixed;
   }
 
-  .sajunara-public-shell::before,
-  .sajunara-public-shell::after {
+  .beautymate-public-shell::before,
+  .beautymate-public-shell::after {
     content: "";
     position: fixed;
     z-index: 0;
-    width: 22rem;
-    height: 22rem;
-    border: 1px solid rgba(104, 73, 216, 0.07);
+    width: 25rem;
+    height: 25rem;
     border-radius: 999px;
     pointer-events: none;
+    filter: blur(2px);
   }
 
-  .sajunara-public-shell::before { left: -9rem; top: 17vh; }
-  .sajunara-public-shell::after { right: -10rem; bottom: 10vh; }
+  .beautymate-public-shell::before {
+    left: -10rem;
+    top: 14vh;
+    border: 1px solid rgba(180, 75, 104, 0.1);
+    box-shadow:
+      inset 0 0 0 4rem rgba(255, 255, 255, 0.2),
+      0 0 90px rgba(225, 130, 151, 0.11);
+  }
+
+  .beautymate-public-shell::after {
+    right: -11rem;
+    bottom: 8vh;
+    border: 1px solid rgba(109, 41, 69, 0.09);
+    box-shadow:
+      inset 0 0 0 4.5rem rgba(255, 255, 255, 0.22),
+      0 0 100px rgba(180, 75, 104, 0.1);
+  }
+
+  .beautymate-app-frame {
+    border-inline: 1px solid rgba(180, 75, 104, 0.1);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.72),
+      0 24px 80px rgba(109, 41, 69, 0.16) !important;
+  }
+
+  /* 메인페이지만 일반적인 PC 사이트 폭으로 확장한다.
+     다른 공개 페이지는 기존 480px 모바일 앱 프레임을 유지한다. */
+  .beautymate-app-frame:has(.beautymate-desktop-home) {
+    max-width: none;
+    border-inline: 0;
+    box-shadow: none !important;
+  }
+
+  .beautymate-app-frame:has(.beautymate-desktop-home) > main {
+    padding-bottom: 0;
+  }
 }
 
 /* ── 라이브 뷰어 다크 UI ─────────────────────────────────────────── */

@@ -68,10 +68,10 @@ export default function ProductDetailModal({ productId, productName, triggerClas
             setActiveImage(json.product?.thumbnail || json.product?.images?.[0]?.url || null);
           }
         } else {
-          if (!cancelled) setError("상담상품 정보를 불러오지 못했습니다.");
+          if (!cancelled) setError("뷰티 서비스 정보를 불러오지 못했습니다.");
         }
       } catch {
-        if (!cancelled) setError("상담상품 정보를 불러오지 못했습니다.");
+        if (!cancelled) setError("뷰티 서비스 정보를 불러오지 못했습니다.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -119,8 +119,8 @@ export default function ProductDetailModal({ productId, productName, triggerClas
                   <Icon name="Gem" size={18} className="text-brand-600" />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-[15px] font-bold text-gray-900 truncate">{data?.name || productName || "상담상품 상세정보"}</h3>
-                  <p className="text-[10px] text-gray-400">등록된 상담상품 정보</p>
+                  <h3 className="text-[15px] font-bold text-gray-900 truncate">{data?.name || productName || "뷰티 서비스 상세정보"}</h3>
+                  <p className="text-[10px] text-gray-400">등록된 뷰티 서비스 정보</p>
                 </div>
               </div>
               <button onClick={() => setOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-400 transition-colors flex-shrink-0">
@@ -169,7 +169,7 @@ export default function ProductDetailModal({ productId, productName, triggerClas
                     )}
                   </div>
 
-                  {/* 상담상품 기본 정보 */}
+                  {/* 뷰티 서비스 기본 정보 */}
                   <div className="bg-gray-50 rounded-2xl p-4 space-y-2.5">
                     {data.brand && (
                       <span className="text-[10px] text-purple-500 bg-purple-50 px-2 py-0.5 rounded-full inline-block">{data.brand.brandName}</span>

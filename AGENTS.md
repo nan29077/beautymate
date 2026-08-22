@@ -9,7 +9,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ## Project Overview
 
-사주메이트 — 라이브 점사 예약 플랫폼. 브랜드→상담사→고객 3자 구조의 Next.js 14 App Router 기반 풀스택 단일 앱.
+뷰티메이트 — 라이브 뷰티 상담 예약 플랫폼. 브랜드→뷰티 전문가→고객 3자 구조의 Next.js 14 App Router 기반 풀스택 단일 앱.
 
 ## Commands
 

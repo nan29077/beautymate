@@ -115,16 +115,16 @@ export default function ShopDirectExposureManager() {
       <div className="bg-white rounded-xl border border-gray-100 p-4">
         <div className="flex items-center gap-2 mb-2">
           <Building2 size={16} strokeWidth={1.5} className="text-brand-500" />
-          <h3 className="text-sm font-bold text-gray-900">일반상담상품 노출</h3>
+          <h3 className="text-sm font-bold text-gray-900">일반 뷰티 서비스 노출</h3>
         </div>
         <p className="text-[12px] text-gray-500 leading-relaxed">
-          점집에 일반상담상품 탭을 노출할지 설정합니다. 스위치를 켜면 아래에서 선택한 상담상품들이 점집 &lsquo;일반상담상품&rsquo; 탭에 노출됩니다.
-          스위치를 끄면 점집에서 일반상담상품 탭이 완전히 사라집니다.
+          뷰티샵에 일반 뷰티 서비스 탭을 노출할지 설정합니다. 스위치를 켜면 아래에서 선택한 뷰티 서비스들이 뷰티샵 &lsquo;일반 뷰티 서비스&rsquo; 탭에 노출됩니다.
+          스위치를 끄면 뷰티샵에서 일반 뷰티 서비스 탭이 완전히 사라집니다.
         </p>
 
         {/* 노출 스위치 */}
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
-          <span className="text-sm font-medium text-gray-700">점집 일반상담상품 탭 노출</span>
+          <span className="text-sm font-medium text-gray-700">뷰티샵 일반 뷰티 서비스 탭 노출</span>
           <button
             onClick={handleToggle}
             disabled={savingToggle}
@@ -142,13 +142,13 @@ export default function ShopDirectExposureManager() {
       {/* 스위치 상태별 UI */}
       {isEnabled ? (
         <div className="bg-white rounded-xl border border-gray-100 p-4">
-          <p className="text-[12px] text-gray-500 mb-3">선택된 상담상품들이 점집 일반상담상품 탭에 노출됩니다.</p>
+          <p className="text-[12px] text-gray-500 mb-3">선택된 뷰티 서비스들이 뷰티샵 일반 뷰티 서비스 탭에 노출됩니다.</p>
 
           {products.length === 0 ? (
             <div className="text-center py-12 text-gray-400">
               <Star size={36} strokeWidth={1.5} className="mx-auto mb-2 opacity-30" />
-              <p className="text-xs">등록된 일반상담상품이 없습니다.</p>
-              <p className="text-[11px] mt-1">상담상품관리 &gt; 일반상담상품 탭에서 먼저 상담상품을 등록하세요.</p>
+              <p className="text-xs">등록된 일반 뷰티 서비스가 없습니다.</p>
+              <p className="text-[11px] mt-1">뷰티 서비스 관리 &gt; 일반 뷰티 서비스 탭에서 먼저 뷰티 서비스를 등록하세요.</p>
             </div>
           ) : (
             <>
@@ -199,7 +199,7 @@ export default function ShopDirectExposureManager() {
       ) : (
         <div className="text-center py-12 text-gray-400 bg-gray-50 rounded-xl">
           <Building2 size={36} strokeWidth={1.5} className="mx-auto mb-2 opacity-30" />
-          <p className="text-xs">현재 점집에 일반상담상품 탭이 노출되지 않습니다.</p>
+          <p className="text-xs">현재 뷰티샵에 일반 뷰티 서비스 탭이 노출되지 않습니다.</p>
         </div>
       )}
     </div>

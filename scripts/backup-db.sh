@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 셀러브릭스 운영 DB 백업 스크립트 (mysqldump 논리 백업).
+# 뷰티메이트 운영 DB 백업 스크립트 (mysqldump 논리 백업).
 #
 # - app/.env 의 DATABASE_URL 을 파싱해서 mysqldump 실행
 # - 결과를 gzip 압축하여 REPO_DIR/backups/ 에 타임스탬프 파일로 저장
@@ -80,7 +80,7 @@ fi
 # ── 백업 실행 ─────────────────────────────────────────────
 mkdir -p "$BACKUP_DIR"
 TS="$(date '+%Y%m%d-%H%M%S')"
-OUT="$BACKUP_DIR/sellerbricks-$TS.sql.gz"
+OUT="$BACKUP_DIR/beautymate-$TS.sql.gz"
 
 # 암호를 커맨드라인(ps 노출)에 두지 않기 위해 임시 defaults-file 사용.
 CNF="$(mktemp)"
@@ -139,7 +139,7 @@ log "백업 완료: $OUT ($(du -h "$OUT" | cut -f1))"
 
 # ── 오래된 백업 정리 ──────────────────────────────────────
 if [ "$RETENTION_DAYS" -gt 0 ]; then
-  DELETED=$(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'sellerbricks-*.sql.gz' -mtime "+$RETENTION_DAYS" -print -delete | wc -l)
+  DELETED=$(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'beautymate-*.sql.gz' -mtime "+$RETENTION_DAYS" -print -delete | wc -l)
   log "보존기간(${RETENTION_DAYS}일) 초과 백업 $DELETED 개 삭제"
 fi
 

@@ -20,7 +20,7 @@ interface SellerResult {
   isExternalLive: boolean;
 }
 
-export default function SellerSearchHero() {
+export default function SellerSearchHero({ variant = "mobile" }: { variant?: "mobile" | "desktop" }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SellerResult[]>([]);
@@ -78,7 +78,7 @@ export default function SellerSearchHero() {
     [router]
   );
 
-  // 엔터: 결과가 1개 이상이면 첫 점집으로 이동(검색 결과가 없으면 그대로 둠).
+  // 엔터: 결과가 1개 이상이면 첫 뷰티샵으로 이동(검색 결과가 없으면 그대로 둠).
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
@@ -92,24 +92,24 @@ export default function SellerSearchHero() {
   );
 
   return (
-    <section className="relative bg-brand-50/50 px-5 pt-7 pb-6">
+    <section className={variant === "desktop" ? "relative h-full rounded-[2rem] border border-rose-100 bg-white p-8 shadow-[0_20px_55px_rgba(109,41,69,0.09)]" : "relative bg-brand-50/50 px-5 pt-7 pb-6"}>
       <div className="relative">
         {/* 소개 카피 */}
-        <div className="inline-flex items-center gap-1 rounded-full bg-white border border-brand-100 px-2.5 py-1 mb-3">
+        <div className={variant === "desktop" ? "inline-flex items-center gap-1.5 rounded-full bg-rose-50 border border-rose-100 px-3 py-1.5 mb-5" : "inline-flex items-center gap-1 rounded-full bg-white border border-brand-100 px-2.5 py-1 mb-3"}>
           <Sparkles size={11} className="text-brand-500" />
-          <span className="text-[10px] font-semibold text-brand-600">사주나라</span>
+          <span className={variant === "desktop" ? "text-xs font-bold text-brand-600" : "text-[10px] font-semibold text-brand-600"}>뷰티메이트</span>
         </div>
-        <h1 className="text-[22px] font-extrabold leading-tight text-gray-900">
-          좋아하는 <span className="text-brand-600">상담사</span>를 단골로 설정하고,
-          <br />그 상담사의 점집·라이브를 즐기세요
+        <h1 className={variant === "desktop" ? "text-[30px] font-extrabold leading-[1.3] tracking-tight text-gray-950" : "text-[22px] font-extrabold leading-tight text-gray-900"}>
+          좋아하는 <span className="text-brand-600">뷰티 전문가</span>를 단골로 설정하고,
+          <br />{variant === "desktop" ? "전문가의 뷰티샵과 라이브를 즐기세요" : "그 뷰티 전문가의 뷰티샵·라이브를 즐기세요"}
         </h1>
-        <p className="mt-2 text-[13px] text-gray-500 leading-relaxed">
-          상담사를 단골로 설정하면 단골가게가 되고,
-          <br />상담사별 전용 점집에서 상담상품·단체 상담·라이브를 만나요.
+        <p className={variant === "desktop" ? "mt-4 text-sm text-gray-500 leading-7" : "mt-2 text-[13px] text-gray-500 leading-relaxed"}>
+          뷰티 전문가를 단골로 설정하면 단골가게가 되고,
+          <br />뷰티 전문가별 전용 뷰티샵에서 뷰티 서비스·공동 프로모션·라이브를 만나요.
         </p>
 
-        {/* 상담사 검색 */}
-        <div ref={boxRef} className="relative mt-5">
+        {/* 뷰티 전문가 검색 */}
+        <div ref={boxRef} className={variant === "desktop" ? "relative mt-7" : "relative mt-5"}>
           <form onSubmit={handleSubmit}>
             <div className="relative">
               <Icon name="Search" size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -119,8 +119,8 @@ export default function SellerSearchHero() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => results.length > 0 && setOpen(true)}
-                placeholder="상담사 이름 검색"
-                className="w-full pl-11 pr-11 py-3.5 rounded-2xl bg-white text-[15px] text-gray-900 placeholder-gray-400 shadow-sm border border-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400/40 focus:border-brand-300 transition-all"
+                placeholder="뷰티 전문가 이름 검색"
+                className={variant === "desktop" ? "w-full pl-12 pr-11 py-4 rounded-2xl bg-gray-50 text-[15px] text-gray-900 placeholder-gray-400 border border-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400/30 focus:border-brand-300 transition-all" : "w-full pl-11 pr-11 py-3.5 rounded-2xl bg-white text-[15px] text-gray-900 placeholder-gray-400 shadow-sm border border-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-400/40 focus:border-brand-300 transition-all"}
               />
               {query && (
                 <button
@@ -147,7 +147,7 @@ export default function SellerSearchHero() {
               ) : results.length === 0 ? (
                 <div className="px-4 py-6 text-center">
                   <p className="text-sm text-gray-500 font-medium">검색 결과가 없어요</p>
-                  <p className="mt-1 text-[11px] text-gray-400">상담사 이름을 정확히 입력해 주세요</p>
+                  <p className="mt-1 text-[11px] text-gray-400">뷰티 전문가 이름을 정확히 입력해 주세요</p>
                 </div>
               ) : (
                 <ul className="divide-y divide-gray-50">
@@ -175,7 +175,7 @@ export default function SellerSearchHero() {
                             {s.isLive && <OnAirBadge />}
                           </div>
                           <p className="text-[11px] text-gray-400 truncate">
-                            {s.category || s.mood || "라이브 점집"}
+                            {s.category || s.mood || "라이브 뷰티샵"}
                           </p>
                         </div>
                         <span className="text-[10px] text-gray-400 flex items-center gap-0.5 flex-shrink-0">

@@ -37,13 +37,13 @@ const TEST_ACCOUNTS = [
   {
     key: "admin",
     label: "관리자로 로그인",
-    email: "test-admin@sajumate.com",
+    email: "test-admin@beautymate.com",
     password: "TestAdmin123!",
   },
   {
     key: "consultant",
-    label: "상담사로 로그인",
-    email: "test-consultant@sajumate.com",
+    label: "뷰티 전문가로 로그인",
+    email: "test-consultant@beautymate.com",
     password: "TestConsult123!",
   },
 ] as const;
@@ -229,7 +229,7 @@ function LoginForm() {
           <BrandWordmark size="lg" />
         </Link>
         <p className="text-sm text-gray-400">
-          사주나라 라이브 점사 예약 플랫폼
+          뷰티메이트 라이브 뷰티 상담 예약 플랫폼
         </p>
       </div>
 
@@ -328,10 +328,10 @@ function LoginForm() {
               />
               <div>
                 <p className="text-sm font-semibold text-yellow-800 mb-1">
-                  상담사 승인 대기 중
+                  뷰티 전문가 승인 대기 중
                 </p>
                 <p className="text-xs text-yellow-700 leading-relaxed">
-                  상담사 계정은 관리자 승인 후 이용 가능합니다. 승인이
+                  뷰티 전문가 계정은 관리자 승인 후 이용 가능합니다. 승인이
                   완료되면 로그인하여 서비스를 이용하실 수 있습니다.
                 </p>
               </div>
@@ -527,18 +527,18 @@ function BeeModal({
   );
 }
 
-// 상담사 계정 고객센터 안내 (아이디/비밀번호 공용)
+// 뷰티 전문가 계정 고객센터 안내 (아이디/비밀번호 공용)
 function SellerSupportNotice() {
   return (
     <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-800">
       <p className="mb-2">
-        상담사 계정은 보안을 위해 고객센터를 통해서만 아이디/비밀번호 찾기가
+        뷰티 전문가 계정은 보안을 위해 고객센터를 통해서만 아이디/비밀번호 찾기가
         가능합니다.
       </p>
       <p className="text-xs text-amber-700">
-        고객센터: 카카오톡 채널 <b>@사주나라</b>
+        고객센터: 카카오톡 채널 <b>@뷰티메이트</b>
         <br />
-        또는 <b>support@sajunara.co.kr</b>
+        또는 <b>support@beautymate.co.kr</b>
       </p>
     </div>
   );

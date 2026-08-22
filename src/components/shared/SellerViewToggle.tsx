@@ -102,7 +102,7 @@ function SellerGridCard({ seller }: { seller: Seller }) {
           </span>
           {seller._count.shopProducts > 0 && (
             <span className="flex items-center gap-1 text-[11px] text-gray-500">
-              <Icon name="Cart" size={12} strokeWidth={1.5} className="text-gray-400" /> 상담상품 {seller._count.shopProducts}
+              <Icon name="Cart" size={12} strokeWidth={1.5} className="text-gray-400" /> 뷰티 서비스 {seller._count.shopProducts}
             </span>
           )}
           {seller._count.campaigns > 0 && (
@@ -137,7 +137,7 @@ function SellerListCard({ seller }: { seller: Seller }) {
             <Icon name="Users" size={10} strokeWidth={1.5} /> 팬 {seller.totalFans.toLocaleString()}
           </span>
           {seller._count.shopProducts > 0 && (
-            <span className="text-[11px] text-gray-400">상담상품 {seller._count.shopProducts}</span>
+            <span className="text-[11px] text-gray-400">뷰티 서비스 {seller._count.shopProducts}</span>
           )}
           {seller._count.campaigns > 0 && (
             <span className="text-[11px] text-gray-400">공구 {seller._count.campaigns}</span>

@@ -4,8 +4,8 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// 고객이 "상담사로 입점 신청" — 현재 계정에 승인 대기(SellerProfile.isApproved=false) 상담사 신청을 생성.
-// 최고관리자 상담사 관리에서 승인하면 role 이 CONSULTANT 로 전환된다.
+// 고객이 "뷰티 전문가로 입점 신청" — 현재 계정에 승인 대기(SellerProfile.isApproved=false) 뷰티 전문가 신청을 생성.
+// 최고관리자 뷰티 전문가 관리에서 승인하면 role 이 CONSULTANT 로 전환된다.
 export async function POST() {
   const session = await auth();
   if (!session?.user?.id) {
@@ -13,7 +13,7 @@ export async function POST() {
   }
   const role = session.user.role;
   if (role !== "CUSTOMER") {
-    return NextResponse.json({ error: "시청자 회원만 상담사 입점 신청이 가능합니다." }, { status: 400 });
+    return NextResponse.json({ error: "시청자 회원만 뷰티 전문가 입점 신청이 가능합니다." }, { status: 400 });
   }
 
   const user = await prisma.user.findUnique({
@@ -25,7 +25,7 @@ export async function POST() {
   if (user.sellerProfile) {
     return NextResponse.json(
       { alreadyApplied: true, approved: user.sellerProfile.isApproved,
-        error: user.sellerProfile.isApproved ? "이미 승인된 상담사입니다." : "이미 상담사 입점 신청이 접수되어 승인 대기 중입니다." },
+        error: user.sellerProfile.isApproved ? "이미 승인된 뷰티 전문가입니다." : "이미 뷰티 전문가 입점 신청이 접수되어 승인 대기 중입니다." },
       { status: 400 },
     );
   }
@@ -42,10 +42,10 @@ export async function POST() {
     data: {
       userId: user.id,
       slug,
-      shopName: `${user.name}의 점집`,
+      shopName: `${user.name}의 뷰티샵`,
       isApproved: false, // 최고관리자 승인 대기
     },
   });
 
-  return NextResponse.json({ success: true, message: "상담사 입점 신청이 접수되었습니다. 관리자 승인 후 상담사 기능을 이용할 수 있습니다." });
+  return NextResponse.json({ success: true, message: "뷰티 전문가 입점 신청이 접수되었습니다. 관리자 승인 후 뷰티 전문가 기능을 이용할 수 있습니다." });
 }

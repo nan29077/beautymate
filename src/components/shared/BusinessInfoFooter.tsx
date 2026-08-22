@@ -24,7 +24,7 @@ export default function BusinessInfoFooter({ settings }: { settings?: FooterSett
         <p>
           <span className="text-gray-500">전화</span> {f.phone}
           <span className="mx-1.5 text-gray-300">|</span>
-          <span className="text-gray-500">이메일</span> support@sajunara.co.kr
+          <span className="text-gray-500">이메일</span> support@beautymate.co.kr
         </p>
         <p>
           <span className="text-gray-500">주소</span> {f.address}

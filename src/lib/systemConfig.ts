@@ -1,5 +1,5 @@
 // 시스템 전역 스위치(SystemConfig) 서버 전용 액세스 레이어.
-// - sellerOnlyFee: true 이면 플랫폼 수수료 전액을 상담사가 부담 (공급자 수수료 없음).
+// - sellerOnlyFee: true 이면 플랫폼 수수료 전액을 뷰티 전문가가 부담 (공급자 수수료 없음).
 // - prisma 를 import 하므로 서버 컴포넌트 / route handler 에서만 사용하세요.
 
 import { cache } from "react";

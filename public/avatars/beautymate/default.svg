@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="뷰티메이트 기본 프로필">
+  <defs>
+    <linearGradient id="bg" x1="20" y1="16" x2="140" y2="148" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7F8"/>
+      <stop offset="1" stop-color="#F1B2C0"/>
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="52" fill="url(#bg)"/>
+  <circle cx="80" cy="64" r="28" fill="#FFF7F8"/>
+  <path d="M31 146c4-31 23-49 49-49s45 18 49 49H31Z" fill="#6D2945"/>
+  <path d="M80 27c6 8 9 15 9 21 0 10-7 18-9 18s-9-8-9-18c0-6 3-13 9-21Z" fill="#B44B68"/>
+  <path d="M58 49c8-6 15-9 21-9 10 0 18 7 18 9s-8 9-18 9c-6 0-13-3-21-9Z" fill="#EAA7B8" fill-opacity=".9"/>
+  <circle cx="80" cy="49" r="7" fill="#FFF7F8"/>
+  <path d="m119 25 2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5Z" fill="#B44B68"/>
+</svg>

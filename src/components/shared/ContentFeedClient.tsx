@@ -216,7 +216,7 @@ function ContentListCard({ post }: { post: ContentPost }) {
           </span>
           {post.shoppingTags.length > 0 && (
             <span className="flex items-center gap-0.5 text-[10px] text-brand-500">
-              <Icon name="Cart" size={9} /> {uniqueProducts.length}개 상담상품
+              <Icon name="Cart" size={9} /> {uniqueProducts.length}개 뷰티 서비스
             </span>
           )}
         </div>

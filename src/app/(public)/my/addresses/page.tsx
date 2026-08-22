@@ -9,7 +9,7 @@ export default function AddressesPage() {
   return (
     <div className="animate-fade-in px-4 py-20 text-center">
       <PackageX size={48} strokeWidth={1.2} className="mx-auto mb-4 text-gray-200" />
-      <p className="text-sm font-medium text-gray-600">점집에서 사용하지 않는 기능입니다.</p>
+      <p className="text-sm font-medium text-gray-600">뷰티샵에서 사용하지 않는 기능입니다.</p>
       <p className="text-xs text-gray-400 mt-1.5">
         상담 예약은 배송지 없이 진행됩니다.
       </p>

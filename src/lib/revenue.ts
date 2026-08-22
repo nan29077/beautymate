@@ -1,14 +1,14 @@
-// 플랫폼(사주나라) 수익 집계.
+// 플랫폼(뷰티메이트) 수익 집계.
 //
 // 이전 구현(admin/revenue/page.tsx)은 다음 세 가지가 틀려서 수익을 과대 계상했다:
 //  1. 결제액 전액(finalAmount)에 요율을 곱함 → 공급가(브랜드/중간관리자 몫)까지 플랫폼
 //     수수료 기준에 포함시킴. 실제 수수료 기준은 "각 수취인의 몫"이다.
-//  2. 전역 sellerFeeRate 만 사용 → 상담사별 개별 요율을 무시.
+//  2. 전역 sellerFeeRate 만 사용 → 뷰티 전문가별 개별 요율을 무시.
 //  3. take: 500 → 예약이 500건을 넘으면 합계 자체가 틀림.
 //
 // 여기서는 settlement.ts 와 완전히 동일한 규칙(스냅샷 우선)으로 계산해,
-// 상담사/공급자 정산액과 플랫폼 수익의 합이 결제액과 정확히 맞아떨어지게 한다.
-//   결제액 = 상담사 정산액 + 공급자 정산액 + 플랫폼 수수료
+// 뷰티 전문가/공급자 정산액과 플랫폼 수익의 합이 결제액과 정확히 맞아떨어지게 한다.
+//   결제액 = 뷰티 전문가 정산액 + 공급자 정산액 + 플랫폼 수수료
 //
 // prisma 를 사용하므로 서버에서만 호출할 것.
 
@@ -27,7 +27,7 @@ export interface RevenueRow {
   reservationNumber: string;
   sellerName: string;
   finalAmount: number;
-  sellerFee: number; // 상담사에게서 받은 플랫폼 수수료
+  sellerFee: number; // 뷰티 전문가에게서 받은 플랫폼 수수료
   supplierFee: number; // 브랜드/중간관리자에게서 받은 플랫폼 수수료
   platformFee: number; // sellerFee + supplierFee
   marginRevenue: number; // 관리자 마진(adminMargin × 수량)
@@ -42,7 +42,7 @@ export interface PlatformRevenue {
   totalSellerFee: number;
   totalSupplierFee: number;
   totalPlatformFee: number; // 수수료 수익 (부가세 포함)
-  totalMarginRevenue: number; // 상담상품 마진 수익
+  totalMarginRevenue: number; // 뷰티 서비스 마진 수익
   totalPgFee: number; // PG 수수료(비용)
   netRevenue: number; // 순수익 = 수수료 + 마진 − PG
 }
@@ -88,7 +88,7 @@ export async function getPlatformRevenue(opts: {
     orderBy: { createdAt: "desc" },
   }), []);
 
-  // 스냅샷이 없는 과거 예약(폴백용) + 관리자 마진용 상담상품 정보
+  // 스냅샷이 없는 과거 예약(폴백용) + 관리자 마진용 뷰티 서비스 정보
   const productIds = [...new Set(orders.flatMap((o) => o.items.map((i) => i.productId)))];
   const products = productIds.length
     ? await prisma.product.findMany({
@@ -113,7 +113,7 @@ export async function getPlatformRevenue(opts: {
 
   for (const o of orders) {
     const finalAmount = Number(o.finalAmount);
-    // 상담사 요율: 예약 스냅샷 > 상담사 프로필 > 전역
+    // 뷰티 전문가 요율: 예약 스냅샷 > 뷰티 전문가 프로필 > 전역
     const orderSellerRate =
       o.sellerFeeRateSnap != null
         ? Number(o.sellerFeeRateSnap)
@@ -121,7 +121,7 @@ export async function getPlatformRevenue(opts: {
           ? Number(o.seller.commissionRate)
           : fees.sellerFeeRate;
 
-    let sellerBase = 0; // 상담사 몫 (상담사 수수료 부과 기준)
+    let sellerBase = 0; // 뷰티 전문가 몫 (뷰티 전문가 수수료 부과 기준)
     let sellerFee = 0;
     let supplierFee = 0;
     let marginRevenue = 0;
@@ -149,22 +149,22 @@ export async function getPlatformRevenue(opts: {
         ? it.isSellerProductSnap === true
         : live?.sellerId === o.sellerId;
       const sellerRate = hasSnap ? Number(it.sellerFeeRateSnap) : orderSellerRate;
-      // 공급자는 플랫폼 하나뿐이라 상담사 수수료율을 공급자 요율로 그대로 쓴다.
+      // 공급자는 플랫폼 하나뿐이라 뷰티 전문가 수수료율을 공급자 요율로 그대로 쓴다.
       const supplierRate = hasSnap
         ? it.supplierFeeRateSnap != null
           ? Number(it.supplierFeeRateSnap)
           : fees.sellerFeeRate
         : fees.sellerFeeRate;
 
-      if (!hasSnap && !live) continue; // 스냅샷도 상담상품도 없음 → settlement.ts 와 동일하게 0원 처리
+      if (!hasSnap && !live) continue; // 스냅샷도 뷰티 서비스도 없음 → settlement.ts 와 동일하게 0원 처리
 
       const itemSale = Number(it.totalPrice);
 
-      // settlement.ts 와 동일한 3분기: 상담사 몫과 공급자 몫을 나눈다.
+      // settlement.ts 와 동일한 3분기: 뷰티 전문가 몫과 공급자 몫을 나눈다.
       let sBase: number;
       let supBase: number;
       if (isSellerProduct) {
-        sBase = itemSale; // Case 1 — 상담사 직접 등록: 전액이 상담사 몫
+        sBase = itemSale; // Case 1 — 뷰티 전문가 직접 등록: 전액이 뷰티 전문가 몫
         supBase = 0;
       } else if (priceModel === "COMMISSION" && prodCommRate != null) {
         sBase = itemSale * (prodCommRate / 100); // Case 2B
@@ -183,7 +183,7 @@ export async function getPlatformRevenue(opts: {
       marginRevenue += Number(live?.adminMargin ?? 0) * it.quantity;
     }
 
-    // 아이템 없는 예약(수기/소셜 예약서): 결제액 전액이 상담사 몫
+    // 아이템 없는 예약(수기/소셜 예약서): 결제액 전액이 뷰티 전문가 몫
     if (o.items.length === 0) {
       sellerBase = finalAmount;
       sellerFee = finalAmount * vatFee(orderSellerRate);

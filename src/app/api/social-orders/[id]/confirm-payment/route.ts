@@ -15,7 +15,7 @@ export async function POST(
       return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
     }
     if ((session.user as any).role !== "CONSULTANT") {
-      return NextResponse.json({ error: "상담사만 입금 확인을 처리할 수 있습니다." }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가만 입금 확인을 처리할 수 있습니다." }, { status: 403 });
     }
 
     const resolvedParams = await Promise.resolve(params);
@@ -30,13 +30,13 @@ export async function POST(
       return NextResponse.json({ error: "소셜예약서를 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // 소유권 검사 — 본인 점집의 예약서만 입금 확인 가능
+    // 소유권 검사 — 본인 뷰티샵의 예약서만 입금 확인 가능
     const myProfile = await prisma.sellerProfile.findUnique({
       where: { userId: session.user.id },
       select: { id: true },
     });
     if (!myProfile || myProfile.id !== order.sellerId) {
-      return NextResponse.json({ error: "본인 점집의 예약서만 처리할 수 있습니다." }, { status: 403 });
+      return NextResponse.json({ error: "본인 뷰티샵의 예약서만 처리할 수 있습니다." }, { status: 403 });
     }
 
     if (order.status === "CONFIRMED") {

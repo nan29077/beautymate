@@ -29,9 +29,9 @@ export default async function CheckoutPage({
 
   const qty = Math.max(1, parseInt(quantity || "1", 10) || 1);
 
-  // ── 상담사 일반상담상품(DirectProduct) 결제 ──
+  // ── 뷰티 전문가 일반 뷰티 서비스(DirectProduct) 결제 ──
   // 카탈로그 Product 가 아닌 별도 모델이라 조회 경로가 다르다.
-  // 옵션(variant)·단체 상담 캠페인은 일반상담상품에 존재하지 않으므로 무시한다.
+  // 옵션(variant)·공동 프로모션 캠페인은 일반 뷰티 서비스에 존재하지 않으므로 무시한다.
   if (type === "direct") {
     const [direct, directSeller] = await Promise.all([
       prisma.directProduct.findUnique({
@@ -40,7 +40,7 @@ export default async function CheckoutPage({
       }),
       prisma.sellerProfile.findUnique({ where: { id: sellerId }, select: { id: true, shopName: true } }),
     ]);
-    // 상담상품이 없거나 비활성이거나, 다른 상담사의 상담상품을 이 상담사 이름으로 사려는 경우 차단
+    // 뷰티 서비스가 없거나 비활성이거나, 다른 뷰티 전문가의 뷰티 서비스를 이 뷰티 전문가 이름으로 사려는 경우 차단
     // (상담 서비스라 재고 검증은 하지 않는다)
     if (!direct || !direct.isActive || !directSeller || direct.sellerId !== directSeller.id) redirect("/");
 
@@ -164,7 +164,7 @@ export default async function CheckoutPage({
     price,
     quantity: qty,
     isCampaign: !!campaignInfo,
-    // 상담 방식 설정 (상담상품 기준)
+    // 진행 방식 설정 (뷰티 서비스 기준)
     shippingFee: 0,
     freeShipping: true,
     freeShippingThreshold: null,

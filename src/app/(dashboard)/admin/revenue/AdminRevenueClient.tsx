@@ -48,7 +48,7 @@ export default function AdminRevenueClient({ revenue, period }: Props) {
         <div>
           <h1 className="text-lg sm:text-xl font-bold text-gray-900">관리자 수익</h1>
           <p className="text-xs sm:text-sm text-gray-500">
-            예약 시점 요율 기준 · 상담사 수수료 + 공급자 수수료 + 마진 − PG 수수료
+            예약 시점 요율 기준 · 뷰티 전문가 수수료 + 공급자 수수료 + 마진 − PG 수수료
           </p>
         </div>
         {/* 기간 필터 */}
@@ -91,7 +91,7 @@ export default function AdminRevenueClient({ revenue, period }: Props) {
           </div>
           <p className="text-2xl font-bold text-gray-900">{formatPrice(totalPlatformFee)}</p>
           <p className="text-[11px] text-gray-400 mt-1">
-            상담사 {formatPrice(totalSellerFee)} + 공급자 {formatPrice(totalSupplierFee)}
+            뷰티 전문가 {formatPrice(totalSellerFee)} + 공급자 {formatPrice(totalSupplierFee)}
           </p>
         </div>
 
@@ -100,7 +100,7 @@ export default function AdminRevenueClient({ revenue, period }: Props) {
             <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
               <Icon name="Wallet" size={18} className="text-amber-600" strokeWidth={1.5} />
             </div>
-            <p className="text-sm font-medium text-gray-600">상담상품 마진 수익</p>
+            <p className="text-sm font-medium text-gray-600">뷰티 서비스 마진 수익</p>
           </div>
           <p className="text-2xl font-bold text-gray-900">{formatPrice(totalMarginRevenue)}</p>
           <p className="text-[11px] text-gray-400 mt-1">adminMargin × 판매수량 합계</p>
@@ -116,7 +116,7 @@ export default function AdminRevenueClient({ revenue, period }: Props) {
             <dd className="font-medium text-gray-900">{formatPrice(totalSales)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-gray-500">상담사 수수료 수익</dt>
+            <dt className="text-gray-500">뷰티 전문가 수수료 수익</dt>
             <dd className="text-emerald-700">+ {formatPrice(totalSellerFee)}</dd>
           </div>
           <div className="flex justify-between">
@@ -124,7 +124,7 @@ export default function AdminRevenueClient({ revenue, period }: Props) {
             <dd className="text-emerald-700">+ {formatPrice(totalSupplierFee)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-gray-500">상담상품 마진 수익</dt>
+            <dt className="text-gray-500">뷰티 서비스 마진 수익</dt>
             <dd className="text-amber-700">+ {formatPrice(totalMarginRevenue)}</dd>
           </div>
           <div className="flex justify-between">
@@ -166,7 +166,7 @@ export default function AdminRevenueClient({ revenue, period }: Props) {
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/50">
                   <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 whitespace-nowrap">예약번호</th>
-                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 whitespace-nowrap">상담사</th>
+                  <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 whitespace-nowrap">뷰티 전문가</th>
                   <th className="text-left px-4 py-2.5 text-[11px] font-semibold text-gray-500 whitespace-nowrap">예약일</th>
                   <th className="text-right px-4 py-2.5 text-[11px] font-semibold text-gray-500 whitespace-nowrap">판매금액</th>
                   <th className="text-right px-4 py-2.5 text-[11px] font-semibold text-gray-500 whitespace-nowrap">플랫폼 수수료</th>

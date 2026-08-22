@@ -11,7 +11,7 @@ import BookingContactForm from "@/components/shared/BookingContactForm";
 import { useFeatureFlags } from "@/components/shared/FeatureFlagsProvider";
 
 interface CheckoutItem {
-  // PRODUCT: 카탈로그 상담상품(Product) / DIRECT: 상담사 일반상담상품(DirectProduct)
+  // PRODUCT: 카탈로그 뷰티 서비스(Product) / DIRECT: 뷰티 전문가 일반 뷰티 서비스(DirectProduct)
   itemType: "PRODUCT" | "DIRECT";
   productId: string;
   name: string;
@@ -30,7 +30,7 @@ interface CheckoutItem {
   freeShippingThreshold: number | null;
 }
 
-// 장바구니 할인 설정 (상담사별) — 소계가 threshold 이상이면 rate% 할인
+// 장바구니 할인 설정 (뷰티 전문가별) — 소계가 threshold 이상이면 rate% 할인
 interface CartDiscountInfo {
   threshold: number;
   rate: number;
@@ -287,7 +287,7 @@ export default function CheckoutClient({ item }: { item: CheckoutItem }) {
   }, [appAlert]);
 
   // 결제 미완료 상태로 페이지를 이탈(브라우저 뒤로가기·탭 닫기·SPA 라우팅 등)하면
-  // 예약 생성 시 차감된 일반상담상품(DirectProduct) 재고가 PENDING 예약에 묶여 "품절"이 된다.
+  // 예약 생성 시 차감된 일반 뷰티 서비스(DirectProduct) 재고가 PENDING 예약에 묶여 "품절"이 된다.
   // 이탈 시점에 자동으로 abort 를 호출해 재고를 즉시 복원한다.
   // - exitAbortArmedRef 가 true(같은 페이지 모달/팝업 결제 진행 중)인 경우에만 동작.
   // - 결제 성공 콜백에서 disarm 하므로 완료될 결제를 취소하지 않는다.
@@ -325,7 +325,7 @@ export default function CheckoutClient({ item }: { item: CheckoutItem }) {
   const cartDiscountEligible = !!cartDiscount && totalPrice >= cartDiscount.threshold;
   const discountAmount =
     cartDiscount && cartDiscountEligible ? Math.round(totalPrice * cartDiscount.rate / 100) : 0;
-  // 라이브 점사는 배송이 없어 배송비를 더하지 않는다.
+  // 라이브 뷰티 상담는 배송이 없어 배송비를 더하지 않는다.
   const finalTotal = totalPrice - discountAmount - couponDiscountAmount;
 
   const handleApplyCoupon = async () => {
@@ -782,7 +782,7 @@ export default function CheckoutClient({ item }: { item: CheckoutItem }) {
           <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-1.5"><Icon name="Receipt_icon" size={15} /> 결제 요약</h3>
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500">상담상품 금액</span>
+              <span className="text-gray-500">뷰티 서비스 금액</span>
               <span className="font-medium">{formatPrice(totalPrice)}</span>
             </div>
             {discountAmount > 0 && (

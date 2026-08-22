@@ -1,7 +1,7 @@
 import { CSSProperties, ReactNode } from "react";
 
 /**
- * HexNumBadge — 육각형 컨셉 상담상품 순번 뱃지
+ * HexNumBadge — 육각형 컨셉 뷰티 서비스 순번 뱃지
  * 육각형(honeycomb) 클리핑 + amber 배경 + 짙은 갈색 텍스트.
  * 서버/클라이언트 컴포넌트 어디서든 사용 가능 (훅 미사용).
  */

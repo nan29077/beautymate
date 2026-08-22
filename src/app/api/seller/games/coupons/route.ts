@@ -4,16 +4,16 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// GET: 상담사가 이전에 만든 쿠폰(게임 쿠폰 + 라이브 쿠폰) 목록 — 새 게임 쿠폰으로 불러오기용
+// GET: 뷰티 전문가가 이전에 만든 쿠폰(게임 쿠폰 + 라이브 쿠폰) 목록 — 새 게임 쿠폰으로 불러오기용
 export async function GET() {
   try {
     const session = await auth();
     if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
-    if (session.user.role !== "CONSULTANT") return NextResponse.json({ error: "상담사 전용" }, { status: 403 });
+    if (session.user.role !== "CONSULTANT") return NextResponse.json({ error: "뷰티 전문가 전용" }, { status: 403 });
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 400 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 400 });
 
-    // 이 상담사의 게임에 연결된 게임 쿠폰
+    // 이 뷰티 전문가의 게임에 연결된 게임 쿠폰
     const gameCoupons = await prisma.gameCoupon.findMany({
       where: { game: { sellerId: seller.id } },
       orderBy: { createdAt: "desc" },
@@ -21,7 +21,7 @@ export async function GET() {
       include: { game: { select: { title: true } } },
     });
 
-    // 이 상담사의 라이브 쿠폰
+    // 이 뷰티 전문가의 라이브 쿠폰
     const liveCoupons = await prisma.liveCoupon.findMany({
       where: { liveStream: { sellerId: seller.id } },
       orderBy: { createdAt: "desc" },

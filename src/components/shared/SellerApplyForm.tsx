@@ -40,8 +40,8 @@ export default function SellerApplyForm({ initialApplied, initialApproved, isLog
           <Icon name="Check" size={18} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[14px] font-bold text-gray-900">상담사 승인 완료!</p>
-          <p className="text-[11px] text-gray-500 mt-0.5">상담사 대시보드에서 점집을 운영해보세요.</p>
+          <p className="text-[14px] font-bold text-gray-900">뷰티 전문가 승인 완료!</p>
+          <p className="text-[11px] text-gray-500 mt-0.5">뷰티 전문가 대시보드에서 뷰티샵을 운영해보세요.</p>
         </div>
         <Link href="/seller" className="text-[12px] font-bold text-emerald-700 flex items-center gap-0.5 flex-shrink-0">
           대시보드 <Icon name="ChevronDown" size={14} className="-rotate-90" />
@@ -59,7 +59,7 @@ export default function SellerApplyForm({ initialApplied, initialApproved, isLog
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-[14px] font-bold text-gray-900">신청 접수 완료</p>
-          <p className="text-[11px] text-gray-500 mt-0.5">최고관리자 승인 후 상담사 기능이 활성화돼요.</p>
+          <p className="text-[11px] text-gray-500 mt-0.5">최고관리자 승인 후 뷰티 전문가 기능이 활성화돼요.</p>
         </div>
       </div>
     );
@@ -68,7 +68,7 @@ export default function SellerApplyForm({ initialApplied, initialApproved, isLog
   // 신청 가능
   const handleApply = async () => {
     const ok = await appConfirm({
-      message: "상담사로 입점 신청하시겠습니까?\n신청 후 최고관리자 승인이 완료되면 상담사 기능을 이용할 수 있습니다.",
+      message: "뷰티 전문가로 입점 신청하시겠습니까?\n신청 후 최고관리자 승인이 완료되면 뷰티 전문가 기능을 이용할 수 있습니다.",
       confirmText: "신청하기",
     });
     if (!ok) return;
@@ -78,7 +78,7 @@ export default function SellerApplyForm({ initialApplied, initialApproved, isLog
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setApplied(true);
-        await appAlert({ message: data.message || "상담사 입점 신청이 접수되었습니다.", type: "success" });
+        await appAlert({ message: data.message || "뷰티 전문가 입점 신청이 접수되었습니다.", type: "success" });
         router.refresh();
       } else if (data.alreadyApplied) {
         setApplied(true);
@@ -104,7 +104,7 @@ export default function SellerApplyForm({ initialApplied, initialApproved, isLog
         {loading ? <Loader2 size={18} className="animate-spin" /> : <Icon name="Sparkles" size={18} strokeWidth={2} />}
       </div>
       <div className="flex-1 min-w-0 text-left">
-        <p className="text-[14px] font-extrabold">상담사 입점신청하기</p>
+        <p className="text-[14px] font-extrabold">뷰티 전문가 입점신청하기</p>
         <p className="text-[11px] text-white/60 mt-0.5">신청 즉시 접수 · 관리자 승인 후 활성화</p>
       </div>
       <Icon name="ChevronDown" size={18} className="text-white/50 flex-shrink-0 -rotate-90" />

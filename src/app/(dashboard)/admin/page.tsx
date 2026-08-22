@@ -103,7 +103,7 @@ export default async function AdminDashboard() {
   const weekRevenue = Number(weekRevenueAgg._sum.finalAmount || 0);
 
   const roleLabels: Record<string, string> = {
-    SUPER_ADMIN: "관리자", CONSULTANT: "상담사", CUSTOMER: "고객",
+    SUPER_ADMIN: "관리자", CONSULTANT: "뷰티 전문가", CUSTOMER: "고객",
   };
   const roleColors: Record<string, string> = {
     SUPER_ADMIN: "bg-red-50 text-red-600",
@@ -177,8 +177,8 @@ export default async function AdminDashboard() {
       {/* KPI Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
         {[
-          { label: "상담사", value: sellerCount, icon: "Consultant", href: "/admin/sellers", color: "text-brand-600" },
-          { label: "상담상품", value: `${activeProductCount}/${productCount}`, icon: "Gem", href: "/admin/products", color: "text-brand-500", sub: "활성/전체" },
+          { label: "뷰티 전문가", value: sellerCount, icon: "Consultant", href: "/admin/sellers", color: "text-brand-600" },
+          { label: "뷰티 서비스", value: `${activeProductCount}/${productCount}`, icon: "Gem", href: "/admin/products", color: "text-brand-500", sub: "활성/전체" },
           { label: "캠페인", value: `${activeCampaigns}/${campaignCount}`, icon: "Event", href: "/admin/campaigns", color: "text-moon-700", sub: "진행/전체" },
           { label: "처리 대기", value: pendingOrders, icon: "Cart", href: "/admin/reservations", color: "text-amber-500" },
           { label: "진행중 캠페인", value: activeCampaigns, icon: "Chart", href: "/admin/campaigns", color: "text-red-500" },
@@ -315,11 +315,11 @@ export default async function AdminDashboard() {
         <div className="grid grid-cols-1 min-[390px]:grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
           {[
             { href: "/admin/users", label: "회원 관리", icon: "Users", desc: "회원 목록 & 권한" },
-            { href: "/admin/sellers", label: "상담사 관리", icon: "Store", desc: "승인 & 관리" },
-            { href: "/admin/products", label: "상담상품 관리", icon: "Package", desc: "상담상품 등록 & 관리" },
+            { href: "/admin/sellers", label: "뷰티 전문가 관리", icon: "Store", desc: "승인 & 관리" },
+            { href: "/admin/products", label: "뷰티 서비스 관리", icon: "Package", desc: "뷰티 서비스 등록 & 관리" },
             { href: "/admin/campaigns", label: "캠페인", icon: "Event", desc: "공구 캠페인" },
             { href: "/admin/reservations", label: "예약 관리", icon: "OrderManagement", desc: "예약 처리" },
-            { href: "/admin/settlements", label: "정산", icon: "Settlement", desc: "상담사 정산" },
+            { href: "/admin/settlements", label: "정산", icon: "Settlement", desc: "뷰티 전문가 정산" },
             { href: "/admin/banners", label: "배너", icon: "Notice", desc: "메인 배너" },
             { href: "/", label: "사이트 보기", icon: "Eye", desc: "메인 페이지" },
           ].map((item) => (

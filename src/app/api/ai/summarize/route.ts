@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * POST /api/ai/summarize — 상담 메모를 고객 친화적인 요약으로 변환 (상담사 전용).
+ * POST /api/ai/summarize — 고객 메모를 고객 친화적인 요약으로 변환 (뷰티 전문가 전용).
  *
  * body: { memo: string, consultType: string, duration: number }
  * res : { summary: string }
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const duration = Number.isFinite(Number(body?.duration)) ? Number(body.duration) : 0;
 
     if (!memo) {
-      return NextResponse.json({ error: "요약할 상담 메모를 입력해주세요" }, { status: 400 });
+      return NextResponse.json({ error: "요약할 고객 메모를 입력해주세요" }, { status: 400 });
     }
 
     const apiKey = await getOpenAiKey();
@@ -59,8 +59,8 @@ export async function POST(req: NextRequest) {
           {
             role: "system",
             content:
-              "당신은 사주·운세 상담 내용을 고객에게 전달할 요약문으로 정리하는 어시스턴트입니다. " +
-              "상담사가 적은 메모를 바탕으로, 고객이 읽기 편한 따뜻하고 정중한 존댓말로 요약하세요. " +
+              "당신은 뷰티·뷰티 트렌드 요청사항을 고객에게 전달할 요약문으로 정리하는 어시스턴트입니다. " +
+              "뷰티 전문가가 적은 메모를 바탕으로, 고객이 읽기 편한 따뜻하고 정중한 존댓말로 요약하세요. " +
               "규칙: (1) 3~5개의 불릿(•)만 출력, (2) 각 불릿은 한 문장, " +
               "(3) 메모에 없는 내용을 지어내지 말 것, (4) 단정적 예언·의학/법률 조언은 피하고 조언 형태로 표현, " +
               "(5) 머리말·맺음말 없이 불릿만 출력.",
@@ -69,8 +69,8 @@ export async function POST(req: NextRequest) {
             role: "user",
             content:
               `상담 유형: ${typeLabel}\n` +
-              `상담 시간: ${duration > 0 ? `${duration}분` : "미기재"}\n\n` +
-              `상담사 메모:\n${memo}`,
+              `소요 시간: ${duration > 0 ? `${duration}분` : "미기재"}\n\n` +
+              `뷰티 전문가 메모:\n${memo}`,
           },
         ],
       }),

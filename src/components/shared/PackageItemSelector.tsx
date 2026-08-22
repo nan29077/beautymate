@@ -61,7 +61,7 @@ export default function PackageItemSelector({ selected, onChange }: Props) {
       const res = await fetch(`/api/products/for-package?${params}`);
       const data = await res.json();
       if (!res.ok) {
-        setFetchError(data.error || "상담상품 목록을 불러오지 못했습니다.");
+        setFetchError(data.error || "뷰티 서비스 목록을 불러오지 못했습니다.");
         setProducts([]);
         setCategories([]);
         setBrands([]);
@@ -71,7 +71,7 @@ export default function PackageItemSelector({ selected, onChange }: Props) {
       setCategories(data.categories || []);
       setBrands(data.brands || []);
     } catch {
-      setFetchError("상담상품 목록을 불러오는 중 오류가 발생했습니다.");
+      setFetchError("뷰티 서비스 목록을 불러오는 중 오류가 발생했습니다.");
       setProducts([]);
     } finally {
       setLoading(false);
@@ -114,12 +114,12 @@ export default function PackageItemSelector({ selected, onChange }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* 선택된 구성 상담상품 */}
+      {/* 선택된 구성 뷰티 서비스 */}
       {selected.length > 0 && (
         <div className="bg-brand-50 rounded-xl p-4 border border-brand-200">
           <div className="flex items-center justify-between mb-3">
             <p className="text-sm font-bold text-gray-800">
-              선택된 구성 상담상품 ({selected.length}개)
+              선택된 구성 뷰티 서비스 ({selected.length}개)
             </p>
             <p className="text-xs text-gray-500">
               단가 합계: <span className="font-bold text-brand-600">{formatPrice(selectedTotal)}원</span>
@@ -167,7 +167,7 @@ export default function PackageItemSelector({ selected, onChange }: Props) {
 
       {selected.length < 2 && (
         <p className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg">
-          ⚠ 구성 상담상품을 최소 2개 이상 선택해야 합니다.
+          ⚠ 구성 뷰티 서비스를 최소 2개 이상 선택해야 합니다.
         </p>
       )}
 
@@ -177,7 +177,7 @@ export default function PackageItemSelector({ selected, onChange }: Props) {
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="상담상품명 검색"
+            placeholder="뷰티 서비스명 검색"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400"
@@ -212,7 +212,7 @@ export default function PackageItemSelector({ selected, onChange }: Props) {
       </div>
 
       <div className="flex items-center justify-between">
-        <p className="text-xs text-gray-400">총 {filteredProducts.length}개 상담상품</p>
+        <p className="text-xs text-gray-400">총 {filteredProducts.length}개 뷰티 서비스</p>
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-400">정렬:</span>
           <button
@@ -232,9 +232,9 @@ export default function PackageItemSelector({ selected, onChange }: Props) {
         </div>
       </div>
 
-      {/* 상담상품 목록 */}
+      {/* 뷰티 서비스 목록 */}
       {loading ? (
-        <div className="py-10 text-center text-sm text-gray-400">상담상품 불러오는 중...</div>
+        <div className="py-10 text-center text-sm text-gray-400">뷰티 서비스 불러오는 중...</div>
       ) : fetchError ? (
         <div className="py-10 text-center text-sm text-red-500 bg-red-50 rounded-xl px-4">
           <Star size={32} className="mx-auto mb-2 opacity-30" />
@@ -243,7 +243,7 @@ export default function PackageItemSelector({ selected, onChange }: Props) {
       ) : filteredProducts.length === 0 ? (
         <div className="py-10 text-center text-sm text-gray-400">
           <Star size={32} className="mx-auto mb-2 opacity-30" />
-          조건에 맞는 상담상품이 없습니다.
+          조건에 맞는 뷰티 서비스가 없습니다.
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto pr-1">

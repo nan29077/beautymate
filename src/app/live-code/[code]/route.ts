@@ -3,13 +3,13 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// 상담사 대시보드의 "내 라이브 코드"(= SellerProfile.slug)로 진입했을 때,
+// 뷰티 전문가 대시보드의 "내 라이브 코드"(= SellerProfile.slug)로 진입했을 때,
 // 라이브 방송 여부에 따라 목적지를 서버에서 판단해 리다이렉트한다.
 //
 // 우선순위:
-//   1순위) 라이브 상담 실제 방송 중(status="LIVE") → 라이브 시청 페이지 /live/[shareCode]
-//   2순위) 점집관리 "라이브 표시 설정" ON(isManualLive) + 라이브 연동 링크(liveLink) → 외부 링크
-//   방송 중 아님) 최근 라이브 시청 페이지(방송 종료/예정 안내 표시) → 없으면 점집으로 폴백
+//   1순위) 라이브 뷰티 실제 방송 중(status="LIVE") → 라이브 시청 페이지 /live/[shareCode]
+//   2순위) 뷰티샵관리 "라이브 표시 설정" ON(isManualLive) + 라이브 연동 링크(liveLink) → 외부 링크
+//   방송 중 아님) 최근 라이브 시청 페이지(방송 종료/예정 안내 표시) → 없으면 뷰티샵으로 폴백
 export async function GET(req: NextRequest, { params }: { params: { code: string } }) {
   const origin = new URL(req.url).origin;
   const code = decodeURIComponent(params.code || "").trim();
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest, { params }: { params: { code: string
     },
   });
 
-  // 상담사를 찾지 못하면 라이브 검색 페이지로 (코드로 재검색 가능)
+  // 뷰티 전문가를 찾지 못하면 라이브 검색 페이지로 (코드로 재검색 가능)
   if (!seller) {
     return NextResponse.redirect(`${origin}/live?q=${encodeURIComponent(code)}`);
   }
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest, { params }: { params: { code: string
   const streams = seller.liveStreams;
   const activeShareCode = streams.find((s) => s.status === "LIVE")?.shareCode ?? null;
 
-  // 1순위: 라이브 상담 실제 방송 중 → 라이브 시청 페이지
+  // 1순위: 라이브 뷰티 실제 방송 중 → 라이브 시청 페이지
   if (activeShareCode) {
     return NextResponse.redirect(`${origin}/live/${activeShareCode}`);
   }
@@ -60,6 +60,6 @@ export async function GET(req: NextRequest, { params }: { params: { code: string
     return NextResponse.redirect(`${origin}/live/${latestShareCode}`);
   }
 
-  // 라이브 이력이 전혀 없으면 점집으로 폴백
+  // 라이브 이력이 전혀 없으면 뷰티샵으로 폴백
   return NextResponse.redirect(`${origin}/shop/${seller.slug}`);
 }

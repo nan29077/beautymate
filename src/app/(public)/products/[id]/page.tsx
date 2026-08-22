@@ -30,7 +30,7 @@ export default async function ProductDetailPage({
   // Next.js 14.2+ 에서 params는 Promise일 수 있음
   const resolvedParams = await Promise.resolve(params);
   const resolvedSearchParams = searchParams ? await Promise.resolve(searchParams) : {};
-  // 점집에서 진입한 경우(?ref=상담사slug) 뒤로가기를 해당 점집 메인으로 연결
+  // 뷰티샵에서 진입한 경우(?ref=뷰티 전문가slug) 뒤로가기를 해당 뷰티샵 메인으로 연결
   const refSlug = typeof resolvedSearchParams.ref === "string" ? resolvedSearchParams.ref : null;
   const backHref = refSlug ? `/shop/${refSlug}` : "/";
   // 라이브 시청화면(?from=live)에서 진입한 경우에만 뒤로가기 버튼 숨김
@@ -38,7 +38,7 @@ export default async function ProductDetailPage({
   // 라이브 팝업(iframe, ?embedded=true) 또는 라이브 진입 시 상단 헤더 전체 숨김
   const embedded = resolvedSearchParams.embedded === "true";
   const hideChrome = fromLive || embedded;
-  // 라이브에서 진입 시 URL에 상담사ID 포함 → 점집 미등록 상담상품도 구매 가능하도록 폴백
+  // 라이브에서 진입 시 URL에 뷰티 전문가ID 포함 → 뷰티샵 미등록 뷰티 서비스도 구매 가능하도록 폴백
   const sellerIdFromUrl = typeof resolvedSearchParams.sellerId === "string" ? resolvedSearchParams.sellerId : null;
   const id = resolvedParams.id;
   // id가 유효한지 먼저 확인
@@ -95,14 +95,14 @@ export default async function ProductDetailPage({
     ? product.reviews.reduce((sum, r) => sum + r.rating, 0) / product.reviews.length
     : 0;
 
-  // 라이브에서 진입 시 sellerIdFromUrl을 최우선 적용 (상담사 미등록 상담상품도 구매 가능하도록)
+  // 라이브에서 진입 시 sellerIdFromUrl을 최우선 적용 (뷰티 전문가 미등록 뷰티 서비스도 구매 가능하도록)
   const defaultSellerId = sellerIdFromUrl
     || product.campaigns[0]?.sellerId
     || product.sellerProducts[0]?.sellerId
     || null;
 
   // Serialize campaign data to plain objects.
-  // 단체 상담 기능 비활성 기간에는 캠페인 진입을 모두 차단해 일반 상담상품처럼만 노출.
+  // 공동 프로모션 기능 비활성 기간에는 캠페인 진입을 모두 차단해 일반 뷰티 서비스처럼만 노출.
   const campaigns = FEATURE_GROUP_BUY
     ? product.campaigns.map(c => ({
         id: c.id,
@@ -146,7 +146,7 @@ export default async function ProductDetailPage({
     },
   }));
 
-  // refSlug 또는 sellerIdFromUrl 기준으로 상담사 판매가 결정
+  // refSlug 또는 sellerIdFromUrl 기준으로 뷰티 전문가 판매가 결정
   const refSellerProduct = refSlug
     ? sellerProducts.find(sp => sp.seller.slug === refSlug)
     : sellerIdFromUrl
@@ -246,7 +246,7 @@ export default async function ProductDetailPage({
           <div className="px-4 py-4">
             <div className="flex items-center gap-2 mb-3">
               <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-              <h2 className="text-[15px] font-bold text-gray-900">단체 상담</h2>
+              <h2 className="text-[15px] font-bold text-gray-900">공동 프로모션</h2>
             </div>
             <div className="space-y-2">
               {campaigns.map((c) => (
@@ -307,7 +307,7 @@ export default async function ProductDetailPage({
       {sellerProducts.length > 0 && (
         <>
           <div className="px-4 py-4">
-            <h2 className="text-[15px] font-bold text-gray-900 mb-3">판매 상담사</h2>
+            <h2 className="text-[15px] font-bold text-gray-900 mb-3">판매 뷰티 전문가</h2>
             <div className="space-y-2">
               {sellerProducts.map((sp) => (
                 <Link

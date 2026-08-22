@@ -7,7 +7,7 @@ import { useAppDialog } from "@/components/shared/AppDialog";
 import SavedPopup from "@/components/shared/SavedPopup";
 import Pagination, { usePagination } from "@/components/shared/Pagination";
 import SafeImage from "@/components/shared/SafeImage";
-import { pickSajuAvatar } from "@/lib/defaults";
+import { pickBeautyMateAvatar } from "@/lib/defaults";
 
 interface SellerRate {
   id: string; shopName: string; shopLogo: string | null; slug: string;
@@ -83,7 +83,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
   };
 
   const handleBulkApply = async () => {
-    if (selectedIds.size === 0) { appAlert("상담사를 선택하세요"); return; }
+    if (selectedIds.size === 0) { appAlert("뷰티 전문가를 선택하세요"); return; }
     setBulkSaving(true);
     try {
       for (const id of selectedIds) {
@@ -97,7 +97,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
           body: JSON.stringify({ sellerId: id, ...newValues }),
         });
       }
-      appAlert(`${selectedIds.size}명의 상담사에게 할인율이 적용되었습니다.`);
+      appAlert(`${selectedIds.size}명의 뷰티 전문가에게 할인율이 적용되었습니다.`);
       setSelectedIds(new Set());
       setBulkValues({ referralCommissionRate: "", referralDiscountRate: "", pickDiscountRate: "" });
       window.location.reload();
@@ -117,7 +117,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
           <Icon name="Settings" size={20} className="text-brand-600" />
           <h1 className="text-xl font-bold text-gray-900">고객 추천·할인율 설정</h1>
         </div>
-        <p className="text-sm text-gray-500">상담사별 고객 추천 혜택과 채널 인증 할인율을 설정합니다</p>
+        <p className="text-sm text-gray-500">뷰티 전문가별 고객 추천 혜택과 채널 인증 할인율을 설정합니다</p>
       </div>
 
       {/* ★ 상세 설명 가이드 토글 */}
@@ -147,10 +147,10 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
             </div>
             <div className="bg-brand-50 rounded-xl p-4 mb-3">
               <p className="text-xs text-gray-700 leading-relaxed">
-                <b>정의:</b> 인플루언서가 자신의 추천 코드로 가입한 회원이 상담상품을 구매할 때, 해당 인플루언서에게 지급되는 수수료율입니다.
+                <b>정의:</b> 인플루언서가 자신의 추천 코드로 가입한 회원이 뷰티 서비스를 구매할 때, 해당 인플루언서에게 지급되는 수수료율입니다.
               </p>
               <p className="text-xs text-gray-600 leading-relaxed mt-2">
-                <b>계산:</b> 추천 회원이 100,000원 상담상품 구매 시 → 100,000원 × 3% = <b className="text-brand-600">3,000원</b>이 인플루언서에게 적립됩니다.
+                <b>계산:</b> 추천 회원이 100,000원 뷰티 서비스 구매 시 → 100,000원 × 3% = <b className="text-brand-600">3,000원</b>이 인플루언서에게 적립됩니다.
               </p>
             </div>
             {/* 예시 플로우 */}
@@ -162,7 +162,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="InviteFriend" size={10} className="text-blue-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>1단계:</b> 상담사 "하늘"이 추천 코드 <span className="font-mono bg-white px-1 py-0.5 rounded text-brand-600 text-[10px]">HANEUL2024</span>를 팬에게 공유
+                    <b>1단계:</b> 뷰티 전문가 "하늘"이 추천 코드 <span className="font-mono bg-white px-1 py-0.5 rounded text-brand-600 text-[10px]">HANEUL2024</span>를 팬에게 공유
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -170,7 +170,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="InviteFriend" size={10} className="text-green-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>2단계:</b> 팬 "김민수"가 추천 코드를 입력하여 사주나라에 회원가입 (회원가입 시 <b className="text-purple-600">추천인 할인 5%</b> 즉시 적용)
+                    <b>2단계:</b> 팬 "김민수"가 추천 코드를 입력하여 뷰티메이트에 회원가입 (회원가입 시 <b className="text-purple-600">추천인 할인 5%</b> 즉시 적용)
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -178,7 +178,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="Cart" size={10} className="text-emerald-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>3단계:</b> 김민수가 "실크 블라우스" 100,000원 상담상품 구매 → 추천인 할인 5% 적용 = <b>95,000원</b> 결제
+                    <b>3단계:</b> 김민수가 "실크 블라우스" 100,000원 뷰티 서비스 구매 → 추천인 할인 5% 적용 = <b>95,000원</b> 결제
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -217,7 +217,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                 <b>정의:</b> 인플루언서의 추천 코드로 가입한 신규 회원이 받는 할인율입니다. 가입 즉시 적용되며, 이후 모든 구매에 적용됩니다.
               </p>
               <p className="text-xs text-gray-600 leading-relaxed mt-2">
-                <b>고객 혜택:</b> 100,000원 상담상품을 <b className="text-purple-600">5% 할인된 95,000원</b>에 구매 가능합니다.
+                <b>고객 혜택:</b> 100,000원 뷰티 서비스를 <b className="text-purple-600">5% 할인된 95,000원</b>에 구매 가능합니다.
               </p>
             </div>
             <div className="bg-gray-50 rounded-xl p-4">
@@ -225,7 +225,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
               <div className="flex items-center gap-2 text-[11px] text-gray-500 flex-wrap">
                 <span className="bg-white px-2 py-1 rounded-lg border border-gray-200">추천 코드 입력하여 가입</span>
                 <Icon name="ArrowRight" size={12} className="text-gray-300" />
-                <span className="bg-white px-2 py-1 rounded-lg border border-gray-200">BuyerProfile에 추천상담사 연결</span>
+                <span className="bg-white px-2 py-1 rounded-lg border border-gray-200">BuyerProfile에 추천뷰티 전문가 연결</span>
                 <Icon name="ArrowRight" size={12} className="text-gray-300" />
                 <span className="bg-purple-100 px-2 py-1 rounded-lg border border-purple-200 text-purple-700 font-medium">구매 시 자동 할인 적용</span>
               </div>
@@ -250,10 +250,10 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
             </div>
             <div className="bg-pink-50 rounded-xl p-4 mb-3">
               <p className="text-xs text-gray-700 leading-relaxed">
-                <b>정의:</b> 고객이 특정 상담사를 "단골"(팔로우)로 등록하고, SNS 채널 구독 인증을 완료한 경우 적용되는 추가 할인율입니다.
+                <b>정의:</b> 고객이 특정 뷰티 전문가를 "단골"(팔로우)로 등록하고, SNS 채널 구독 인증을 완료한 경우 적용되는 추가 할인율입니다.
               </p>
               <p className="text-xs text-gray-600 leading-relaxed mt-2">
-                <b>조건:</b> ① 상담사 단골 설정(팔로우) 완료 <b>+</b> ② 해당 상담사의 유튜브/인스타 등 SNS 채널 구독 인증 완료 → 두 조건 모두 충족 시 할인 적용
+                <b>조건:</b> ① 뷰티 전문가 단골 설정(팔로우) 완료 <b>+</b> ② 해당 뷰티 전문가의 유튜브/인스타 등 SNS 채널 구독 인증 완료 → 두 조건 모두 충족 시 할인 적용
               </p>
             </div>
             <div className="bg-gray-50 rounded-xl p-4">
@@ -264,7 +264,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="Wishlist" size={10} className="text-pink-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>1단계:</b> 고객 "김민수"가 상담사 "수아 뷰티랩"을 <b>단골</b>(팔로우)로 등록 → SellerFollower 레코드 생성
+                    <b>1단계:</b> 고객 "김민수"가 뷰티 전문가 "수아 뷰티랩"을 <b>단골</b>(팔로우)로 등록 → SellerFollower 레코드 생성
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -272,13 +272,13 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="Cart" size={10} className="text-emerald-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>2단계:</b> 김민수가 수아 뷰티랩의 상담상품 50,000원 예약 시 → 3% 할인 = <b className="text-pink-600">1,500원 할인</b> → <b>48,500원</b> 결제
+                    <b>2단계:</b> 김민수가 수아 뷰티랩의 뷰티 서비스 50,000원 예약 시 → 3% 할인 = <b className="text-pink-600">1,500원 할인</b> → <b>48,500원</b> 결제
                   </div>
                 </div>
               </div>
               <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
                 <p className="text-[10px] text-blue-700">
-                  <b>안내:</b> 단골+채널인증 할인은 <b>해당 상담사의 상담상품 구매 시에만</b> 적용됩니다. 다른 상담사의 상담상품에는 적용되지 않습니다.
+                  <b>안내:</b> 단골+채널인증 할인은 <b>해당 뷰티 전문가의 뷰티 서비스 구매 시에만</b> 적용됩니다. 다른 뷰티 전문가의 뷰티 서비스에는 적용되지 않습니다.
                 </p>
               </div>
             </div>
@@ -288,10 +288,10 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
           <div className="p-5 bg-gradient-to-br from-gray-50 to-brand-50 border-t border-gray-100">
             <h3 className="flex items-center gap-1.5 text-sm font-bold text-gray-900 mb-3"><Icon name="Revenue" size={15} className="text-moon-700" /> 종합 수익 분배 예시</h3>
             <div className="bg-white rounded-xl p-4 border border-gray-100">
-              <p className="text-xs text-gray-500 mb-3">상담상품가격 100,000원 | 상담사 기본 수수료 10% | 추천인 커미션 3% | 추천인 할인 5%</p>
+              <p className="text-xs text-gray-500 mb-3">뷰티 서비스가격 100,000원 | 뷰티 전문가 기본 수수료 10% | 추천인 커미션 3% | 추천인 할인 5%</p>
               <div className="space-y-1.5 text-[11px]">
                 <div className="flex justify-between py-1.5 border-b border-gray-50">
-                  <span className="text-gray-600">상담상품 정가</span>
+                  <span className="text-gray-600">뷰티 서비스 정가</span>
                   <span className="font-bold">100,000원</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-gray-50">
@@ -303,7 +303,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                   <span className="font-bold">95,000원</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-gray-50">
-                  <span className="text-blue-600">상담사 기본 커미션 (10%)</span>
+                  <span className="text-blue-600">뷰티 전문가 기본 커미션 (10%)</span>
                   <span className="font-bold text-blue-600">10,000원</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-gray-50">
@@ -329,7 +329,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
         <div className="relative flex-1">
           <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="상담사명 검색..." className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white" />
+            placeholder="뷰티 전문가명 검색..." className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white" />
           {searchQuery && <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><X size={14} /></button>}
         </div>
         <button onClick={toggleSelectAll}
@@ -391,7 +391,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                   {isSelected ? <Icon name="Check" size={18} className="text-brand-600" /> : <Square size={18} className="text-gray-300" />}
                 </button>
                 <div className="w-10 h-10 rounded-full bg-gray-100 overflow-hidden flex-shrink-0">
-                  <SafeImage src={seller.shopLogo} alt={seller.shopName} width={40} height={40} placeholder={pickSajuAvatar(seller.id)} fallbackText={seller.shopName.charAt(0)} className="w-full h-full object-cover" />
+                  <SafeImage src={seller.shopLogo} alt={seller.shopName} width={40} height={40} placeholder={pickBeautyMateAvatar(seller.id)} fallbackText={seller.shopName.charAt(0)} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">

@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
         where: { id: { in: productIds } },
         data: { isApproved: true },
       });
-      return NextResponse.json({ success: true, count: res.count, message: `${res.count}개 상담상품 승인됨` });
+      return NextResponse.json({ success: true, count: res.count, message: `${res.count}개 뷰티 서비스 승인됨` });
     }
 
     if (action === "approve_shop_product" && shopProductId) {
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
         where: { id: shopProductId },
         data: { isApproved: true, isActive: true, rejectionReason: null },
       });
-      return NextResponse.json({ success: true, message: "상담사 상담상품 승인됨" });
+      return NextResponse.json({ success: true, message: "뷰티 전문가 뷰티 서비스 승인됨" });
     }
 
     if (action === "reject_shop_product" && shopProductId) {
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         where: { id: shopProductId },
         data: { isApproved: false, isActive: false, rejectionReason: reason || "사유 미입력" },
       });
-      return NextResponse.json({ success: true, message: "상담사 상담상품 반려됨" });
+      return NextResponse.json({ success: true, message: "뷰티 전문가 뷰티 서비스 반려됨" });
     }
 
     if (action === "approve_product" && productId) {
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         where: { id: productId },
         data: updateData,
       });
-      return NextResponse.json({ success: true, message: "상담상품 승인됨" });
+      return NextResponse.json({ success: true, message: "뷰티 서비스 승인됨" });
     }
 
     if (action === "reject_product" && productId) {
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
         prisma.reservationItem.deleteMany({ where: { productId } }),
         prisma.product.delete({ where: { id: productId } }),
       ]);
-      return NextResponse.json({ success: true, message: "상담상품이 반려되었습니다" });
+      return NextResponse.json({ success: true, message: "뷰티 서비스가 반려되었습니다" });
     }
 
     if (action === "link_brand" && productId && brandId) {

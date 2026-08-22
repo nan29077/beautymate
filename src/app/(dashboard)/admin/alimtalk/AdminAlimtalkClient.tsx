@@ -84,7 +84,7 @@ interface TemplateInfo {
 
 const PURPOSE_LABELS: Record<string, string> = {
   LIVE_START: "라이브 방송시작 알림",
-  ORDER_PLACED: "예약접수 알림(상담사)",
+  ORDER_PLACED: "예약접수 알림(뷰티 전문가)",
   RESERVATION_CONFIRMED: "예약 확정 안내",
   SIGNUP_WELCOME: "회원가입 환영",
   PASSWORD_RESET: "임시 비밀번호 문자",
@@ -137,7 +137,7 @@ export default function AdminAlimtalkClient() {
   const [totals, setTotals] = useState<Totals>({ recipientCount: 0, acceptedCount: 0, failCount: 0, cost: 0 });
   const [loading, setLoading] = useState(true);
 
-  // 기간 · 상담사 필터
+  // 기간 · 뷰티 전문가 필터
   const [preset, setPreset] = useState<PeriodPreset>("ALL");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -207,7 +207,7 @@ export default function AdminAlimtalkClient() {
     fetchTemplates();
   }, []);
 
-  // 상담사 검색은 이미 받아온 집계 위에서 필터링 (기간 내 발송이 있는 상담사만 집계에 포함됨)
+  // 뷰티 전문가 검색은 이미 받아온 집계 위에서 필터링 (기간 내 발송이 있는 뷰티 전문가만 집계에 포함됨)
   const visibleSellers = useMemo(() => {
     const q = sellerQuery.trim().toLowerCase();
     if (!q) return sellers;
@@ -444,7 +444,7 @@ export default function AdminAlimtalkClient() {
         </div>
         {selectedSeller && (
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-sm text-gray-500">선택한 상담사</span>
+            <span className="text-sm text-gray-500">선택한 뷰티 전문가</span>
             <span className="px-2.5 py-1 rounded-full bg-yellow-50 text-yellow-800 text-xs font-semibold">
               {selectedSeller.shopName}
               {selectedSeller.sellerName ? ` · ${selectedSeller.sellerName}` : ""}
@@ -465,7 +465,7 @@ export default function AdminAlimtalkClient() {
         </div>
       ) : (
         <>
-          {/* 요약 통계 — 선택 기간 전체 (상담사 선택과 무관) */}
+          {/* 요약 통계 — 선택 기간 전체 (뷰티 전문가 선택과 무관) */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-white rounded-lg shadow-sm p-5">
               <p className="text-sm text-gray-500">총 발송 대상</p>
@@ -493,20 +493,20 @@ export default function AdminAlimtalkClient() {
             </div>
           </div>
 
-          {/* 상담사별 사용량 */}
+          {/* 뷰티 전문가별 사용량 */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
             <div className="px-5 py-4 border-b border-gray-100 flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 className="font-semibold text-gray-800">상담사별 발송 현황</h2>
+                <h2 className="font-semibold text-gray-800">뷰티 전문가별 발송 현황</h2>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  행을 클릭하면 해당 상담사의 발송 내역만 볼 수 있습니다. 비밀번호 문자 등 상담사와 무관한 발송은 &quot;시스템 발송&quot;으로 집계됩니다
+                  행을 클릭하면 해당 뷰티 전문가의 발송 내역만 볼 수 있습니다. 비밀번호 문자 등 뷰티 전문가와 무관한 발송은 &quot;시스템 발송&quot;으로 집계됩니다
                 </p>
               </div>
               <input
                 type="search"
                 value={sellerQuery}
                 onChange={(e) => setSellerQuery(e.target.value)}
-                placeholder="상담사명 · 점집명 검색"
+                placeholder="뷰티 전문가명 · 뷰티샵명 검색"
                 className="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 sm:min-w-[200px]"
               />
             </div>
@@ -519,8 +519,8 @@ export default function AdminAlimtalkClient() {
                 <table className="w-full text-sm">
                   <thead className="bg-gray-50">
                     <tr className="text-left text-gray-500">
-                      <th className="px-5 py-3 font-medium">상담사명</th>
-                      <th className="px-5 py-3 font-medium">점집명</th>
+                      <th className="px-5 py-3 font-medium">뷰티 전문가명</th>
+                      <th className="px-5 py-3 font-medium">뷰티샵명</th>
                       <th className="px-5 py-3 font-medium">알림톡</th>
                       <th className="px-5 py-3 font-medium">문자</th>
                       <th className="px-5 py-3 font-medium">발송 횟수</th>
@@ -567,14 +567,14 @@ export default function AdminAlimtalkClient() {
             )}
           </div>
 
-          {/* 선택한 상담사의 발송 사유별 내역 */}
+          {/* 선택한 뷰티 전문가의 발송 사유별 내역 */}
           {selectedSeller && purposeBreakdown.length > 0 && (
             <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
               <div className="px-5 py-4 border-b border-gray-100">
                 <h2 className="font-semibold text-gray-800">
                   {selectedSeller.shopName} — 발송 사유별 집계
                 </h2>
-                <p className="text-xs text-gray-500 mt-0.5">선택한 기간 내 이 상담사의 발송을 사유별로 나눈 값입니다</p>
+                <p className="text-xs text-gray-500 mt-0.5">선택한 기간 내 이 뷰티 전문가의 발송을 사유별로 나눈 값입니다</p>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -636,7 +636,7 @@ export default function AdminAlimtalkClient() {
                   <thead className="bg-gray-50">
                     <tr className="text-left text-gray-500">
                       <th className="px-5 py-3 font-medium">일시</th>
-                      <th className="px-5 py-3 font-medium">상담사/점집</th>
+                      <th className="px-5 py-3 font-medium">뷰티 전문가/뷰티샵</th>
                       <th className="px-5 py-3 font-medium">발송 사유</th>
                       <th className="px-5 py-3 font-medium">유형</th>
                       <th className="px-5 py-3 font-medium">대상</th>

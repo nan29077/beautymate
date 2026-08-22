@@ -18,14 +18,13 @@ export const viewport: Viewport = {
 };
 
 const baseMetadata: Metadata = {
-  title: "사주나라 - 라이브 점사 예약 플랫폼",
+  title: "뷰티메이트 - 나에게 맞는 뷰티 전문가를 만나는 곳",
   description:
-    "방송하는 동안 예약이 알아서 들어옵니다. 유튜브·SNS 사주·신점·타로 상담사를 위한 예약 커머스",
-  keywords: ["사주나라", "사주", "신점", "타로", "궁합", "작명", "라이브 상담", "점사 예약"],
+    "스킨케어, 메이크업, 헤어, 네일, 퍼스널 컬러까지 검증된 뷰티 전문가를 발견하고 라이브로 소통하며 간편하게 예약하세요.",
+  keywords: ["뷰티메이트", "뷰티 전문가", "뷰티샵", "스킨케어", "메이크업", "헤어", "네일", "퍼스널 컬러", "뷰티 예약"],
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "16x16 32x32 48x48", type: "image/x-icon" },
       { url: "/favicon.png", sizes: "64x64", type: "image/png" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
@@ -33,11 +32,11 @@ const baseMetadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   openGraph: {
-    title: "사주나라 - 라이브 점사 예약 플랫폼",
+    title: "뷰티메이트 - 나에게 맞는 뷰티 전문가를 만나는 곳",
     description:
-      "방송하는 동안 예약이 알아서 들어옵니다. 유튜브·SNS 사주·신점·타로 상담사를 위한 예약 커머스",
+      "검증된 뷰티 전문가를 발견하고 라이브로 소통하며 간편하게 예약하세요.",
     url: "/",
-    siteName: "사주나라",
+    siteName: "뷰티메이트",
     locale: "ko_KR",
     type: "website",
     images: [
@@ -45,15 +44,15 @@ const baseMetadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "사주나라 - 라이브 점사 예약 플랫폼",
+        alt: "뷰티메이트 - 나에게 맞는 뷰티 전문가를 만나는 곳",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "사주나라 - 라이브 점사 예약 플랫폼",
+    title: "뷰티메이트 - 나에게 맞는 뷰티 전문가를 만나는 곳",
     description:
-      "방송하는 동안 예약이 알아서 들어옵니다. 유튜브·SNS 사주·신점·타로 상담사를 위한 예약 커머스",
+      "검증된 뷰티 전문가를 발견하고 라이브로 소통하며 간편하게 예약하세요.",
     images: ["/og-image.png"],
   },
 };
@@ -69,7 +68,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       ...baseMetadata.openGraph,
       url: pageUrl,
-      images: [{ url: imageUrl, width: 1200, height: 630, alt: "사주나라 - 라이브 점사 예약 플랫폼", type: "image/png" }],
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: "뷰티메이트 - 나에게 맞는 뷰티 전문가를 만나는 곳", type: "image/png" }],
     },
     twitter: {
       ...baseMetadata.twitter,

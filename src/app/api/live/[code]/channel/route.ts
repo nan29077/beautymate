@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sellerProfileImage } from "@/lib/sellerLive";
 
-// GET: 라이브 채널 페이지 데이터 (방송 상태, OFF 썸네일, 예약 목록, 상담상품, 공지 수)
+// GET: 라이브 채널 페이지 데이터 (방송 상태, OFF 썸네일, 예약 목록, 뷰티 서비스, 공지 수)
 export async function GET(
   _req: NextRequest,
   { params }: { params: { code: string } }
@@ -49,7 +49,7 @@ export async function GET(
       return NextResponse.json({ error: "라이브 채널을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // 같은 상담사의 예약된 라이브 목록 (현재 라이브 포함)
+    // 같은 뷰티 전문가의 예약된 라이브 목록 (현재 라이브 포함)
     const scheduledLives = await prisma.liveStream.findMany({
       where: { sellerId: live.sellerId, status: "SCHEDULED" },
       select: { id: true, title: true, scheduledAt: true, shareCode: true, thumbnailImage: true },
@@ -69,7 +69,7 @@ export async function GET(
       // DB 컬럼 미반영 시 null 반환 (안전 처리)
     }
 
-    // 현재 라이브가 LIVE 상태가 아닐 때, 같은 상담사의 활성(LIVE) 방송이 새로 시작됐는지 확인
+    // 현재 라이브가 LIVE 상태가 아닐 때, 같은 뷰티 전문가의 활성(LIVE) 방송이 새로 시작됐는지 확인
     // → 클라이언트에서 새 shareCode로 리다이렉트하는 데 사용
     let activeShareCode: string | null = null;
     if (live.status !== "LIVE") {

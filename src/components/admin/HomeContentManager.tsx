@@ -13,7 +13,7 @@ type BenefitItem = { iconType: string; title: string; desc: string };
 
 const AVATARS = Array.from(
   { length: 30 },
-  (_, index) => `/avatars/saju/saju-avatar-${String(index + 1).padStart(2, "0")}.png`,
+  () => "/avatars/beautymate/default.svg",
 );
 
 const ICON_OPTIONS = [
@@ -59,15 +59,15 @@ export default function HomeContentManager({
   const [savingStories, setSavingStories] = useState(false);
 
   const defaultBenefitStats: BenefitStat[] = initialBenefits?.stats ?? [
-    { value: "68%", label: "단골 재구매율", sub: "단골 상담사 기준" },
+    { value: "68%", label: "단골 재구매율", sub: "단골 뷰티 전문가 기준" },
     { value: "3.2x", label: "라이브 평균 체류", sub: "일반 대비" },
-    { value: "1,200+", label: "활동 상담사", sub: "누적" },
+    { value: "1,200+", label: "활동 뷰티 전문가", sub: "누적" },
     { value: "4,500+", label: "월 라이브 방송", sub: "플랫폼 합계" },
   ];
   const defaultBenefitItems: BenefitItem[] = initialBenefits?.items ?? [
     { iconType: "heart", title: "단골로 충성 고객", desc: "한 번 단골이 된 팬이 다시 찾아오는, 관계 기반의 반복 구매." },
     { iconType: "radio", title: "라이브로 실시간 소통", desc: "방송 중 바로 묻고 바로 사는, 몰입도 높은 쿼핑 경험." },
-    { iconType: "shield", title: "정산·상담 방식 걱정 없이", desc: "복잡한 운영은 플랫폼이, 상담사는 판매와 소통에만 집중." },
+    { iconType: "shield", title: "정산·진행 방식 걱정 없이", desc: "복잡한 운영은 플랫폼이, 뷰티 전문가는 판매와 소통에만 집중." },
   ];
 
   const [benefitStats, setBenefitStats] = useState<BenefitStat[]>(defaultBenefitStats);
@@ -118,7 +118,7 @@ export default function HomeContentManager({
       <section className="bg-white rounded-xl border border-gray-100 p-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
-            <Quote size={15} className="text-brand-600" /> 사주나라로 성공한 상담사
+            <Quote size={15} className="text-brand-600" /> 뷰티메이트로 성공한 뷰티 전문가
           </h2>
           <button
             onClick={() => setStories((p) => [...p, { name: "", quote: "", metric: "", avatar: AVATARS[0] }])}
@@ -132,12 +132,12 @@ export default function HomeContentManager({
             <div key={i} className="rounded-lg border border-gray-100 p-3 space-y-2">
               <div className="flex items-center gap-2">
                 <input value={s.name} onChange={(e) => updateStory(i, "name", e.target.value)}
-                  placeholder="이름 · 분야 (예: 유나 · 뷰티 상담사)" className={inputCls} />
+                  placeholder="이름 · 분야 (예: 유나 · 뷰티 뷰티 전문가)" className={inputCls} />
                 <button onClick={() => setStories((p) => p.filter((_, idx) => idx !== i))}
                   className="p-2 text-gray-300 hover:text-red-500" aria-label="삭제"><Icon name="Delete" size={15} /></button>
               </div>
               <textarea value={s.quote} onChange={(e) => updateStory(i, "quote", e.target.value)}
-                placeholder="한마디 (상담사의 후기)" rows={2}
+                placeholder="한마디 (뷰티 전문가의 후기)" rows={2}
                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-400/40 resize-none" />
               <div className="flex items-center gap-2">
                 <input value={s.metric} onChange={(e) => updateStory(i, "metric", e.target.value)}
@@ -154,13 +154,13 @@ export default function HomeContentManager({
           ))}
           {stories.length === 0 && <p className="text-xs text-gray-400 py-2">스토리가 없습니다. 추가해주세요.</p>}
         </div>
-        <SectionSaveButton saving={savingStories} label="성공한 상담사 저장"
-          onClick={() => save(setSavingStories, { section: "stories", stories }, "성공한 상담사 스토리가 저장되었습니다.")} />
+        <SectionSaveButton saving={savingStories} label="성공한 뷰티 전문가 저장"
+          onClick={() => save(setSavingStories, { section: "stories", stories }, "성공한 뷰티 전문가 스토리가 저장되었습니다.")} />
       </section>
 
       <section className="bg-white rounded-xl border border-gray-100 p-4">
         <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5 mb-4">
-          <Sparkles size={15} className="text-brand-600" /> 사주나라로 얻는 것
+          <Sparkles size={15} className="text-brand-600" /> 뷰티메이트로 얻는 것
         </h2>
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
@@ -178,7 +178,7 @@ export default function HomeContentManager({
                 <input value={s.label} onChange={(e) => updateBenefitStat(i, "label", e.target.value)}
                   placeholder="라벨 (예: 단골 재구매율)" className={inputCls} />
                 <input value={s.sub} onChange={(e) => updateBenefitStat(i, "sub", e.target.value)}
-                  placeholder="서브 (예: 단골 상담사 기준)" className={inputCls} />
+                  placeholder="서브 (예: 단골 뷰티 전문가 기준)" className={inputCls} />
                 <button onClick={() => setBenefitStats((p) => p.filter((_, idx) => idx !== i))}
                   className="p-2 text-gray-300 hover:text-red-500" aria-label="삭제"><Icon name="Delete" size={15} /></button>
               </div>
@@ -213,13 +213,13 @@ export default function HomeContentManager({
           </div>
         </div>
         <SectionSaveButton saving={savingBenefits} label="얻는 것 저장"
-          onClick={() => save(setSavingBenefits, { section: "benefits", benefitStats, benefitItems }, "사주나라로 얻는 것이 저장되었습니다.")} />
+          onClick={() => save(setSavingBenefits, { section: "benefits", benefitStats, benefitItems }, "뷰티메이트로 얻는 것이 저장되었습니다.")} />
       </section>
 
       <section className="bg-white rounded-xl border border-gray-100 p-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
-            <Icon name="Chart" size={15} className="text-brand-600" /> 숫자로 보는 사주나라
+            <Icon name="Chart" size={15} className="text-brand-600" /> 숫자로 보는 뷰티메이트
           </h2>
           <button onClick={() => setStats((p) => [...p, { value: "", label: "" }])}
             className="text-xs flex items-center gap-1 text-brand-600 font-medium hover:underline">
@@ -240,7 +240,7 @@ export default function HomeContentManager({
           {stats.length === 0 && <p className="text-xs text-gray-400 py-2">항목이 없습니다. 추가해주세요.</p>}
         </div>
         <SectionSaveButton saving={savingStats} label="숫자 저장"
-          onClick={() => save(setSavingStats, { section: "stats", stats }, "숫자로 보는 사주나라가 저장되었습니다.")} />
+          onClick={() => save(setSavingStats, { section: "stats", stats }, "숫자로 보는 뷰티메이트가 저장되었습니다.")} />
       </section>
 
     </div>

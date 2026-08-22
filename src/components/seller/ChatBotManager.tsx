@@ -6,8 +6,8 @@ import { Bot, Loader2, X, RefreshCw, KeyRound, Eye, EyeOff, ExternalLink } from 
 import HexNumBadge from "@/components/shared/HexNumBadge";
 import { useAppDialog } from "@/components/shared/AppDialog";
 
-// AI YouTube 채팅 봇 관리 (상담사 라이브 관리 → AI 봇 탭)
-// 봇 메시지는 앱 채팅에 발송(isBot). 상담사가 YouTube OAuth 를 연결하고
+// AI YouTube 채팅 봇 관리 (뷰티 전문가 라이브 관리 → AI 봇 탭)
+// 봇 메시지는 앱 채팅에 발송(isBot). 뷰티 전문가가 YouTube OAuth 를 연결하고
 // "YouTube로 전송" 을 켜면 YouTube 라이브 채팅에도 동시 전송된다.
 
 interface KeywordRule { keyword: string; response: string }
@@ -108,28 +108,28 @@ function BotGuideModal({ onClose }: { onClose: () => void }) {
   const FEATURES = [
     { icon: "ChatJoin_icon", name: "자동 인사 메시지", desc: "시청자가 라이브에서 첫 채팅을 남기면 봇이 자동으로 환영 인사를 보내요. 인사 문구는 직접 수정할 수 있어요." },
     { icon: "SnsComment_icon", name: "키워드 자동 응답", desc: "채팅에 등록한 키워드가 포함되면 답변을 자동 발송해요. 앱 채팅과 YouTube 채팅 모두 감지해요." },
-    { icon: "ProductDetail_icon", name: "상담상품 정보 자동 안내", desc: "“3번 상담상품 뭐예요?”, “가격 얼마예요?”, “예약 가능한가요?” 같은 질문에 라이브 상담상품의 이름·특가를 자동 안내해요." },
+    { icon: "ProductDetail_icon", name: "뷰티 서비스 정보 자동 안내", desc: "“3번 뷰티 서비스 뭐예요?”, “가격 얼마예요?”, “예약 가능한가요?” 같은 질문에 라이브 뷰티 서비스의 이름·특가를 자동 안내해요." },
     { icon: "ChatBlock_icon", name: "스팸/욕설 필터", desc: "금지어가 포함된 앱 채팅을 자동 숨김 처리하고 경고를 발송해요. 금지어는 원하는 만큼 등록할 수 있어요." },
-    { icon: "ProductQA_icon", name: "FAQ 자동 응답", desc: "자주 묻는 질문(예: 상담 방식 언제)을 등록하면 해당 문구 감지 시 답변을 자동 발송해요." },
+    { icon: "ProductQA_icon", name: "FAQ 자동 응답", desc: "자주 묻는 질문(예: 진행 방식 언제)을 등록하면 해당 문구 감지 시 답변을 자동 발송해요." },
     { icon: "BuyNow_icon", name: "구매 유도 메시지", desc: "설정한 주기(분)마다 구매 유도 메시지를 자동 발송해 구매 전환을 도와요." },
     { icon: "StreamStats_icon", name: "라이브 통계 공지", desc: "현재 시청자 수·좋아요 수를 주기적으로 공지해 라이브 분위기를 띄워요." },
     { icon: "Coupon_icon", name: "쿠폰 코드 자동 공지", desc: "라이브에 발급된 쿠폰 코드를 주기적으로 공지해요. 쿠폰이 있는 라이브에서만 동작해요." },
   ];
   const KEYWORD_STEPS = [
     "「키워드 자동 응답」 카드의 스위치를 켜세요.",
-    "왼쪽 입력란에 감지할 키워드를 입력하세요. (예: 상담 방식)",
+    "왼쪽 입력란에 감지할 키워드를 입력하세요. (예: 진행 방식)",
     "오른쪽 입력란에 자동 응답 내용을 입력하고 [추가]를 누르세요.",
     "하단의 [AI 봇 설정 저장] 버튼을 눌러야 실제로 적용돼요.",
   ];
   const YT_STEPS = [
     "라이브 생성 시 외부 플랫폼에서 YouTube를 선택하고 라이브 URL을 연결하세요. (방식 A: URL 직접 입력 / 방식 B: 채널 자동 감지)",
     "AI 봇 탭에서 YouTube Data API v3 키를 등록하면 방송 화면과 봇이 YouTube 채팅을 자동으로 읽어와요. (미등록 시 서버 공용 키가 있으면 그 키를 사용)",
-    "YouTube 채팅에서도 키워드·FAQ·상담상품 질문이 감지되면 봇이 답변해요.",
+    "YouTube 채팅에서도 키워드·FAQ·뷰티 서비스 질문이 감지되면 봇이 답변해요.",
     "AI 봇 탭에서 YouTube 채널을 연결(OAuth)하고 「봇 메시지 YouTube로 전송」을 켜면 봇 답변이 YouTube 채팅에도 함께 발송돼요.",
   ];
   const TIPS = [
-    { icon: "BuyNow_icon", title: "구매 유도 키워드 예시", body: "「구매」, 「어디서 사요」, 「살게요」, 「예약」 키워드를 등록하고 “화면의 상담상품 목록에서 바로 구매하실 수 있어요!”라고 응답하게 해보세요." },
-    { icon: "Shipping_icon", title: "상담 방식 FAQ 미리 등록", body: "「상담 방식 언제」 → “결제 후 3~5일 이내 출고됩니다” 처럼 방송마다 반복되는 질문은 FAQ로 등록해 두면 편해요." },
+    { icon: "BuyNow_icon", title: "구매 유도 키워드 예시", body: "「구매」, 「어디서 사요」, 「살게요」, 「예약」 키워드를 등록하고 “화면의 뷰티 서비스 목록에서 바로 구매하실 수 있어요!”라고 응답하게 해보세요." },
+    { icon: "Shipping_icon", title: "진행 방식 FAQ 미리 등록", body: "「진행 방식 언제」 → “결제 후 3~5일 이내 출고됩니다” 처럼 방송마다 반복되는 질문은 FAQ로 등록해 두면 편해요." },
     { icon: "ChatBlock_icon", title: "금지어는 구체적으로", body: "너무 짧은 금지어(한 글자 등)는 정상 채팅까지 숨길 수 있어요. 광고 문구·욕설 등 구체적인 단어로 등록하세요." },
     { icon: "Clock_icon", title: "주기 메시지는 5~10분 추천", body: "구매 유도·쿠폰 공지가 너무 잦으면 도배처럼 느껴질 수 있어요. 5~10분 간격을 권장해요." },
   ];
@@ -142,10 +142,10 @@ function BotGuideModal({ onClose }: { onClose: () => void }) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-amber-100 bg-amber-50 flex-shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-2xl bg-white border border-amber-200 flex items-center justify-center flex-shrink-0">
-              <Icon name="EmojiBee_icon" size={36} />
+              <Icon name="Sparkles" size={36} />
             </div>
             <div>
-              <p className="text-xs font-black text-amber-700">AI 사주봇 가이드</p>
+              <p className="text-xs font-black text-amber-700">AI 뷰티봇 가이드</p>
               <p className="text-[15px] font-bold text-gray-900">사용법 안내</p>
             </div>
           </div>
@@ -158,10 +158,10 @@ function BotGuideModal({ onClose }: { onClose: () => void }) {
         <div className="p-5 space-y-5 overflow-y-auto">
           {/* 봇 동작 방식 */}
           <div className="rounded-2xl border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 p-4 flex items-start gap-3">
-            <Icon name="EmojiHoney_icon" size={26} className="flex-shrink-0" />
+            <Icon name="Sparkles" size={26} className="flex-shrink-0" />
             <p className="text-[12px] text-amber-800 leading-relaxed">
-              AI 사주봇은 <b>라이브 진행 중, 라이브 관리 페이지가 열려 있는 동안</b> 약 20초 간격으로 채팅을 분석해요.
-              사주나라 앱 채팅과 YouTube 채팅(읽기)을 함께 감지하고, 봇 메시지는 <b>봇 배지</b>와 함께 앱 채팅에 표시됩니다.
+              AI 뷰티봇은 <b>라이브 진행 중, 라이브 관리 페이지가 열려 있는 동안</b> 약 20초 간격으로 채팅을 분석해요.
+              뷰티메이트 앱 채팅과 YouTube 채팅(읽기)을 함께 감지하고, 봇 메시지는 <b>봇 배지</b>와 함께 앱 채팅에 표시됩니다.
             </p>
           </div>
 
@@ -260,7 +260,7 @@ function ApiKeyGuideModal({ onClose }: { onClose: () => void }) {
     },
     {
       title: "프로젝트 생성",
-      body: <>상단 프로젝트 선택 메뉴 → <b>새 프로젝트</b>를 클릭하고, 프로젝트 이름(예: sajunara-live)을 입력한 뒤 <b>만들기</b>를 누르세요. 생성 후 상단에서 해당 프로젝트가 선택되어 있는지 확인하세요.</>,
+      body: <>상단 프로젝트 선택 메뉴 → <b>새 프로젝트</b>를 클릭하고, 프로젝트 이름(예: beautymate-live)을 입력한 뒤 <b>만들기</b>를 누르세요. 생성 후 상단에서 해당 프로젝트가 선택되어 있는지 확인하세요.</>,
     },
     {
       title: "YouTube Data API v3 활성화",
@@ -306,7 +306,7 @@ function ApiKeyGuideModal({ onClose }: { onClose: () => void }) {
           <div className="rounded-2xl border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 p-4 flex items-start gap-3">
             <Icon name="YouTube_icon" size={22} className="flex-shrink-0 mt-0.5" />
             <p className="text-[12px] text-amber-800 leading-relaxed">
-              API 키를 등록하면 라이브 방송 화면에서 <b>YouTube 실시간 채팅</b>을 읽어와 사주나라 채팅과 함께 표시하고,
+              API 키를 등록하면 라이브 방송 화면에서 <b>YouTube 실시간 채팅</b>을 읽어와 뷰티메이트 채팅과 함께 표시하고,
               AI 봇의 키워드·FAQ 감지에도 활용돼요. 키는 <b>서버에만 저장</b>되며 시청자에게 노출되지 않아요.
             </p>
           </div>
@@ -476,11 +476,11 @@ export default function ChatBotManager({ onConfigSaved }: { onConfigSaved?: () =
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-12 h-12 rounded-2xl bg-white border-2 border-amber-300 flex items-center justify-center flex-shrink-0 shadow-sm">
-              <Icon name="EmojiBee_icon" size={42} />
+              <Icon name="Bot" size={42} />
             </div>
             <div className="min-w-0">
               <p className="text-[15px] font-bold text-amber-900 flex items-center gap-1.5">
-                AI 사주봇 <Icon name="EmojiHoney_icon" size={16} />
+                AI 뷰티봇 <Icon name="Sparkles" size={16} />
               </p>
               <p className="text-[11px] text-amber-700/80 mt-0.5">
                 {config.enabled ? "봇이 활성화되어 있어요. 라이브 진행 중 자동으로 동작합니다." : "봇이 꺼져 있어요. 켜면 라이브 채팅을 자동으로 관리해 드려요."}
@@ -492,7 +492,7 @@ export default function ChatBotManager({ onConfigSaved }: { onConfigSaved?: () =
         <div className="mt-3 flex items-start gap-2 rounded-xl bg-white/70 border border-amber-200 px-3 py-2.5">
           <Icon name="Info" size={13} className="text-amber-500 flex-shrink-0 mt-0.5" />
           <p className="text-[11px] text-amber-800 leading-relaxed">
-            봇 메시지는 <b>사주나라 앱 채팅</b>에 표시되고, 아래에서 YouTube 채널을 연결하면 <b>YouTube 채팅에도 동시 전송</b>할 수 있어요.
+            봇 메시지는 <b>뷰티메이트 앱 채팅</b>에 표시되고, 아래에서 YouTube 채널을 연결하면 <b>YouTube 채팅에도 동시 전송</b>할 수 있어요.
             YouTube 채팅은 <b>읽기 연동</b>되어 키워드 감지에 활용돼요.
             봇은 <b>라이브 진행 중 이 라이브 관리 페이지가 열려 있는 동안</b> 약 20초 간격으로 동작합니다.
           </p>
@@ -515,7 +515,7 @@ export default function ChatBotManager({ onConfigSaved }: { onConfigSaved?: () =
           <KeyRound size={15} className="text-amber-500" /> YouTube Data API v3 API 키
         </p>
         <p className="text-[11px] text-gray-500 leading-relaxed">
-          API 키를 등록하면 라이브 방송 화면에서 <b>YouTube 실시간 채팅</b>을 읽어와 사주나라 채팅과 함께 표시하고,
+          API 키를 등록하면 라이브 방송 화면에서 <b>YouTube 실시간 채팅</b>을 읽어와 뷰티메이트 채팅과 함께 표시하고,
           AI 봇의 키워드·FAQ 감지에도 활용돼요. 키는 서버에만 저장되며 시청자에게 노출되지 않아요.
         </p>
         <div className="flex gap-2">
@@ -658,7 +658,7 @@ export default function ChatBotManager({ onConfigSaved }: { onConfigSaved?: () =
           num={2}
           icon="SnsComment_icon"
           title="키워드 자동 응답"
-          desc="채팅에 키워드가 감지되면 등록한 답변을 자동 발송해요. (예: 상담 방식 → 상담 방식 안내)"
+          desc="채팅에 키워드가 감지되면 등록한 답변을 자동 발송해요. (예: 진행 방식 → 진행 방식 안내)"
           on={config.keywordEnabled}
           onToggle={() => patch({ keywordEnabled: !config.keywordEnabled })}
         >
@@ -715,12 +715,12 @@ export default function ChatBotManager({ onConfigSaved }: { onConfigSaved?: () =
           </div>
         </FeatureCard>
 
-        {/* 3. 상담상품 정보 자동 안내 */}
+        {/* 3. 뷰티 서비스 정보 자동 안내 */}
         <FeatureCard
           num={3}
           icon="ProductDetail_icon"
-          title="상담상품 정보 자동 안내"
-          desc="“3번 상담상품 뭐예요?”, “가격 얼마예요?”, “예약 가능한가요?” 같은 질문에 라이브 상담상품 정보를 자동으로 안내해요."
+          title="뷰티 서비스 정보 자동 안내"
+          desc="“3번 뷰티 서비스 뭐예요?”, “가격 얼마예요?”, “예약 가능한가요?” 같은 질문에 라이브 뷰티 서비스 정보를 자동으로 안내해요."
           on={config.productInfoEnabled}
           onToggle={() => patch({ productInfoEnabled: !config.productInfoEnabled })}
         />
@@ -817,7 +817,7 @@ export default function ChatBotManager({ onConfigSaved }: { onConfigSaved?: () =
             <input
               type="text"
               className="w-full text-[12px] border border-amber-200 rounded-lg px-2.5 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-amber-300"
-              placeholder="질문 문구 (예: 상담 방식 언제)"
+              placeholder="질문 문구 (예: 진행 방식 언제)"
               value={faqDraft.question}
               onChange={e => setFaqDraft(d => ({ ...d, question: e.target.value }))}
             />

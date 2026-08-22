@@ -12,7 +12,7 @@ interface Fees {
 }
 
 const FIELDS: { key: keyof Fees; label: string; desc: string; icon: typeof User }[] = [
-  { key: "sellerFeeRate", label: "상담사 플랫폼 수수료율", desc: "상담사 정산액에서 차감", icon: User },
+  { key: "sellerFeeRate", label: "뷰티 전문가 플랫폼 수수료율", desc: "뷰티 전문가 정산액에서 차감", icon: User },
 ];
 
 // 부가세 포함 실효율 (rate × 1.1), 소수 둘째자리까지

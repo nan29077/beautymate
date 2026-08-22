@@ -4,7 +4,7 @@ interface Props {
 }
 
 /**
- * 상담상품 썸네일이 없을 때 표시하는 "노이미지" 플레이스홀더.
+ * 뷰티 서비스 썸네일이 없을 때 표시하는 "노이미지" 플레이스홀더.
  * 캐릭터 브랜드 이미지(/no-image.png) 사용.
  */
 export default function NoImagePlaceholder({ className = "w-full h-full" }: Props) {

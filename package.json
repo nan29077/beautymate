@@ -1,20 +1,22 @@
 {
-  "name": "sajunara",
+  "name": "beautymate",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3023",
+    "dev": "next dev -p 3028",
     "build": "next build",
     "postinstall": "prisma generate",
-    "start": "next start",
+    "start": "next start -p 3028",
     "lint": "next lint",
     "format": "prettier --write .",
     "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:seed": "npx tsx prisma/seed.ts",
-    "db:seed-node": "npx tsx prisma/seed-node.ts",
-    "db:studio": "prisma studio"
+    "db:check": "tsx scripts/assert-beautymate-db.ts",
+    "db:push": "npm run db:check && prisma db push",
+    "db:migrate": "npm run db:check && prisma migrate dev",
+    "db:seed": "npm run db:check && tsx prisma/seed.ts",
+    "db:seed-node": "npm run db:check && tsx prisma/seed-node.ts",
+    "db:studio": "npm run db:check && prisma studio",
+    "db:bootstrap": "npm run db:push && npm run db:seed"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

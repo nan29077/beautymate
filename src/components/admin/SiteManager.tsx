@@ -43,7 +43,7 @@ export default function SiteManager({
     { key: "social",        iconName: "Globe",           label: "소셜 링크" },
     { key: "footer",        iconName: "Warehouse",       label: "푸터 관리" },
     { key: "footer-content",iconName: "File",            label: "푸터 콘텐츠" },
-    { key: "policy",        iconName: "Certified",       label: "점집 정책" },
+    { key: "policy",        iconName: "Certified",       label: "뷰티샵 정책" },
   ];
 
   return (

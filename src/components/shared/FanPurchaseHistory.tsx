@@ -11,7 +11,7 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
   PAID: { label: "결제완료", color: "bg-blue-50 text-blue-600" },
   CONFIRMED: { label: "확인됨", color: "bg-indigo-50 text-indigo-600" },
   SHIPPING: { label: "상담 진행중", color: "bg-cyan-50 text-cyan-600" },
-  DELIVERED: { label: "상담 완료", color: "bg-green-50 text-green-600" },
+  DELIVERED: { label: "서비스 완료", color: "bg-green-50 text-green-600" },
   CANCELLED: { label: "취소됨", color: "bg-red-50 text-red-600" },
   REFUND_REQUESTED: { label: "환불요청", color: "bg-orange-50 text-orange-600" },
   REFUNDED: { label: "환불완료", color: "bg-gray-100 text-gray-500" },
@@ -165,7 +165,7 @@ export default function FanPurchaseHistory({ userId, userName, reservationCount,
                         </div>
                         <div className="flex gap-3">
                           <div className="w-12 h-12 rounded-lg bg-gray-50 overflow-hidden flex-shrink-0">
-                            <ProductImage src={o.thumbnail} alt="예약 상담상품" width={48} height={48} />
+                            <ProductImage src={o.thumbnail} alt="예약 뷰티 서비스" width={48} height={48} />
                           </div>
                           <div className="flex-1 min-w-0">
                             {o.items.map((it) => (
@@ -181,7 +181,7 @@ export default function FanPurchaseHistory({ userId, userName, reservationCount,
                               </div>
                             ))}
                             {o.campaignTitle && (
-                              <p className="text-[10px] text-emerald-600 mt-0.5">단체 상담: {o.campaignTitle}</p>
+                              <p className="text-[10px] text-emerald-600 mt-0.5">공동 프로모션: {o.campaignTitle}</p>
                             )}
                           </div>
                         </div>

@@ -5,7 +5,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { X, Loader2, Minus, Plus } from 'lucide-react';
 import SafeImage from "@/components/shared/SafeImage";
-import { isLegacyBundledAvatar, pickSajuAvatar, shouldUseAvatar } from "@/lib/defaults";
+import { isLegacyBundledAvatar, pickBeautyMateAvatar, shouldUseAvatar } from "@/lib/defaults";
 import ApproveSellerButton from "@/components/shared/ApproveSellerButton";
 import RejectSellerButton from "@/components/shared/RejectSellerButton";
 import RecommendSellerButton from "@/components/shared/RecommendSellerButton";
@@ -34,11 +34,11 @@ interface MiddleAdminOption {
 
 const won = (n: number) => Math.round(n).toLocaleString("ko-KR") + "원";
 
-// 상담사 목록 아바타: 직접 올린 프로필/점집 로고 우선, 없거나 레거시 꿀벌 캐릭터면 사주 동물 캐릭터.
+// 뷰티 전문가 목록 아바타: 직접 올린 프로필/뷰티샵 로고 우선, 없거나 레거시 꿀벌 캐릭터면 뷰티 동물 캐릭터.
 function sellerAvatarSrc(s: Pick<Seller, "userId" | "userImage" | "shopLogo" | "userName" | "shopName">): string | undefined {
   const uploaded = (!isLegacyBundledAvatar(s.userImage) ? s.userImage : null) || s.shopLogo;
   if (uploaded) return uploaded;
-  return shouldUseAvatar(s.userName, s.shopName) ? pickSajuAvatar(s.userId) : undefined;
+  return shouldUseAvatar(s.userName, s.shopName) ? pickBeautyMateAvatar(s.userId) : undefined;
 }
 
 function ImpersonateButton({ userId, shopName }: { userId: string; shopName: string }) {
@@ -174,8 +174,8 @@ export default function AdminSellersClient({
     <>
       <DashboardPageHeader
         iconName="Consultant"
-        title="상담사 관리"
-        description="상담사 입점 승인, 수수료와 운영 현황을 관리합니다."
+        title="뷰티 전문가 관리"
+        description="뷰티 전문가 입점 승인, 수수료와 운영 현황을 관리합니다."
         meta={`총 ${sellers.length}명 · 승인 대기 ${pending.length}명`}
         className="mb-5"
       />
@@ -184,7 +184,7 @@ export default function AdminSellersClient({
         <div className="mb-5 rounded-xl border border-yellow-200 bg-yellow-50/60 p-3 sm:p-4">
           <div className="flex items-center gap-1.5 mb-3">
             <Icon name="Clock" size={15} className="text-yellow-600" />
-            <h2 className="text-sm font-bold text-gray-900">상담사 입점 신청</h2>
+            <h2 className="text-sm font-bold text-gray-900">뷰티 전문가 입점 신청</h2>
             <span className="text-[10px] font-bold bg-yellow-500 text-white px-1.5 py-0.5 rounded-full">{pending.length}</span>
           </div>
           <div className="space-y-2">
@@ -211,7 +211,7 @@ export default function AdminSellersClient({
         <div className="relative flex-1">
           <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="상담사명, 이름, 이메일 검색..."
+            placeholder="뷰티 전문가명, 이름, 이메일 검색..."
             className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white" />
           {searchQuery && <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"><X size={14} /></button>}
         </div>
@@ -221,8 +221,8 @@ export default function AdminSellersClient({
         {filtered.length === 0 ? (
           <DashboardEmptyState
             iconName="Consultant"
-            title={searchQuery ? "검색 결과가 없습니다" : "등록된 상담사가 없습니다"}
-            description={searchQuery ? "다른 상담사명이나 이메일로 검색해 보세요." : "상담사가 입점을 신청하면 이곳에 표시됩니다."}
+            title={searchQuery ? "검색 결과가 없습니다" : "등록된 뷰티 전문가가 없습니다"}
+            description={searchQuery ? "다른 뷰티 전문가명이나 이메일로 검색해 보세요." : "뷰티 전문가가 입점을 신청하면 이곳에 표시됩니다."}
           />
         ) : pageItems.map((seller) => (
           <div key={seller.id} className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4">
@@ -268,7 +268,7 @@ export default function AdminSellersClient({
               {[
                 { label: "팔로워", value: seller.followersCount },
                 { label: "팬", value: seller.totalFans },
-                { label: "상담상품", value: seller.shopProductsCount },
+                { label: "뷰티 서비스", value: seller.shopProductsCount },
                 { label: "캠페인", value: seller.campaignsCount },
                 { label: "예약", value: seller.ordersCount },
               ].map((stat) => (
@@ -329,7 +329,7 @@ export default function AdminSellersClient({
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-5 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
-                <Icon name="Info" size={15} className="text-gray-500" /> 상담사 상세
+                <Icon name="Info" size={15} className="text-gray-500" /> 뷰티 전문가 상세
               </h3>
               <button onClick={() => setDetailSeller(null)} className="text-gray-400 hover:text-gray-600"><X size={17} /></button>
             </div>
@@ -533,7 +533,7 @@ function SellerMarginPanel({
       <div>
         <p className="text-xs font-semibold text-gray-700 flex items-center gap-1.5 mb-2.5">
           <Icon name="Discount" size={13} className="text-indigo-500" />
-          상담사 판매 수수료율
+          뷰티 전문가 판매 수수료율
         </p>
         <div className="flex items-end gap-2">
           <div className="flex-1">

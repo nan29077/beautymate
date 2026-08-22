@@ -7,8 +7,8 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useAppDialog } from "@/components/shared/AppDialog";
 
-// 상담사 Pick(팔로우) 토글.
-// 사주나라 시절의 SNS 채널 구독 인증(ChannelVerification) 연동은 제거되었고,
+// 뷰티 전문가 Pick(팔로우) 토글.
+// 뷰티메이트 시절의 SNS 채널 구독 인증(ChannelVerification) 연동은 제거되었고,
 // 지금은 순수하게 Pick / Pick 해제만 처리한다.
 
 interface PickSellerButtonProps {
@@ -99,7 +99,7 @@ export default function PickSellerButton({
         <div className="px-6 py-5">
           <div className="bg-brand-50 rounded-xl px-4 py-3 mb-4">
             <p className="text-[13px] text-brand-700 leading-relaxed">
-              단골 상담사의 <strong>라이브 상담 시작</strong>과 새 소식을 알림으로 받아볼 수 있어요.
+              단골 뷰티 전문가의 <strong>라이브 뷰티 시작</strong>과 새 소식을 알림으로 받아볼 수 있어요.
             </p>
           </div>
           <button onClick={() => setShowPopup(false)} className="w-full py-3 text-sm btn-primary">

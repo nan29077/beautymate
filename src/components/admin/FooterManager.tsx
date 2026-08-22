@@ -45,7 +45,7 @@ export default function FooterManager({ initialSettings }: { initialSettings: Fo
     { key: "mailOrderNum", label: "통신판매신고번호", placeholder: "0000-테스트-0000" },
     { key: "phone", label: "대표번호", placeholder: "000-0000-0000" },
     { key: "address", label: "주소", placeholder: "서울특별시 테스트구 테스트로 000, 0층" },
-    { key: "copyright", label: "저작권 문구", placeholder: "2026 사주나라. All rights reserved." },
+    { key: "copyright", label: "저작권 문구", placeholder: "2026 뷰티메이트. All rights reserved." },
   ];
 
   return (

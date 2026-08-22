@@ -22,7 +22,7 @@ export const dynamic = "force-dynamic";
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   PENDING: { label: "예약 대기", color: "bg-yellow-50 text-yellow-700" },
   CONFIRMED: { label: "예약 확정", color: "bg-blue-50 text-blue-700" },
-  COMPLETED: { label: "상담 완료", color: "bg-green-50 text-green-700" },
+  COMPLETED: { label: "서비스 완료", color: "bg-green-50 text-green-700" },
   CANCELLED: { label: "취소됨", color: "bg-gray-100 text-gray-500" },
   NO_SHOW: { label: "노쇼", color: "bg-red-50 text-red-600" },
 };
@@ -35,7 +35,7 @@ const FILTER_TABS = [
   { value: "CANCELLED", label: "취소" },
 ];
 
-/** 상담 방식 배지 (영상/전화/방문) */
+/** 진행 방식 배지 (영상/전화/방문) */
 function MethodBadge({ method }: { method: string | null }) {
   if (!method) return null;
   const icon = isVideoMethod(method) ? (
@@ -85,8 +85,8 @@ export default async function MyReservationsPage({
       orderBy: { reservationDate: "desc" },
     }), []);
 
-  // ── 상담 방식(영상/전화/방문) 역조회 ───────────────────────────────
-  // Reservation 에는 상담 방식이 없어 첫 아이템의 Product 에서 가져온다.
+  // ── 진행 방식(영상/전화/방문) 역조회 ───────────────────────────────
+  // Reservation 에는 진행 방식이 없어 첫 아이템의 Product 에서 가져온다.
   // 명시적 select 는 전역 omit 을 우회해 P2022 가능 → safeQuery 폴백.
   const productIds = Array.from(
     new Set(
@@ -172,7 +172,7 @@ export default async function MyReservationsPage({
             const date = new Date(r.reservationDate);
             const dateStr = `${date.getUTCFullYear()}년 ${date.getUTCMonth() + 1}월 ${date.getUTCDate()}일`;
             const firstItem = r.items[0];
-            const productName = firstItem?.productName || "상담 상품";
+            const productName = firstItem?.productName || "뷰티 서비스";
             const method =
               firstItem && firstItem.itemType === "PRODUCT"
                 ? methodByProduct.get(firstItem.productId) ?? null
@@ -184,7 +184,7 @@ export default async function MyReservationsPage({
               isVideoMethod(method) &&
               !!consultingSession &&
               (consultingSession.status === "WAITING" || consultingSession.status === "ACTIVE");
-            // 리뷰 작성: 완료된 카탈로그 상담 상품만 (자체 상품은 리뷰 대상 없음)
+            // 리뷰 작성: 완료된 카탈로그 뷰티 서비스만 (자체 상품은 리뷰 대상 없음)
             const reviewHref =
               r.status === "COMPLETED" && firstItem && firstItem.itemType === "PRODUCT"
                 ? `/products/${firstItem.productId}`

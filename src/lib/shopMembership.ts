@@ -1,11 +1,11 @@
-// 점집 독립 회원(ShopMembership) 도메인 로직 — 서버 전용.
+// 뷰티샵 독립 회원(ShopMembership) 도메인 로직 — 서버 전용.
 // ⚠️ shop_memberships 테이블은 운영 DB에 아직 없을 수 있다(P2021) — 모든 접근은 폴백 필수.
 import { prisma } from "@/lib/prisma";
 import { safeQuery, isMissingSchemaError } from "@/lib/safeDb";
 import type { ShopMembership } from "@/generated/prisma";
 
 /**
- * 점집 멤버십을 멱등 생성한다.
+ * 뷰티샵 멤버십을 멱등 생성한다.
  * 테이블 미반영(P2021) 환경에서는 경고만 남기고 null 반환 — 가입 흐름은 막지 않는다.
  */
 export async function ensureShopMembership(
@@ -43,7 +43,7 @@ export async function ensureShopMembership(
   }
 }
 
-/** 현재 사용자가 이 점집 회원인지 (테이블 미반영 시 false) */
+/** 현재 사용자가 이 뷰티샵 회원인지 (테이블 미반영 시 false) */
 export async function isShopMember(shopId: string, userId: string): Promise<boolean> {
   const m = await safeQuery(
     `shop membership check (${shopId}/${userId})`,

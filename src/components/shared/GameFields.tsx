@@ -157,7 +157,7 @@ export default function GameFields({
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1.5">키워드</label>
             <input value={config.keyword ?? ""} onChange={(e) => cfg("keyword", e.target.value)}
-              placeholder="예) 사주나라" maxLength={30} className={inputCls} />
+              placeholder="예) 뷰티메이트" maxLength={30} className={inputCls} />
             <Hint>시청자가 채팅에 입력해야 하는 정확한 단어를 입력하세요. 대소문자는 구분하지 않습니다.</Hint>
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -181,7 +181,7 @@ export default function GameFields({
         <div className="mb-4 p-3.5 rounded-xl bg-gray-50 border border-gray-100 space-y-3">
           <div className="grid grid-cols-3 gap-2">
             <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1.5">정답 (상담사만)</label>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5">정답 (뷰티 전문가만)</label>
               <input type="number" value={config.answer ?? 0}
                 onChange={(e) => cfg("answer", Number(e.target.value))} className={inputCls} />
             </div>
@@ -225,7 +225,7 @@ export default function GameFields({
             <input
               value={type === "QUIZ" ? (config.question ?? "") : (config.topic ?? "")}
               onChange={(e) => cfg(type === "QUIZ" ? "question" : "topic", e.target.value)}
-              placeholder={type === "QUIZ" ? "예) 사주나라 마스코트는?" : "예) 다음 라이브 상담상품은?"}
+              placeholder={type === "QUIZ" ? "예) 뷰티메이트 마스코트는?" : "예) 다음 라이브 뷰티 서비스는?"}
               maxLength={80} className={inputCls}
             />
           </div>
@@ -294,7 +294,7 @@ export default function GameFields({
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1.5">달성 보상 (선택)</label>
             <input value={config.reward ?? ""} onChange={(e) => cfg("reward", e.target.value)}
-              placeholder="예: 타로 상담 10% 할인 쿠폰" className={inputCls} />
+              placeholder="예: 퍼스널 컬러 상담 10% 할인 쿠폰" className={inputCls} />
             <Hint>목표 달성 시 모든 고객에게 제공할 혜택을 입력하세요. (예: 10% 추가 할인 쿠폰)</Hint>
           </div>
           <p className="text-[11px] text-gray-400 leading-relaxed">
@@ -314,7 +314,7 @@ export default function GameFields({
                   placeholder="항목명" maxLength={20} className={inputCls + " flex-1"} />
                 <select value={b.kind} onChange={(e) => setBox(i, { kind: e.target.value })}
                   className="px-2 py-2 rounded-lg border border-gray-200 text-xs shrink-0">
-                  <option value="PRODUCT">상담상품</option>
+                  <option value="PRODUCT">뷰티 서비스</option>
                   <option value="COUPON">쿠폰</option>
                   <option value="MISS">꽝</option>
                 </select>

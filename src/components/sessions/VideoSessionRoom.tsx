@@ -1,7 +1,7 @@
 "use client";
 
-// 1:1 영상 상담실 공용 컴포넌트 (상담사 host / 고객 guest 공용)
-// Daily.co iframe 임베드 + 상담 타이머 + (host) 상담 메모·종료 컨트롤
+// 1:1 영상 상담실 공용 컴포넌트 (뷰티 전문가 host / 고객 guest 공용)
+// Daily.co iframe 임베드 + 상담 타이머 + (host) 고객 메모·종료 컨트롤
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -54,7 +54,7 @@ interface SessionData {
 const STATUS_LABEL: Record<SessionData["status"], string> = {
   WAITING: "입장 대기",
   ACTIVE: "상담 진행 중",
-  COMPLETED: "상담 완료",
+  COMPLETED: "서비스 완료",
   CANCELLED: "취소됨",
 };
 
@@ -280,7 +280,7 @@ export default function VideoSessionRoom({
             <p className="text-xs text-gray-400 mt-0.5">
               {isHost
                 ? `${data.reservation.customerName}님과의 상담`
-                : `${data.reservation.shopName} · ${data.reservation.consultantName || "상담사"}`}
+                : `${data.reservation.shopName} · ${data.reservation.consultantName || "뷰티 전문가"}`}
               {data.reservation.productName ? ` · ${data.reservation.productName}` : ""}
             </p>
           </div>
@@ -336,7 +336,7 @@ export default function VideoSessionRoom({
             {data.status === "CANCELLED" ? "취소된 상담입니다." : "상담이 종료되었습니다."}
           </p>
           {data.duration != null && (
-            <p className="text-xs text-gray-400">실제 상담 시간 {data.duration}분</p>
+            <p className="text-xs text-gray-400">실제 소요 시간 {data.duration}분</p>
           )}
           <Link
             href={backHref}
@@ -371,12 +371,12 @@ export default function VideoSessionRoom({
         />
       )}
 
-      {/* host 컨트롤: 상담 메모 + 종료 */}
+      {/* host 컨트롤: 고객 메모 + 종료 */}
       {isHost && !ended && (
         <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
           <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
             <StickyNote size={15} className="text-amber-500" />
-            상담 메모
+            고객 메모
             <span className="text-xs font-normal text-gray-400">
               (고객에게 노출되지 않으며 상담 종료 시 저장됩니다)
             </span>
@@ -385,7 +385,7 @@ export default function VideoSessionRoom({
             value={memo}
             onChange={(e) => setMemo(e.target.value)}
             rows={4}
-            placeholder="상담 내용을 기록해 두세요. 고객관리(CRM) 이력에 표시됩니다."
+            placeholder="요청사항을 기록해 두세요. 고객관리(CRM) 이력에 표시됩니다."
             className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm resize-none focus:outline-none focus:border-indigo-400"
           />
           {confirmEnd ? (
@@ -421,7 +421,7 @@ export default function VideoSessionRoom({
       {/* guest 안내 */}
       {!isHost && !ended && (
         <p className="text-xs text-gray-400 text-center">
-          상담이 끝나면 상담사가 종료 처리합니다. 연결에 문제가 있으면 새로고침해 주세요.
+          상담이 끝나면 뷰티 전문가가 종료 처리합니다. 연결에 문제가 있으면 새로고침해 주세요.
         </p>
       )}
       {joined && (

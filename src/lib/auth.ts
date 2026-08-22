@@ -13,7 +13,7 @@ import {
   linkReferralForNewBuyer,
 } from "@/lib/referral";
 import { verifyImpersonationToken } from "@/lib/impersonation";
-import { pickBuyerAvatar, pickSajuAvatar } from "@/lib/defaults";
+import { pickBuyerAvatar, pickBeautyMateAvatar } from "@/lib/defaults";
 import { normalizeRole } from "@/lib/roles";
 import { ensureSellerProfile } from "@/lib/sellerProfile";
 
@@ -64,7 +64,7 @@ const providers: NextAuthConfig["providers"] = [
         throw new Error("CONSULTANT_NOT_APPROVED");
       }
 
-      // 레거시/테스트 상담사 계정은 SellerProfile 이 없을 수 있다 → 최소 프로필 자동 생성
+      // 레거시/테스트 뷰티 전문가 계정은 SellerProfile 이 없을 수 있다 → 최소 프로필 자동 생성
       let sellerSlug = user.sellerProfile?.slug || null;
       if (role === "CONSULTANT" && !user.sellerProfile) {
         try {
@@ -443,7 +443,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
      * OAuth 신규 가입 시 호출. Credentials 가입은 호출 안 됨 — register API 에서 직접 처리.
      * 처리:
      *  1) 소셜 프로필 사진이 없는 고객에게 랜덤 고객 캐릭터 배정
-     *  2) 쿠키 sb_ref 에서 상담사 slug 추출
+     *  2) 쿠키 sb_ref 에서 뷰티 전문가 slug 추출
      *  3) linkReferralForNewBuyer 로 BuyerProfile 생성 + 추천인 매핑 + totalFans++
      *  4) OAuth 가입자는 CUSTOMER 역할 (schema default 유지)
      */
@@ -455,12 +455,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const refCookie = cookieStore.get(SELLER_REF_COOKIE)?.value;
         const sellerSlug = refCookie && isValidSellerSlug(refCookie) ? refCookie : null;
 
-        // 개인 샵 유입 고객은 기존 프로필 풀, 일반 유입 고객은 사주 캐릭터 풀을 사용한다.
+        // 개인 샵 유입 고객은 기존 프로필 풀, 일반 유입 고객은 뷰티 캐릭터 풀을 사용한다.
         // 소셜 제공자가 프로필 사진을 준 경우에는 사용자의 원본 이미지를 존중한다.
         if (!user.image) {
           await prisma.user.update({
             where: { id: user.id },
-            data: { avatar: sellerSlug ? pickBuyerAvatar(user.id) : pickSajuAvatar(user.id) },
+            data: { avatar: sellerSlug ? pickBuyerAvatar(user.id) : pickBeautyMateAvatar(user.id) },
           });
         }
 

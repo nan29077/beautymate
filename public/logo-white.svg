@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 72" role="img" aria-label="뷰티메이트">
+  <g transform="translate(4 4)">
+    <rect width="64" height="64" rx="20" fill="#FFFFFF" fill-opacity=".12"/>
+    <path d="M32 13c5.7 7.2 8.6 13.7 8.6 19.5C40.6 42.2 34.1 50 32 50c-2.1 0-8.6-7.8-8.6-17.5C23.4 26.7 26.3 20.2 32 13Z" fill="#FFFFFF"/>
+    <path d="M13 32c7.2-5.7 13.7-8.6 19.5-8.6C42.2 23.4 50 29.9 50 32c0 2.1-7.8 8.6-17.5 8.6C26.7 40.6 20.2 37.7 13 32Z" fill="#F7D4DD" fill-opacity=".9"/>
+    <circle cx="32" cy="32" r="7.5" fill="#6D2945"/>
+    <path d="m49.5 10.5 1.8 4.2 4.2 1.8-4.2 1.8-1.8 4.2-1.8-4.2-4.2-1.8 4.2-1.8 1.8-4.2Z" fill="#FFFFFF"/>
+  </g>
+  <text x="82" y="48" font-size="34" font-weight="800" letter-spacing="-1.8" font-family="Pretendard, Noto Sans KR, sans-serif" fill="#FFFFFF">뷰티메이트</text>
+</svg>

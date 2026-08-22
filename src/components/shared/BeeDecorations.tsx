@@ -1,6 +1,6 @@
 "use client";
 
-import { MoonStar, Orbit, Sparkles, Star } from "lucide-react";
+import { Droplets, Flower2, Gem, Heart, Sparkles } from "lucide-react";
 import { useFeatureFlags } from "@/components/shared/FeatureFlagsProvider";
 
 type Deco = {
@@ -15,14 +15,14 @@ type Deco = {
 };
 
 const PUBLIC_DECORATIONS: Deco[] = [
-  { icon: MoonStar, top: "9%", size: 48, rotate: "-10deg", opacity: 0.22, posKey: "left", posVal: "7%", tone: "#6849d8" },
-  { icon: Orbit, top: "30%", size: 72, rotate: "14deg", opacity: 0.12, posKey: "left", posVal: "14%", tone: "#896af1" },
-  { icon: Sparkles, top: "58%", size: 34, rotate: "-8deg", opacity: 0.22, posKey: "left", posVal: "5%", tone: "#b78a36" },
-  { icon: Star, top: "84%", size: 28, rotate: "12deg", opacity: 0.18, posKey: "left", posVal: "17%", tone: "#6849d8" },
-  { icon: Star, top: "14%", size: 30, rotate: "8deg", opacity: 0.2, posKey: "right", posVal: "11%", tone: "#b78a36" },
-  { icon: Sparkles, top: "39%", size: 40, rotate: "10deg", opacity: 0.2, posKey: "right", posVal: "5%", tone: "#6849d8" },
-  { icon: Orbit, top: "66%", size: 76, rotate: "-16deg", opacity: 0.11, posKey: "right", posVal: "15%", tone: "#896af1" },
-  { icon: MoonStar, top: "89%", size: 44, rotate: "7deg", opacity: 0.18, posKey: "right", posVal: "6%", tone: "#6849d8" },
+  { icon: Flower2, top: "8%", size: 54, rotate: "-10deg", opacity: 0.18, posKey: "left", posVal: "7%", tone: "#b44b68" },
+  { icon: Droplets, top: "29%", size: 62, rotate: "12deg", opacity: 0.12, posKey: "left", posVal: "15%", tone: "#c98c9d" },
+  { icon: Sparkles, top: "57%", size: 34, rotate: "-8deg", opacity: 0.2, posKey: "left", posVal: "6%", tone: "#9a6b52" },
+  { icon: Heart, top: "83%", size: 30, rotate: "10deg", opacity: 0.14, posKey: "left", posVal: "17%", tone: "#b44b68" },
+  { icon: Gem, top: "13%", size: 34, rotate: "8deg", opacity: 0.15, posKey: "right", posVal: "11%", tone: "#9a6b52" },
+  { icon: Sparkles, top: "38%", size: 40, rotate: "10deg", opacity: 0.18, posKey: "right", posVal: "6%", tone: "#b44b68" },
+  { icon: Flower2, top: "66%", size: 70, rotate: "-14deg", opacity: 0.11, posKey: "right", posVal: "15%", tone: "#c98c9d" },
+  { icon: Droplets, top: "88%", size: 46, rotate: "7deg", opacity: 0.14, posKey: "right", posVal: "6%", tone: "#b44b68" },
 ];
 
 const DASHBOARD_DECORATIONS = PUBLIC_DECORATIONS.filter((_, index) => index % 2 === 0).map((item) => ({

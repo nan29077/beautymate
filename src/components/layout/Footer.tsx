@@ -3,7 +3,7 @@
 import BrandWordmark from "@/components/shared/BrandWordmark";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Instagram, Youtube, Mail, Download } from "lucide-react";
+import { Instagram, Youtube, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { FeatureFlags, SocialLinks } from "@/lib/featureFlags";
 import type { FooterSettings } from "@/lib/settings";
@@ -20,6 +20,7 @@ export default function Footer({
   footerSettings?: FooterSettings;
 }) {
   const pathname = usePathname() ?? "";
+  const isHome = pathname === "/";
   const { subpageActive } = useShopChrome();
   if (/^\/shop\/[^\/]+/.test(pathname) || subpageActive) return null;
 
@@ -41,10 +42,10 @@ export default function Footer({
 
   return (
     <footer className="bg-gray-950 text-gray-400">
-      <div className="px-4 py-5">
-        <div className="grid grid-cols-2 gap-6 mb-6">
+      <div className={isHome ? "px-4 py-5 lg:mx-auto lg:max-w-[1320px] lg:px-8 lg:py-16" : "px-4 py-5"}>
+        <div className={isHome ? "mb-6 grid grid-cols-2 gap-6 lg:grid-cols-4 lg:gap-12 lg:mb-12" : "grid grid-cols-2 gap-6 mb-6"}>
           {/* 브랜드 */}
-          <div className="col-span-2">
+          <div className={isHome ? "col-span-2 lg:pr-16" : "col-span-2"}>
             <Link href="/" className="inline-block mb-3">
               <BrandWordmark size="lg" variant="light" />
             </Link>
@@ -71,10 +72,10 @@ export default function Footer({
             <h4 className="text-xs font-semibold text-white mb-3">서비스</h4>
             <ul className="space-y-2">
               {FEATURE_GROUP_BUY && (
-                <li><Link href="/campaigns" className="text-xs hover:text-white transition-colors">단체 상담</Link></li>
+                <li><Link href="/campaigns" className="text-xs hover:text-white transition-colors">공동 프로모션</Link></li>
               )}
-              <li><Link href="/auth/register?role=seller" className="text-xs hover:text-white transition-colors">상담사 신청하기</Link></li>
-              <li><Link href="/support/seller-guide" className="text-xs hover:text-white transition-colors">상담사 신청 안내</Link></li>
+              <li><Link href="/auth/register?role=seller" className="text-xs hover:text-white transition-colors">뷰티 전문가 신청하기</Link></li>
+              <li><Link href="/support/seller-guide" className="text-xs hover:text-white transition-colors">뷰티 전문가 신청 안내</Link></li>
               <li><Link href="/support/terms" className="text-xs hover:text-white transition-colors">이용약관</Link></li>
               <li><Link href="/support/privacy" className="text-xs hover:text-white transition-colors">개인정보처리방침</Link></li>
             </ul>
@@ -86,16 +87,7 @@ export default function Footer({
             <ul className="space-y-2">
               <li><Link href="/support/contact" className="text-xs hover:text-white transition-colors">1대1 문의</Link></li>
               <li><Link href="/support/faq" className="text-xs hover:text-white transition-colors">자주 묻는 질문</Link></li>
-              <li><Link href="/support/shipping" className="text-xs hover:text-white transition-colors">상담 방식 안내</Link></li>
-              <li>
-                <a
-                  href="/sajunara-brochure.pdf"
-                  download="사주나라-서비스소개서.pdf"
-                  className="inline-flex items-center gap-1 text-xs text-gray-300 hover:text-white transition-colors"
-                >
-                  <Download size={12} strokeWidth={1.8} /> 서비스 소개서 (PDF)
-                </a>
-              </li>
+              <li><Link href="/support/shipping" className="text-xs hover:text-white transition-colors">진행 방식 안내</Link></li>
             </ul>
           </div>
         </div>
@@ -133,7 +125,7 @@ export default function Footer({
       </div>
 
       {/* 모바일 하단 네비 높이만큼 여백 */}
-      <div className="h-16" />
+      <div className={isHome ? "h-16 lg:hidden" : "h-16"} />
     </footer>
   );
 }

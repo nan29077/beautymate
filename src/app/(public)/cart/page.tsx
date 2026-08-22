@@ -63,7 +63,7 @@ export default async function CartPage() {
       productId: item.productId,
       sellerId: item.sellerId,
       campaignId: item.campaignId,
-      name: product?.name || "상담상품",
+      name: product?.name || "뷰티 서비스",
       thumbnail: product?.thumbnail || null,
       variantId: item.variantId,
       variantName: item.variant?.name || null,

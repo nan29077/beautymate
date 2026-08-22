@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
 
-// 대시보드 예약 현황에서 바로 상담 완료 처리 (PATCH /api/reservations/[id]).
+// 대시보드 예약 현황에서 바로 서비스 완료 처리 (PATCH /api/reservations/[id]).
 // 예약 테이블 미반영 환경에서는 API가 503을 주므로 메시지만 보여주고 상태는 그대로 둔다.
 export default function DashboardReservationComplete({
   reservationId,

@@ -39,7 +39,7 @@ export default async function WishlistPage() {
           <Link href="/my" className="text-gray-900 hover:opacity-60 transition-opacity">
             <Icon name="ArrowRight" size={22} strokeWidth={1.5} className="rotate-180" />
           </Link>
-          <p className="text-sm font-medium text-gray-900">찜한 상담상품</p>
+          <p className="text-sm font-medium text-gray-900">찜한 뷰티 서비스</p>
           <div className="w-[22px]" />
         </div>
       </div>
@@ -47,7 +47,7 @@ export default async function WishlistPage() {
       {/* 찜 개수 */}
       <div className="px-4 py-3 border-b border-gray-50">
         <p className="text-xs text-gray-500">
-          총 <span className="font-bold text-gray-900">{wishlists.length}</span>개의 상담상품
+          총 <span className="font-bold text-gray-900">{wishlists.length}</span>개의 뷰티 서비스
         </p>
       </div>
 
@@ -107,8 +107,8 @@ export default async function WishlistPage() {
       ) : (
         <div className="text-center py-20 text-gray-400">
           <Icon name="Wishlist" size={48} strokeWidth={1.5} className="mx-auto mb-3 opacity-30" />
-          <p className="text-sm font-medium mb-1">찜한 상담상품이 없습니다</p>
-          <p className="text-xs text-gray-400 mb-4">마음에 드는 상담상품을 찜해보세요!</p>
+          <p className="text-sm font-medium mb-1">찜한 뷰티 서비스가 없습니다</p>
+          <p className="text-xs text-gray-400 mb-4">마음에 드는 뷰티 서비스를 찜해보세요!</p>
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-xs text-white bg-black px-4 py-2.5 rounded-lg hover:bg-gray-800 transition-colors"

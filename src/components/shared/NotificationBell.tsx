@@ -38,7 +38,7 @@ function timeAgo(iso: string): string {
 }
 
 // 우측 상단 알림 버튼 + 카드형 화이트 드롭다운 팝업.
-// allHref: "전체 보기" 링크 경로. /my/* 는 고객 전용이라 대시보드(상담사/브랜드 등)에서는
+// allHref: "전체 보기" 링크 경로. /my/* 는 고객 전용이라 대시보드(뷰티 전문가/브랜드 등)에서는
 // 클릭 시 역할 대시보드로 리다이렉트되므로, 그 경우 null을 넘겨 링크를 숨긴다.
 export default function NotificationBell({ className = "", size = 20, buttonClassName = "", allHref = "/my/notifications" }: { className?: string; size?: number; buttonClassName?: string; allHref?: string | null }) {
   const { data: session } = useSession();
@@ -111,7 +111,7 @@ export default function NotificationBell({ className = "", size = 20, buttonClas
   const handleClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     if (!session?.user) {
-      // 로그인 후 현재 페이지로 복귀 (점집에 머무르도록)
+      // 로그인 후 현재 페이지로 복귀 (뷰티샵에 머무르도록)
       router.push(`/auth/login?callbackUrl=${encodeURIComponent(pathname || "/")}`);
       return;
     }

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET    /api/auth/youtube/status — YouTube OAuth 연결 상태 조회 (상담사 전용)
+// GET    /api/auth/youtube/status — YouTube OAuth 연결 상태 조회 (뷰티 전문가 전용)
 // DELETE /api/auth/youtube/status — 연결 해제 (저장된 토큰 삭제)
 
 async function getSeller() {
@@ -13,7 +13,7 @@ async function getSeller() {
 
 export async function GET() {
   const seller = await getSeller();
-  if (!seller) return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+  if (!seller) return NextResponse.json({ error: "뷰티 전문가만 접근 가능" }, { status: 403 });
 
   const connected = Boolean(seller.youtubeAccessToken && seller.youtubeRefreshToken);
   return NextResponse.json({
@@ -26,7 +26,7 @@ export async function GET() {
 
 export async function DELETE() {
   const seller = await getSeller();
-  if (!seller) return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+  if (!seller) return NextResponse.json({ error: "뷰티 전문가만 접근 가능" }, { status: 403 });
 
   await prisma.sellerProfile.update({
     where: { id: seller.id },

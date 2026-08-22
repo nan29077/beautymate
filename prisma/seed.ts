@@ -3,27 +3,27 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-// 사주메이트 시드 — 2자 구조(상담사 ↔ 고객) 기준 최소 데이터셋.
-// ⚠️ 운영 DB(app/.env DATABASE_URL)에 그대로 반영되므로 실행 전 반드시 대상 DB를 확인할 것.
+// 뷰티메이트 시드 — 2자 구조(뷰티 전문가 ↔ 고객) 기준 최소 데이터셋.
+// scripts/assert-beautymate-db.ts 검사를 통과한 뷰티메이트 전용 DB에서만 실행한다.
 
-const CONSULTING_TYPES = ["사주", "신점", "타로", "궁합", "작명", "사업운", "연애운", "택일"] as const;
-const CONSULTING_METHODS = ["영상통화", "전화", "방문", "채팅"] as const;
+const CONSULTING_TYPES = ["스킨케어", "메이크업", "헤어", "네일", "퍼스널 컬러", "바디케어", "왁싱", "이미지 컨설팅"] as const;
+const CONSULTING_METHODS = ["방문", "영상상담", "채팅상담"] as const;
 
 async function main() {
-  console.log("🌱 사주메이트 시드 데이터 생성 시작...");
+  console.log("🌱 뷰티메이트 시드 데이터 생성 시작...");
 
   const pw = await bcrypt.hash("password123", 12);
 
-  // ─── 카테고리 (상담 종류) ───
+  // ─── 뷰티 서비스 카테고리 ───
   const categories = [];
   for (let i = 0; i < CONSULTING_TYPES.length; i++) {
     const name = CONSULTING_TYPES[i];
     const c = await prisma.category.create({
       data: {
         name,
-        slug: `consulting-${i + 1}`,
+        slug: `beauty-${i + 1}`,
         icon: "Sparkles",
-        description: `${name} 상담`,
+        description: `${name} 전문가와 서비스를 만나보세요`,
         sortOrder: i + 1,
       },
     });
@@ -33,38 +33,38 @@ async function main() {
   // ─── 최고관리자 ───
   await prisma.user.create({
     data: {
-      email: "admin@sajumate.com",
+      email: "admin@beautymate.com",
       name: "관리자",
       password: pw,
       role: Role.SUPER_ADMIN,
     },
   });
 
-  // ─── 상담사 3명 ───
+  // ─── 뷰티 전문가 3명 ───
   const consultantsData = [
     {
-      email: "consultant1@sajumate.com",
-      name: "김하늘",
-      slug: "haneul",
-      shopName: "하늘 사주원",
-      shopDescription: "30년 경력 사주·궁합 전문. 사주 원국을 바탕으로 흐름을 짚어드립니다.",
-      category: "사주",
+      email: "expert1@beautymate.kr",
+      name: "윤서연",
+      slug: "glow-atelier",
+      shopName: "글로우 아틀리에",
+      shopDescription: "피부 컨디션과 라이프스타일을 함께 살피는 맞춤 스킨케어 스튜디오입니다.",
+      category: "스킨케어",
     },
     {
-      email: "consultant2@sajumate.com",
-      name: "이수아",
-      slug: "sua",
-      shopName: "수아 타로하우스",
-      shopDescription: "타로와 신점을 함께 봅니다. 당면한 고민에 대한 구체적인 방향을 제시합니다.",
-      category: "타로",
+      email: "expert2@beautymate.kr",
+      name: "김민지",
+      slug: "tone-and-color",
+      shopName: "톤앤컬러 스튜디오",
+      shopDescription: "퍼스널 컬러 진단부터 메이크업 컬러 추천까지 일상에 바로 쓰이는 솔루션을 제안합니다.",
+      category: "퍼스널 컬러",
     },
     {
-      email: "consultant3@sajumate.com",
-      name: "박지은",
-      slug: "jieun",
-      shopName: "지은 작명연구소",
-      shopDescription: "작명·개명과 택일 전문. 이름과 날짜로 운의 흐름을 다듬습니다.",
-      category: "작명",
+      email: "expert3@beautymate.kr",
+      name: "박하린",
+      slug: "muse-hair-makeup",
+      shopName: "뮤즈 헤어앤메이크업",
+      shopDescription: "얼굴형과 분위기에 어울리는 헤어·메이크업 스타일을 함께 디자인합니다.",
+      category: "헤어",
     },
   ];
 
@@ -92,18 +92,18 @@ async function main() {
     consultants.push(user.sellerProfile!);
   }
 
-  // ─── 상담 상품 ───
-  // 상담사별로 (상담 종류 × 시간) 조합을 몇 개씩 등록한다.
+  // ─── 뷰티 서비스 ───
+  // 전문가별 대표 서비스와 예약 가능 수량을 등록한다.
   const productsData = [
-    { consultant: 0, type: "사주", method: "영상통화", minutes: 30, price: 39000, slots: 6 },
-    { consultant: 0, type: "사주", method: "방문", minutes: 60, price: 69000, slots: 4 },
-    { consultant: 0, type: "궁합", method: "영상통화", minutes: 60, price: 79000, slots: 3 },
-    { consultant: 1, type: "타로", method: "채팅", minutes: 30, price: 29000, slots: 8 },
-    { consultant: 1, type: "신점", method: "전화", minutes: 60, price: 89000, slots: 4 },
-    { consultant: 1, type: "연애운", method: "영상통화", minutes: 30, price: 35000, slots: 6 },
-    { consultant: 2, type: "작명", method: "방문", minutes: 90, price: 150000, slots: 2 },
-    { consultant: 2, type: "택일", method: "전화", minutes: 30, price: 45000, slots: 5 },
-    { consultant: 2, type: "사업운", method: "영상통화", minutes: 120, price: 190000, slots: 2 },
+    { consultant: 0, type: "스킨케어", method: "방문", minutes: 60, price: 79000, slots: 5 },
+    { consultant: 0, type: "스킨케어", method: "영상상담", minutes: 30, price: 39000, slots: 8 },
+    { consultant: 0, type: "바디케어", method: "방문", minutes: 90, price: 129000, slots: 3 },
+    { consultant: 1, type: "퍼스널 컬러", method: "방문", minutes: 90, price: 119000, slots: 4 },
+    { consultant: 1, type: "메이크업", method: "영상상담", minutes: 45, price: 59000, slots: 6 },
+    { consultant: 1, type: "이미지 컨설팅", method: "채팅상담", minutes: 30, price: 35000, slots: 8 },
+    { consultant: 2, type: "헤어", method: "방문", minutes: 90, price: 99000, slots: 4 },
+    { consultant: 2, type: "메이크업", method: "방문", minutes: 60, price: 89000, slots: 5 },
+    { consultant: 2, type: "이미지 컨설팅", method: "영상상담", minutes: 60, price: 79000, slots: 4 },
   ];
 
   const products = [];
@@ -113,10 +113,10 @@ async function main() {
     const category = categories.find((c) => c.name === p.type) ?? categories[0];
     const product = await prisma.product.create({
       data: {
-        name: `${p.type} 상담 ${p.minutes}분 (${p.method})`,
-        slug: `consulting-${i + 1}-${p.minutes}m`,
-        description: `${p.type} 상담을 ${p.method}(으)로 ${p.minutes}분간 진행합니다.`,
-        detailContent: `<h2>${p.type} 상담</h2><p>상담 방식: ${p.method}</p><p>상담 시간: ${p.minutes}분</p>`,
+        name: `${p.type} 맞춤 서비스 ${p.minutes}분 (${p.method})`,
+        slug: `beauty-service-${i + 1}-${p.minutes}m`,
+        description: `${p.type} 전문가가 ${p.method}(으)로 ${p.minutes}분간 맞춤 서비스를 제공합니다.`,
+        detailContent: `<h2>${p.type} 맞춤 서비스</h2><p>진행 방식: ${p.method}</p><p>소요 시간: ${p.minutes}분</p>`,
         basePrice: p.price,
         supplyPrice: Math.round(p.price * 0.7),
         categoryId: category.id,
@@ -131,7 +131,7 @@ async function main() {
     });
     products.push(product);
 
-    // 상담사 샵에 노출
+    // 뷰티 전문가 샵에 노출
     await prisma.sellerShopProduct.create({
       data: {
         sellerId: consultant.id,
@@ -161,7 +161,7 @@ async function main() {
     customers.push(u);
   }
 
-  // ─── 시간 슬롯 (각 상담사 앞으로 7일치, 10:00~16:00 매시) ───
+  // ─── 시간 슬롯 (각 뷰티 전문가 앞으로 7일치, 10:00~16:00 매시) ───
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   for (const c of consultantsData.keys()) {
@@ -213,10 +213,10 @@ async function main() {
         reservationTime: r.time,
         customerName: customer.name,
         customerPhone: customer.phone ?? "010-0000-0000",
-        birthDate: "1993-05-14",
-        birthTime: "09:30",
-        gender: i % 2 === 0 ? "M" : "F",
-        consultingContent: "올해 전반적인 운의 흐름과 이직 시기를 보고 싶습니다.",
+        birthDate: null,
+        birthTime: null,
+        gender: null,
+        consultingContent: "현재 고민과 원하는 스타일을 바탕으로 맞춤 추천을 받고 싶습니다.",
         paidAt: r.status === ReservationStatus.PENDING ? null : new Date(),
         items: {
           create: [
@@ -244,18 +244,18 @@ async function main() {
   await prisma.banner.createMany({
     data: [
       {
-        title: "오늘의 추천 상담사",
-        subtitle: "검증된 상담사와 라이브로 만나보세요",
-        imageUrl: "/banner/placeholder-1.png",
+        title: "오늘의 추천 뷰티 전문가",
+        subtitle: "검증된 뷰티 전문가와 라이브로 만나보세요",
+        imageUrl: "/banners/beautymate/hero-live-v3.png",
         linkUrl: "/search",
         position: "hero",
         sortOrder: 0,
         isActive: true,
       },
       {
-        title: "상담사 입점 안내",
-        subtitle: "나만의 점집을 열고 고객과 만나보세요",
-        imageUrl: "/banner/placeholder-2.png",
+        title: "뷰티 전문가 입점 안내",
+        subtitle: "나만의 뷰티샵을 열고 고객과 만나보세요",
+        imageUrl: "/banners/beautymate/expert-cta-v3.png",
         linkUrl: "/auth/register",
         position: "hero",
         sortOrder: 1,
@@ -265,7 +265,7 @@ async function main() {
   });
 
   console.log("✅ 시드 완료");
-  console.log(`   카테고리 ${categories.length}개 / 상담사 ${consultants.length}명 / 상담상품 ${products.length}개 / 고객 ${customers.length}명`);
+  console.log(`   카테고리 ${categories.length}개 / 뷰티 전문가 ${consultants.length}명 / 뷰티 서비스 ${products.length}개 / 고객 ${customers.length}명`);
   console.log("   계정 비밀번호: password123");
 }
 

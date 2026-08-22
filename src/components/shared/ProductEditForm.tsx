@@ -11,7 +11,7 @@ interface Category { id: string; name: string; slug: string; parentId: string | 
 interface Variant { name: string; price: string; stock: string; }
 
 interface Props {
-  // 저장/취소 후 돌아갈 목록 경로 (브랜드: /brand/products, 관리자: /admin/products, 상담사: /seller/products)
+  // 저장/취소 후 돌아갈 목록 경로 (브랜드: /brand/products, 관리자: /admin/products, 뷰티 전문가: /seller/products)
   backHref: string;
   // 역할 모드: "brand"는 공급가만 입력·조회(판매가 비노출), "admin"은 판매가+공급가, "seller"는 판매가만
   mode?: "admin" | "brand" | "seller";
@@ -51,7 +51,7 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
         const res = await fetch(`/api/products/${productId}`);
         if (!res.ok) {
           const data = await res.json();
-          setError(data.error || "상담상품을 불러올 수 없습니다");
+          setError(data.error || "뷰티 서비스를 불러올 수 없습니다");
           setPageLoading(false);
           return;
         }
@@ -98,7 +98,7 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
         });
         setCategories(data.categories || []);
       } catch {
-        setError("상담상품 데이터를 불러오는 중 오류가 발생했습니다");
+        setError("뷰티 서비스 데이터를 불러오는 중 오류가 발생했습니다");
       }
       setPageLoading(false);
     };
@@ -130,7 +130,7 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
     setTimeout(() => { ta.focus(); ta.selectionStart = ta.selectionEnd = s + ins.length; }, 0);
   };
 
-  // 저장 가능 조건: 브랜드는 공급가, 관리자/상담사는 판매가가 필수
+  // 저장 가능 조건: 브랜드는 공급가, 관리자/뷰티 전문가는 판매가가 필수
   const canSave = !!form.name && (isBrand ? !!form.supplyPrice : !!form.basePrice);
 
   const handleSave = async () => {
@@ -149,7 +149,7 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
               basePrice: parseFloat(form.basePrice),
               comparePrice: form.comparePrice ? parseFloat(form.comparePrice) : null,
             }),
-        // 공급가: 브랜드/관리자만 입력 가능. 상담사는 전송하지 않음
+        // 공급가: 브랜드/관리자만 입력 가능. 뷰티 전문가는 전송하지 않음
         ...(!isSeller ? { supplyPrice: form.supplyPrice ? parseFloat(form.supplyPrice) : null } : {}),
         categoryId: form.categoryId || null,
         thumbnail: form.thumbnail || form.images[0] || null,
@@ -195,7 +195,7 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-center">
           <Loader2 size={32} className="animate-spin text-brand-500 mx-auto mb-3" />
-          <p className="text-sm text-gray-400">상담상품 정보를 불러오는 중...</p>
+          <p className="text-sm text-gray-400">뷰티 서비스 정보를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -226,7 +226,7 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
             <Icon name="ChevronDown" size={20} className="rotate-90" />
           </button>
           <div>
-            <h1 className="text-lg font-bold text-gray-900">상담상품 수정</h1>
+            <h1 className="text-lg font-bold text-gray-900">뷰티 서비스 수정</h1>
             <p className="text-xs text-gray-400">{form.name}</p>
           </div>
         </div>
@@ -270,8 +270,8 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
         {activeTab === "basic" && (
           <div className="space-y-4">
             <div>
-              <label className="text-xs font-medium text-gray-600">상담상품명 *</label>
-              <input type="text" className="input-field mt-1 text-sm" placeholder="상담상품명" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
+              <label className="text-xs font-medium text-gray-600">뷰티 서비스명 *</label>
+              <input type="text" className="input-field mt-1 text-sm" placeholder="뷰티 서비스명" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
             </div>
             {isBrand ? (
               /* 브랜드: 공급가만 입력·조회 (판매가는 중간/최고관리자 전용, 비노출) */
@@ -288,7 +288,7 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
                 <p className="text-[10px] text-gray-400 mt-1.5">공급가만 입력하세요. 판매가·마진은 중간관리자가 설정합니다.</p>
               </div>
             ) : isSeller ? (
-              /* 상담사: 판매가와 정가만 입력 (공급가 비노출) */
+              /* 뷰티 전문가: 판매가와 정가만 입력 (공급가 비노출) */
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-medium text-gray-600">판매가 *</label>
@@ -352,7 +352,7 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
               </div>
             </div>
 
-            {/* 배송 설정 제거: 사주나라는 예약(비실물) 전용 서비스 (기존 배송값은 그대로 유지·저장) */}
+            {/* 배송 설정 제거: 뷰티메이트는 예약(비실물) 전용 서비스 (기존 배송값은 그대로 유지·저장) */}
 
             {/* 외부 최저가 (브랜드·관리자만 입력) */}
             {!isSeller && (
@@ -376,7 +376,7 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
                     </div>
                   </div>
                 </div>
-                <p className="text-[10px] text-gray-400">입력하면 상담사가 참고하여 판매를 시작합니다.</p>
+                <p className="text-[10px] text-gray-400">입력하면 뷰티 전문가가 참고하여 판매를 시작합니다.</p>
               </div>
             )}
           </div>
@@ -413,8 +413,8 @@ export default function ProductEditForm({ backHref, mode = "admin" }: Props) {
               <ImageUploader images={form.thumbnail ? [form.thumbnail] : []} onChange={urls => setForm(prev => ({ ...prev, thumbnail: urls[0] || "" }))} maxImages={1} compact />
             </div>
             {/* Images */}
-            <ImageUploader images={form.images} onChange={imgs => setForm(prev => ({ ...prev, images: imgs }))} maxImages={10} label="상담상품 이미지" />
-            {/* 재고 수량 (옵션 미사용 단일 상담상품) */}
+            <ImageUploader images={form.images} onChange={imgs => setForm(prev => ({ ...prev, images: imgs }))} maxImages={10} label="뷰티 서비스 이미지" />
+            {/* 재고 수량 (옵션 미사용 단일 뷰티 서비스) */}
             {form.variants.length === 0 && (
               <div>
                 <label className="text-xs font-medium text-gray-600 mb-1.5 block flex items-center gap-1"><Icon name="Gem" size={13} /> 예약 가능 수량</label>

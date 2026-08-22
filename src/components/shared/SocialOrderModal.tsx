@@ -154,7 +154,7 @@ export default function SocialOrderModal({ open, onClose, productId, sellerId, p
               <Icon name="Check" size={34} className="text-amber-500" />
             </div>
             <p className="text-[15px] font-bold text-gray-900">계좌 입금 예약서가 제출되었습니다</p>
-            <p className="text-[13px] text-gray-500 mt-1.5">상담사가 확인 후 연락드릴 예정입니다.</p>
+            <p className="text-[13px] text-gray-500 mt-1.5">뷰티 전문가가 확인 후 연락드릴 예정입니다.</p>
             {bank && (bank.bankName || bank.bankAccount) && (
               <div className="mt-4 w-full bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-left space-y-2">
                 <p className="text-[12px] font-bold text-amber-800">아래 계좌로 입금해 주세요</p>
@@ -203,7 +203,7 @@ export default function SocialOrderModal({ open, onClose, productId, sellerId, p
                 <div className="px-4 py-3 space-y-3">
                   {productName && (
                     <div>
-                      <p className="text-[11px] text-amber-600 font-semibold mb-1 flex items-center gap-1"><Icon name="ProductName_icon" size={13} /> 예약 상담상품</p>
+                      <p className="text-[11px] text-amber-600 font-semibold mb-1 flex items-center gap-1"><Icon name="ProductName_icon" size={13} /> 예약 뷰티 서비스</p>
                       <p className="text-[13px] font-bold text-gray-800 truncate">{productName}</p>
                     </div>
                   )}
@@ -222,7 +222,7 @@ export default function SocialOrderModal({ open, onClose, productId, sellerId, p
                     </div>
                   )}
                   <div>
-                    <p className="text-[11px] text-amber-600 font-semibold mb-1 flex items-center gap-1"><Icon name="PriceTag_icon" size={13} /> 입금액 (상담상품금액)</p>
+                    <p className="text-[11px] text-amber-600 font-semibold mb-1 flex items-center gap-1"><Icon name="PriceTag_icon" size={13} /> 입금액 (뷰티 서비스금액)</p>
                     <p className="text-[15px] font-bold text-amber-700">
                       {productPrice ? productPrice.toLocaleString("ko-KR") + "원" : "-"}
                     </p>
@@ -257,7 +257,7 @@ export default function SocialOrderModal({ open, onClose, productId, sellerId, p
                 />
               </div>
 
-              {/* 배송지 입력 제거: 사주나라는 예약(비실물) 전용 서비스 */}
+              {/* 배송지 입력 제거: 뷰티메이트는 예약(비실물) 전용 서비스 */}
 
               <div>
                 <label className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-700 mb-1.5">

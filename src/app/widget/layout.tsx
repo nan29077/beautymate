@@ -9,7 +9,7 @@ import type { Metadata } from "next";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "사주나라 라이브 위젯",
+  title: "뷰티메이트 라이브 위젯",
   robots: { index: false, follow: false },
 };
 

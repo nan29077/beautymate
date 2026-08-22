@@ -3,15 +3,15 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { refreshYoutubeToken } from "@/lib/youtubeOAuth";
 
-// POST /api/auth/youtube/refresh — access_token 수동 갱신 (상담사 전용)
+// POST /api/auth/youtube/refresh — access_token 수동 갱신 (뷰티 전문가 전용)
 
 export async function POST() {
   const session = await auth();
   if (!session || session.user?.role !== "CONSULTANT") {
-    return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+    return NextResponse.json({ error: "뷰티 전문가만 접근 가능" }, { status: 403 });
   }
   const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-  if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+  if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
   if (!seller.youtubeRefreshToken) {
     return NextResponse.json({ error: "YouTube 채널이 연결되어 있지 않습니다." }, { status: 400 });
   }

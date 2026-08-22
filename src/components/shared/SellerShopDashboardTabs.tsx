@@ -8,7 +8,7 @@ import ShopDirectExposureManager from "@/components/shared/ShopDirectExposureMan
 const TABS = [
   { key: "basic", label: "기본 정보", icon: Building2 },
   { key: "live", label: "라이브 설정", icon: Radio },
-  { key: "direct", label: "일반상담상품", icon: Star },
+  { key: "direct", label: "일반 뷰티 서비스", icon: Star },
   { key: "reviews", label: "후기 관리", icon: Star },
 ] as const;
 
@@ -25,8 +25,8 @@ export default function SellerShopDashboardTabs({ basicContent, liveContent }: P
   return (
     <div>
       <div className="mb-5">
-        <h1 className="text-lg sm:text-xl font-bold text-gray-900">점집 관리</h1>
-        <p className="text-xs sm:text-sm text-gray-500">점집 정보, 라이브 설정, 후기를 관리합니다</p>
+        <h1 className="text-lg sm:text-xl font-bold text-gray-900">뷰티샵 관리</h1>
+        <p className="text-xs sm:text-sm text-gray-500">뷰티샵 정보, 라이브 설정, 후기를 관리합니다</p>
       </div>
 
       {/* 탭 헤더 */}

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET: 모든 상담사의 할인율/커미션율 조회
+// GET: 모든 뷰티 전문가의 할인율/커미션율 조회
 export async function GET() {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
@@ -40,7 +40,7 @@ export async function GET() {
   });
 }
 
-// PATCH: 특정 상담사의 할인율/커미션율 수정
+// PATCH: 특정 뷰티 전문가의 할인율/커미션율 수정
 export async function PATCH(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "로그인 필요" }, { status: 401 });

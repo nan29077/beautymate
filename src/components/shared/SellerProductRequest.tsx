@@ -13,7 +13,7 @@ interface SellerProductRequestProps {
     name: string;
     thumbnail: string | null;
     basePrice: number;
-    // 상담사 노출 공급가 (공급가 + 중간관리자 마진). 판매가는 상담사가 직접 설정.
+    // 뷰티 전문가 노출 공급가 (공급가 + 중간관리자 마진). 판매가는 뷰티 전문가가 직접 설정.
     supplyPrice?: number;
     // 제공 방식: SUPPLY(공급가 제공) / COMMISSION(수수료 제공)
     priceModel?: "SUPPLY" | "COMMISSION";
@@ -31,7 +31,7 @@ const formatPrice = (n: number) => n.toLocaleString("ko-KR") + "원";
 export default function SellerProductRequest({ product }: SellerProductRequestProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "done">("idle");
   const [showModal, setShowModal] = useState(false);
-  // 상담사 노출 공급가 (판매가 하한 기준)
+  // 뷰티 전문가 노출 공급가 (판매가 하한 기준)
   const supply = product.supplyPrice ?? product.basePrice;
   const [priceInput, setPriceInput] = useState("");
   const isCommission = product.priceModel === "COMMISSION";
@@ -135,12 +135,12 @@ export default function SellerProductRequest({ product }: SellerProductRequestPr
             {status === "loading" && <Loader2 size={12} className="animate-spin" />}
             {status === "done" && <Icon name="Check" size={12} />}
             {status === "idle" && <Icon name="Plus" size={12} />}
-            {status === "done" ? "신청됨" : status === "loading" ? "신청 중" : "상담상품 신청"}
+            {status === "done" ? "신청됨" : status === "loading" ? "신청 중" : "뷰티 서비스 신청"}
           </button>
         </div>
       </div>
 
-      {/* 판매가 입력 모달 (공급가 제공 상담상품) */}
+      {/* 판매가 입력 모달 (공급가 제공 뷰티 서비스) */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => status !== "loading" && setShowModal(false)} />
@@ -167,7 +167,7 @@ export default function SellerProductRequest({ product }: SellerProductRequestPr
             </div>
 
             <div className="px-5 pb-5 space-y-3.5">
-              {/* 상담상품 요약 */}
+              {/* 뷰티 서비스 요약 */}
               <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
                 <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
                   <SafeImage src={product.thumbnail} placeholder={NO_IMAGE} alt={product.name} width={48} height={48} fallbackText="P" />

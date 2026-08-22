@@ -326,7 +326,7 @@ export default function ContentDetailClient({ post }: { post: ContentPost }) {
       {/* Tagged products list */}
       {post.shoppingTags.length > 0 && (
         <div className="px-4 pb-4">
-          <p className="text-xs font-semibold text-gray-500 mb-2">쇼핑 태그 상담상품</p>
+          <p className="text-xs font-semibold text-gray-500 mb-2">쇼핑 태그 뷰티 서비스</p>
           <div className="space-y-2">
             {[...new Map(post.shoppingTags.map((t) => [t.productId, t])).values()].map((tag) => (
               <Link key={tag.id} href={`/products/${tag.product.id}`}

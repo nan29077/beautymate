@@ -189,7 +189,7 @@ export default function BookingFlow({
           }
         }
       } catch {
-        // 결제 초기화 실패 시 기존 흐름(신청 완료 → 상담사 확정 대기)으로 폴백
+        // 결제 초기화 실패 시 기존 흐름(신청 완료 → 뷰티 전문가 확정 대기)으로 폴백
       }
       setSubmitting(false);
       setStep("done");
@@ -269,7 +269,7 @@ export default function BookingFlow({
             onClick={() => setStep("done")}
             className="w-full py-2.5 text-xs text-gray-400 hover:text-gray-600"
           >
-            나중에 결제하기 (상담사 확정 대기)
+            나중에 결제하기 (뷰티 전문가 확정 대기)
           </button>
         </div>
       </div>
@@ -281,13 +281,13 @@ export default function BookingFlow({
       <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
         <CheckCircle size={64} className="text-green-500 mb-4" />
         <h1 className="text-xl font-bold text-gray-900 mb-2">예약이 신청되었습니다!</h1>
-        <p className="text-gray-500 text-sm mb-6">상담사 확인 후 예약이 확정됩니다.</p>
+        <p className="text-gray-500 text-sm mb-6">뷰티 전문가 확인 후 예약이 확정됩니다.</p>
         <div className="flex flex-col gap-2 w-full max-w-xs">
           <Link href="/my/reservations" className="w-full py-3 bg-indigo-600 text-white rounded-xl text-sm font-medium text-center">
             예약 내역 보기
           </Link>
           <Link href={`/shop/${seller.slug}`} className="w-full py-3 border border-gray-200 text-gray-700 rounded-xl text-sm text-center">
-            상담사 홈으로
+            뷰티 전문가 홈으로
           </Link>
         </div>
       </div>
@@ -314,7 +314,7 @@ export default function BookingFlow({
         <div>
           <h1 className="text-base font-bold text-gray-900">{seller.shopName}</h1>
           <p className="text-xs text-gray-400">
-            {step === "product" && "상담 상품 선택"}
+            {step === "product" && "뷰티 서비스 선택"}
             {step === "date" && "날짜 선택"}
             {step === "time" && "시간 선택"}
             {step === "info" && "신청자 정보"}
@@ -329,7 +329,7 @@ export default function BookingFlow({
         {step === "product" && (
           <div className="space-y-3">
             {products.length === 0 ? (
-              <div className="text-center py-16 text-gray-400 text-sm">등록된 상담 상품이 없습니다.</div>
+              <div className="text-center py-16 text-gray-400 text-sm">등록된 뷰티 서비스가 없습니다.</div>
             ) : (
               products.map((p) => (
                 <button
@@ -476,44 +476,11 @@ export default function BookingFlow({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">생년월일</label>
-              <input
-                type="date"
-                value={form.birthDate}
-                onChange={e => setForm(f => ({ ...f, birthDate: e.target.value }))}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">태어난 시각 (선택)</label>
-              <input
-                type="time"
-                value={form.birthTime}
-                onChange={e => setForm(f => ({ ...f, birthTime: e.target.value }))}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">성별 (선택)</label>
-              <div className="flex gap-2">
-                {[{ value: "M", label: "남성" }, { value: "F", label: "여성" }].map(({ value, label }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setForm(f => ({ ...f, gender: f.gender === value ? "" : value }))}
-                    className={`flex-1 py-2.5 rounded-xl border text-sm transition-colors ${form.gender === value ? "bg-indigo-600 text-white border-indigo-600" : "border-gray-200 text-gray-700"}`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">상담 내용 (선택)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">요청사항 (선택)</label>
               <textarea
                 value={form.consultingContent}
                 onChange={e => setForm(f => ({ ...f, consultingContent: e.target.value }))}
-                placeholder="궁금한 점이나 상담 내용을 미리 적어주세요."
+                placeholder="원하는 스타일, 현재 고민, 알레르기나 주의사항을 알려주세요."
                 rows={3}
                 className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm resize-none"
               />
@@ -538,16 +505,16 @@ export default function BookingFlow({
           <div className="space-y-4">
             <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3 text-sm">
               <p className="font-semibold text-gray-900">예약 정보 확인</p>
-              <Row label="상담사" value={seller.shopName} />
-              <Row label="상담 상품" value={selectedProduct.name} />
+              <Row label="뷰티 전문가" value={seller.shopName} />
+              <Row label="뷰티 서비스" value={selectedProduct.name} />
               {(selectedProduct.consultingType || selectedProduct.consultingMethod) && (
                 <Row
-                  label="상담 유형"
+                  label="서비스 유형"
                   value={[selectedProduct.consultingType, selectedProduct.consultingMethod].filter(Boolean).join(" · ")}
                 />
               )}
               {selectedProduct.durationMinutes != null && (
-                <Row label="상담 시간" value={`${selectedProduct.durationMinutes}분`} />
+                <Row label="소요 시간" value={`${selectedProduct.durationMinutes}분`} />
               )}
               <Row label="예약 날짜" value={selectedDate} />
               <Row label="예약 시간" value={`${selectedSlot.startTime} ~ ${selectedSlot.endTime}`} />
@@ -556,10 +523,7 @@ export default function BookingFlow({
               </div>
               <Row label="이름" value={form.customerName} />
               <Row label="연락처" value={form.customerPhone} />
-              {form.birthDate && <Row label="생년월일" value={form.birthDate} />}
-              {form.birthTime && <Row label="태어난 시각" value={form.birthTime} />}
-              {form.gender && <Row label="성별" value={form.gender === "M" ? "남성" : "여성"} />}
-              {form.consultingContent && <Row label="상담 내용" value={form.consultingContent} />}
+              {form.consultingContent && <Row label="요청사항" value={form.consultingContent} />}
               <div className="border-t border-gray-100 pt-2 flex justify-between">
                 <span className="font-semibold text-gray-700">결제 금액</span>
                 <span className="font-bold text-indigo-600 text-base">
@@ -574,7 +538,7 @@ export default function BookingFlow({
             >
               {submitting ? "예약 신청 중..." : "예약 신청하기"}
             </button>
-            <p className="text-xs text-gray-400 text-center">예약 신청 후 상담사 확인 시 최종 확정됩니다.</p>
+            <p className="text-xs text-gray-400 text-center">예약 신청 후 뷰티 전문가 확인 시 최종 확정됩니다.</p>
           </div>
         )}
       </div>

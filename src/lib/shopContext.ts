@@ -1,6 +1,6 @@
-// 점집 "컨텍스트" 공용 정의.
-// - 점집(/shop/[slug])에 들어오면 상담사 미니정보를 쿠키에 저장하고,
-//   장바구니/예약내역/내정보 등 고객 서브페이지에서도 상담사 전용 헤더·하단바를 유지한다.
+// 뷰티샵 "컨텍스트" 공용 정의.
+// - 뷰티샵(/shop/[slug])에 들어오면 뷰티 전문가 미니정보를 쿠키에 저장하고,
+//   장바구니/예약내역/내정보 등 고객 서브페이지에서도 뷰티 전문가 전용 헤더·하단바를 유지한다.
 // - 이 모듈은 prisma/document 등 환경 의존 코드를 두지 않아 서버·클라이언트 양쪽에서 import 가능.
 
 export const SB_SHOP_COOKIE = "sb_shop";
@@ -25,8 +25,8 @@ export function parseShopCookie(raw: string | undefined | null): ShopMini | null
   return null;
 }
 
-// 상담사 컨텍스트를 "유지"할 고객 서브페이지 경로.
-// (점집 메인 /shop/[slug] 자체는 자체 헤더/하단바를 쓰므로 여기서 제외)
+// 뷰티 전문가 컨텍스트를 "유지"할 고객 서브페이지 경로.
+// (뷰티샵 메인 /shop/[slug] 자체는 자체 헤더/하단바를 쓰므로 여기서 제외)
 const SUBPAGE_PATTERNS: RegExp[] = [
   /^\/cart(\/|$)/,
   /^\/my\/(?!seller$).+/,   // /my/seller(내픽)는 제외, /my/orders 등만 포함

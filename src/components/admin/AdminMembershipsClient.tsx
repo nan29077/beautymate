@@ -1,6 +1,6 @@
 "use client";
 
-// 관리자 점집 회원 관리 — 전체 조회·점집 필터·회원 등록/해제
+// 관리자 뷰티샵 회원 관리 — 전체 조회·뷰티샵 필터·회원 등록/해제
 import { useCallback, useEffect, useState } from "react";
 import { Search, Users, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 
@@ -73,7 +73,7 @@ export default function AdminMembershipsClient() {
   return (
     <div className="p-4 md:p-6 space-y-4">
       <h1 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-        <Users size={20} className="text-indigo-500" /> 점집 회원 관리
+        <Users size={20} className="text-indigo-500" /> 뷰티샵 회원 관리
         <span className="text-sm font-normal text-gray-400">총 {total}명</span>
       </h1>
 
@@ -107,7 +107,7 @@ export default function AdminMembershipsClient() {
           }}
           className="border border-gray-200 rounded-lg px-2.5 py-2 text-xs text-gray-600"
         >
-          <option value="">전체 점집</option>
+          <option value="">전체 뷰티샵</option>
           {shops.map((s) => (
             <option key={s.id} value={s.id}>
               {s.shopName}
@@ -120,7 +120,7 @@ export default function AdminMembershipsClient() {
         <div className="py-16 text-center text-sm text-gray-400">불러오는 중...</div>
       ) : rows.length === 0 ? (
         <div className="py-16 text-center text-sm text-gray-400">
-          점집 회원이 없습니다. (DB 스키마 미반영 환경에서는 빈 목록이 표시됩니다)
+          뷰티샵 회원이 없습니다. (DB 스키마 미반영 환경에서는 빈 목록이 표시됩니다)
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
@@ -129,7 +129,7 @@ export default function AdminMembershipsClient() {
               <tr className="border-b border-gray-100 text-gray-400 text-left">
                 <th className="px-4 py-3 font-medium">회원</th>
                 <th className="px-4 py-3 font-medium">연락처</th>
-                <th className="px-4 py-3 font-medium">소속 점집</th>
+                <th className="px-4 py-3 font-medium">소속 뷰티샵</th>
                 <th className="px-4 py-3 font-medium">가입일</th>
                 <th className="px-4 py-3 font-medium text-right">관리</th>
               </tr>

@@ -6,8 +6,8 @@ import { completeConsultingSession } from "@/lib/consultingSession";
 
 export const dynamic = "force-dynamic";
 
-// POST /api/sessions/[id]/end — 상담 종료 (상담사·관리자 전용)
-// body: { memo?: string } — 상담사가 종료 시 남기는 상담 메모 (Reservation.consultantMemo 저장)
+// POST /api/sessions/[id]/end — 상담 종료 (뷰티 전문가·관리자 전용)
+// body: { memo?: string } — 뷰티 전문가가 종료 시 남기는 고객 메모 (Reservation.consultantMemo 저장)
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> | { id: string } },

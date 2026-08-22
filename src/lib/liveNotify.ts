@@ -11,7 +11,7 @@ export interface LiveNotifyResult {
 }
 
 /**
- * 라이브 방송 시작 시, 해당 상담사를 팔로우한 고객 전체에게 카카오 알림톡을 발송한다.
+ * 라이브 방송 시작 시, 해당 뷰티 전문가를 팔로우한 고객 전체에게 카카오 알림톡을 발송한다.
  * - 이미 발송된(kakaoNotified) 라이브는 force=false면 건너뛴다.
  * - 템플릿 본문/버튼은 발송 시점에 알리고 등록 원문을 가져와 변수만 치환한다 (alimtalkEngine).
  * - 알리고 미설정/수신자 없음 등은 에러가 아니라 "건너뜀"으로 처리하여 방송 시작을 막지 않는다.
@@ -61,7 +61,7 @@ export async function notifyLiveStartToFollowers(
   const result = await sendTemplatedAlimtalk({
     purpose: "LIVE_START",
     variables: {
-      "상담사명": live.seller.shopName,
+      "뷰티 전문가명": live.seller.shopName,
       "방송제목": live.title,
       shopid: live.seller.slug,
       livecode: live.shareCode,

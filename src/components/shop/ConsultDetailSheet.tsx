@@ -140,7 +140,7 @@ export default function ConsultDetailSheet({
               <div className="bg-gray-50 rounded-xl p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <User size={14} className="text-violet-500 flex-shrink-0" />
-                  <span className="text-xs text-gray-500">상담사</span>
+                  <span className="text-xs text-gray-500">뷰티 전문가</span>
                   <span className="text-sm font-semibold text-gray-900 ml-auto">{consultantName}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -165,7 +165,7 @@ export default function ConsultDetailSheet({
                 {selected.product && (
                   <div className="flex items-center gap-2">
                     <div className="w-3.5 h-3.5 flex-shrink-0" />
-                    <span className="text-xs text-gray-500">상담 종류</span>
+                    <span className="text-xs text-gray-500">서비스 종류</span>
                     <span className="text-sm font-semibold text-gray-900 ml-auto truncate max-w-[180px]">
                       {selected.product.name}
                     </span>
@@ -186,7 +186,7 @@ export default function ConsultDetailSheet({
                 ) : (
                   <div className="bg-gray-50 rounded-xl p-4 text-center">
                     <p className="text-xs text-gray-400">이 상담에 대한 AI 요약이 없어요.</p>
-                    <p className="text-[11px] text-gray-400 mt-1">라이브 상담에 참여하면 AI가 내용을 정리해드려요.</p>
+                    <p className="text-[11px] text-gray-400 mt-1">라이브 뷰티에 참여하면 AI가 내용을 정리해드려요.</p>
                   </div>
                 )}
               </div>

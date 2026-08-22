@@ -50,7 +50,7 @@ export default async function SellerReservationsPage({
       orderBy: [{ reservationDate: "desc" }, { reservationTime: "asc" }],
     }), []);
 
-  // 상담 메모는 컬럼 미반영 환경을 대비해 별도 조회(실패 시 빈 값)
+  // 고객 메모는 컬럼 미반영 환경을 대비해 별도 조회(실패 시 빈 값)
   const memoMap = await getConsultantMemos(
     reservations.filter((r) => r.status === "COMPLETED").map((r) => r.id)
   );

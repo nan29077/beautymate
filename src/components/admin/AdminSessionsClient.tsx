@@ -205,7 +205,7 @@ export default function AdminSessionsClient() {
               <tr className="border-b border-gray-100 text-gray-400 text-left">
                 <th className="px-4 py-3 font-medium">상태</th>
                 <th className="px-4 py-3 font-medium">예약 일시</th>
-                <th className="px-4 py-3 font-medium">점집 / 상담사</th>
+                <th className="px-4 py-3 font-medium">뷰티샵 / 뷰티 전문가</th>
                 <th className="px-4 py-3 font-medium">고객</th>
                 <th className="px-4 py-3 font-medium">상품</th>
                 <th className="px-4 py-3 font-medium">진행</th>

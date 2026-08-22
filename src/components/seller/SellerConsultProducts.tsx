@@ -1,6 +1,6 @@
 "use client";
 
-// 상담사 "상담상품 관리" — DirectProduct 기반 상담 서비스 목록/등록/수정/삭제.
+// 뷰티 전문가 "뷰티 서비스 관리" — DirectProduct 기반 상담 서비스 목록/등록/수정/삭제.
 // 상담 유형·시간·가격은 스키마 변경 없이 DirectProduct.description 에 JSON 으로 저장한다.
 //   신형: { "type": "VIDEO"|"PHONE"|"VISIT", "durations": [{"duration": 30, "price": 50000}, ...], "note": "설명" }
 //   구형: { "type": "VIDEO", "duration": 60, "note": "..." }  ← 하위 호환 유지
@@ -90,7 +90,7 @@ export function parseConsultMeta(description: string | null, fallbackPrice?: num
               Number.isFinite((d as any).price) &&
               (d as any).price >= 0
           )
-          .map((d) => ({ duration: Math.floor(d.duration), price: d.price }));
+          .map((d: { duration: number; price: number }) => ({ duration: Math.floor(d.duration), price: d.price }));
         if (durations.length > 0) return { type, durations, note };
       }
 
@@ -283,7 +283,7 @@ export default function SellerConsultProducts({ initialProducts }: { initialProd
   const handleDelete = async (p: ConsultProduct) => {
     if (
       !(await appConfirm({
-        message: `'${p.name}' 상담상품을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`,
+        message: `'${p.name}' 뷰티 서비스를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`,
         type: "warning",
         confirmText: "삭제",
       }))
@@ -311,12 +311,12 @@ export default function SellerConsultProducts({ initialProducts }: { initialProd
             <Package size={18} />
           </span>
           <div>
-            <h2 className="text-sm font-bold text-brand-950">등록된 상담상품</h2>
+            <h2 className="text-sm font-bold text-brand-950">등록된 뷰티 서비스</h2>
             <p className="text-[10px] text-gray-400">총 {products.length}개</p>
           </div>
         </div>
         <button onClick={openCreate} className="btn-primary min-h-10 px-3 py-2 text-[12px] whitespace-nowrap">
-          <Plus size={14} strokeWidth={1.8} /> 상담상품 등록
+          <Plus size={14} strokeWidth={1.8} /> 뷰티 서비스 등록
         </button>
       </div>
 
@@ -324,10 +324,10 @@ export default function SellerConsultProducts({ initialProducts }: { initialProd
       {products.length === 0 ? (
         <div className="dashboard-empty dashboard-panel">
           <Package size={40} strokeWidth={1.5} className="mx-auto mb-3 text-brand-200" />
-          <p className="text-sm">등록된 상담상품이 없습니다</p>
+          <p className="text-sm">등록된 뷰티 서비스가 없습니다</p>
           <p className="text-xs mt-1">영상·전화·방문 상담을 등록해 고객이 예약할 수 있게 해보세요.</p>
           <button onClick={openCreate} className="btn-primary mt-4 px-4 py-2 text-xs">
-            <Plus size={14} strokeWidth={1.8} /> 상담상품 등록
+            <Plus size={14} strokeWidth={1.8} /> 뷰티 서비스 등록
           </button>
         </div>
       ) : (
@@ -424,7 +424,7 @@ export default function SellerConsultProducts({ initialProducts }: { initialProd
             {/* Header */}
             <div className="flex-shrink-0 px-5 pt-5 pb-3 border-b border-gray-100 flex items-center justify-between">
               <h3 className="text-base font-bold text-gray-900">
-                {editing ? "상담상품 수정" : "상담상품 등록"}
+                {editing ? "뷰티 서비스 수정" : "뷰티 서비스 등록"}
               </h3>
               <button
                 onClick={() => setShowForm(false)}
@@ -444,7 +444,7 @@ export default function SellerConsultProducts({ initialProducts }: { initialProd
                 <input
                   type="text"
                   className="input-field text-sm"
-                  placeholder="예: 신년 운세 종합 상담"
+                  placeholder="예: 신년 뷰티 트렌드 종합 상담"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                 />
@@ -481,7 +481,7 @@ export default function SellerConsultProducts({ initialProducts }: { initialProd
               {/* 시간 + 가격 옵션 */}
               <div>
                 <label className="text-xs font-semibold text-gray-700 mb-1.5 block">
-                  상담 시간 및 가격 <span className="text-red-500">*</span>
+                  소요 시간 및 가격 <span className="text-red-500">*</span>
                 </label>
                 <div className="space-y-2">
                   {form.durations.map((row, idx) => (
@@ -557,7 +557,7 @@ export default function SellerConsultProducts({ initialProducts }: { initialProd
               </div>
 
               <p className="text-[11px] text-gray-400 leading-relaxed">
-                등록하면 별도 승인 없이 바로 점집에 노출됩니다.
+                등록하면 별도 승인 없이 바로 뷰티샵에 노출됩니다.
               </p>
             </div>
 

@@ -34,9 +34,9 @@ function RegisterForm() {
   const sellerRefFromUrl = searchParams?.get("ref") ?? null;
   const refCode = searchParams?.get("code") ?? null;
   const typeParam = searchParams?.get("type") ?? "";
-  // 상담사 소개 페이지(/become-seller)에서 "상담사 신청하기"로 들어오면 ?role=CONSULTANT 로 상담사 가입을 미리 선택.
+  // 뷰티 전문가 소개 페이지(/become-seller)에서 "뷰티 전문가 신청하기"로 들어오면 ?role=CONSULTANT 로 뷰티 전문가 가입을 미리 선택.
   const roleFromUrl = (searchParams?.get("role") ?? "").toUpperCase() === "CONSULTANT" ? "CONSULTANT" : null;
-  // 상담사 귀속은 URL ?ref= 로 들어온 경우에만 (쿠키 fallback 제거)
+  // 뷰티 전문가 귀속은 URL ?ref= 로 들어온 경우에만 (쿠키 fallback 제거)
   const sellerRef = sellerRefFromUrl;
   const [autoFilledShopName, setAutoFilledShopName] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -66,10 +66,10 @@ function RegisterForm() {
     needsApproval: boolean;
   } | null>(null);
 
-  // 상담사 초대는 URL의 ?ref=<slug> 로 들어온 경우에만 적용한다.
-  // (이전엔 sb_ref 쿠키 fallback 으로 자동 탐지했으나, 상담사 점집 방문 후 남은
-  //  쿠키 때문에 일반 가입도 상담사 초대로 표시되는 문제가 있어 제거함)
-  // URL slug 가 있을 때만 점집명을 조회해 배너에 표시.
+  // 뷰티 전문가 초대는 URL의 ?ref=<slug> 로 들어온 경우에만 적용한다.
+  // (이전엔 sb_ref 쿠키 fallback 으로 자동 탐지했으나, 뷰티 전문가 뷰티샵 방문 후 남은
+  //  쿠키 때문에 일반 가입도 뷰티 전문가 초대로 표시되는 문제가 있어 제거함)
+  // URL slug 가 있을 때만 뷰티샵명을 조회해 배너에 표시.
   useEffect(() => {
     if (!sellerRefFromUrl) return;
     let cancelled = false;
@@ -202,7 +202,7 @@ function RegisterForm() {
             needsApproval: true,
           });
         } else {
-          // 분양몰(상담사 점집) 경유 가입이면 로그인 후 해당 점집으로 복귀하도록 callbackUrl 전달.
+          // 분양몰(뷰티 전문가 뷰티샵) 경유 가입이면 로그인 후 해당 뷰티샵으로 복귀하도록 callbackUrl 전달.
           const shopCallback = sellerRef ? `/shop/${encodeURIComponent(sellerRef)}` : null;
           router.push(
             shopCallback
@@ -238,7 +238,7 @@ function RegisterForm() {
       appAlert(`${provider} 로그인이 아직 설정되지 않았습니다. 관리자에게 문의해주세요.`);
       return;
     }
-    // 분양몰(상담사 점집) 경유 가입이면 가입 후 해당 점집으로 복귀. (ref = 상담사 slug)
+    // 분양몰(뷰티 전문가 뷰티샵) 경유 가입이면 가입 후 해당 뷰티샵으로 복귀. (ref = 뷰티 전문가 slug)
     const callbackUrl = sellerRef ? `/shop/${encodeURIComponent(sellerRef)}` : "/";
     signIn(provider, { callbackUrl });
   };
@@ -258,7 +258,7 @@ function RegisterForm() {
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-yellow-50 flex items-center justify-center">
               <Icon name="Clock" size={32} className="text-yellow-500" />
             </div>
-            <h2 className="text-lg font-bold text-gray-900 mb-2">상담사 가입 완료!</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-2">뷰티 전문가 가입 완료!</h2>
             <p className="text-sm text-gray-600 mb-4 leading-relaxed">
               {registrationResult.message}
             </p>
@@ -307,16 +307,16 @@ function RegisterForm() {
               <Icon name="Gift" size={14} />
               <span className="font-medium">
                 {autoFilledShopName
-                  ? `${autoFilledShopName} 상담사 초대로 가입합니다`
+                  ? `${autoFilledShopName} 뷰티 전문가 초대로 가입합니다`
                   : sellerRef
-                  ? "상담사 초대를 통해 가입합니다"
+                  ? "뷰티 전문가 초대를 통해 가입합니다"
                   : "추천인 코드를 통해 가입합니다"}
               </span>
             </div>
           )}
           {typeParam === "seller" && (
             <div className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 bg-gray-900 text-white text-sm rounded-full">
-              <span className="font-medium">상담사로 시작하기 — 아래에서 가입 유형을 선택하세요</span>
+              <span className="font-medium">뷰티 전문가로 시작하기 — 아래에서 가입 유형을 선택하세요</span>
             </div>
           )}
         </div>
@@ -577,8 +577,8 @@ function RegisterForm() {
                 <label className="block text-xs font-semibold text-gray-600 mb-2">가입 유형</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { value: "CUSTOMER", label: "시청자 회원", desc: "상담 예약 & 단체 상담", badge: "즉시 이용 가능" },
-                    { value: "CONSULTANT", label: "상담사", desc: "점집 운영 & 판매", badge: "관리자 승인 필요" },
+                    { value: "CUSTOMER", label: "시청자 회원", desc: "상담 예약 & 공동 프로모션", badge: "즉시 이용 가능" },
+                    { value: "CONSULTANT", label: "뷰티 전문가", desc: "뷰티샵 운영 & 판매", badge: "관리자 승인 필요" },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -610,8 +610,8 @@ function RegisterForm() {
                 <div className="flex items-start gap-2">
                   <Icon name="Clock" size={14} className="text-yellow-600 flex-shrink-0 mt-0.5" />
                   <p className="text-[11px] text-yellow-700 leading-relaxed">
-                    상담사 계정은 가입 후 <strong>관리자 승인</strong>이 필요합니다.
-                    승인 전까지 상담사 기능을 이용할 수 없습니다.
+                    뷰티 전문가 계정은 가입 후 <strong>관리자 승인</strong>이 필요합니다.
+                    승인 전까지 뷰티 전문가 기능을 이용할 수 없습니다.
                   </p>
                 </div>
               </div>

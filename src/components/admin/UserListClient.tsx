@@ -11,7 +11,7 @@ import { withVatRate } from "@/lib/utils";
 import Pagination, { usePagination } from "@/components/shared/Pagination";
 import SignupBadges from "@/components/shared/SignupBadges";
 import SafeImage from "@/components/shared/SafeImage";
-import { pickRoleAvatar, pickSajuAvatar, resolveAdminDashboardAvatar, resolveConsultantAvatar } from "@/lib/defaults";
+import { pickRoleAvatar, pickBeautyMateAvatar, resolveAdminDashboardAvatar, resolveConsultantAvatar } from "@/lib/defaults";
 
 interface User {
   id: string;
@@ -28,7 +28,7 @@ interface User {
   createdAt: string;
   // 소셜 가입 제공자(kakao·naver·google). 비어 있으면 이메일 가입.
   authProviders?: string[];
-  // 상담사 전용
+  // 뷰티 전문가 전용
   sellerId?: string | null;
   commissionRate?: number | null;
 }
@@ -38,7 +38,7 @@ const dashPath = (r: string) =>
 
 const ROLE_MAP: Record<string, { label: string; color: string; order: number }> = {
   SUPER_ADMIN: { label: "관리자", color: "bg-red-50 text-red-600", order: 1 },
-  CONSULTANT: { label: "상담사", color: "bg-blue-50 text-blue-600", order: 4 },
+  CONSULTANT: { label: "뷰티 전문가", color: "bg-blue-50 text-blue-600", order: 4 },
   CUSTOMER: { label: "고객", color: "bg-green-50 text-green-600", order: 5 },
 };
 
@@ -46,11 +46,11 @@ function getUserAvatar(user: User): string {
   if (user.role === "SUPER_ADMIN") {
     return resolveAdminDashboardAvatar(user.id, user.avatar);
   }
-  // 상담사는 DB 에 남은 레거시 꿀벌 캐릭터도 사주 동물 캐릭터로 교체한다.
+  // 뷰티 전문가는 DB 에 남은 레거시 꿀벌 캐릭터도 뷰티 동물 캐릭터로 교체한다.
   if (user.role === "CONSULTANT") return resolveConsultantAvatar(user.id, user.avatar);
   if (user.avatar) return user.avatar;
   return user.role === "CUSTOMER"
-    ? pickSajuAvatar(user.id)
+    ? pickBeautyMateAvatar(user.id)
     : pickRoleAvatar(user.id, user.role, user.gender);
 }
 
@@ -257,7 +257,7 @@ export default function UserListClient({ users }: { users: User[] }) {
             >
               <option value="all">전체 ({roleCounts.all})</option>
               <option value="SUPER_ADMIN">관리자 ({roleCounts.SUPER_ADMIN})</option>
-              <option value="CONSULTANT">상담사 ({roleCounts.CONSULTANT})</option>
+              <option value="CONSULTANT">뷰티 전문가 ({roleCounts.CONSULTANT})</option>
               <option value="CUSTOMER">고객 ({roleCounts.CUSTOMER})</option>
             </select>
           </div>
@@ -449,7 +449,7 @@ export default function UserListClient({ users }: { users: User[] }) {
                 <Icon name="Discount" size={18} className="text-indigo-500" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-gray-900">상담사 수수료율 설정</h3>
+                <h3 className="text-sm font-bold text-gray-900">뷰티 전문가 수수료율 설정</h3>
                 <p className="text-[11px] text-gray-400">{commTarget.name}</p>
               </div>
             </div>

@@ -9,9 +9,9 @@ import { ensureShopMembership } from "@/lib/shopMembership";
 
 export const dynamic = "force-dynamic";
 
-// POST /api/shop/[slug]/join — 점집 독립 회원 가입
+// POST /api/shop/[slug]/join — 뷰티샵 독립 회원 가입
 // 두 가지 모드:
-//  1) 로그인 상태(고객): 현재 계정을 이 점집 회원으로 연결 (body 불필요)
+//  1) 로그인 상태(고객): 현재 계정을 이 뷰티샵 회원으로 연결 (body 불필요)
 //  2) 비로그인: {name, email, password, phone?} 로 신규 계정 생성 + 멤버십 + 귀속
 export async function POST(
   request: Request,
@@ -24,16 +24,16 @@ export async function POST(
     select: { id: true, shopName: true, isApproved: true, userId: true },
   });
   if (!shop || !shop.isApproved) {
-    return NextResponse.json({ error: "점집을 찾을 수 없습니다." }, { status: 404 });
+    return NextResponse.json({ error: "뷰티샵을 찾을 수 없습니다." }, { status: 404 });
   }
 
   const session = await auth();
 
-  // ── 모드 1: 로그인된 고객을 점집 회원으로 연결 ──
+  // ── 모드 1: 로그인된 고객을 뷰티샵 회원으로 연결 ──
   if (session?.user) {
     if (session.user.role !== "CUSTOMER") {
       return NextResponse.json(
-        { error: "고객 계정만 점집 회원으로 가입할 수 있습니다." },
+        { error: "고객 계정만 뷰티샵 회원으로 가입할 수 있습니다." },
         { status: 400 },
       );
     }
@@ -78,7 +78,7 @@ export async function POST(
   if (existing) {
     return NextResponse.json(
       {
-        error: "이미 가입된 이메일입니다. 점집 로그인 후 회원 연결을 진행해주세요.",
+        error: "이미 가입된 이메일입니다. 뷰티샵 로그인 후 회원 연결을 진행해주세요.",
         alreadyExists: true,
       },
       { status: 409 },
@@ -104,14 +104,14 @@ export async function POST(
     select: { id: true },
   });
 
-  // 점집 귀속(레퍼럴) — 기존 1단계 체계와 병행 유지
+  // 뷰티샵 귀속(레퍼럴) — 기존 1단계 체계와 병행 유지
   await linkReferralForNewBuyer(prisma, {
     userId: user.id,
     sellerRef: slug,
     referralCode: null,
   }).catch((e) => console.error("[shop/join] 귀속 처리 오류:", e));
 
-  // 점집 독립 멤버십 (테이블 미반영 시 null — 가입은 그대로 진행)
+  // 뷰티샵 독립 멤버십 (테이블 미반영 시 null — 가입은 그대로 진행)
   const membership = await ensureShopMembership(shop.id, user.id, shop.userId);
 
   // 환영 알림톡 (실패 무시)
@@ -130,7 +130,7 @@ export async function POST(
   });
 }
 
-// GET /api/shop/[slug]/join — 현재 로그인 사용자의 이 점집 멤버십 여부
+// GET /api/shop/[slug]/join — 현재 로그인 사용자의 이 뷰티샵 멤버십 여부
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug: string }> | { slug: string } },
@@ -146,7 +146,7 @@ export async function GET(
     select: { id: true },
   });
   if (!shop) {
-    return NextResponse.json({ error: "점집을 찾을 수 없습니다." }, { status: 404 });
+    return NextResponse.json({ error: "뷰티샵을 찾을 수 없습니다." }, { status: 404 });
   }
 
   const { isShopMember } = await import("@/lib/shopMembership");

@@ -14,7 +14,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
 
 // 슬러그 → 아이콘 이름 폴백 맵
 const SLUG_FALLBACK: Record<string, string> = {
-  saju: "Sun", sinjeom: "Sparkles", tarot: "Star", gunghap: "Heart",
+  beautymate: "Sun", sinjeom: "Sparkles", tarot: "Star", gunghap: "Heart",
   jakmyeong: "Paintbrush", gwansang: "Glasses", taegil: "Flag", pungsu: "Compass",
   astrology: "Globe", dream: "Moon", bujeok: "Ribbon", gut: "Theater",
   counseling: "Stethoscope", fortune: "Zap", love: "Heart", money: "Gem",

@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// 상담사가 직접 설정하는 최초의 할인율 — 상한을 서버에서 강제한다 (실수/악용 방지)
+// 뷰티 전문가가 직접 설정하는 최초의 할인율 — 상한을 서버에서 강제한다 (실수/악용 방지)
 const MAX_RATE = 20; // 할인율 상한(%)
 
-// GET: 장바구니 할인 설정 조회 (상담사 본인)
+// GET: 장바구니 할인 설정 조회 (뷰티 전문가 본인)
 export async function GET() {
   try {
     const session = await auth();
@@ -22,7 +22,7 @@ export async function GET() {
         cartDiscountRate: true,
       },
     });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필이 없습니다" }, { status: 404 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필이 없습니다" }, { status: 404 });
 
     return NextResponse.json({
       enabled: seller.cartDiscountEnabled,
@@ -49,7 +49,7 @@ export async function PUT(req: NextRequest) {
       where: { userId: session.user!.id },
       select: { id: true },
     });
-    if (!seller) return NextResponse.json({ error: "상담사 프로필이 없습니다" }, { status: 404 });
+    if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필이 없습니다" }, { status: 404 });
 
     const body = await req.json();
     const enabled = body.enabled === true;

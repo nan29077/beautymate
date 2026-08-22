@@ -1,31 +1,28 @@
 // 역할별 기본 아바타 이미지 유틸
-import { SAJU_CUSTOMER_AVATARS } from "@/lib/defaults";
+import { BEAUTYMATE_CUSTOMER_AVATARS } from "@/lib/defaults";
 
 export type UserRole = "SUPER_ADMIN" | "CONSULTANT" | "CUSTOMER";
 
 export function getDefaultAvatar(role: UserRole, gender?: "male" | "female", index?: number): string {
-  const i = ((index ?? 0) % getAvatarCount(role)) + 1;
   switch (role) {
     case "SUPER_ADMIN":
-      return `/avatars/관리자_${i}.png`;
+      return "/avatars/beautymate/default.svg";
     case "CONSULTANT":
-      // 상담사는 사주 동물 캐릭터 풀 사용 (기존 꿀벌 캐릭터 폐기)
-      return SAJU_CUSTOMER_AVATARS[(index ?? 0) % SAJU_CUSTOMER_AVATARS.length];
+      // 뷰티 전문가는 뷰티 동물 캐릭터 풀 사용 (기존 꿀벌 캐릭터 폐기)
+      return BEAUTYMATE_CUSTOMER_AVATARS[(index ?? 0) % BEAUTYMATE_CUSTOMER_AVATARS.length];
     case "CUSTOMER":
     default: {
-      const bi = ((index ?? 0) % 13) + 1;
-      if (gender === "male") return `/avatars/남성구매회원_${bi}.png`;
-      return `/avatars/여성구매회원_${bi}.png`;
+      return "/avatars/beautymate/default.svg";
     }
   }
 }
 
 export function getAvatarCount(role: UserRole): number {
   switch (role) {
-    case "SUPER_ADMIN": return 5;
-    case "CONSULTANT": return SAJU_CUSTOMER_AVATARS.length;
-    case "CUSTOMER": return 13;
-    default: return 5;
+    case "SUPER_ADMIN": return 1;
+    case "CONSULTANT": return BEAUTYMATE_CUSTOMER_AVATARS.length;
+    case "CUSTOMER": return 1;
+    default: return 1;
   }
 }
 

@@ -27,8 +27,8 @@ export default async function AdminProductsPage() {
       },
       orderBy: { createdAt: "desc" },
     }),
-    // 상담사 신청 승인 대기 — 최고관리자가 직접 등록한 상담상품(브랜드·중간관리자·상담사 없음)만.
-    // 브랜드/중간관리자 소속 상담상품 신청은 각 대시보드에서 승인.
+    // 뷰티 전문가 신청 승인 대기 — 최고관리자가 직접 등록한 뷰티 서비스(브랜드·중간관리자·뷰티 전문가 없음)만.
+    // 브랜드/중간관리자 소속 뷰티 서비스 신청은 각 대시보드에서 승인.
     prisma.sellerShopProduct.findMany({
       where: {
         isApproved: false,
@@ -41,7 +41,7 @@ export default async function AdminProductsPage() {
       },
       orderBy: { createdAt: "desc" },
     }),
-    // 판매 중인 상담상품 — 최고관리자가 승인해 상담사가 현재 판매 중(승인+활성)인 상담상품
+    // 판매 중인 뷰티 서비스 — 최고관리자가 승인해 뷰티 전문가가 현재 판매 중(승인+활성)인 뷰티 서비스
     prisma.sellerShopProduct.findMany({
       where: {
         isApproved: true,
@@ -54,16 +54,16 @@ export default async function AdminProductsPage() {
       },
       orderBy: { createdAt: "desc" },
     }),
-    // 상담사별 필터용 목록
+    // 뷰티 전문가별 필터용 목록
     prisma.sellerProfile.findMany({
       select: { id: true, shopName: true },
       orderBy: { shopName: "asc" },
     }),
-    // 상담상품별 상담사 점집 매핑 (상담사별 필터용)
+    // 뷰티 서비스별 뷰티 전문가 뷰티샵 매핑 (뷰티 전문가별 필터용)
     prisma.sellerShopProduct.findMany({
       select: { productId: true, sellerId: true },
     }),
-    // 판매중(승인+활성) 상담사 매핑 — "판매중" 탭 필터용
+    // 판매중(승인+활성) 뷰티 전문가 매핑 — "판매중" 탭 필터용
     prisma.sellerShopProduct.findMany({
       where: { isApproved: true, isActive: true },
       select: {
@@ -73,7 +73,7 @@ export default async function AdminProductsPage() {
     }),
   ]);
 
-  // 상담상품ID → 해당 상담상품이 담긴 상담사 점집 sellerId 목록
+  // 뷰티 서비스ID → 해당 뷰티 서비스가 담긴 뷰티 전문가 뷰티샵 sellerId 목록
   const shopSellerMap = new Map<string, string[]>();
   for (const row of shopSellerRows) {
     const list = shopSellerMap.get(row.productId) ?? [];
@@ -81,7 +81,7 @@ export default async function AdminProductsPage() {
     shopSellerMap.set(row.productId, list);
   }
 
-  // 상담상품ID → 판매중(승인+활성) 상담사 목록
+  // 뷰티 서비스ID → 판매중(승인+활성) 뷰티 전문가 목록
   const activeSellerMap = new Map<string, { id: string; shopName: string; shopLogo: string | null }[]>();
   for (const row of activeSellerRows) {
     const list = activeSellerMap.get(row.productId) ?? [];
@@ -101,9 +101,9 @@ export default async function AdminProductsPage() {
     registrarSellerId: p.sellerId,
     shopSellerIds: shopSellerMap.get(p.id) ?? [],
     categoryName: p.category?.name || null,
-    // 등록자 유형: 상담사 > 관리자
+    // 등록자 유형: 뷰티 전문가 > 관리자
     registrarType: (p.sellerId ? "CONSULTANT" : "ADMIN") as "CONSULTANT" | "BRAND" | "ADMIN",
-    registeredBy: p.sellerId ? `상담사 (${p.registrarSeller?.shopName || ""})` : "관리자",
+    registeredBy: p.sellerId ? `뷰티 전문가 (${p.registrarSeller?.shopName || ""})` : "관리자",
     sellerNames: p.sellerProducts.map(sp => sp.seller.shopName),
     sellerCount: p._count.sellerProducts,
     reviewCount: p._count.reviews,
@@ -114,7 +114,7 @@ export default async function AdminProductsPage() {
     createdAt: p.createdAt.toISOString(),
     sellerLogos: p.sellerProducts.map(sp => ({ id: sp.seller.id, shopName: sp.seller.shopName, shopLogo: sp.seller.shopLogo })),
     activeCampaigns: p.campaigns.map(c => ({ id: c.id, sellerName: c.seller.shopName })),
-    // 판매중(승인+활성) 상담사 정보
+    // 판매중(승인+활성) 뷰티 전문가 정보
     activeSellers: (activeSellerMap.get(p.id) ?? []).slice(0, 5),
     isSelling: (activeSellerMap.get(p.id) ?? []).length > 0,
   }));

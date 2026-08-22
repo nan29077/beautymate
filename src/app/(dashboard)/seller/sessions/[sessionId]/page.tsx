@@ -4,7 +4,7 @@ import VideoSessionRoom from "@/components/sessions/VideoSessionRoom";
 
 export const dynamic = "force-dynamic";
 
-// 상담사용 1:1 영상 상담실 — 권한·소유권 검증은 /api/sessions/[id] 에서 수행
+// 뷰티 전문가용 1:1 영상 상담실 — 권한·소유권 검증은 /api/sessions/[id] 에서 수행
 export default async function SellerSessionPage({
   params,
 }: {

@@ -6,13 +6,13 @@ import { withForwardPrefix } from "@/lib/youtubeChatForward";
 import { isMissingDbColumnError } from "@/lib/prismaErrors";
 
 // AI 채팅 봇 엔진 (tick 방식)
-// 상담사 라이브 관리 페이지가 라이브 진행 중 주기적으로 호출하면(약 20초 간격)
+// 뷰티 전문가 라이브 관리 페이지가 라이브 진행 중 주기적으로 호출하면(약 20초 간격)
 // 마지막 처리 시점 이후의 앱 채팅 + YouTube 채팅을 분석해 봇 메시지를 앱 채팅에 발송한다.
-// - 봇 메시지는 사주나라 앱 채팅에 표시 (isBot=true)
-// - 상담사가 YouTube OAuth(youtube.force-ssl) 연결 + "YouTube로 전송" 옵션 ON 시
+// - 봇 메시지는 뷰티메이트 앱 채팅에 표시 (isBot=true)
+// - 뷰티 전문가가 YouTube OAuth(youtube.force-ssl) 연결 + "YouTube로 전송" 옵션 ON 시
 //   liveChat/messages insert 로 YouTube 채팅에도 동시 전송 (토큰 만료 시 자동 갱신)
 
-const BOT_NICKNAME = "AI 사주봇";
+const BOT_NICKNAME = "AI 뷰티봇";
 const MAX_MESSAGES_PER_TICK = 5;
 
 interface KeywordRule { keyword: string; response: string }
@@ -45,7 +45,7 @@ async function fetchYoutubeMessages(
   cursor: { liveChatId: string | null; pageToken: string | null },
   sellerApiKey?: string | null,
 ): Promise<{ messages: IncomingMsg[]; liveChatId: string | null; pageToken: string | null }> {
-  // 상담사가 유튜브AI챗봇 탭에서 등록한 키 우선, 없으면 서버 공용 키 폴백
+  // 뷰티 전문가가 유튜브AI챗봇 탭에서 등록한 키 우선, 없으면 서버 공용 키 폴백
   const apiKey = sellerApiKey?.trim() || process.env.YOUTUBE_API_KEY;
   if (!apiKey) return { messages: [], liveChatId: cursor.liveChatId, pageToken: cursor.pageToken };
 
@@ -105,10 +105,10 @@ export async function POST(req: NextRequest) {
 async function handleTick(req: NextRequest) {
   const session = await auth();
   if (!session || session.user?.role !== "CONSULTANT") {
-    return NextResponse.json({ error: "상담사만 접근 가능" }, { status: 403 });
+    return NextResponse.json({ error: "뷰티 전문가만 접근 가능" }, { status: 403 });
   }
   const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user!.id } });
-  if (!seller) return NextResponse.json({ error: "상담사 프로필 없음" }, { status: 404 });
+  if (!seller) return NextResponse.json({ error: "뷰티 전문가 프로필 없음" }, { status: 404 });
 
   const body = await req.json().catch(() => ({}));
   const liveId = String(body.liveId || "");
@@ -225,15 +225,15 @@ async function handleTick(req: NextRequest) {
     botMessages.push(...Array.from(matchedResponses).slice(0, 3).map(resp => resp));
   }
 
-  // ── 3. 상담상품 정보 자동 안내 ("N번 상담상품", "가격/얼마", "재고/품절")
+  // ── 3. 뷰티 서비스 정보 자동 안내 ("N번 뷰티 서비스", "가격/얼마", "재고/품절")
   if (config.productInfoEnabled && combined.length > 0 && live.products.length > 0) {
     for (const msg of combined) {
       const numMatch = msg.message.match(/(\d+)\s*번/);
-      if (numMatch && /상담상품|제품|아이템|뭐예요|뭐에요/.test(msg.message)) {
+      if (numMatch && /뷰티 서비스|제품|아이템|뭐예요|뭐에요/.test(msg.message)) {
         const lp = live.products[parseInt(numMatch[1], 10) - 1];
         if (lp) {
           const price = lp.livePrice ? Number(lp.livePrice) : Number(lp.product.basePrice);
-          botMessages.push(`${numMatch[1]}번 상담상품은 「${lp.product.name}」 — 라이브 특가 ${price.toLocaleString()}원! 화면의 상담상품 목록에서 바로 구매하실 수 있어요 🍯`);
+          botMessages.push(`${numMatch[1]}번 뷰티 서비스는 「${lp.product.name}」 — 라이브 특가 ${price.toLocaleString()}원! 화면의 뷰티 서비스 목록에서 바로 구매하실 수 있어요 🍯`);
           break; // 틱당 1건
         }
       } else if (/가격|얼마/.test(msg.message)) {
@@ -242,7 +242,7 @@ async function handleTick(req: NextRequest) {
         botMessages.push(`지금 소개 중인 「${lp.product.name}」은 라이브 특가 ${price.toLocaleString()}원이에요! 🍯`);
         break;
       } else if (/재고|품절|남았/.test(msg.message)) {
-        botMessages.push("라이브 특가 재고는 실시간으로 소진되고 있어요! 상담상품 상세 페이지에서 옵션별 재고를 확인해 주세요 🍯");
+        botMessages.push("라이브 특가 재고는 실시간으로 소진되고 있어요! 뷰티 서비스 상세 페이지에서 옵션별 재고를 확인해 주세요 🍯");
         break;
       }
     }

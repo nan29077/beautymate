@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 const LOGS_PAGE_SIZE = 20;
 
-// 상담사 없는(시스템) 발송을 가리키는 sellerId 파라미터 값
+// 뷰티 전문가 없는(시스템) 발송을 가리키는 sellerId 파라미터 값
 const SYSTEM_SELLER_KEY = "system";
 
 function parseDate(value: string | null): Date | null {
@@ -13,12 +13,12 @@ function parseDate(value: string | null): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-// 알리고 실발송 기록(aligo_send_logs) 기준 상담사별 사용량 집계.
+// 알리고 실발송 기록(aligo_send_logs) 기준 뷰티 전문가별 사용량 집계.
 // 발신 계정은 플랫폼 공용이므로 sellerId가 null인 기록은 "시스템 발송"(비밀번호 문자 등)이다.
 //
 // 쿼리 파라미터
 // - from / to : ISO 일시. 클라이언트가 사용자 로컬(KST) 기준 하루의 시작·끝을 계산해 보낸다.
-// - sellerId  : 발송 내역을 특정 상담사로 좁힘. "system"이면 sellerId가 null인 기록.
+// - sellerId  : 발송 내역을 특정 뷰티 전문가로 좁힘. "system"이면 sellerId가 null인 기록.
 // - page      : 발송 내역 페이지 (1부터)
 export async function GET(req: NextRequest) {
   const session = await auth();
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
   const sellerParam = sp.get("sellerId");
   const page = Math.max(1, Number(sp.get("page")) || 1);
 
-  // 기간 조건 — 상담사별 집계/합계는 상담사 필터와 무관하게 항상 기간 전체를 보여준다
+  // 기간 조건 — 뷰티 전문가별 집계/합계는 뷰티 전문가 필터와 무관하게 항상 기간 전체를 보여준다
   const rangeWhere: any = {};
   if (from || to) {
     rangeWhere.createdAt = {};
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
     if (to) rangeWhere.createdAt.lte = to;
   }
 
-  // 발송 내역 조건 — 기간 + 선택된 상담사
+  // 발송 내역 조건 — 기간 + 선택된 뷰티 전문가
   const logWhere: any = { ...rangeWhere };
   if (sellerParam === SYSTEM_SELLER_KEY) logWhere.sellerId = null;
   else if (sellerParam) logWhere.sellerId = sellerParam;
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
       where: rangeWhere,
       _sum: { recipientCount: true, acceptedCount: true, failCount: true, cost: true },
     }),
-    // 상담사를 선택했을 때만 발송 사유별 내역을 함께 내려준다
+    // 뷰티 전문가를 선택했을 때만 발송 사유별 내역을 함께 내려준다
     sellerParam
       ? prisma.aligoSendLog.groupBy({
           by: ["purpose", "kind"],
@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
       : Promise.resolve([] as any[]),
   ]);
 
-  // 상담사 정보 일괄 조회
+  // 뷰티 전문가 정보 일괄 조회
   const sellerIds = Array.from(new Set(grouped.map((g) => g.sellerId).filter(Boolean))) as string[];
   const sellerProfiles = sellerIds.length
     ? await prisma.sellerProfile.findMany({
@@ -135,7 +135,7 @@ export async function GET(req: NextRequest) {
     (a, b) => (b.lastSentAt?.getTime() ?? 0) - (a.lastSentAt?.getTime() ?? 0),
   );
 
-  // 발송 사유별 집계 (상담사 선택 시)
+  // 발송 사유별 집계 (뷰티 전문가 선택 시)
   const purposeMap = new Map<string, {
     purpose: string;
     alimtalkCount: number;

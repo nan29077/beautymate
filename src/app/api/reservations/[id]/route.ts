@@ -64,7 +64,7 @@ export async function PATCH(
       return NextResponse.json({ error: "대기 중인 예약만 취소할 수 있습니다." }, { status: 400 });
     }
   } else if (role === "CONSULTANT") {
-    // 상담사는 본인 샵 예약만
+    // 뷰티 전문가는 본인 샵 예약만
     if (reservation.seller.userId !== session.user.id) {
       return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
     }
@@ -113,7 +113,7 @@ export async function PATCH(
     );
   }
 
-  // 상담 완료/취소 → 열려 있는 영상 세션 정리
+  // 서비스 완료/취소 → 열려 있는 영상 세션 정리
   if (status === "COMPLETED" || status === "CANCELLED") {
     try {
       const cs = await prisma.consultingSession.findUnique({
@@ -170,7 +170,7 @@ export async function GET(
   if (role === "CUSTOMER" && reservation.userId !== session.user.id) {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 403 });
   }
-  // 상담사는 본인 점집 예약만 열람 가능 (조건 없이 항상 소유권 검사)
+  // 뷰티 전문가는 본인 뷰티샵 예약만 열람 가능 (조건 없이 항상 소유권 검사)
   if (role === "CONSULTANT") {
     const seller = await prisma.sellerProfile.findUnique({ where: { userId: session.user.id } });
     if (!seller || seller.id !== reservation.sellerId) {
@@ -178,7 +178,7 @@ export async function GET(
     }
   }
 
-  // 상담 방식(영상/전화/방문) — Reservation 에 저장되지 않으므로 상품에서 역조회
+  // 진행 방식(영상/전화/방문) — Reservation 에 저장되지 않으므로 상품에서 역조회
   const { method: consultingMethod } = await getReservationConsultingInfo(id);
 
   // 영상 상담 세션 (테이블 미반영 환경에서는 null)
@@ -192,7 +192,7 @@ export async function GET(
     null,
   );
 
-  // 확정된 전화/방문 상담이면 상담사 연락처·상담소 주소를 공개한다 (마스킹 해제)
+  // 확정된 전화/방문 상담이면 뷰티 전문가 연락처·상담소 주소를 공개한다 (마스킹 해제)
   let consultantContact: { phone?: string | null; address?: string | null } | null = null;
   if (
     (reservation.status === "CONFIRMED" || reservation.status === "COMPLETED") &&

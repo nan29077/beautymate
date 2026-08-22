@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────
-// 상담상품 대량 등록(엑셀) 공용 컬럼 정의
+// 뷰티 서비스 대량 등록(엑셀) 공용 컬럼 정의
 // 클라이언트(템플릿 생성)와 서버(파싱/검증)가 이 정의를 함께 사용해 컬럼 스키마를 동기화한다.
 // 프레임워크(React/Prisma) 비의존 — 순수 데이터/함수만 둔다.
 // ─────────────────────────────────────────────
@@ -36,9 +36,9 @@ export const BADGE_CODES = Object.values(BADGE_LABEL_TO_CODE);
 // 모든 모드에서 등장 가능한 컬럼의 마스터 정의 (헤더는 전역적으로 고유)
 const NAME: BulkColumn = {
   key: "name",
-  header: "상담상품명",
+  header: "뷰티 서비스명",
   required: true,
-  guide: "필수. 상담상품 이름을 입력하세요.",
+  guide: "필수. 뷰티 서비스 이름을 입력하세요.",
   example: "(예시) 프리미엄 코튼 티셔츠",
 };
 const BASE_PRICE: BulkColumn = {
@@ -63,12 +63,12 @@ const CONSUMER_PRICE: BulkColumn = {
   guide: "필수. 소비자가(판매가). 숫자만 입력 (콤마·원 제외).",
   example: "19900",
 };
-// 수수료 방식 전용: 상담사 수수료율(%)
+// 수수료 방식 전용: 뷰티 전문가 수수료율(%)
 const SELLER_COMMISSION_RATE: BulkColumn = {
   key: "sellerCommissionRate",
-  header: "상담사수수료율(%)",
+  header: "뷰티 전문가수수료율(%)",
   required: true,
-  guide: "필수. 판매가 대비 상담사에게 지급할 수수료율(%). 숫자만 입력 (예: 10).",
+  guide: "필수. 판매가 대비 뷰티 전문가에게 지급할 수수료율(%). 숫자만 입력 (예: 10).",
   example: "10",
 };
 const BRAND_NAME: BulkColumn = {
@@ -116,7 +116,7 @@ const STOCK: BulkColumn = {
 const OPTIONS: BulkColumn = {
   key: "options",
   header: "옵션(형식:옵션명:판매가:재고;…)",
-  guide: "선택. '옵션명:판매가:재고' 형태, 여러 개는 세미콜론(;). 판매가 비우면 상담상품가 사용.",
+  guide: "선택. '옵션명:판매가:재고' 형태, 여러 개는 세미콜론(;). 판매가 비우면 뷰티 서비스가 사용.",
   example: "블랙:19900:50;화이트:19900:50",
 };
 const SHIPPING_FEE: BulkColumn = {
@@ -152,7 +152,7 @@ const BADGES: BulkColumn = {
 const DESCRIPTION: BulkColumn = {
   key: "description",
   header: "간단설명",
-  guide: "선택. 상담상품 요약 설명.",
+  guide: "선택. 뷰티 서비스 요약 설명.",
   example: "부드러운 촉감의 데일리 코튼 티셔츠",
 };
 const DETAIL: BulkColumn = {
@@ -164,7 +164,7 @@ const DETAIL: BulkColumn = {
 
 // 모드별 컬럼 구성 (순서 유지)
 export function columnsForMode(mode: BulkMode, priceType: PriceType = "SUPPLY_PRICE"): BulkColumn[] {
-  // 수수료 제공 방식: 공급가/중간관리자마진 대신 판매가(소비자가) + 상담사수수료율 사용
+  // 수수료 제공 방식: 공급가/중간관리자마진 대신 판매가(소비자가) + 뷰티 전문가수수료율 사용
   const priceCols: BulkColumn[] =
     priceType === "COMMISSION"
       ? mode === "admin"
@@ -193,8 +193,8 @@ export function columnsForMode(mode: BulkMode, priceType: PriceType = "SUPPLY_PR
   ];
 }
 
-// 상담사 "일반상담상품(빠른상담상품)" 대량 등록 전용 컬럼 (DirectProduct 모델 필드)
-// - 카테고리·브랜드·옵션·배지가 없는 단순 상담상품이므로 재고/배송비/설명 안내를 별도로 둔다.
+// 뷰티 전문가 "일반 뷰티 서비스(빠른뷰티 서비스)" 대량 등록 전용 컬럼 (DirectProduct 모델 필드)
+// - 카테고리·브랜드·옵션·배지가 없는 단순 뷰티 서비스가므로 재고/배송비/설명 안내를 별도로 둔다.
 // - 헤더는 위 마스터 컬럼과 동일하게 맞춰 HEADER_TO_KEY 매핑을 그대로 재사용한다.
 const DIRECT_STOCK: BulkColumn = {
   key: "stock",
@@ -256,7 +256,7 @@ export const HEADER_TO_KEY: Record<string, string> = ALL_COLUMNS.reduce(
 );
 
 /** 제목 행을 식별하는 기준 셀 (이 값과 정확히 일치하는 셀이 있는 행이 헤더 행) */
-export const HEADER_MARKER = NAME.header; // "상담상품명"
+export const HEADER_MARKER = NAME.header; // "뷰티 서비스명"
 
-/** 예시 행 판별: 상담상품명이 이 접두사로 시작하면 등록에서 제외 */
+/** 예시 행 판별: 뷰티 서비스명이 이 접두사로 시작하면 등록에서 제외 */
 export const EXAMPLE_PREFIX = "(예시)";

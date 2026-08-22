@@ -21,9 +21,9 @@ export function isVideoMethod(method: string | null | undefined): boolean {
 }
 
 /**
- * 예약의 상담 방식·상담 시간(분)을 조회한다.
- * 상담 방식은 Reservation에 저장되지 않으므로 첫 아이템의 Product를 역조회한다.
- * - itemType=DIRECT(상담사 자체 상품)는 상담 속성이 없어 방식 null 처리.
+ * 예약의 진행 방식·소요 시간(분)을 조회한다.
+ * 진행 방식은 Reservation에 저장되지 않으므로 첫 아이템의 Product를 역조회한다.
+ * - itemType=DIRECT(뷰티 전문가 자체 상품)는 상담 속성이 없어 방식 null 처리.
  * - consultingMethod/durationMinutes 컬럼은 운영 DB 드리프트(P2022) 가능 — 폴백 기본값 사용.
  */
 export async function getReservationConsultingInfo(
@@ -91,7 +91,7 @@ export async function ensureConsultingSession(
   );
   if (existing) return existing;
 
-  // 2) 예약·상담 방식 확인
+  // 2) 예약·진행 방식 확인
   const reservation = await prisma.reservation.findUnique({
     where: { id: reservationId },
     select: {
@@ -223,7 +223,7 @@ export async function completeConsultingSession(
     },
   });
 
-  // 예약 상태 동기화 + 상담 메모 저장 (취소 강제종료 시에는 예약을 건드리지 않는다)
+  // 예약 상태 동기화 + 고객 메모 저장 (취소 강제종료 시에는 예약을 건드리지 않는다)
   if (!options?.cancelled) {
     await prisma.reservation.update({
       where: { id: session.reservationId },

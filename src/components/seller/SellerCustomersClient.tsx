@@ -16,7 +16,7 @@ export interface CustomerRow {
   totalPaid: number;
   lastReservationDate: string | null;
   firstReservationDate: string | null;
-  /** 이 점집으로 가입 귀속된 고객 (예약 이력 없이도 노출) */
+  /** 이 뷰티샵으로 가입 귀속된 고객 (예약 이력 없이도 노출) */
   isReferred?: boolean;
 }
 

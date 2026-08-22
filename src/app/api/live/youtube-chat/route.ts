@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 // - videoId → videos.list(liveStreamingDetails)로 activeLiveChatId 조회
 // - liveChatId → liveChat/messages.list 폴링 결과 반환
 // - 쓰기(liveChatMessages.insert)는 채널 소유자 OAuth가 필요해 지원하지 않음 (뷰어 UI에 안내만 표시)
-// - API 키: liveId/code 로 라이브의 상담사를 찾아 유튜브AI챗봇 탭에서 등록한 키를 우선 사용,
+// - API 키: liveId/code 로 라이브의 뷰티 전문가를 찾아 유튜브AI챗봇 탭에서 등록한 키를 우선 사용,
 //   없으면 서버 공용 YOUTUBE_API_KEY 폴백. 둘 다 없으면 503 API_KEY_NOT_SET → 클라이언트는 폴링 중단
 
 export async function GET(req: NextRequest) {
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const liveId = searchParams.get("liveId");
   const code = searchParams.get("code");
 
-  // 상담사가 유튜브AI챗봇 탭에서 등록한 API 키 조회 (없으면 서버 공용 키 폴백)
+  // 뷰티 전문가가 유튜브AI챗봇 탭에서 등록한 API 키 조회 (없으면 서버 공용 키 폴백)
   let apiKey: string | null = process.env.YOUTUBE_API_KEY || null;
   if (liveId || code) {
     try {
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
       const sellerKey = live?.seller?.chatBotConfig?.youtubeApiKey?.trim();
       if (sellerKey) apiKey = sellerKey;
     } catch (e) {
-      console.error("[live/youtube-chat] 상담사 API 키 조회 실패", e);
+      console.error("[live/youtube-chat] 뷰티 전문가 API 키 조회 실패", e);
     }
   }
   if (!apiKey) {

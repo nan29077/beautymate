@@ -129,7 +129,7 @@ export default function ShopQRSection({ slug }: Props) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-4 mt-4">
       <h3 className="text-sm font-bold text-gray-900 mb-4">
-        점집 QR코드 다운로드
+        뷰티샵 QR코드 다운로드
       </h3>
       <div className="flex flex-col items-start gap-2">
         <div className="border border-gray-200 rounded-xl shadow-sm p-2 bg-white">

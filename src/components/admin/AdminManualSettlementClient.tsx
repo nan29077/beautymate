@@ -31,7 +31,7 @@ type Props = {
 type TabKey = "CONSULTANT";
 
 const TAB_LABELS: Record<TabKey, string> = {
-  CONSULTANT: "상담사",
+  CONSULTANT: "뷰티 전문가",
 };
 
 function fmt(n: number) {

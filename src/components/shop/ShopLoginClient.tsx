@@ -1,6 +1,6 @@
 "use client";
 
-// 점집 독립 로그인 — 로그인 성공 시 해당 점집으로 복귀
+// 뷰티샵 독립 로그인 — 로그인 성공 시 해당 뷰티샵으로 복귀
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -45,10 +45,10 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
   return (
     <ShopAuthShell
       shop={shop}
-      title="점집 로그인"
+      title="뷰티샵 로그인"
       subtitle={`로그인 후 ${shop.shopName}으로 돌아갑니다`}
     >
-      {/* 점집 전용 소셜 로그인 — 메인 /auth/login 과 완전히 분리된 컴포넌트 */}
+      {/* 뷰티샵 전용 소셜 로그인 — 메인 /auth/login 과 완전히 분리된 컴포넌트 */}
       <div className="space-y-2.5 mb-4">
         {/* 카카오 간편 로그인 */}
         <button
@@ -138,7 +138,7 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
           {loading ? "로그인 중..." : "로그인"}
         </button>
         {/* 테스트 계정으로 로그인 — 개발 환경(NODE_ENV=development)에서만 노출된다.
-            이 점집 회원(고객)으로 계정을 준비(귀속)한 뒤 로그인한다. */}
+            이 뷰티샵 회원(고객)으로 계정을 준비(귀속)한 뒤 로그인한다. */}
         {process.env.NODE_ENV === "development" && (
         <div className="space-y-1.5">
           <button
@@ -152,7 +152,7 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
               try {
                 // 1) 기존 테스트 계정으로 로그인 시도
                 let result = await signIn("credentials", { email: TEST_EMAIL, password: TEST_PW, redirect: false });
-                // 2) 계정이 없으면 이 점집 회원(고객)으로 생성 → 귀속 → 재로그인
+                // 2) 계정이 없으면 이 뷰티샵 회원(고객)으로 생성 → 귀속 → 재로그인
                 if (result?.error) {
                   const res = await fetch(`/api/shop/${shop.slug}/join`, {
                     method: "POST",
@@ -182,13 +182,13 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
           >
             {loading ? "처리 중..." : "🧪 테스트 계정으로 로그인"}
           </button>
-          <p className="text-center text-[10px] text-gray-300">이 점집 회원(고객)으로 로그인해 화면을 확인합니다</p>
+          <p className="text-center text-[10px] text-gray-300">이 뷰티샵 회원(고객)으로 로그인해 화면을 확인합니다</p>
         </div>
         )}
         <p className="text-center text-xs text-gray-400">
           아직 회원이 아니신가요?{" "}
           <Link href={`/shop/${shop.slug}/join`} className="text-amber-600 font-semibold hover:underline">
-            점집 회원가입
+            뷰티샵 회원가입
           </Link>
         </p>
       </form>

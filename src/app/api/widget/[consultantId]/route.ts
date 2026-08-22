@@ -23,7 +23,7 @@ export async function GET(
     const data = await getWidgetData(consultantId, date);
     if (!data) {
       return NextResponse.json(
-        { error: "상담사를 찾을 수 없습니다." },
+        { error: "뷰티 전문가를 찾을 수 없습니다." },
         { status: 404, headers: NO_STORE }
       );
     }

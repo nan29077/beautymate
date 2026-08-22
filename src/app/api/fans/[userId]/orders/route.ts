@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 // 팬(구매회원)의 구매내역 조회.
 // - SUPER_ADMIN: 해당 회원의 모든 예약
-// - CONSULTANT: 자기 점집에서 발생한 해당 회원의 예약만 (타 상담사 예약은 비노출)
+// - CONSULTANT: 자기 뷰티샵에서 발생한 해당 회원의 예약만 (타 뷰티 전문가 예약은 비노출)
 export async function GET(
   _req: Request,
   { params }: { params: { userId: string } }
@@ -26,7 +26,7 @@ export async function GET(
       select: { id: true },
     });
     if (!seller) {
-      return NextResponse.json({ error: "상담사 프로필이 없습니다." }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가 프로필이 없습니다." }, { status: 403 });
     }
     where.sellerId = seller.id;
   }
@@ -42,7 +42,7 @@ export async function GET(
     take: 100,
   });
 
-  // 상담상품 썸네일 매핑 (OrderItem 에 product relation 이 없어 별도 조회)
+  // 뷰티 서비스 썸네일 매핑 (OrderItem 에 product relation 이 없어 별도 조회)
   const productIds = [...new Set(orders.flatMap((o) => o.items.map((i) => i.productId)))];
   const products = productIds.length
     ? await prisma.product.findMany({

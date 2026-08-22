@@ -23,8 +23,8 @@ function formatDate(d: string | null): string {
   return new Date(d).toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
 }
 
-// 상담사 "점집 기능 관리"의 지난 방송 상담상품 노출 스위치.
-// 켜면 점집 "지난 방송 상담상품" 영역에 노출, 끄면 숨김.
+// 뷰티 전문가 "뷰티샵 기능 관리"의 지난 방송 뷰티 서비스 노출 스위치.
+// 켜면 뷰티샵 "지난 방송 뷰티 서비스" 영역에 노출, 끄면 숨김.
 export default function PastBroadcastToggles({ initialItems }: { initialItems: PastBroadcastItem[] }) {
   const [items, setItems] = useState(initialItems);
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -55,9 +55,9 @@ export default function PastBroadcastToggles({ initialItems }: { initialItems: P
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-5 space-y-4">
       <div>
-        <h3 className="text-sm font-bold text-gray-900">지난 방송 상담상품 노출</h3>
+        <h3 className="text-sm font-bold text-gray-900">지난 방송 뷰티 서비스 노출</h3>
         <p className="text-[11px] text-gray-400 mt-0.5">
-          켠 방송만 라이브 점집 &quot;지난 방송 상담상품&quot; 영역에 표시됩니다
+          켠 방송만 라이브 뷰티샵 &quot;지난 방송 뷰티 서비스&quot; 영역에 표시됩니다
         </p>
       </div>
 
@@ -89,7 +89,7 @@ export default function PastBroadcastToggles({ initialItems }: { initialItems: P
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
-                    <Icon name="Video" size={10} /> 상담상품 {item.productCount}개
+                    <Icon name="Video" size={10} /> 뷰티 서비스 {item.productCount}개
                   </span>
                   <span className="text-[10px] text-gray-300 flex items-center gap-0.5">
                     <Icon name="Eye" size={10} /> {item.peakViewerCount.toLocaleString()}명

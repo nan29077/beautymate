@@ -12,21 +12,21 @@ const POLICIES = [
 
 예시:
 1. 상담 시작 전 취소 결제 금액 전액 환불됩니다.
-2. 상담 시작 후 취소 진행된 상담 시간에 해당하는 금액을 제외하고 환불됩니다.
-3. 상담사 사정으로 상담이 진행되지 못한 경우 전액 환불 또는 일정 재조정이 가능합니다.
+2. 상담 시작 후 취소 진행된 소요 시간에 해당하는 금액을 제외하고 환불됩니다.
+3. 뷰티 전문가 사정으로 상담이 진행되지 못한 경우 전액 환불 또는 일정 재조정이 가능합니다.
 4. 통신 장애 등으로 상담이 중단된 경우 잔여 시간만큼 재상담 또는 환불 처리됩니다.
 ※ 법적 안내  소비자분쟁해결기준에 따라 피해보상이 이루어집니다.`,
   },
   {
     key: "shippingPolicy",
-    label: "상담 방식 안내",
+    label: "진행 방식 안내",
     placeholder: `상담 진행 방식 안내 내용을 입력하세요.
 
 예시:
-- 상담 방식: 라이브 영상 상담 / 음성 상담 / 채팅 상담
+- 진행 방식: 라이브 영상 상담 / 음성 상담 / 채팅 상담
 - 예약하신 시간에 알림톡으로 발송된 링크를 통해 입장해 주세요.
-- 상담 전 생년월일시 등 사주 정보를 미리 준비해 주시면 원활합니다.
-- 상담 시간은 상담상품에 표기된 시간을 기준으로 진행됩니다.`,
+- 서비스 전 알레르기·시술 이력 등 뷰티 정보를 미리 준비해 주시면 원활합니다.
+- 소요 시간은 뷰티 서비스에 표기된 시간을 기준으로 진행됩니다.`,
   },
   {
     key: "usagePolicy",
@@ -109,9 +109,9 @@ export default function ShopPolicyManager() {
 
   return (
     <div className="space-y-6">
-      {/* 라이브 상담 관리 */}
+      {/* 라이브 뷰티 관리 */}
       <div>
-        <h2 className="text-sm font-bold text-gray-900">라이브 상담 관리</h2>
+        <h2 className="text-sm font-bold text-gray-900">라이브 뷰티 관리</h2>
         <div className="mt-2 bg-white border border-gray-100 rounded-xl p-4">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
@@ -120,7 +120,7 @@ export default function ShopPolicyManager() {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-gray-800">SNS 라이브 연동 (외부 플랫폼)</p>
               <p className="text-xs text-gray-500 mt-0.5">
-                켜면 상담사의 새 라이브 생성 시 외부 라이브 플랫폼(YouTube 등) 연동 옵션이 표시됩니다
+                켜면 뷰티 전문가의 새 라이브 생성 시 외부 라이브 플랫폼(YouTube 등) 연동 옵션이 표시됩니다
               </p>
             </div>
             {snsSaving ? (
@@ -144,9 +144,9 @@ export default function ShopPolicyManager() {
       </div>
 
       <div>
-        <h2 className="text-sm font-bold text-gray-900">라이브 점집 정책 관리</h2>
+        <h2 className="text-sm font-bold text-gray-900">라이브 뷰티샵 정책 관리</h2>
         <p className="text-xs text-gray-500 mt-0.5">
-          저장된 내용은 각 상담상품 상세페이지 상담 방식/교환 탭에 표시됩니다.
+          저장된 내용은 각 뷰티 서비스 상세페이지 진행 방식/교환 탭에 표시됩니다.
         </p>
       </div>
 

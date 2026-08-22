@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET: 상담사 사업자 정보 조회
+// GET: 뷰티 전문가 사업자 정보 조회
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id || session.user.role !== "CONSULTANT") {
@@ -24,7 +24,7 @@ export async function GET() {
   return NextResponse.json({ seller });
 }
 
-// PUT: 상담사 사업자 정보 수정
+// PUT: 뷰티 전문가 사업자 정보 수정
 export async function PUT(request: Request) {
   const session = await auth();
   if (!session?.user?.id || session.user.role !== "CONSULTANT") {

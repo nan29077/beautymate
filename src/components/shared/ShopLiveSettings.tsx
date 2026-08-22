@@ -48,7 +48,7 @@ export default function ShopLiveSettings({ initial }: Props) {
   const [savingLink, setSavingLink] = useState(false);
   const [savedLink, setSavedLink] = useState(false);
 
-  // 라이브 노출 상담상품 선택
+  // 라이브 노출 뷰티 서비스 선택
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>(initial.manualLiveProductIds || []);
   const [shopProducts, setShopProducts] = useState<ShopProduct[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
@@ -58,7 +58,7 @@ export default function ShopLiveSettings({ initial }: Props) {
   // 크게 보기 팝업
   const [isLargeViewOpen, setIsLargeViewOpen] = useState(false);
 
-  // 스위치가 ON일 때 상담상품 목록 로드 (한 번만)
+  // 스위치가 ON일 때 뷰티 서비스 목록 로드 (한 번만)
   useEffect(() => {
     if (isLive && shopProducts.length === 0 && !loadingProducts) {
       setLoadingProducts(true);
@@ -111,7 +111,7 @@ export default function ShopLiveSettings({ initial }: Props) {
     }
   };
 
-  // 선택한 상담상품 순서 변경 (위/아래)
+  // 선택한 뷰티 서비스 순서 변경 (위/아래)
   const moveProduct = (index: number, dir: -1 | 1) => {
     setSelectedProductIds((prev) => {
       const next = [...prev];
@@ -148,8 +148,8 @@ export default function ShopLiveSettings({ initial }: Props) {
       <div className="flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 px-3.5 py-3 mb-3.5">
         <Icon name="Info" size={14} className="text-amber-500 flex-shrink-0 mt-0.5" />
         <p className="text-[11px] text-amber-800 leading-relaxed">
-          이 기능은 사주나라 앱 내 라이브 방송 없이, 유튜브·인스타그램·틱톡 등 외부 SNS에서만 라이브를 진행할 때 사용하세요.
-          외부 SNS 라이브 진행 중 이 스위치를 켜면 라이브 점집에 <b>&ldquo;라이브 중&rdquo;</b> 표시와 함께 선택한 상담상품이 노출됩니다.
+          이 기능은 뷰티메이트 앱 내 라이브 방송 없이, 유튜브·인스타그램·틱톡 등 외부 SNS에서만 라이브를 진행할 때 사용하세요.
+          외부 SNS 라이브 진행 중 이 스위치를 켜면 라이브 뷰티샵에 <b>&ldquo;라이브 중&rdquo;</b> 표시와 함께 선택한 뷰티 서비스가 노출됩니다.
         </p>
       </div>
 
@@ -158,7 +158,7 @@ export default function ShopLiveSettings({ initial }: Props) {
         <div className="min-w-0">
           <p className="text-sm font-medium text-gray-900">라이브 중 표시</p>
           <p className="text-[11px] text-gray-400 mt-0.5 leading-relaxed">
-            스위치를 켜면 라이브 상담 기능과 관계없이 상담사 점집 프로필에 &lsquo;라이브 중&rsquo; 표시가 나타납니다.
+            스위치를 켜면 라이브 뷰티 기능과 관계없이 뷰티 전문가 뷰티샵 프로필에 &lsquo;라이브 중&rsquo; 표시가 나타납니다.
             실제 방송 중일 때만 사용해 주세요.
           </p>
         </div>
@@ -179,24 +179,24 @@ export default function ShopLiveSettings({ initial }: Props) {
         )}
       </div>
 
-      {/* 스위치 ON 시: 안내 + 상담상품 선택 */}
+      {/* 스위치 ON 시: 안내 + 뷰티 서비스 선택 */}
       {isLive && (
         <>
           <div className="mt-3.5 flex items-start gap-2 rounded-xl border border-brand-200 bg-brand-50 px-3 py-2.5">
             <Lightbulb size={15} className="text-brand-600 flex-shrink-0 mt-0.5" />
             <p className="text-[11px] text-gray-600 leading-relaxed">
-              <b className="text-gray-800">사주나라 라이브 상담을 실행하면 자동으로 우선 적용</b>됩니다.
-              이 경우 &lsquo;라이브 중 표시&rsquo;의 외부 링크 대신 사주나라 라이브 방송 화면으로 연결돼요.
+              <b className="text-gray-800">뷰티메이트 라이브 뷰티을 실행하면 자동으로 우선 적용</b>됩니다.
+              이 경우 &lsquo;라이브 중 표시&rsquo;의 외부 링크 대신 뷰티메이트 라이브 방송 화면으로 연결돼요.
             </p>
           </div>
 
-          {/* 라이브 노출 상담상품 선택 */}
+          {/* 라이브 노출 뷰티 서비스 선택 */}
           <div className="mt-3.5 pt-3.5 border-t border-gray-50">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <p className="text-sm font-medium text-gray-900">라이브 노출 상담상품 선택</p>
+                <p className="text-sm font-medium text-gray-900">라이브 노출 뷰티 서비스 선택</p>
                 <p className="text-[11px] text-gray-400 mt-0.5">
-                  선택한 상담상품이 라이브 점집 &ldquo;현재 라이브 중 상담상품&rdquo; 탭에 표시됩니다.
+                  선택한 뷰티 서비스가 라이브 뷰티샵 &ldquo;현재 라이브 중 뷰티 서비스&rdquo; 탭에 표시됩니다.
                 </p>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0 ml-2">
@@ -222,7 +222,7 @@ export default function ShopLiveSettings({ initial }: Props) {
             ) : shopProducts.length === 0 ? (
               <div className="text-center py-6 bg-gray-50 rounded-xl">
                 <Icon name="Cart" size={24} className="mx-auto text-gray-300 mb-1" />
-                <p className="text-xs text-gray-400">상담상품관리에서 상담상품을 추가해주세요.</p>
+                <p className="text-xs text-gray-400">뷰티 서비스 관리에서 뷰티 서비스를 추가해주세요.</p>
               </div>
             ) : (
               <div className="space-y-1.5 max-h-56 overflow-y-auto border border-gray-100 rounded-xl p-2">
@@ -265,12 +265,12 @@ export default function ShopLiveSettings({ initial }: Props) {
               </div>
             )}
 
-            {/* 선택한 상담상품 노출 순서 변경 */}
+            {/* 선택한 뷰티 서비스 노출 순서 변경 */}
             {selectedProductIds.length > 0 && (
               <div className="mt-3.5 pt-3.5 border-t border-gray-50">
                 <p className="text-sm font-medium text-gray-900">노출 순서 변경</p>
                 <p className="text-[11px] text-gray-400 mt-0.5 mb-2">
-                  위/아래 화살표로 라이브 점집에 표시되는 상담상품 순서를 조정하세요.
+                  위/아래 화살표로 라이브 뷰티샵에 표시되는 뷰티 서비스 순서를 조정하세요.
                 </p>
                 <div className="space-y-1.5">
                   {selectedProductIds.map((pid, idx) => {
@@ -330,7 +330,7 @@ export default function ShopLiveSettings({ initial }: Props) {
                 ) : (
                   <Icon name="Gem" size={14} />
                 )}
-                {savedProducts ? "저장됨" : "상담상품 저장"}
+                {savedProducts ? "저장됨" : "뷰티 서비스 저장"}
               </button>
             </div>
           </div>
@@ -398,7 +398,7 @@ export default function ShopLiveSettings({ initial }: Props) {
             <div className="bg-gradient-to-r from-yellow-400 to-amber-400 p-4 flex items-center justify-between rounded-t-2xl flex-shrink-0">
               <div className="flex items-center gap-2">
                 <span className="text-xl"></span>
-                <h2 className="text-base font-bold text-white">라이브 노출 상담상품 선택</h2>
+                <h2 className="text-base font-bold text-white">라이브 노출 뷰티 서비스 선택</h2>
                 <span className="text-[11px] font-bold text-yellow-900 bg-yellow-200 px-2 py-0.5 rounded-full">
                   {selectedProductIds.length}개 선택
                 </span>
@@ -408,7 +408,7 @@ export default function ShopLiveSettings({ initial }: Props) {
               </button>
             </div>
 
-            {/* 상담상품 목록 */}
+            {/* 뷰티 서비스 목록 */}
             <div className="overflow-y-auto flex-1 p-4">
               {loadingProducts ? (
                 <div className="flex items-center justify-center py-16 text-gray-400">
@@ -417,7 +417,7 @@ export default function ShopLiveSettings({ initial }: Props) {
               ) : shopProducts.length === 0 ? (
                 <div className="text-center py-16 text-gray-400">
                   <Icon name="Cart" size={36} className="mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">상담상품관리에서 상담상품을 추가해주세요.</p>
+                  <p className="text-sm">뷰티 서비스 관리에서 뷰티 서비스를 추가해주세요.</p>
                 </div>
               ) : (
                 <div className="space-y-2">

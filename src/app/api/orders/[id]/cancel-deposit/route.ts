@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// POST: 상담사가 입금완료 버튼 클릭 (POST_DAY 케이스)
+// POST: 뷰티 전문가가 입금완료 버튼 클릭 (POST_DAY 케이스)
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> | { id: string } }
@@ -16,18 +16,18 @@ export async function POST(
     }
     const role = (session.user as any).role as string;
     if (role !== "CONSULTANT") {
-      return NextResponse.json({ error: "상담사만 입금완료 처리를 할 수 있습니다." }, { status: 403 });
+      return NextResponse.json({ error: "뷰티 전문가만 입금완료 처리를 할 수 있습니다." }, { status: 403 });
     }
 
     const resolvedParams = await Promise.resolve(params);
     const orderId = resolvedParams.id;
 
-    // 상담사 프로필 조회
+    // 뷰티 전문가 프로필 조회
     const sellerProfile = await prisma.sellerProfile.findUnique({
       where: { userId: session.user!.id },
     });
     if (!sellerProfile) {
-      return NextResponse.json({ error: "상담사 프로필을 찾을 수 없습니다." }, { status: 404 });
+      return NextResponse.json({ error: "뷰티 전문가 프로필을 찾을 수 없습니다." }, { status: 404 });
     }
 
     // 예약 조회
@@ -46,7 +46,7 @@ export async function POST(
 
     // 본인 예약인지 확인
     if (order.sellerId !== sellerProfile.id) {
-      return NextResponse.json({ error: "본인 점집의 예약만 처리할 수 있습니다." }, { status: 403 });
+      return NextResponse.json({ error: "본인 뷰티샵의 예약만 처리할 수 있습니다." }, { status: 403 });
     }
 
     // 취소 요청 상태인지 확인

@@ -12,7 +12,7 @@ import {
 
 interface ShopChromeValue {
   shop: ShopMini | null;
-  // 현재 경로가 "상담사 서브페이지"이고 상담사 컨텍스트가 살아있어 상담사 전용 크롬을 써야 하는 상태
+  // 현재 경로가 "뷰티 전문가 서브페이지"이고 뷰티 전문가 컨텍스트가 살아있어 뷰티 전문가 전용 크롬을 써야 하는 상태
   subpageActive: boolean;
 }
 
@@ -29,7 +29,7 @@ function clearShopCookie() {
   document.cookie = `${SB_SHOP_COOKIE}=; path=/; max-age=0; samesite=lax`;
 }
 
-// (public) 레이아웃을 감싸 상담사 컨텍스트를 자식에게 제공한다.
+// (public) 레이아웃을 감싸 뷰티 전문가 컨텍스트를 자식에게 제공한다.
 // initialShop 은 서버에서 쿠키를 파싱한 값(SSR 첫 페인트 일관성용).
 export default function ShopChromeProvider({
   initialShop,
@@ -42,13 +42,13 @@ export default function ShopChromeProvider({
   const [shop, setShop] = useState<ShopMini | null>(initialShop);
 
   useEffect(() => {
-    // shop 관련 경로(메인/서브페이지)가 아니면 → 상담사 컨텍스트 해제
+    // shop 관련 경로(메인/서브페이지)가 아니면 → 뷰티 전문가 컨텍스트 해제
     if (!isShopMainPath(pathname) && !isShopSubpagePath(pathname)) {
       clearShopCookie();
       setShop(null);
       return;
     }
-    // shop 경로에서는 쿠키(점집 진입 시 ShopContextSync 가 설정)를 신뢰 소스로 동기화
+    // shop 경로에서는 쿠키(뷰티샵 진입 시 ShopContextSync 가 설정)를 신뢰 소스로 동기화
     setShop(readShopCookie());
   }, [pathname]);
 

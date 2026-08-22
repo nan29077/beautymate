@@ -125,16 +125,16 @@ export default function PCDirectorSuiteComponent({
 
   // ── LEFT RAIL (chat 탭 제거) ────────────────────────────────────
   const railItems = [
-    { tab: "products" as RailTab, icon: <BookOpen size={20} />, label: "상담상품" },
+    { tab: "products" as RailTab, icon: <BookOpen size={20} />, label: "뷰티 서비스" },
     { tab: "coupon" as RailTab, icon: <Ticket size={20} />, label: "쿠폰" },
     { tab: "intro" as RailTab, icon: <Info size={20} />, label: "라이브 소개" },
   ];
 
-  // ── 상담상품 목록 렌더 ──────────────────────────────────────────────
+  // ── 뷰티 서비스 목록 렌더 ──────────────────────────────────────────────
   const renderProducts = () => (
     <div>
       <div className="px-4 py-2.5 flex items-center justify-between border-b border-white/10">
-        <span className="text-[11px] font-bold text-white/40 tracking-wider uppercase">상담상품 목록</span>
+        <span className="text-[11px] font-bold text-white/40 tracking-wider uppercase">뷰티 서비스 목록</span>
         <span className="text-[11px] font-bold" style={{ color: AMBER }}>{products.length}개</span>
       </div>
       {products.map((lp: any) => {
@@ -195,7 +195,7 @@ export default function PCDirectorSuiteComponent({
       {products.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-white/20">
           <Star size={36} className="mb-3" />
-          <p className="text-[13px]">등록된 상담상품이 없습니다</p>
+          <p className="text-[13px]">등록된 뷰티 서비스가 없습니다</p>
         </div>
       )}
     </div>
@@ -278,7 +278,7 @@ export default function PCDirectorSuiteComponent({
       </div>
       <div>
         <h3 className="text-[13px] font-bold text-white/60 mb-2 flex items-center gap-1.5">
-          <BookOpen size={13} style={{ color: AMBER }} /> 상담사 정보
+          <BookOpen size={13} style={{ color: AMBER }} /> 뷰티 전문가 정보
         </h3>
         <Link href={`/shop/${seller?.slug}`} className="flex items-center gap-3 p-4 bg-white/5 rounded-xl hover:bg-white/[0.08] transition-colors">
           <div className="w-12 h-12 rounded-full bg-gray-800 border border-white/10 overflow-hidden flex-shrink-0 relative">
@@ -364,8 +364,8 @@ export default function PCDirectorSuiteComponent({
           <button onClick={onShare} title="공유" className="w-11 h-11 rounded-2xl flex items-center justify-center text-white/60 hover:text-white/90 hover:bg-white/10 transition-all">
             <Share2 size={20} />
           </button>
-          {/* 점집 */}
-          <Link href={`/shop/${seller?.slug}`} title="상담사 점집" className="w-11 h-11 rounded-2xl flex items-center justify-center text-white/60 hover:text-white/90 hover:bg-white/10 transition-all">
+          {/* 뷰티샵 */}
+          <Link href={`/shop/${seller?.slug}`} title="뷰티 전문가 뷰티샵" className="w-11 h-11 rounded-2xl flex items-center justify-center text-white/60 hover:text-white/90 hover:bg-white/10 transition-all">
             <Building2 size={20} />
           </Link>
         </div>
@@ -448,7 +448,7 @@ export default function PCDirectorSuiteComponent({
             {isScheduled && <span className="bg-blue-500/60 text-white text-[10px] font-medium px-3 py-1 rounded-full backdrop-blur-sm">방송 예정</span>}
           </div>
 
-          {/* 우측 하단: 액션 버튼 (상담상품바와 겹치지 않게 위치 조정) */}
+          {/* 우측 하단: 액션 버튼 (뷰티 서비스바와 겹치지 않게 위치 조정) */}
           <div className="absolute right-4 flex flex-col items-center gap-4" style={{ bottom: exposedProduct ? "5.5rem" : "2rem" }}>
             {/* 좋아요 */}
             <button onClick={onLike} className="relative flex flex-col items-center gap-1">
@@ -462,7 +462,7 @@ export default function PCDirectorSuiteComponent({
             </button>
           </div>
 
-          {/* 하단 좌: 비디오 컨트롤 (상담상품바와 겹치지 않게 위치 조정) */}
+          {/* 하단 좌: 비디오 컨트롤 (뷰티 서비스바와 겹치지 않게 위치 조정) */}
           <div className="absolute left-4 flex items-center gap-2" style={{ bottom: exposedProduct ? "5.5rem" : "2rem" }}>
             <button
               onClick={onMuteToggle}
@@ -480,7 +480,7 @@ export default function PCDirectorSuiteComponent({
             </button>
           </div>
 
-          {/* 방송화면 하단 상담상품바 (isActive 상담상품이 있을 때만 표시) */}
+          {/* 방송화면 하단 뷰티 서비스바 (isActive 뷰티 서비스가 있을 때만 표시) */}
           {exposedProduct && (() => {
             const lp = exposedProduct;
             const lpPrice = Number(lp.livePrice) || lp.product.basePrice;
@@ -489,7 +489,7 @@ export default function PCDirectorSuiteComponent({
               : 0;
             return (
               <div className="absolute bottom-3 left-3 right-3 rounded-2xl p-3 flex items-center gap-3 border border-white/10" style={{ backgroundColor: 'rgba(0,0,0,0.75)' }}>
-                {/* 투명 PNG 가시성 확보를 위해 밝은 배경 (상담상품 목록 썸네일과 동일) */}
+                {/* 투명 PNG 가시성 확보를 위해 밝은 배경 (뷰티 서비스 목록 썸네일과 동일) */}
                 <div className="w-12 h-12 rounded-xl bg-gray-100 flex-shrink-0 overflow-hidden relative">
                   {lp.product.thumbnail
                     ? <img
@@ -524,7 +524,7 @@ export default function PCDirectorSuiteComponent({
       {/* ── RIGHT PANEL (360px) ───────────────────────────────── */}
       <div className="w-[360px] flex-shrink-0 flex flex-col h-screen border-l border-white/[0.07]" style={{ background: "#0E0F15" }}>
 
-        {/* 상담사 헤더 - compact */}
+        {/* 뷰티 전문가 헤더 - compact */}
         <div className="px-4 py-2 flex items-center gap-2.5 flex-shrink-0 border-b border-white/[0.07] h-12">
           <Link href={`/shop/${seller?.slug}`} className="flex-shrink-0">
             <div className="w-8 h-8 rounded-full bg-gray-800 ring-2 ring-amber-400/20 overflow-hidden relative">
@@ -566,7 +566,7 @@ export default function PCDirectorSuiteComponent({
         <div className="flex border-b border-white/[0.07] flex-shrink-0">
           {(["products", "coupon", "intro"] as const).map(tab => {
             const labels: Record<RailTab, string> = {
-              products: "상담상품",
+              products: "뷰티 서비스",
               coupon: "쿠폰",
               intro: "라이브 소개",
             };
@@ -614,13 +614,13 @@ export default function PCDirectorSuiteComponent({
                   </div>
                 ) : (
                   <div className="flex items-start gap-1.5">
-                    {/* 출처 배지: YouTube 실시간 채팅 vs 사주나라 앱 채팅 */}
+                    {/* 출처 배지: YouTube 실시간 채팅 vs 뷰티메이트 앱 채팅 */}
                     {msg.isYoutube ? (
                       <span title="YouTube 채팅" className="inline-flex items-center justify-center h-[15px] px-1 rounded bg-[#FF0000] flex-shrink-0 mt-[1px]">
                         <Youtube size={10} className="text-white" />
                       </span>
                     ) : (
-                      <img src="/favicon.png" alt="사주나라" title="사주나라 채팅" className="w-[15px] h-[15px] rounded-[3px] flex-shrink-0 mt-[1px]" />
+                      <img src="/favicon.png" alt="뷰티메이트" title="뷰티메이트 채팅" className="w-[15px] h-[15px] rounded-[3px] flex-shrink-0 mt-[1px]" />
                     )}
                     <div className="min-w-0">
                       <span className="font-semibold text-white/60">{msg.nickname}</span>

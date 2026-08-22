@@ -171,7 +171,7 @@ export async function POST(request: Request) {
   await ensureConsultingSession(order.id).catch((e) =>
     console.error("[ongi] 영상 세션 생성 오류:", e),
   );
-  // 결제 완료 → 해당 점집 상담사에게 예약접수 알림톡 (실패해도 결제 처리에 영향 없음)
+  // 결제 완료 → 해당 뷰티샵 뷰티 전문가에게 예약접수 알림톡 (실패해도 결제 처리에 영향 없음)
   await notifyOrderPlacedToSeller(order.id).catch((e) => console.error("[ongi] 예약접수 알림톡 오류:", e));
   await logPayment({
     orderId: order.id,

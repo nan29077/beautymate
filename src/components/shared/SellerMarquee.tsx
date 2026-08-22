@@ -1,27 +1,27 @@
 "use client";
 
-// 활동중인 상담사를 가로로 자동 슬라이드(마퀴)로 보여주는 장식용 섹션.
-// ※ 더미(데모) 상담사 — 실제 상담사 디렉토리 탐색이 아니라 "활동중" 분위기를 보여주는 용도(클릭 비활성).
-// ※ 선녀·도령·무당·만신·선생·역술인 등 다양한 유형을 혼합해 표시.
+// 활동중인 뷰티 전문가를 가로로 자동 슬라이드(마퀴)로 보여주는 장식용 섹션.
+// ※ 더미(데모) 뷰티 전문가 — 실제 뷰티 전문가 디렉토리 탐색이 아니라 "활동중" 분위기를 보여주는 용도(클릭 비활성).
+// ※ 다양한 뷰티 분야의 데모 전문가를 혼합해 표시.
 const DUMMY = [
-  { name: "월령 선생", mood: "사주명리 · 신년운세", status: "오늘 상담 가능", avatar: 1 },
-  { name: "청아 선녀", mood: "천상계 사주 해석", status: "예약 가능", avatar: 3 },
-  { name: "해월 무당", mood: "신내림 30년 · 신점", status: "라이브 상담", avatar: 8 },
-  { name: "연화 만신", mood: "만신 · 굿 · 부적", status: "오늘의 추천", avatar: 14 },
-  { name: "도윤 도령", mood: "도령신 · 직업·이직운", status: "예약 가능", avatar: 20 },
-  { name: "별하 역술인", mood: "역술 · 가족·인간관계", status: "오늘 상담 가능", avatar: 25 },
-  { name: "현명 선생", mood: "대운 · 종합운세", status: "라이브 상담", avatar: 27 },
-  { name: "소담 선녀", mood: "천기누설 · 타로", status: "예약 가능", avatar: 30 },
+  { name: "서연 테라피스트", mood: "맞춤 스킨케어 · 피부 컨디션", status: "오늘 예약 가능", avatar: 1 },
+  { name: "민지 컨설턴트", mood: "퍼스널 컬러 · 메이크업", status: "예약 가능", avatar: 3 },
+  { name: "하린 디자이너", mood: "헤어 · 스타일링", status: "라이브 중", avatar: 8 },
+  { name: "유나 아티스트", mood: "데일리 메이크업 · 브로우", status: "오늘의 추천", avatar: 14 },
+  { name: "도윤 원장", mood: "네일 아트 · 케어", status: "예약 가능", avatar: 20 },
+  { name: "별하 테라피스트", mood: "바디케어 · 웰니스", status: "오늘 예약 가능", avatar: 25 },
+  { name: "현아 디자이너", mood: "헤어 컬러 · 두피 케어", status: "라이브 중", avatar: 27 },
+  { name: "소담 컨설턴트", mood: "이미지 컨설팅 · 컬러", status: "예약 가능", avatar: 30 },
 ];
 
-function sajuAvatar(index: number): string {
-  return `/avatars/saju/saju-avatar-${String(index).padStart(2, "0")}.png`;
+function beautymateAvatar(index: number): string {
+  return "/avatars/beautymate/default.svg";
 }
 
 function Card({ s }: { s: (typeof DUMMY)[number] }) {
   return (
     <div className="flex-shrink-0 w-40 mr-3 rounded-2xl border border-gray-100 bg-white p-3 flex items-center gap-2.5">
-      <img src={sajuAvatar(s.avatar)} alt="" className="w-11 h-11 rounded-full ring-2 ring-brand-200 bg-brand-50 flex-shrink-0 object-cover" />
+      <img src={beautymateAvatar(s.avatar)} alt="" className="w-11 h-11 rounded-full ring-2 ring-brand-200 bg-brand-50 flex-shrink-0 object-cover" />
       <div className="min-w-0">
         <p className="text-[12px] font-bold text-gray-900 truncate">{s.name}</p>
         <p className="text-[10px] text-gray-400 truncate">{s.mood}</p>

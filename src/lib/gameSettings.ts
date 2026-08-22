@@ -1,5 +1,5 @@
 // 게임 노출/오버레이 스타일 설정 (서버 전용) — JSON 파일 기반.
-// 최고관리자가 게임 유형별 "상담사 노출 여부"와 "오버레이 스타일"을 설정한다.
+// 최고관리자가 게임 유형별 "뷰티 전문가 노출 여부"와 "오버레이 스타일"을 설정한다.
 // prisma 등 서버 모듈에 의존하지 않지만 fs 를 사용하므로 서버에서만 import 할 것.
 
 import { promises as fs } from "fs";
@@ -65,7 +65,7 @@ export async function writeGameSettings(settings: GameSettings): Promise<void> {
   await fs.writeFile(SETTINGS_PATH, JSON.stringify(normalized, null, 2), "utf-8");
 }
 
-// 상담사 게임관리 화면에 노출할 게임 타입 목록
+// 뷰티 전문가 게임관리 화면에 노출할 게임 타입 목록
 export async function getSellerVisibleTypes(): Promise<string[]> {
   const s = await readGameSettings();
   return (GAME_TYPES as readonly string[]).filter((t) => s.gameTypes[t]?.sellerVisible !== false);

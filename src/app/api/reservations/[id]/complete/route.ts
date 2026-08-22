@@ -6,9 +6,9 @@ import { completeConsultingSession } from "@/lib/consultingSession";
 
 export const dynamic = "force-dynamic";
 
-// POST /api/reservations/[id]/complete — 상담 완료 처리 (전화·방문 상담 등)
-// 상담사(본인 점집)·관리자 전용. 확정(CONFIRMED) 상태의 예약만 완료할 수 있다.
-// body: { memo?: string } — 상담사가 남기는 상담 메모 (선택)
+// POST /api/reservations/[id]/complete — 서비스 완료 처리 (전화·방문 상담 등)
+// 뷰티 전문가(본인 뷰티샵)·관리자 전용. 확정(CONFIRMED) 상태의 예약만 완료할 수 있다.
+// body: { memo?: string } — 뷰티 전문가가 남기는 고객 메모 (선택)
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> | { id: string } },

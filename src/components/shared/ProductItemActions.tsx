@@ -192,7 +192,7 @@ export default function ProductItemActions({ productId, mode, isActive, ownerLab
                 href={`/products/${productId}`}
                 className="flex items-center gap-2.5 w-full px-3 py-2 text-xs text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
               >
-                <Icon name="ArrowRight" size={14} /> 상담상품 상세보기
+                <Icon name="ArrowRight" size={14} /> 뷰티 서비스 상세보기
               </Link>
             </div>
 

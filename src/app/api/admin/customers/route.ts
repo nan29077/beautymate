@@ -4,8 +4,8 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-// GET /api/admin/customers — 전체 고객의 귀속 상담사 조회 (관리자 전용)
-// query: search(이름/이메일/전화), sellerId(귀속 상담사 필터, "none"=미귀속), page, limit
+// GET /api/admin/customers — 전체 고객의 귀속 뷰티 전문가 조회 (관리자 전용)
+// query: search(이름/이메일/전화), sellerId(귀속 뷰티 전문가 필터, "none"=미귀속), page, limit
 export async function GET(request: Request) {
   const session = await auth();
   if (session?.user?.role !== "SUPER_ADMIN") {
@@ -87,7 +87,7 @@ export async function GET(request: Request) {
   });
 }
 
-// PATCH /api/admin/customers — 고객의 귀속 상담사 변경 (관리자 전용)
+// PATCH /api/admin/customers — 고객의 귀속 뷰티 전문가 변경 (관리자 전용)
 // body: { userId, sellerId: string | null } — null 이면 귀속 해제
 export async function PATCH(request: Request) {
   const session = await auth();
@@ -114,7 +114,7 @@ export async function PATCH(request: Request) {
       select: { id: true },
     });
     if (!seller) {
-      return NextResponse.json({ error: "상담사를 찾을 수 없습니다." }, { status: 404 });
+      return NextResponse.json({ error: "뷰티 전문가를 찾을 수 없습니다." }, { status: 404 });
     }
   }
 

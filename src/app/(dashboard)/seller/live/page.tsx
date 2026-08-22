@@ -101,7 +101,7 @@ export default function SellerLivePage() {
     liveIntro: "",
     notices: "",
     theme: "default" as string,
-    // 점사 예약 방식: 당일 예약 가능 슬롯 수(빈 값 = 무제한) + 방송 중 예약 위젯 표시
+    // 뷰티 상담 예약 방식: 당일 예약 가능 슬롯 수(빈 값 = 무제한) + 방송 중 예약 위젯 표시
     dailySlotLimit: "",
     showReservationWidget: true,
   });
@@ -118,7 +118,7 @@ export default function SellerLivePage() {
 
   // ★ 테마 옵션
   const THEME_OPTIONS = [
-    { id: "default", name: "기본", color: "#6366f1", desc: "사주나라 기본 테마" },
+    { id: "default", name: "기본", color: "#6366f1", desc: "뷰티메이트 기본 테마" },
     { id: "modern", name: "모던", color: "#111827", desc: "심플하고 세련된 블랙" },
     { id: "simple", name: "심플", color: "#0ea5e9", desc: "깔끔한 스카이블루" },
     { id: "lovely", name: "러블리", color: "#ec4899", desc: "사랑스러운 핑크" },
@@ -138,13 +138,13 @@ export default function SellerLivePage() {
   const [systemMsg, setSystemMsg] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Expose product (노출 상담상품 관리)
+  // Expose product (노출 뷰티 서비스 관리)
   const [exposedProductId, setExposedProductId] = useState<string | null>(null);
   const [exposingLoading, setExposingLoading] = useState(false);
 
   // SNS 라이브 연동 노출 여부 (관리자 사이트관리 토글, 기본값 true)
   const [enableSnsLive, setEnableSnsLive] = useState(true);
-  // 점집관리 수동 라이브 상태 (충돌 팝업 조건)
+  // 뷰티샵관리 수동 라이브 상태 (충돌 팝업 조건)
   const [shopManualLive, setShopManualLive] = useState(false);
 
   // 라이브 시작 확인 팝업 (충돌 여부에 따라 안내 문구 변경)
@@ -191,7 +191,7 @@ export default function SellerLivePage() {
       .catch(() => {});
   }, []);
 
-  // 점집관리 수동 라이브 상태 조회 (충돌 팝업 조건)
+  // 뷰티샵관리 수동 라이브 상태 조회 (충돌 팝업 조건)
   const fetchShopManualLive = useCallback(() => {
     fetch("/api/seller/shop")
       .then(r => r.json())
@@ -226,7 +226,7 @@ export default function SellerLivePage() {
   }, [botEnabled, activeLiveId]);
 
   // 진행 중인 YouTube 라이브의 실시간 채팅 수집 트리거 (봇 ON/OFF 무관).
-  // 서버가 상담사 API 키로 YouTube 채팅을 폴링해 앱 채팅에 병합 → 방송자/시청자 채팅창에 함께 표시.
+  // 서버가 뷰티 전문가 API 키로 YouTube 채팅을 폴링해 앱 채팅에 병합 → 방송자/시청자 채팅창에 함께 표시.
   const activeYoutubeLiveId = lives.find(l => l.status === "LIVE" && l.platform === "YOUTUBE" && l.externalUrl)?.id ?? null;
   useEffect(() => {
     if (!activeYoutubeLiveId) return;
@@ -267,7 +267,7 @@ export default function SellerLivePage() {
       .catch(() => setYtOauth({ connected: false, channelTitle: null }));
   }, []);
 
-  // OAuth 연결된 상담사: 내 채널의 진행 중인 방송을 클릭 한 번으로 자동 감지 (B방식)
+  // OAuth 연결된 뷰티 전문가: 내 채널의 진행 중인 방송을 클릭 한 번으로 자동 감지 (B방식)
   const handleMyLiveDetect = async () => {
     setYtDetecting(true);
     setYtDetectError("");
@@ -338,7 +338,7 @@ export default function SellerLivePage() {
     }
   };
 
-  // 라이브 데이터에서 현재 노출 중인 상담상품 동기화
+  // 라이브 데이터에서 현재 노출 중인 뷰티 서비스 동기화
   useEffect(() => {
     const activeLive = lives.find(l => l.status === "LIVE");
     if (activeLive) {
@@ -365,7 +365,7 @@ export default function SellerLivePage() {
     }
   }, [showChatManager, fetchChat]);
 
-  // 노출 상담상품 전환
+  // 노출 뷰티 서비스 전환
   const handleExposeProduct = async (liveId: string, productId: string) => {
     setExposingLoading(true);
     const isAlreadyExposed = exposedProductId === productId;
@@ -380,7 +380,7 @@ export default function SellerLivePage() {
     } catch {} finally { setExposingLoading(false); }
   };
 
-  // 지난방송 상담상품노출 스위치 (점집 "지난 방송 상담상품" 영역 노출 on/off)
+  // 지난방송 뷰티 서비스노출 스위치 (뷰티샵 "지난 방송 뷰티 서비스" 영역 노출 on/off)
   const [pastToggleLoading, setPastToggleLoading] = useState<string | null>(null);
   const handleTogglePastInShop = async (liveId: string, show: boolean) => {
     // 낙관적 업데이트
@@ -415,7 +415,7 @@ export default function SellerLivePage() {
           // B방식: YouTube 라이브일 때만 OBS/PRISM 송출용 스트림 키 전달
           streamKey: form.platform === "YOUTUBE" ? form.youtubeStreamKey.trim() || null : undefined,
           productIds: form.selectedProducts, livePrices: form.livePrices,
-          // 점사 예약 방식 설정
+          // 뷰티 상담 예약 방식 설정
           dailySlotLimit: form.dailySlotLimit.trim() || null,
           showReservationWidget: form.showReservationWidget,
         }),
@@ -532,7 +532,7 @@ export default function SellerLivePage() {
             body: JSON.stringify({ action: "end", liveId: l.id }),
           }).catch(() => {});
         }
-        // 점집관리 수동 라이브 OFF
+        // 뷰티샵관리 수동 라이브 OFF
         if (shopManualLive) {
           await fetch("/api/seller/shop", {
             method: "PATCH",
@@ -605,7 +605,7 @@ export default function SellerLivePage() {
     setShowCreate(true);
   };
 
-  // ★ 상담상품 순서 이동 헬퍼 (create form)
+  // ★ 뷰티 서비스 순서 이동 헬퍼 (create form)
   const moveProduct = (list: string[], idx: number, dir: -1 | 1): string[] => {
     const newList = [...list];
     const targetIdx = idx + dir;
@@ -629,7 +629,7 @@ export default function SellerLivePage() {
     <div className="animate-fade-in">
       <DashboardPageHeader
         iconName="LiveConsulting"
-        title="라이브 상담"
+        title="라이브 뷰티"
         description={`총 ${lives.length}개의 라이브 · 진행/예정 ${liveCount}개`}
         className="mb-6"
         actions={<button onClick={openCreate} className="btn-primary text-sm flex items-center gap-1.5 !px-4 !py-2.5 !text-white">
@@ -672,7 +672,7 @@ export default function SellerLivePage() {
                     <LiveCard key={live.id} live={live} onAction={handleAction} actionLoading={actionLoading}
                       onDetail={() => {
                         setShowDetail(live.id);
-                        // 현재 노출 중인 상담상품 찾기
+                        // 현재 노출 중인 뷰티 서비스 찾기
                         const activeP = live.products.find((p: any) => p.isActive);
                         setExposedProductId(activeP ? (activeP.product?.id || activeP.productId) : null);
                       }}
@@ -778,7 +778,7 @@ export default function SellerLivePage() {
                 {[
                   { n: 1, text: "유튜브 스튜디오(studio.youtube.com)에서 라이브 방송 시작" },
                   { n: 2, text: "방송 중인 유튜브 URL 복사\n(예: youtube.com/watch?v=xxxx 또는 youtu.be/xxxx)" },
-                  { n: 3, text: "사주나라 라이브 생성 → URL 입력란에 붙여넣기" },
+                  { n: 3, text: "뷰티메이트 라이브 생성 → URL 입력란에 붙여넣기" },
                   { n: 4, text: "라이브 시작 클릭" },
                 ].map(s => (
                   <div key={s.n} className="flex gap-3 items-start">
@@ -826,7 +826,7 @@ export default function SellerLivePage() {
               <div className="space-y-2.5">
                 {[
                   { n: 1, text: "유튜브 채널 URL 또는 채널 ID 확인\n(유튜브 채널 페이지 → 더보기 → 채널 정보)" },
-                  { n: 2, text: "사주나라 라이브 생성 → 채널 ID/URL 입력" },
+                  { n: 2, text: "뷰티메이트 라이브 생성 → 채널 ID/URL 입력" },
                   { n: 3, text: "'라이브 자동 감지' 버튼 클릭 → 현재 라이브 중인 영상 자동 세팅" },
                   { n: 4, text: "라이브 시작 클릭" },
                 ].map(s => (
@@ -864,7 +864,7 @@ export default function SellerLivePage() {
           <div className="flex items-center gap-0 px-5 py-3 bg-gray-50 border-b border-gray-100 flex-shrink-0">
             {[
               { n: 1, label: "기본 정보·예약 설정" },
-              { n: 2, label: "예약 상담 상품" },
+              { n: 2, label: "예약 뷰티 서비스" },
               { n: 3, label: "혜택·공지" },
               { n: 4, label: "확인" },
             ].map((s, i) => (
@@ -883,11 +883,11 @@ export default function SellerLivePage() {
               <>
                 <div>
                   <label className="text-xs font-bold text-gray-700 flex items-center gap-1"><Icon name="ProductName_icon" size={14} /> 라이브 제목 <span className="text-red-500">*</span></label>
-                  <input type="text" className="input-field mt-1.5" placeholder="예: 오늘의 사주·타로 실시간 상담" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
+                  <input type="text" className="input-field mt-1.5" placeholder="예: 오늘의 뷰티·퍼스널 컬러 실시간 상담" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-700 flex items-center gap-1"><Icon name="ShortDescription_icon" size={14} /> 설명</label>
-                  <textarea className="input-field mt-1.5 h-20 resize-none" placeholder="예: 오늘 방송에서 받을 상담 종류와 특이사항을 적어주세요" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+                  <textarea className="input-field mt-1.5 h-20 resize-none" placeholder="예: 오늘 방송에서 받을 서비스 종류와 특이사항을 적어주세요" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
                 </div>
                 {/* 썸네일 이미지 */}
                 <div>
@@ -901,10 +901,10 @@ export default function SellerLivePage() {
                   <ScheduledTimePicker value={form.scheduledAt} onChange={(v) => setForm({ ...form, scheduledAt: v })} />
                 </div>
 
-                {/* ★ 점사 예약 설정 — 방송 중 시청자 예약 접수 방식 */}
+                {/* ★ 뷰티 상담 예약 설정 — 방송 중 시청자 예약 접수 방식 */}
                 <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3.5 space-y-3">
                   <p className="text-xs font-bold text-amber-800 flex items-center gap-1">
-                    <Icon name="Calendar" size={13} /> 점사 예약 설정
+                    <Icon name="Calendar" size={13} /> 뷰티 상담 예약 설정
                   </p>
                   <div>
                     <label className="text-[11px] font-semibold text-gray-700">오늘 받을 상담 수</label>
@@ -939,7 +939,7 @@ export default function SellerLivePage() {
                   <label className="text-xs font-bold text-gray-700 flex items-center gap-1">
                     <Icon name="SnsLiveStream_icon" size={14} /> 외부 라이브 플랫폼
                   </label>
-                  <p className="text-[10px] text-gray-400 mt-1">선택하면 점집 프로필의 LIVE 뱃지가 이 URL로 연결됩니다.</p>
+                  <p className="text-[10px] text-gray-400 mt-1">선택하면 뷰티샵 프로필의 LIVE 뱃지가 이 URL로 연결됩니다.</p>
                   <div className="grid grid-cols-3 gap-2 mt-2">
                     {PLATFORM_OPTIONS.map(p => {
                       const selected = form.platform === p.id;
@@ -1225,17 +1225,17 @@ export default function SellerLivePage() {
             {createStep === 2 && (
               <>
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-500">라이브에서 판매할 상담상품을 선택하고 순서와 특가를 설정하세요.</p>
+                  <p className="text-xs text-gray-500">라이브에서 판매할 뷰티 서비스를 선택하고 순서와 특가를 설정하세요.</p>
                   <span className="text-[11px] font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded-lg">
                     <Hash size={10} className="inline mr-0.5" />{form.selectedProducts.length}개 선택
                   </span>
                 </div>
 
-                {/* ★ 선택된 상담상품 순서 관리 영역 */}
+                {/* ★ 선택된 뷰티 서비스 순서 관리 영역 */}
                 {form.selectedProducts.length > 0 && (
                   <div className="bg-brand-50 rounded-xl p-3 border border-brand-100">
                     <p className="text-[10px] font-bold text-brand-700 mb-2 flex items-center gap-1">
-                      <GripVertical size={10} /> 상담상품 순서 (번호 = 방송 중 표시 번호)
+                      <GripVertical size={10} /> 뷰티 서비스 순서 (번호 = 방송 중 표시 번호)
                     </p>
                     <div className="space-y-1.5">
                       {form.selectedProducts.map((pid, idx) => {
@@ -1280,7 +1280,7 @@ export default function SellerLivePage() {
                   </div>
                 )}
 
-                {/* 상담상품 탭 (내 상담상품 / 사주나라 상담상품) */}
+                {/* 뷰티 서비스 탭 (내 뷰티 서비스 / 뷰티메이트 뷰티 서비스) */}
                 {(() => {
                   const ownCount = products.filter(p => p.isOwn).length;
                   const brickCount = products.length - ownCount;
@@ -1291,20 +1291,20 @@ export default function SellerLivePage() {
                         onClick={() => setProductTab("own")}
                         className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${productTab === "own" ? "bg-white text-brand-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
                       >
-                        내 상담상품 <span className="text-[10px] text-gray-400">({ownCount})</span>
+                        내 뷰티 서비스 <span className="text-[10px] text-gray-400">({ownCount})</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setProductTab("brick")}
                         className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${productTab === "brick" ? "bg-white text-brand-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
                       >
-                        사주나라 상담상품 <span className="text-[10px] text-gray-400">({brickCount})</span>
+                        뷰티메이트 뷰티 서비스 <span className="text-[10px] text-gray-400">({brickCount})</span>
                       </button>
                     </div>
                   );
                 })()}
 
-                {/* 상담상품 목록 (선택/해제) */}
+                {/* 뷰티 서비스 목록 (선택/해제) */}
                 <div className="space-y-2 max-h-60 overflow-y-auto border border-gray-100 rounded-xl p-2">
                   {(() => {
                     const filtered = products.filter(p => (productTab === "own" ? p.isOwn : !p.isOwn));
@@ -1312,8 +1312,8 @@ export default function SellerLivePage() {
                       return (
                         <p className="text-xs text-gray-400 text-center py-8">
                           {productTab === "own"
-                            ? "직접 등록한 상담상품이 없습니다. 상담상품관리에서 등록해주세요."
-                            : "점집에 추가한 사주나라 상담상품이 없습니다. 상담상품관리에서 추가해주세요."}
+                            ? "직접 등록한 뷰티 서비스가 없습니다. 뷰티 서비스 관리에서 등록해주세요."
+                            : "뷰티샵에 추가한 뷰티메이트 뷰티 서비스가 없습니다. 뷰티 서비스 관리에서 추가해주세요."}
                         </p>
                       );
                     }
@@ -1490,7 +1490,7 @@ export default function SellerLivePage() {
                     <p>설명: {form.description || "-"}</p>
                     <p>예정 시간: {form.scheduledAt ? new Date(form.scheduledAt).toLocaleString("ko-KR") : "미정"}</p>
                     <p>외부 플랫폼: {form.platform ? `${PLATFORM_OPTIONS.find(p => p.id === form.platform)?.label} (${form.externalUrl || "URL 미입력"})` : "없음"}</p>
-                    <p>선택 상담상품: {form.selectedProducts.length}개</p>
+                    <p>선택 뷰티 서비스: {form.selectedProducts.length}개</p>
                     <p>테마: {THEME_OPTIONS.find(t => t.id === form.theme)?.name || "기본"}</p>
                     {pendingCoupons.length > 0 && <p>쿠폰: {pendingCoupons.length}개 예정</p>}
                     {FEATURE_LIVE_COMMERCE && form.thumbnailImage && (
@@ -1500,11 +1500,11 @@ export default function SellerLivePage() {
                     )}
                   </div>
                 </div>
-                {/* 상담상품 순서 미리보기 */}
+                {/* 뷰티 서비스 순서 미리보기 */}
                 {form.selectedProducts.length > 0 && (
                   <div className="bg-gray-50 rounded-xl p-4">
                     <p className="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1">
-                      <Hash size={11} /> 상담상품 번호 순서
+                      <Hash size={11} /> 뷰티 서비스 번호 순서
                     </p>
                     <div className="space-y-1">
                       {form.selectedProducts.map((pid, idx) => {
@@ -1562,25 +1562,25 @@ export default function SellerLivePage() {
 
       {/* ============ Product Manager Modal (with numbering) ============ */}
       {showProductManager && (
-        <Modal title="라이브 상담상품 관리" onClose={() => setShowProductManager(null)}>
+        <Modal title="라이브 뷰티 서비스 관리" onClose={() => setShowProductManager(null)}>
           <div className="p-4 space-y-3 flex-1 min-h-0 overflow-y-auto overscroll-contain">
             <div className="flex items-center justify-between">
-              <p className="text-xs text-gray-400">상담상품 순서를 변경하고 번호를 설정하세요. 방송 중에도 실시간 반영됩니다.</p>
+              <p className="text-xs text-gray-400">뷰티 서비스 순서를 변경하고 번호를 설정하세요. 방송 중에도 실시간 반영됩니다.</p>
               <span className="text-[11px] font-bold text-brand-600 bg-brand-50 px-2 py-1 rounded-lg flex-shrink-0">
                 <Hash size={10} className="inline mr-0.5" />{managingProducts.length}개
               </span>
             </div>
 
-            {/* ★ 선택된 상담상품 순서 관리 (번호 표시) */}
+            {/* ★ 선택된 뷰티 서비스 순서 관리 (번호 표시) */}
             {managingProducts.length > 0 && (
               <div className="bg-brand-50 rounded-xl p-3 border border-brand-100">
                 <p className="text-[10px] font-bold text-brand-700 mb-2 flex items-center gap-1">
-                  <GripVertical size={10} /> 방송 상담상품 순서 (↑↓ 버튼으로 순서 변경)
+                  <GripVertical size={10} /> 방송 뷰티 서비스 순서 (↑↓ 버튼으로 순서 변경)
                 </p>
                 <div className="space-y-1.5">
                   {managingProducts.map((pid, idx) => {
                     let p = products.find(pp => pp.id === pid);
-                    // 상담상품 목록에 없는 경우, 라이브에 등록된 상담상품 데이터에서 폴백
+                    // 뷰티 서비스 목록에 없는 경우, 라이브에 등록된 뷰티 서비스 데이터에서 폴백
                     if (!p) {
                       const currentLive = lives.find(l => l.id === showProductManager);
                       const liveP = currentLive?.products?.find((lp: any) => (lp.product?.id || lp.productId) === pid);
@@ -1639,12 +1639,12 @@ export default function SellerLivePage() {
               </div>
             )}
 
-            {/* 추가 가능한 상담상품 목록 */}
+            {/* 추가 가능한 뷰티 서비스 목록 */}
             <div className="border border-gray-100 rounded-xl">
-              <p className="text-[10px] font-bold text-gray-500 px-3 py-2 bg-gray-50 border-b border-gray-100">상담상품 추가</p>
+              <p className="text-[10px] font-bold text-gray-500 px-3 py-2 bg-gray-50 border-b border-gray-100">뷰티 서비스 추가</p>
               <div className="max-h-40 overflow-y-auto p-2 space-y-1">
                 {products.filter(p => !managingProducts.includes(p.id)).length === 0 ? (
-                  <p className="text-xs text-gray-400 text-center py-4">추가할 상담상품이 없습니다.</p>
+                  <p className="text-xs text-gray-400 text-center py-4">추가할 뷰티 서비스가 없습니다.</p>
                 ) : products.filter(p => !managingProducts.includes(p.id)).map(p => (
                   <button
                     key={p.id}
@@ -1667,7 +1667,7 @@ export default function SellerLivePage() {
             <button onClick={() => setShowProductManager(null)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl">취소</button>
             <button onClick={() => handleProductUpdate(showProductManager)} className="btn-primary text-sm !px-5 !py-2.5">
               {actionLoading === showProductManager ? <Loader2 size={14} className="animate-spin" /> : <>
-                <Hash size={12} className="inline mr-1" />상담상품 업데이트 ({managingProducts.length})
+                <Hash size={12} className="inline mr-1" />뷰티 서비스 업데이트 ({managingProducts.length})
               </>}
             </button>
           </div>
@@ -1689,11 +1689,11 @@ export default function SellerLivePage() {
                   msg.isHidden ? "bg-gray-50 border border-gray-100 opacity-50 line-through" : "bg-white border border-gray-100"
                 }`}>
                   <span className="font-bold inline-flex items-center gap-1 align-middle">
-                    {/* 출처 배지: YouTube 실시간 채팅 vs 사주나라 앱 채팅 */}
+                    {/* 출처 배지: YouTube 실시간 채팅 vs 뷰티메이트 앱 채팅 */}
                     {msg.isYoutube ? (
                       <span title="YouTube 채팅" className="inline-flex items-center px-1 py-[1px] rounded bg-[#FF0000] text-white text-[8px] font-bold leading-none">YT</span>
                     ) : (!msg.isBot && !msg.isManager && !msg.isSystem) ? (
-                      <img src="/favicon.png" alt="사주나라" title="사주나라 채팅" className="w-3.5 h-3.5 rounded-[3px]" />
+                      <img src="/favicon.png" alt="뷰티메이트" title="뷰티메이트 채팅" className="w-3.5 h-3.5 rounded-[3px]" />
                     ) : null}
                     {msg.isBot ? <Icon name="Bot" size={12} className="text-brand-600" /> : msg.isManager ? <Icon name="Megaphone" size={12} className="text-brand-600" /> : msg.isSystem ? <Icon name="Pin" size={12} className="text-moon-700" /> : null}
                     <span>{msg.nickname}</span>
@@ -1730,7 +1730,7 @@ export default function SellerLivePage() {
                 </button>
               </div>
               <div className="flex gap-1.5 flex-wrap">
-                {["환영합니다!", "잠시 후 시작합니다", "지금 예약하시면 특별 혜택!", "상담상품 교체 중입니다", "질문은 채팅으로 남겨주세요"].map(msg => (
+                {["환영합니다!", "잠시 후 시작합니다", "지금 예약하시면 특별 혜택!", "뷰티 서비스 교체 중입니다", "질문은 채팅으로 남겨주세요"].map(msg => (
                   <button key={msg} onClick={() => setManagerMsg(msg)}
                     className="text-[10px] px-2.5 py-1 bg-gray-100 text-gray-500 rounded-full hover:bg-gray-200">
                     {msg}
@@ -1784,11 +1784,11 @@ export default function SellerLivePage() {
               </div>
             </div>
 
-            {/* ★ 상담상품 목록 (번호 표시 + 노출 버튼 포함) */}
+            {/* ★ 뷰티 서비스 목록 (번호 표시 + 노출 버튼 포함) */}
             {detailLive.products.length > 0 && (
               <div>
                 <p className="text-xs font-bold text-gray-600 mb-2 flex items-center gap-1">
-                  <Hash size={11} /> 라이브 상담상품 ({detailLive.products.length})
+                  <Hash size={11} /> 라이브 뷰티 서비스 ({detailLive.products.length})
                 </p>
                 <div className="space-y-1.5">
                   {detailLive.products
@@ -1847,7 +1847,7 @@ export default function SellerLivePage() {
               <h3 className="text-[15px] font-bold text-gray-900 mb-2">잠깐, 안내드려요!</h3>
               {startPrompt.conflict ? (
                 <div className="text-[13px] text-gray-500 leading-relaxed space-y-2">
-                  <p>이미 라이브 상담 또는 SNS 라이브가 진행 중입니다.<br />이대로 새 라이브를 시작하시겠습니까?</p>
+                  <p>이미 라이브 뷰티 또는 SNS 라이브가 진행 중입니다.<br />이대로 새 라이브를 시작하시겠습니까?</p>
                   <p className="text-[12px] text-amber-600 font-semibold bg-amber-50 rounded-lg py-2 px-3">
                     기존 라이브는 자동으로 종료됩니다.
                   </p>
@@ -1898,7 +1898,7 @@ export default function SellerLivePage() {
                 {alimtalkWarnMsg}
               </p>
               <p className="text-[11px] text-amber-600 mt-3 bg-amber-100 rounded-lg px-3 py-2">
-                알림톡 설정은 상담사 메뉴 → 알림톡 관리에서 할 수 있습니다.
+                알림톡 설정은 뷰티 전문가 메뉴 → 알림톡 관리에서 할 수 있습니다.
               </p>
             </div>
             {/* 버튼 */}
@@ -2324,7 +2324,7 @@ function LiveCard({ live, onAction, actionLoading, onDetail, onProductManage, on
         </div>
       </div>
 
-      {/* ★ 상담상품 목록 (라이브 중일 때 노출 버튼 포함) */}
+      {/* ★ 뷰티 서비스 목록 (라이브 중일 때 노출 버튼 포함) */}
       {live.products.length > 0 && live.status === "LIVE" && onExposeProduct ? (
         <div className="mt-3 space-y-1.5">
           {live.products
@@ -2451,14 +2451,14 @@ function LiveCard({ live, onAction, actionLoading, onDetail, onProductManage, on
         </div>
       </div>
 
-      {/* ★ 지난방송 상담상품노출 스위치 (종료된 방송만) */}
+      {/* ★ 지난방송 뷰티 서비스노출 스위치 (종료된 방송만) */}
       {live.status === "ENDED" && onTogglePastInShop && (
         <div className={`mt-3 flex items-center gap-2 p-3 rounded-xl border transition-all ${live.showPastInShop ? "bg-brand-50 border-brand-200 ring-1 ring-brand-100" : "bg-gray-50 border-gray-100"}`}>
           <Icon name="Cart" size={14} className={live.showPastInShop ? "text-brand-600" : "text-gray-400"} />
           <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-bold text-gray-800">지난방송 상담상품노출</p>
+            <p className="text-[11px] font-bold text-gray-800">지난방송 뷰티 서비스노출</p>
             <p className="text-[9px] text-gray-400">
-              {live.showPastInShop ? "점집 지난 방송 상담상품 영역에 노출 중" : "점집에 노출되지 않음"}
+              {live.showPastInShop ? "뷰티샵 지난 방송 뷰티 서비스 영역에 노출 중" : "뷰티샵에 노출되지 않음"}
             </p>
           </div>
           {pastToggleLoading ? (
@@ -2497,7 +2497,7 @@ function LiveCard({ live, onAction, actionLoading, onDetail, onProductManage, on
           <>
             {onProductManage && (
               <button onClick={onProductManage} className="text-[11px] px-2.5 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 flex items-center gap-1">
-                <Hash size={12} /> 상담상품번호 관리
+                <Hash size={12} /> 뷰티 서비스번호 관리
               </button>
             )}
             <button onClick={() => (onStart ? onStart() : onAction("start", live.id))} disabled={isLoading} className="text-[11px] px-2.5 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 flex items-center gap-1 disabled:opacity-50">
@@ -2513,7 +2513,7 @@ function LiveCard({ live, onAction, actionLoading, onDetail, onProductManage, on
           <>
             {onProductManage && (
               <button onClick={onProductManage} className="text-[11px] px-2.5 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 flex items-center gap-1">
-                <Hash size={12} /> 상담상품번호 관리
+                <Hash size={12} /> 뷰티 서비스번호 관리
               </button>
             )}
             {onChatManage && (
@@ -2817,11 +2817,11 @@ function StreamSetupModal({ live, onClose, onSaved, copyToClipboard }: {
       <div className="p-5 space-y-4 flex-1 min-h-0 overflow-y-auto overscroll-contain">
         {/* 상단 안내 배너 */}
         <div className="rounded-2xl border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-yellow-50 p-4 flex items-start gap-3">
-          <Icon name="EmojiHoney_icon" size={26} className="flex-shrink-0" />
+          <Icon name="Sparkles" size={26} className="flex-shrink-0" />
           <p className="text-[12px] text-amber-800 leading-relaxed">
             YouTube 스튜디오에서 발급받은 <b>스트림 키</b>를 아래에 저장하고,
             OBS 또는 PRISM Live에 서버 주소와 함께 입력하면 유튜브로 송출됩니다.
-            송출이 시작되면 사주나라 시청 페이지에 유튜브 방송이 자동으로 표시돼요.
+            송출이 시작되면 뷰티메이트 시청 페이지에 유튜브 방송이 자동으로 표시돼요.
           </p>
         </div>
 

@@ -32,7 +32,7 @@ interface LiveData {
   products: { id: string; product: { id: string; name: string; thumbnail: string | null; basePrice: number; comparePrice: number | null; badges: any; description?: string }; livePrice: number | null; sortOrder: number; isActive: boolean }[];
   chatMessages: { id: string; nickname: string; message: string; isManager: boolean; isSystem: boolean; isBot?: boolean; isYoutube?: boolean; createdAt: string }[];
   coupons: LiveCoupon[];
-  // 점사 예약 정보 (예약 설정이 있는 방송만, 미반영 환경은 null)
+  // 뷰티 상담 예약 정보 (예약 설정이 있는 방송만, 미반영 환경은 null)
   reservationInfo?: {
     showReservationWidget: boolean;
     dailySlotLimit: number | null;
@@ -189,7 +189,7 @@ export default function LiveWatchPage() {
   }, [live?.status, fetchLive]);
 
   // ── YouTube 실시간 채팅 수집 트리거 ─────────────────────────────
-  // 라이브(YouTube) 진행 중, 서버가 상담사 API 키로 YouTube 채팅을 폴링해
+  // 라이브(YouTube) 진행 중, 서버가 뷰티 전문가 API 키로 YouTube 채팅을 폴링해
   // 앱 채팅에 병합하도록 주기적으로 요청한다. 서버가 window 당 1회만 실제 폴링하므로
   // 여러 시청자가 동시에 호출해도 쿼터가 낭비되지 않는다. (수신 결과는 위 8초 폴링으로 표시)
   useEffect(() => {
@@ -522,7 +522,7 @@ export default function LiveWatchPage() {
       </div>
       <div>
         <h3 className="text-[13px] font-bold text-gray-800 mb-2 flex items-center gap-1.5">
-          <BookOpen size={13} style={{ color: PRIMARY }} /> 상담사 정보
+          <BookOpen size={13} style={{ color: PRIMARY }} /> 뷰티 전문가 정보
         </h3>
         <Link href={`/shop/${live.seller.slug}`} className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
           {live.seller.shopLogo
@@ -556,12 +556,12 @@ export default function LiveWatchPage() {
     </div>
   );
 
-  // ── 공통 상담상품 목록 렌더 ───────────────────────────────────────
+  // ── 공통 뷰티 서비스 목록 렌더 ───────────────────────────────────────
   const renderProducts = () => (
     <div>
       <div className="px-4 py-2.5 bg-amber-50/80 border-b border-amber-100 flex items-center justify-between">
         <span className="text-[12px] font-bold text-gray-600">
-          상담상품 <span style={{ color: PRIMARY }}>{live.products.length}</span>개
+          뷰티 서비스 <span style={{ color: PRIMARY }}>{live.products.length}</span>개
         </span>
         <button className="text-[11px] font-medium flex items-center gap-0.5" style={{ color: PRIMARY }}>
           전체 보기 <ChevronRight size={12} />
@@ -605,7 +605,7 @@ export default function LiveWatchPage() {
       {live.products.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-gray-300">
           <Star size={36} className="mb-3" />
-          <p className="text-[13px]">등록된 상담상품이 없습니다</p>
+          <p className="text-[13px]">등록된 뷰티 서비스가 없습니다</p>
         </div>
       )}
     </div>
@@ -634,7 +634,7 @@ export default function LiveWatchPage() {
       </div>
     ) : null;
 
-  // ── 방송 화면 하단 상담상품 바 (PC · 모바일 공통) — 점사 예약 방식 ──
+  // ── 방송 화면 하단 뷰티 서비스 바 (PC · 모바일 공통) — 뷰티 상담 예약 방식 ──
   const ProductBar = ({ onBuyClick }: { onBuyClick: () => void }) => (
     currentProduct ? (
       <div>
@@ -671,7 +671,7 @@ export default function LiveWatchPage() {
     <div>
       <div className="px-4 py-2.5 bg-white/5 border-b border-white/10 flex items-center justify-between">
         <span className="text-[12px] font-bold text-white/50">
-          상담상품 <span style={{ color: PRIMARY }}>{live.products.length}</span>개
+          뷰티 서비스 <span style={{ color: PRIMARY }}>{live.products.length}</span>개
         </span>
         <button className="text-[11px] font-medium flex items-center gap-0.5" style={{ color: PRIMARY }}>
           전체 보기 <ChevronRight size={12} />
@@ -717,7 +717,7 @@ export default function LiveWatchPage() {
       {live.products.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-white/20">
           <Star size={36} className="mb-3" />
-          <p className="text-[13px]">등록된 상담상품이 없습니다</p>
+          <p className="text-[13px]">등록된 뷰티 서비스가 없습니다</p>
         </div>
       )}
     </div>
@@ -797,7 +797,7 @@ export default function LiveWatchPage() {
       </div>
       <div>
         <h3 className="text-[13px] font-bold text-white/70 mb-2 flex items-center gap-1.5">
-          <BookOpen size={13} style={{ color: PRIMARY }} /> 상담사 정보
+          <BookOpen size={13} style={{ color: PRIMARY }} /> 뷰티 전문가 정보
         </h3>
         <Link href={`/shop/${live.seller.slug}`} className="flex items-center gap-3 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
           {live.seller.shopLogo
@@ -912,7 +912,7 @@ export default function LiveWatchPage() {
            모달 / 팝업
           ════════════════════════════════════════════════════════ */}
 
-      {/* 모바일 상담상품 목록 바텀시트 */}
+      {/* 모바일 뷰티 서비스 목록 바텀시트 */}
       {showMobilePurchase && (
         <div className="lg:hidden fixed inset-0 z-[70]">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowMobilePurchase(false)} />
@@ -920,7 +920,7 @@ export default function LiveWatchPage() {
             <div className="flex justify-center py-2"><div className="w-9 h-1 bg-gray-200 rounded-full" /></div>
             <div className="px-4 pb-2 flex items-center justify-between">
               <span className="text-[14px] font-bold text-gray-900">
-                라이브 상담상품 <span style={{ color: PRIMARY }}>{live.products.length}</span>
+                라이브 뷰티 서비스 <span style={{ color: PRIMARY }}>{live.products.length}</span>
               </span>
               <button onClick={() => setShowMobilePurchase(false)}><X size={20} className="text-gray-400" /></button>
             </div>
@@ -1057,7 +1057,7 @@ export default function LiveWatchPage() {
         </div>
       )}
 
-      {/* 상담상품 구매 바텀시트 */}
+      {/* 뷰티 서비스 구매 바텀시트 */}
       {selectedLp && (
         <div className="fixed inset-0 z-[75]">
           <div className="absolute inset-0 bg-black/50" onClick={() => setSelectedProductId(null)} />
@@ -1072,7 +1072,7 @@ export default function LiveWatchPage() {
               </button>
             </div>
             <div className="flex-1 min-h-0 border-t border-gray-100">
-              {/* 점사 예약 방식: 상품 상세 대신 예약 플로우를 임베드 (방송 유래 예약으로 기록) */}
+              {/* 뷰티 상담 예약 방식: 상품 상세 대신 예약 플로우를 임베드 (방송 유래 예약으로 기록) */}
               <iframe src={`/shop/${live.seller.slug}/book?product=${selectedLp.product.id}&live=${live.id}&embedded=true`}
                 className="w-full h-full border-0" title="상담 예약" />
             </div>
@@ -1080,7 +1080,7 @@ export default function LiveWatchPage() {
         </div>
       )}
 
-      {/* PC 상담상품 팝업 모달 */}
+      {/* PC 뷰티 서비스 팝업 모달 */}
       {pcSelectedLp && (
         <div className="hidden lg:flex fixed inset-0 z-[85] items-center justify-center">
           <div className="absolute inset-0 bg-black/80" onClick={() => setPcSelectedProductId(null)} />
@@ -1098,8 +1098,8 @@ export default function LiveWatchPage() {
             {/* 콘텐츠 */}
             <div className="overflow-y-auto" style={{ maxHeight: "calc(80vh - 64px)" }}>
               <div className="flex gap-6 p-6">
-                {/* 좌: 상담상품 이미지 */}
-                {/* 투명 PNG 가시성 확보를 위해 밝은 배경 (상담상품 목록 썸네일과 동일) */}
+                {/* 좌: 뷰티 서비스 이미지 */}
+                {/* 투명 PNG 가시성 확보를 위해 밝은 배경 (뷰티 서비스 목록 썸네일과 동일) */}
                 <div className="flex-shrink-0 w-80 h-80 rounded-xl bg-gray-100 border border-white/10 overflow-hidden flex items-center justify-center">
                   {pcSelectedLp.product.thumbnail
                     ? <img
@@ -1112,7 +1112,7 @@ export default function LiveWatchPage() {
                     : <Star size={48} className="text-white/20" />
                   }
                 </div>
-                {/* 우: 상담상품 정보 */}
+                {/* 우: 뷰티 서비스 정보 */}
                 <div className="flex-1 min-w-0 flex flex-col">
                   <div>
                     <p className="text-white text-[18px] font-bold leading-snug mb-4">{pcSelectedLp.product.name}</p>
@@ -1130,7 +1130,7 @@ export default function LiveWatchPage() {
                     {pcSelectedLp.livePrice && Number(pcSelectedLp.livePrice) !== pcSelectedLp.product.basePrice && (
                       <p className="text-white/30 text-[13px] line-through mb-4">{pcSelectedLp.product.basePrice.toLocaleString()}원</p>
                     )}
-                    {/* 상담상품 설명 */}
+                    {/* 뷰티 서비스 설명 */}
                     {pcSelectedLp.product.description && (
                       <div className="mb-4">
                         <p className="text-white/50 text-[13px] leading-relaxed line-clamp-4">{pcSelectedLp.product.description}</p>
@@ -1141,7 +1141,7 @@ export default function LiveWatchPage() {
                   <div className="flex gap-3">
                     <button
                       onClick={() => {
-                        // 점사 예약 방식: 예약 플로우를 새 창으로 (방송 유래 예약으로 기록)
+                        // 뷰티 상담 예약 방식: 예약 플로우를 새 창으로 (방송 유래 예약으로 기록)
                         window.open(
                           `/shop/${live.seller.slug}/book?product=${pcSelectedLp.product.id}&live=${live.id}`,
                           "_blank",

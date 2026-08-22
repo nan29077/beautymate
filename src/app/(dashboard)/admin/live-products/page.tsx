@@ -96,8 +96,8 @@ export default function AdminLiveProductsPage() {
     <div className="animate-fade-in">
       <DashboardPageHeader
         iconName="LiveProduct"
-        title="라이브·단체 상담 상품 관리"
-        description="상담상품별 단체 상담과 라이브 상담 판매 허용 여부를 설정합니다."
+        title="라이브·단체 뷰티 서비스 관리"
+        description="뷰티 서비스별 공동 프로모션과 라이브 뷰티 판매 허용 여부를 설정합니다."
         className="mb-6"
       />
 
@@ -106,17 +106,17 @@ export default function AdminLiveProductsPage() {
         <div className="bg-white rounded-xl border border-gray-100 p-3 sm:p-4">
           <Icon name="Gem" size={16} className="text-gray-400 mb-1" />
           <p className="text-lg font-bold">{products.length}</p>
-          <p className="text-[10px] text-gray-400">전체 상담상품</p>
+          <p className="text-[10px] text-gray-400">전체 뷰티 서비스</p>
         </div>
         <div className="bg-white rounded-xl border border-red-100 p-3 sm:p-4">
           <Icon name="LiveConsulting" size={16} className="text-brand-500 mb-1" />
           <p className="text-lg font-bold text-brand-700">{liveCount}</p>
-          <p className="text-[10px] text-gray-400">라이브 상담 등록</p>
+          <p className="text-[10px] text-gray-400">라이브 뷰티 등록</p>
         </div>
         <div className="bg-white rounded-xl border border-emerald-100 p-3 sm:p-4">
           <Icon name="Cart" size={16} className="text-emerald-500 mb-1" />
           <p className="text-lg font-bold text-emerald-600">{groupBuyCount}</p>
-          <p className="text-[10px] text-gray-400">단체 상담 등록</p>
+          <p className="text-[10px] text-gray-400">공동 프로모션 등록</p>
         </div>
       </div>
 
@@ -126,7 +126,7 @@ export default function AdminLiveProductsPage() {
           <Icon name="Search" size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="상담상품명 또는 브랜드 검색"
+            placeholder="뷰티 서비스명 또는 브랜드 검색"
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 outline-none"
@@ -136,7 +136,7 @@ export default function AdminLiveProductsPage() {
           {[
             { id: "all" as const, label: "전체" },
             { id: "live" as const, label: "라이브" },
-            { id: "groupbuy" as const, label: "단체 상담" },
+            { id: "groupbuy" as const, label: "공동 프로모션" },
           ].map(f => (
             <DashboardFilterPill
               key={f.id}
@@ -165,7 +165,7 @@ export default function AdminLiveProductsPage() {
               </div>
             </div>
             <div className="flex items-center gap-1.5 w-full sm:w-auto flex-shrink-0">
-              {/* 단체 상담 토글 */}
+              {/* 공동 프로모션 토글 */}
               <button
                 onClick={() => toggleFlag(product.id, product.allowGroupBuy ? "disableGroupBuy" : "enableGroupBuy")}
                 disabled={actionLoading === product.id + (product.allowGroupBuy ? "disableGroupBuy" : "enableGroupBuy")}
@@ -182,9 +182,9 @@ export default function AdminLiveProductsPage() {
                 ) : (
                   <X size={10} />
                 )}
-                단체 상담
+                공동 프로모션
               </button>
-              {/* 라이브 상담 토글 */}
+              {/* 라이브 뷰티 토글 */}
               <button
                 onClick={() => toggleFlag(product.id, product.allowLiveCommerce ? "disableLiveCommerce" : "enableLiveCommerce")}
                 disabled={actionLoading === product.id + (product.allowLiveCommerce ? "disableLiveCommerce" : "enableLiveCommerce")}
@@ -207,7 +207,7 @@ export default function AdminLiveProductsPage() {
           </div>
         ))}
         {filtered.length === 0 && (
-          <DashboardEmptyState iconName="LiveProduct" title="조건에 맞는 상담상품이 없습니다" description="검색어나 판매 유형 필터를 변경해 보세요." />
+          <DashboardEmptyState iconName="LiveProduct" title="조건에 맞는 뷰티 서비스가 없습니다" description="검색어나 판매 유형 필터를 변경해 보세요." />
         )}
       </div>
       <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />

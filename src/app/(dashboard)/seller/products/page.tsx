@@ -5,7 +5,7 @@ import SellerConsultProducts, { type ConsultProduct } from "@/components/seller/
 
 export const dynamic = "force-dynamic";
 
-// 상담사 상담상품 관리 — DirectProduct(영상/전화/방문 상담) 목록만 다룬다.
+// 뷰티 전문가 뷰티 서비스 관리 — DirectProduct(영상/전화/방문 상담) 목록만 다룬다.
 export default async function SellerProductsPage() {
   const session = await auth();
   if (session?.user?.role !== "CONSULTANT") redirect("/");
@@ -41,8 +41,8 @@ export default async function SellerProductsPage() {
   return (
     <div className="animate-fade-in">
       <div className="mb-5">
-        <h1 className="text-lg sm:text-xl font-bold text-gray-900">상담상품 관리</h1>
-        <p className="text-xs text-gray-400 mt-0.5">영상·전화·방문 상담 상품을 등록하고 관리합니다.</p>
+        <h1 className="text-lg sm:text-xl font-bold text-gray-900">뷰티 서비스 관리</h1>
+        <p className="text-xs text-gray-400 mt-0.5">영상·전화·방문 뷰티 서비스를 등록하고 관리합니다.</p>
       </div>
 
       <SellerConsultProducts initialProducts={initialProducts} />

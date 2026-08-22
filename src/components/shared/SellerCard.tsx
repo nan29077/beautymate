@@ -98,7 +98,7 @@ export default function SellerCard({
             {seller._count?.shopProducts !== undefined && seller._count.shopProducts > 0 && (
               <span className="flex items-center gap-1 text-[11px] text-gray-500">
                 <Icon name="Cart" size={12} strokeWidth={1.5} className="text-gray-400" />
-                상담상품 {seller._count.shopProducts}
+                뷰티 서비스 {seller._count.shopProducts}
               </span>
             )}
             {FEATURE_GROUP_BUY && seller._count?.campaigns !== undefined && seller._count.campaigns > 0 && (

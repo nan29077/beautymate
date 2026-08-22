@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 // PUT /api/admin/sellers/[id]/commission
-// 상담사 판매 수수료율 수정 (SUPER_ADMIN 전용)
+// 뷰티 전문가 판매 수수료율 수정 (SUPER_ADMIN 전용)
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }

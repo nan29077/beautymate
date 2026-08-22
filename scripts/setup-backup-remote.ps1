@@ -1,4 +1,4 @@
-# Windows -> sellerbricks 실서버 (15.165.111.176) 로 DB 백업 스크립트를 전송하고
+# Windows -> beautymate 실서버 (15.165.111.176) 로 DB 백업 스크립트를 전송하고
 # 매일 자정(KST) cron 을 등록한다.
 #
 # 사용:
@@ -8,7 +8,7 @@
 #   DEPLOY_SSH_KEY    기본 C:\Users\yunse\keys\vanillaform_key.pem
 #   DEPLOY_SSH_USER   기본 ubuntu
 #   DEPLOY_SSH_HOST   기본 15.165.111.176
-#   DEPLOY_REPO_DIR   기본 /home/ubuntu/sellerbricks
+#   DEPLOY_REPO_DIR   기본 /home/ubuntu/beautymate
 
 $ErrorActionPreference = 'Stop'
 
@@ -20,7 +20,7 @@ function Get-EnvOrDefault($name, $default) {
 $SshKey  = Get-EnvOrDefault 'DEPLOY_SSH_KEY'  'C:\Users\yunse\keys\vanillaform_key.pem'
 $SshUser = Get-EnvOrDefault 'DEPLOY_SSH_USER' 'ubuntu'
 $SshHost = Get-EnvOrDefault 'DEPLOY_SSH_HOST' '15.165.111.176'
-$RepoDir = Get-EnvOrDefault 'DEPLOY_REPO_DIR' '/home/ubuntu/sellerbricks'
+$RepoDir = Get-EnvOrDefault 'DEPLOY_REPO_DIR' '/home/ubuntu/beautymate'
 
 if (-not (Test-Path $SshKey)) {
   Write-Error "SSH 키 파일 없음: $SshKey"

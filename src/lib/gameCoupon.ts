@@ -25,7 +25,7 @@ export function normalizeCoupon(
     const productId = typeof body.productId === "string" && body.productId.trim()
       ? body.productId.trim()
       : null;
-    if (!productId) return { error: "구매권 상담상품을 선택해주세요" };
+    if (!productId) return { error: "구매권 뷰티 서비스를 선택해주세요" };
     const minOrderAmount = 0; // 구매권은 최소금액 무관
     const validDays = Math.max(1, Math.floor(Number(body.validDays) || 7));
     const maxIssueRaw = body.maxIssueCount;

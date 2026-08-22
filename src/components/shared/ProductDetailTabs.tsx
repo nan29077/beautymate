@@ -97,14 +97,14 @@ const SHOW_STANDARD_REFUND_CARD = false;
 // 하드코딩 표준 취소·환불 규정
 function StandardRefundCard() {
   const sections = [
-    { icon: "Calendar", title: "예약 확정", items: ["결제 완료 즉시 예약 접수", "상담사 확정 후 마이페이지 > 예약내역에서 확인 가능"] },
+    { icon: "Calendar", title: "예약 확정", items: ["결제 완료 즉시 예약 접수", "뷰티 전문가 확정 후 마이페이지 > 예약내역에서 확인 가능"] },
     {
       icon: "Exchange",
       title: "취소 및 환불",
       items: [
         "상담 시작 전 취소 시 전액 환불",
         "상담 시작 24시간 이내 취소 시 환불 제한될 수 있음",
-        "상담사 귀책 사유 취소: 전액 환불",
+        "뷰티 전문가 귀책 사유 취소: 전액 환불",
         "환불은 접수 후 3~5 영업일 이내 처리",
       ],
     },
@@ -124,8 +124,8 @@ function StandardRefundCard() {
         <div className="flex items-center gap-2">
           <Sparkles size={30} strokeWidth={1.4} className="w-9 h-9 text-amber-700" aria-hidden="true" />
           <div>
-            <p className="text-[13.5px] font-extrabold text-amber-900 leading-tight">사주나라 표준 교환·환불 안내</p>
-            <p className="text-[10.5px] text-amber-700/80 mt-0.5">모든 상담상품에 공통 적용되는 규정이에요</p>
+            <p className="text-[13.5px] font-extrabold text-amber-900 leading-tight">뷰티메이트 표준 교환·환불 안내</p>
+            <p className="text-[10.5px] text-amber-700/80 mt-0.5">모든 뷰티 서비스에 공통 적용되는 규정이에요</p>
           </div>
         </div>
       </div>
@@ -232,7 +232,7 @@ export default function ProductDetailTabs({
               <div className="bg-white rounded-2xl border border-gray-100 p-4 space-y-3">
                 <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
                   <Icon name="File" size={14} strokeWidth={1.5} className="text-amber-500" />
-                  상담상품 상세정보
+                  뷰티 서비스 상세정보
                 </h3>
                 {description
                   ? renderDescription(description)
@@ -280,7 +280,7 @@ export default function ProductDetailTabs({
                 ) : (
                   <div className="space-y-1.5 text-[12px] text-gray-600 leading-relaxed">
                     <p>결제 완료 즉시 예약이 접수됩니다.</p>
-                    <p>상담사 확정 후 마이페이지 &gt; 예약내역에서 일정을 확인하세요.</p>
+                    <p>뷰티 전문가 확정 후 마이페이지 &gt; 예약내역에서 일정을 확인하세요.</p>
                   </div>
                 )}
               </div>
@@ -293,7 +293,7 @@ export default function ProductDetailTabs({
                   <div className="space-y-1.5 text-[12px] text-gray-600 leading-relaxed">
                     <p>상담 시작 전 취소 시 전액 환불됩니다.</p>
                     <p>상담 시작 24시간 이내 취소 시 환불이 제한될 수 있습니다.</p>
-                    <p>상담사 귀책 사유로 상담이 취소된 경우 전액 환불됩니다.</p>
+                    <p>뷰티 전문가 귀책 사유로 상담이 취소된 경우 전액 환불됩니다.</p>
                     <p>환불은 취소 접수 후 3~5 영업일 이내 처리됩니다.</p>
                   </div>
                 )}

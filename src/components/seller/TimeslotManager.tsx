@@ -515,7 +515,7 @@ function BulkCreateModal({
               </select>
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">상담 시간 (분)</label>
+              <label className="block text-xs text-gray-500 mb-1">소요 시간 (분)</label>
               <select value={durationMinutes} onChange={e => setDurationMinutes(Number(e.target.value))} className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-sm">
                 {[30, 60, 90, 120].map(m => <option key={m} value={m}>{m}분</option>)}
               </select>
