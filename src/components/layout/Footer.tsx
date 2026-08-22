@@ -20,7 +20,8 @@ export default function Footer({
   footerSettings?: FooterSettings;
 }) {
   const pathname = usePathname() ?? "";
-  const isHome = pathname === "/";
+  const desktopPublicRoots = ["/", "/sellers", "/experts", "/live", "/about", "/guide", "/become-seller"];
+  const isDesktopPublic = desktopPublicRoots.some((root) => root === "/" ? pathname === "/" : pathname === root || pathname.startsWith(`${root}/`));
   const { subpageActive } = useShopChrome();
   if (/^\/shop\/[^\/]+/.test(pathname) || subpageActive) return null;
 
@@ -42,10 +43,10 @@ export default function Footer({
 
   return (
     <footer className="bg-gray-950 text-gray-400">
-      <div className={isHome ? "px-4 py-5 lg:mx-auto lg:max-w-[1320px] lg:px-8 lg:py-16" : "px-4 py-5"}>
-        <div className={isHome ? "mb-6 grid grid-cols-2 gap-6 lg:grid-cols-4 lg:gap-12 lg:mb-12" : "grid grid-cols-2 gap-6 mb-6"}>
+      <div className={isDesktopPublic ? "px-4 py-5 lg:mx-auto lg:max-w-[1320px] lg:px-8 lg:py-16" : "px-4 py-5"}>
+        <div className={isDesktopPublic ? "mb-6 grid grid-cols-2 gap-6 lg:grid-cols-4 lg:gap-12 lg:mb-12" : "grid grid-cols-2 gap-6 mb-6"}>
           {/* 브랜드 */}
-          <div className={isHome ? "col-span-2 lg:pr-16" : "col-span-2"}>
+          <div className={isDesktopPublic ? "col-span-2 lg:pr-16" : "col-span-2"}>
             <Link href="/" className="inline-block mb-3">
               <BrandWordmark size="lg" variant="light" />
             </Link>
@@ -125,7 +126,7 @@ export default function Footer({
       </div>
 
       {/* 모바일 하단 네비 높이만큼 여백 */}
-      <div className={isHome ? "h-16 lg:hidden" : "h-16"} />
+      <div className={isDesktopPublic ? "h-16 lg:hidden" : "h-16"} />
     </footer>
   );
 }

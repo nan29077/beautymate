@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
+import { safeQuery } from "@/lib/safeDb";
 
 export const dynamic = "force-dynamic";
 
@@ -12,14 +13,14 @@ export async function GET() {
     return NextResponse.json({ sellers: [] });
   }
 
-  const buyer = await prisma.buyerProfile.findUnique({
+  const buyer = await safeQuery("단골 라이브 구매자", () => prisma.buyerProfile.findUnique({
     where: { userId: session.user.id },
-  });
+  }), null, 3500);
   if (!buyer) {
     return NextResponse.json({ sellers: [] });
   }
 
-  const follows = await prisma.sellerFollower.findMany({
+  const follows = await safeQuery("단골 라이브 목록", () => prisma.sellerFollower.findMany({
     where: { buyerId: buyer.id },
     select: {
       seller: {
@@ -36,7 +37,7 @@ export async function GET() {
         },
       },
     },
-  });
+  }), [], 3500);
 
   const liveSellers = follows
     .map(f => f.seller)

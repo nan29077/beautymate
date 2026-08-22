@@ -42,29 +42,31 @@ const FAQ = [
 export default async function BecomeSellerPage() {
   const { beeDecoration: SHOW_BEES } = await getFeatureFlags();
   return (
-    <div className="bg-white min-h-screen pb-40">
+    <div className="beautymate-pc-page bg-white min-h-screen pb-40 lg:pb-0">
       {/* ───── 히어로 (검정 + 별밭) ───── */}
-      <section className="relative overflow-hidden bg-gray-900">
+      <section className="relative overflow-hidden bg-[#3d1427] lg:min-h-[520px]">
         <div className="absolute inset-0" style={{ backgroundImage: STARFIELD }} />
         <div className="absolute -top-16 -right-12 w-56 h-56 rounded-full bg-brand-500/25 blur-3xl" />
-        <div className="relative px-6 pt-12 pb-11 text-white">
+        <div className="absolute inset-y-0 right-0 hidden w-1/2 bg-cover bg-center lg:block" style={{ backgroundImage: `url(${BOTTOM_BANNER})` }} />
+        <div className="absolute inset-0 hidden bg-gradient-to-r from-[#3d1427] via-[#3d1427] to-transparent lg:block" />
+        <div className="relative px-6 pt-12 pb-11 text-white lg:mx-auto lg:flex lg:min-h-[520px] lg:max-w-[1320px] lg:flex-col lg:justify-center lg:px-8 lg:py-20">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-brand-500 text-black px-3 py-1 mb-4">
             <Icon name="Sparkles" size={12} strokeWidth={2.5} />
             <span className="text-[10px] font-extrabold tracking-wide">CONSULTANT PROGRAM</span>
           </div>
           <div className="flex items-start gap-3">
-            <h1 className="text-[28px] font-extrabold leading-tight">
+            <h1 className="text-[28px] font-extrabold leading-tight lg:text-5xl lg:leading-[1.15]">
               내 팬과 함께,
               <br />나만의 <span className="text-brand-500">뷰티샵</span>을 열다
             </h1>
             {SHOW_BEES && <Sparkles size={48} strokeWidth={1.3}
               className="w-12 h-12 text-brand-500 mt-1 pointer-events-none select-none flex-shrink-0 opacity-80" aria-hidden="true" />}
           </div>
-          <p className="mt-3.5 text-[13px] text-gray-300 leading-relaxed">
+          <p className="mt-3.5 text-[13px] text-gray-300 leading-relaxed lg:mt-6 lg:text-base lg:leading-8">
             뷰티 서비스와 가능한 시간만 등록하면,
             <br />라이브와 단골 관리로 나만의 뷰티샵이 열려요.
           </p>
-          <div className="mt-5 flex flex-wrap gap-2 text-[11px] font-semibold">
+          <div className="mt-5 flex flex-wrap gap-2 text-[11px] font-semibold lg:mt-8 lg:gap-3 lg:text-sm">
             <span className="inline-flex items-center gap-1 rounded-full bg-white/10 text-white px-3 py-1.5"><Icon name="Wallet" size={12} className="text-brand-500" /> 예약 수익</span>
             <span className="inline-flex items-center gap-1 rounded-full bg-white/10 text-white px-3 py-1.5"><Icon name="Gift" size={12} className="text-brand-500" /> 추천 수익</span>
             <span className="inline-flex items-center gap-1 rounded-full bg-white/10 text-white px-3 py-1.5"><Icon name="Live" size={12} className="text-brand-500" /> 라이브 예약</span>
@@ -73,24 +75,24 @@ export default async function BecomeSellerPage() {
       </section>
 
       {/* ───── 뷰티 전문가 혜택 ───── */}
-      <section className="px-5 pt-9">
+      <section className="px-5 pt-9 lg:mx-auto lg:max-w-[1320px] lg:px-8 lg:pt-24">
         <div className="flex items-center gap-2">
-          <h2 className="text-[19px] font-extrabold text-gray-900">뷰티 전문가 혜택</h2>
+          <h2 className="text-[19px] font-extrabold text-gray-900 lg:text-4xl">뷰티 전문가 혜택</h2>
           {SHOW_BEES && <Sparkles size={36} strokeWidth={1.3}
             className="w-9 h-9 text-brand-500 pointer-events-none select-none opacity-75" aria-hidden="true" />}
         </div>
         <p className="mt-1 text-[12px] text-gray-400">뷰티메이트가 뷰티 전문가에게 드리는 것들</p>
-        <div className="mt-4 space-y-2">
+        <div className="mt-4 space-y-2 lg:mt-10 lg:grid lg:grid-cols-3 lg:gap-5 lg:space-y-0">
           {BENEFITS.map((b) => {
             const Icon = b.icon;
             return (
-              <div key={b.title} className="flex items-start gap-3 rounded-2xl border border-gray-100 p-4">
+              <div key={b.title} className="flex items-start gap-3 rounded-2xl border border-gray-100 p-4 lg:block lg:rounded-[1.5rem] lg:p-7 lg:shadow-sm">
                 <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center flex-shrink-0">
                   <Icon size={18} className="text-brand-600" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-bold text-gray-900">{b.title}</p>
-                  <p className="text-[12px] text-gray-500 mt-0.5 leading-relaxed">{b.desc}</p>
+                <div className="flex-1 min-w-0 lg:mt-5">
+                  <p className="text-[14px] font-bold text-gray-900 lg:text-lg">{b.title}</p>
+                  <p className="text-[12px] text-gray-500 mt-0.5 leading-relaxed lg:mt-2 lg:text-sm lg:leading-6">{b.desc}</p>
                 </div>
               </div>
             );
@@ -99,17 +101,17 @@ export default async function BecomeSellerPage() {
       </section>
 
       {/* ───── 진행 절차 ───── */}
-      <section className="px-5 pt-9">
-        <h2 className="text-[19px] font-extrabold text-gray-900">신청 절차</h2>
-        <div className="mt-4 space-y-2">
+      <section className="px-5 pt-9 lg:mx-auto lg:max-w-[1320px] lg:px-8 lg:pt-24">
+        <h2 className="text-[19px] font-extrabold text-gray-900 lg:text-4xl">신청 절차</h2>
+        <div className="mt-4 space-y-2 lg:mt-10 lg:grid lg:grid-cols-4 lg:gap-5 lg:space-y-0">
           {STEPS.map((s, i) => (
-            <div key={s.title} className="flex items-start gap-3 rounded-2xl border border-gray-100 px-4 py-3.5">
+            <div key={s.title} className="flex items-start gap-3 rounded-2xl border border-gray-100 px-4 py-3.5 lg:block lg:rounded-[1.5rem] lg:p-7">
               <div className="w-7 h-7 rounded-full bg-brand-500 text-black text-[12px] font-extrabold flex items-center justify-center flex-shrink-0">
                 {i + 1}
               </div>
-              <div className="flex-1 min-w-0 pt-0.5">
-                <p className="text-[13px] font-bold text-gray-900">{s.title}</p>
-                <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">{s.desc}</p>
+              <div className="flex-1 min-w-0 pt-0.5 lg:mt-5">
+                <p className="text-[13px] font-bold text-gray-900 lg:text-base">{s.title}</p>
+                <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed lg:mt-2 lg:text-sm lg:leading-6">{s.desc}</p>
               </div>
             </div>
           ))}
@@ -117,14 +119,14 @@ export default async function BecomeSellerPage() {
       </section>
 
       {/* ───── 지금 뷰티 전문가가 되면 (체크리스트, 검정+노랑) ───── */}
-      <section className="px-5 pt-9">
-        <div className="relative overflow-hidden rounded-3xl bg-gray-900 p-6 text-white">
+      <section className="px-5 pt-9 lg:mx-auto lg:max-w-[1320px] lg:px-8 lg:pt-24">
+        <div className="relative overflow-hidden rounded-3xl bg-[#3d1427] p-6 text-white lg:px-12 lg:py-10">
           <div className="absolute inset-0" style={{ backgroundImage: STARFIELD }} />
           <div className="relative">
             <h3 className="text-[16px] font-extrabold flex items-center gap-1.5">
               <Icon name="Sparkles" size={16} className="text-brand-500" /> 지금 뷰티 전문가가 되면
             </h3>
-            <ul className="mt-3.5 space-y-2.5">
+            <ul className="mt-3.5 space-y-2.5 lg:grid lg:grid-cols-5 lg:gap-5 lg:space-y-0">
               {["입점 비용은 서비스 후 결정", "단골 고객관리(CRM) 프로그램 제공", "요청사항 AI 요약 제공", "라이브·공동 프로모션 예약 채널 제공", "투명한 수익 정산"].map((t) => (
                 <li key={t} className="flex items-center gap-2.5 text-[13px] text-gray-100">
                   <span className="w-5 h-5 rounded-full bg-brand-500 flex items-center justify-center flex-shrink-0">
@@ -139,9 +141,9 @@ export default async function BecomeSellerPage() {
       </section>
 
       {/* ───── 자주 묻는 질문 ───── */}
-      <section className="px-5 pt-9">
-        <h2 className="text-[19px] font-extrabold text-gray-900">자주 묻는 질문</h2>
-        <div className="mt-4 space-y-2">
+      <section className="px-5 pt-9 lg:mx-auto lg:max-w-[1100px] lg:px-8 lg:pt-24">
+        <h2 className="text-[19px] font-extrabold text-gray-900 lg:text-center lg:text-4xl">자주 묻는 질문</h2>
+        <div className="mt-4 space-y-2 lg:mt-10 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
           {FAQ.map((f) => (
             <div key={f.q} className="rounded-2xl border border-gray-100 p-4">
               <p className="text-[13px] font-bold text-gray-900 flex items-start gap-1.5">
@@ -154,16 +156,16 @@ export default async function BecomeSellerPage() {
       </section>
 
       {/* ───── 하단 배너 (뷰티메이트 뷰티 전문가 CTA) + 카피 ───── */}
-      <section className="px-4 pt-9">
-        <div className="relative rounded-3xl overflow-hidden">
+      <section className="px-4 pt-9 lg:mx-auto lg:max-w-[1320px] lg:px-8 lg:pb-8 lg:pt-24">
+        <div className="relative rounded-3xl overflow-hidden lg:rounded-[2rem]">
           <div
-            className="aspect-[16/10] bg-cover bg-center"
+            className="aspect-[16/10] bg-cover bg-center lg:aspect-[21/7]"
             style={{ backgroundImage: `url(${BOTTOM_BANNER})` }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900/85 via-gray-900/35 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-            <p className="text-[16px] font-extrabold leading-snug">일회성 예약을 넘어, 다시 찾아오는 고객</p>
-            <p className="text-[12px] text-gray-200 mt-1 leading-relaxed">
+          <div className="absolute bottom-0 left-0 right-0 p-5 text-white lg:p-10">
+            <p className="text-[16px] font-extrabold leading-snug lg:text-3xl">일회성 예약을 넘어, 다시 찾아오는 고객</p>
+            <p className="text-[12px] text-gray-200 mt-1 leading-relaxed lg:mt-3 lg:text-base">
               뷰티메이트에서는 뷰티 전문가의 실력과 신뢰가 곧 브랜드가 됩니다.
             </p>
           </div>
@@ -172,7 +174,7 @@ export default async function BecomeSellerPage() {
 
       {/* ───── 하단 고정 CTA — 하단 탭바(약 3.5rem) 위에 항상 노출 ───── */}
       <div
-        className="fixed left-1/2 -translate-x-1/2 w-full max-w-[480px] z-[55] px-4 pt-3 pb-3 bg-gradient-to-t from-white via-white to-white/0"
+        className="fixed left-1/2 -translate-x-1/2 w-full max-w-[480px] z-[55] px-4 pt-3 pb-3 bg-gradient-to-t from-white via-white to-white/0 lg:static lg:mx-auto lg:mb-24 lg:mt-4 lg:max-w-sm lg:translate-x-0 lg:bg-none lg:p-0"
         style={{ bottom: "calc(3.5rem + env(safe-area-inset-bottom, 0px))" }}
       >
         <Link

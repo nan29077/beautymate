@@ -379,13 +379,15 @@
 
   /* 메인페이지만 일반적인 PC 사이트 폭으로 확장한다.
      다른 공개 페이지는 기존 480px 모바일 앱 프레임을 유지한다. */
-  .beautymate-app-frame:has(.beautymate-desktop-home) {
+  .beautymate-app-frame:has(.beautymate-desktop-home),
+  .beautymate-app-frame:has(.beautymate-pc-page) {
     max-width: none;
     border-inline: 0;
     box-shadow: none !important;
   }
 
-  .beautymate-app-frame:has(.beautymate-desktop-home) > main {
+  .beautymate-app-frame:has(.beautymate-desktop-home) > main,
+  .beautymate-app-frame:has(.beautymate-pc-page) > main {
     padding-bottom: 0;
   }
 }

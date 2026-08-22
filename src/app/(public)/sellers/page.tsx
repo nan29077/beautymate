@@ -1,12 +1,10 @@
 import { Icon } from '@/components/shared/Icon';
-import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { safeQuery } from "@/lib/safeDb";
 import { resolveSellerDisplayImage } from "@/lib/defaults";
 import { parseJsonArray } from "@/lib/utils";
-import {  } from "lucide-react";
 import SellerSearchClient from "@/components/shared/SellerSearchClient";
-import { getFeatureFlags } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +21,7 @@ export default async function SellersPage({
   // 메인 카테고리(뷰티·스킨케어·퍼스널 컬러 등)에서 넘어온 경우 해당 분야 뷰티 전문가만 노출
   const category = searchParams?.category?.trim() || "";
 
-  const sellers = await prisma.sellerProfile.findMany({
+  const sellers = await safeQuery("뷰티 전문가 목록", () => prisma.sellerProfile.findMany({
     where: {
       isApproved: true,
       user: { role: "CONSULTANT" as any }, // 뷰티메이트 레거시 역할 제외
@@ -65,7 +63,7 @@ export default async function SellersPage({
       },
     },
     orderBy: { totalFans: "desc" },
-  });
+  }), [], 3500);
 
   const serialized = sellers.map((s) => {
     // 뷰티 서비스 이미지 수집
@@ -136,9 +134,9 @@ export default async function SellersPage({
   });
 
   return (
-    <div className="min-h-screen bg-white animate-fade-in">
+    <div className="beautymate-pc-page min-h-screen bg-white animate-fade-in">
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-white border-b border-gray-100">
+      <div className="sticky top-0 z-30 border-b border-gray-100 bg-white lg:hidden">
         <div className="max-w-2xl mx-auto flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
             <Link href="/" className="p-1 -ml-1 text-gray-600 hover:text-gray-900 transition-colors">
@@ -152,19 +150,21 @@ export default async function SellersPage({
 
       {/* 인트로 — 예약 커머스 포지셔닝 */}
       <div
-        className="relative overflow-hidden px-4 py-4 text-white"
+        className="relative overflow-hidden px-4 py-4 text-white lg:px-8 lg:py-16"
         style={{ background: "linear-gradient(150deg, #3d1427 0%, #6d2945 55%, #b44b68 100%)" }}
       >
-        <div className="max-w-2xl mx-auto relative">
-          <p className="text-[15px] font-extrabold leading-snug">방송 중인 뷰티 전문가에게 바로 예약하세요</p>
-          <p className="mt-1 text-[11.5px] text-purple-200/70">
+        <div className="max-w-2xl mx-auto relative lg:max-w-[1320px]">
+          <p className="text-[15px] font-extrabold leading-snug lg:text-4xl lg:tracking-tight">방송 중인 뷰티 전문가에게 바로 예약하세요</p>
+          <p className="mt-1 text-[11.5px] text-rose-100/80 lg:mt-4 lg:text-base">
             스킨케어·메이크업·헤어·네일 등 원하는 분야의 전문가를 찾아보세요
           </p>
         </div>
       </div>
 
       {/* Seller List */}
-      <SellerSearchClient sellers={serialized} baseCategories={CONSULT_CATEGORIES} />
+      <div className="lg:mx-auto lg:max-w-[1320px] lg:px-8 lg:py-12">
+        <SellerSearchClient sellers={serialized} baseCategories={CONSULT_CATEGORIES} />
+      </div>
     </div>
   );
 }

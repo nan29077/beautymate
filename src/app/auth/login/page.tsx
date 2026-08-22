@@ -32,7 +32,9 @@ function getDashboardPath(role: string): string {
   }
 }
 
-// 개발 환경 전용 테스트 계정 (scripts/create-test-accounts.ts 로 생성)
+// 개발 환경 전용 테스트 계정.
+// 계정이 없거나 비밀번호가 다르면 /api/dev/ensure-test-account 가 로그인 직전에 맞춰준다.
+// (이메일·비밀번호는 그 라우트의 TEST_ACCOUNTS 와 동일해야 한다)
 const TEST_ACCOUNTS = [
   {
     key: "admin",
@@ -143,12 +145,39 @@ function LoginForm() {
     }
   };
 
-  // 개발 환경 테스트 계정 즉시 로그인 (시드 계정이 없으면 로그인 실패 메시지 노출)
+  // 개발 환경 테스트 계정 즉시 로그인.
+  // 로그인 전에 /api/dev/ensure-test-account 로 계정을 보장한다 — 계정이 없거나,
+  // 비밀번호가 다르거나, 뷰티 전문가 프로필이 미승인이어도 버튼 하나로 로그인되도록.
   const handleTestLogin = async (account: (typeof TEST_ACCOUNTS)[number]) => {
     setError("");
     setSellerPending(false);
     setTestLoading(account.key);
     try {
+      try {
+        const ensureRes = await fetch("/api/dev/ensure-test-account", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ key: account.key }),
+        });
+        if (!ensureRes.ok) {
+          const data = await ensureRes.json().catch(() => ({}));
+          // 503 = DB 연결 실패 (계정 문제가 아님)
+          setError(
+            ensureRes.status === 503
+              ? (data?.error ?? "DB 연결에 실패했습니다.")
+              : `테스트 계정(${account.email}) 준비에 실패했습니다. ${data?.error ?? `HTTP ${ensureRes.status}`}`,
+          );
+          return;
+        }
+      } catch (e) {
+        setError(
+          `테스트 계정 준비 요청에 실패했습니다. 개발 서버가 실행 중인지 확인해주세요. (${
+            e instanceof Error ? e.message : String(e)
+          })`,
+        );
+        return;
+      }
+
       const result = await signIn("credentials", {
         email: account.email,
         password: account.password,
@@ -156,7 +185,7 @@ function LoginForm() {
       });
       if (result?.error) {
         setError(
-          `테스트 계정(${account.email}) 로그인에 실패했습니다. scripts/create-test-accounts.ts 를 실행했는지 확인해주세요.`,
+          `테스트 계정(${account.email}) 로그인에 실패했습니다. 개발 서버 콘솔의 [authorize] 로그를 확인해주세요.`,
         );
       } else {
         await redirectAfterLogin();
@@ -450,7 +479,7 @@ function LoginForm() {
             </div>
 
             <p className="mt-2 text-center text-[10px] text-gray-400">
-              scripts/create-test-accounts.ts 로 생성 · 개발 환경에서만 표시됩니다
+              버튼 클릭 시 계정이 없으면 자동 생성됩니다 · 개발 환경에서만 표시됩니다
             </p>
           </div>
         )}

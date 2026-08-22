@@ -117,7 +117,7 @@ export default function DesktopHome({
 
       <section id="experts" className="px-8 py-24">
         <div className="mx-auto max-w-[1320px]">
-          <SectionTitle eyebrow="BEAUTY EXPERTS" title="나에게 맞는 뷰티 전문가를 만나보세요" desc="콘텐츠와 라이브로 실력과 분위기를 먼저 확인하고 편하게 예약하세요." href="/sellers" />
+          <SectionTitle eyebrow="BEAUTY EXPERTS" title="나에게 맞는 뷰티 전문가를 만나보세요" desc="콘텐츠와 라이브로 실력과 분위기를 먼저 확인하고 편하게 예약하세요." />
           <div className="mt-10 grid grid-cols-3 gap-6">
             {homeStories.slice(0, 3).map((story, index) => (
               <article key={story.name} className="group overflow-hidden rounded-[1.75rem] border border-gray-100 bg-white shadow-[0_14px_40px_rgba(61,20,39,0.07)] transition hover:-translate-y-1 hover:shadow-[0_22px_55px_rgba(61,20,39,0.12)]">
@@ -170,6 +170,6 @@ export default function DesktopHome({
   );
 }
 
-function SectionTitle({ eyebrow, title, desc, href }: { eyebrow: string; title: string; desc: string; href?: string }) {
-  return <div className="flex items-end justify-between"><div><p className="text-xs font-extrabold tracking-[0.22em] text-[#b44b68]">{eyebrow}</p><h2 className="mt-3 text-[34px] font-extrabold tracking-tight text-gray-950">{title}</h2><p className="mt-3 text-sm text-gray-500">{desc}</p></div>{href && <Link href={href} className="inline-flex items-center gap-1.5 text-sm font-bold text-[#8f3652]">전체 보기 <ArrowRight size={16} /></Link>}</div>;
+function SectionTitle({ eyebrow, title, desc }: { eyebrow: string; title: string; desc: string }) {
+  return <div><p className="text-xs font-extrabold tracking-[0.22em] text-[#b44b68]">{eyebrow}</p><h2 className="mt-3 text-[34px] font-extrabold tracking-tight text-gray-950">{title}</h2><p className="mt-3 text-sm text-gray-500">{desc}</p></div>;
 }

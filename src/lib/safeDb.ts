@@ -17,9 +17,16 @@ export async function safeQuery<T>(
   label: string,
   fn: () => Promise<T>,
   fallback: T,
+  timeoutMs = 8000,
 ): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    return await fn();
+    return await Promise.race([
+      fn(),
+      new Promise<T>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`${label} DB 조회 시간 초과 (${timeoutMs}ms)`)), timeoutMs);
+      }),
+    ]);
   } catch (e) {
     if (isMissingSchemaError(e)) {
       console.warn(`[safeQuery] ${label} — 테이블/컬럼 미반영으로 fallback 사용 (DB 스키마 드리프트)`);
@@ -27,5 +34,7 @@ export async function safeQuery<T>(
       console.error(`[safeQuery] ${label} 실패 (fallback 사용):`, e);
     }
     return fallback;
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 }

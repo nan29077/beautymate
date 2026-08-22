@@ -1,7 +1,7 @@
 "use client";
 
 import { Icon } from '@/components/shared/Icon';
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { List, X, ChevronRight, Radio, Eye } from 'lucide-react';
 import Link from "next/link";
 import SafeImage from "@/components/shared/SafeImage";
@@ -61,6 +61,10 @@ export default function SellerSearchClient({
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
+  useEffect(() => {
+    if (window.matchMedia("(min-width: 1024px)").matches) setViewMode("grid");
+  }, []);
+
   const categories = useMemo(() => {
     const fromSellers = sellers.map((s) => s.category).filter(Boolean) as string[];
     // 기본 분야를 먼저(정해진 순서대로) 두고, 그 외 뷰티 전문가가 실제로 쓰는 분야를 뒤에 붙인다.
@@ -87,16 +91,16 @@ export default function SellerSearchClient({
   return (
     <div>
       {/* 검색 + 필터 + 뷰 토글 */}
-      <div className="px-4 pt-4 pb-2">
+      <div className="px-4 pt-4 pb-2 lg:px-0 lg:pt-0 lg:pb-5">
         {/* 검색 바 */}
-        <div className="relative mb-3">
+        <div className="relative mb-3 lg:mb-6 lg:max-w-2xl">
           <Icon name="Search" size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="뷰티 전문가 이름, 카테고리로 검색..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:bg-white border border-gray-100 focus:border-brand-200 transition-all"
+            className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:bg-white border border-gray-100 focus:border-brand-200 transition-all lg:rounded-2xl lg:py-4 lg:pl-11 lg:text-base"
           />
           {search && (
             <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
@@ -112,7 +116,7 @@ export default function SellerSearchClient({
               onClick={() => setSelectedCategory("")}
               className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all ${
                 !selectedCategory
-                  ? "bg-black text-white"
+                  ? "bg-black text-white lg:bg-[#6d2945]"
                   : "bg-gray-100 text-gray-500 active:bg-gray-200"
               }`}
             >
@@ -124,7 +128,7 @@ export default function SellerSearchClient({
                 onClick={() => setSelectedCategory(selectedCategory === cat ? "" : cat)}
                 className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all ${
                   selectedCategory === cat
-                    ? "bg-black text-white"
+                    ? "bg-black text-white lg:bg-[#6d2945]"
                     : "bg-gray-100 text-gray-500 active:bg-gray-200"
                 }`}
               >
@@ -152,8 +156,8 @@ export default function SellerSearchClient({
       </div>
 
       {/* 결과 수 */}
-      <div className="px-4 py-2">
-        <span className="text-[11px] text-gray-400">{filteredSellers.length}명의 뷰티 전문가</span>
+      <div className="px-4 py-2 lg:px-0 lg:py-5">
+        <span className="text-[11px] text-gray-400 lg:text-sm lg:font-semibold">{filteredSellers.length}명의 뷰티 전문가</span>
       </div>
 
       {/* 뷰티 전문가 목록 */}
@@ -170,7 +174,7 @@ export default function SellerSearchClient({
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 px-4 pb-6">
+        <div className="grid grid-cols-2 gap-3 px-4 pb-6 lg:grid-cols-4 lg:gap-6 lg:px-0 lg:pb-12">
           {filteredSellers.map((seller) => (
             <SellerGridCard key={seller.slug} seller={seller} />
           ))}
@@ -324,10 +328,10 @@ function SellerGridCard({ seller }: { seller: Seller }) {
   return (
     <Link
       href={sellerShopUrl(seller.slug)}
-      className="group block bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-all"
+      className="group block bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-all lg:rounded-[1.5rem] lg:hover:-translate-y-1 lg:hover:shadow-xl"
     >
       {/* 이미지 영역 */}
-      <div className="relative h-32 overflow-hidden bg-gray-100">
+      <div className="relative h-32 overflow-hidden bg-gray-100 lg:h-52">
         {images.length > 0 ? (
           <div className="flex h-full">
             <div className="w-1/2 h-full">
@@ -350,7 +354,7 @@ function SellerGridCard({ seller }: { seller: Seller }) {
       </div>
 
       {/* 정보 */}
-      <div className="p-3">
+      <div className="p-3 lg:p-5">
         <div className="flex items-center gap-2 mb-1">
           {/* 프로필 이미지 - 라이브 중이면 두근두근 + 하단 LIVE */}
           <div className="flex flex-col items-center flex-shrink-0">
@@ -368,8 +372,8 @@ function SellerGridCard({ seller }: { seller: Seller }) {
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-xs font-bold text-gray-900 truncate">{seller.shopName}</h3>
-            {seller.category && <p className="text-[10px] text-gray-400">{seller.category}</p>}
+            <h3 className="text-xs font-bold text-gray-900 truncate lg:text-base">{seller.shopName}</h3>
+            {seller.category && <p className="text-[10px] text-gray-400 lg:mt-1 lg:text-xs">{seller.category}</p>}
           </div>
         </div>
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
+import { safeQuery } from "@/lib/safeDb";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ export async function GET(req: NextRequest) {
   if (!q) return NextResponse.json({ sellers: [] });
 
   // 1) 뷰티 전문가명/슬러그 매칭
-  const byName = await prisma.sellerProfile.findMany({
+  const byName = await safeQuery("라이브 전문가 이름 검색", () => prisma.sellerProfile.findMany({
     where: {
       isApproved: true,
       OR: [{ shopName: { contains: q } }, { slug: { contains: q } }],
@@ -23,10 +24,10 @@ export async function GET(req: NextRequest) {
       liveStreams: { where: { status: "LIVE" }, select: { shareCode: true }, take: 1 },
     },
     take: 20,
-  });
+  }), [], 3500);
 
   // 2) 라이브 코드(shareCode) 정확 매칭 → 해당 뷰티 전문가
-  const byCode = await prisma.liveStream.findMany({
+  const byCode = await safeQuery("라이브 코드 검색", () => prisma.liveStream.findMany({
     where: { shareCode: q },
     select: {
       status: true, shareCode: true,
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
       },
     },
     take: 5,
-  });
+  }), [], 3500);
 
   // 라이브 여부: 수동 표시(isManualLive) 또는 실제 LIVE 방송 — 단골픽/내픽과 동일 기준.
   const toCard = (s: any) => ({

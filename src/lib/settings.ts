@@ -5,6 +5,7 @@
 
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import { safeQuery } from "@/lib/safeDb";
 import {
   FEATURE_DEFAULTS,
   FEATURE_SETTING_KEYS,
@@ -73,13 +74,8 @@ export const DEFAULT_BRAND_SETTLE_DAYS = 5;
 
 // 한 번의 요청 안에서 Setting 조회를 1회로 묶음(React cache).
 export const getSettingsMap = cache(async (): Promise<Record<string, string>> => {
-  try {
-    const rows = await prisma.setting.findMany();
-    return Object.fromEntries(rows.map((r) => [r.key, r.value]));
-  } catch {
-    // 테이블 미생성/DB 오류 시 빈 맵 → 코드 기본값으로 폴백
-    return {};
-  }
+  const rows = await safeQuery("공통 사이트 설정", () => prisma.setting.findMany(), [], 2500);
+  return Object.fromEntries(rows.map((r) => [r.key, r.value]));
 });
 
 function parseBool(value: string | undefined, fallback: boolean): boolean {

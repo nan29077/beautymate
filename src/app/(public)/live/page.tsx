@@ -22,6 +22,18 @@ interface SellerCard {
   liveLink: string | null;
 }
 
+async function fetchJsonWithTimeout(url: string, timeoutMs = 7000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) throw new Error(`요청 실패: ${response.status}`);
+    return await response.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export default function LiveSearchPage() {
   const { liveCommerce } = useFeatureFlags();
   if (!liveCommerce) notFound();
@@ -43,16 +55,14 @@ function LiveSearchInner() {
     setLoading(true);
     setSearched(true);
     try {
-      const res = await fetch(`/api/live/search-sellers?q=${encodeURIComponent(q)}`);
-      const data = await res.json();
+      const data = await fetchJsonWithTimeout(`/api/live/search-sellers?q=${encodeURIComponent(q)}`);
       setResults(data.sellers || []);
     } catch {} finally { setLoading(false); }
   };
 
   // 마운트 시 찜한 뷰티 전문가 중 현재 라이브 중인 분 조회
   useEffect(() => {
-    fetch("/api/live/my-live-picks")
-      .then(r => r.json())
+    fetchJsonWithTimeout("/api/live/my-live-picks")
       .then(d => setFavLiveSellers(d.sellers || []))
       .catch(() => {})
       .finally(() => setFavLoading(false));
@@ -68,7 +78,7 @@ function LiveSearchInner() {
   };
 
   return (
-    <div className="min-h-[80vh]">
+    <div className="beautymate-pc-page min-h-[80vh] bg-white">
       {/* No-link popup */}
       {noLinkPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
@@ -90,38 +100,40 @@ function LiveSearchInner() {
       )}
 
       {/* Search Header */}
-      <div className="sticky top-0 z-30 bg-white border-b border-gray-100 px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="p-1 text-gray-400 hover:text-gray-600">
+      <div className="sticky top-0 z-30 bg-white border-b border-gray-100 px-4 py-3 lg:static lg:border-0 lg:bg-gradient-to-br lg:from-[#3d1427] lg:via-[#6d2945] lg:to-[#b44b68] lg:px-8 lg:py-20">
+        <div className="flex items-center gap-3 lg:mx-auto lg:block lg:max-w-[980px] lg:text-center">
+          <Link href="/" className="p-1 text-gray-400 hover:text-gray-600 lg:hidden">
             <Icon name="ArrowRight" size={20} className="rotate-180" />
           </Link>
-          <div className="flex-1 relative">
+          <p className="hidden text-xs font-extrabold tracking-[0.22em] text-rose-200 lg:block">LIVE BEAUTY</p>
+          <h1 className="mt-3 hidden text-4xl font-extrabold tracking-tight text-white lg:block">라이브로 만나는 뷰티 전문가</h1>
+          <p className="mt-4 hidden text-base text-white/70 lg:block">전문가 이름이나 라이브 코드를 검색하고 실시간으로 소통해 보세요.</p>
+          <div className="flex-1 relative lg:mx-auto lg:mt-8 lg:max-w-2xl">
             <input
               type="text"
               placeholder="라이브 코드 또는 뷰티 전문가명으로 검색"
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full bg-gray-50 border-0 rounded-full px-4 py-2.5 pl-10 text-sm focus:ring-2 focus:ring-brand-200 focus:bg-white"
-              autoFocus
+              className="w-full bg-gray-50 border-0 rounded-full px-4 py-2.5 pl-10 text-sm focus:ring-2 focus:ring-brand-200 focus:bg-white lg:py-4 lg:pl-12 lg:text-base lg:shadow-xl"
             />
             <Icon name="Search" size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
           </div>
-          <button onClick={handleSearch} className="px-3 py-2 text-sm font-medium text-brand-600 hover:bg-brand-50 rounded-lg">
+          <button onClick={handleSearch} className="px-3 py-2 text-sm font-medium text-brand-600 hover:bg-brand-50 rounded-lg lg:mt-4 lg:inline-flex lg:rounded-full lg:bg-white lg:px-7 lg:py-3 lg:font-bold lg:text-[#6d2945] lg:shadow-lg lg:hover:bg-rose-50">
             검색
           </button>
         </div>
       </div>
 
-      <div className="px-4 py-4">
+      <div className="px-4 py-4 lg:mx-auto lg:max-w-[1200px] lg:px-8 lg:py-16">
         {/* 단골 뷰티 전문가 라이브 중 섹션 (검색 전, 로그인한 유저에게만 표시) */}
         {!searched && !favLoading && favLiveSellers.length > 0 && (
-          <div className="mb-6">
-            <p className="text-xs font-bold text-gray-500 mb-3 flex items-center gap-1.5">
+          <div className="mb-6 lg:mb-14">
+            <p className="text-xs font-bold text-gray-500 mb-3 flex items-center gap-1.5 lg:mb-6 lg:text-lg lg:text-gray-900">
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
               단골 뷰티 전문가 라이브 중
             </p>
-            <div className="space-y-3">
+            <div className="space-y-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:space-y-0">
               {favLiveSellers.map(s => (
                 <SellerCardItem key={s.slug} s={s} onNoLink={() => setNoLinkPopup(true)} />
               ))}
@@ -130,10 +142,10 @@ function LiveSearchInner() {
         )}
 
         {!searched ? (
-          <div className="text-center py-16">
+          <div className="text-center py-16 lg:rounded-[2rem] lg:border lg:border-rose-100 lg:bg-rose-50/40 lg:py-24">
             <Icon name="Live" size={48} className="mx-auto text-gray-200 mb-4" />
-            <h2 className="text-base font-bold text-gray-800 mb-2">라이브 찾기</h2>
-            <p className="text-sm text-gray-400 leading-relaxed">
+            <h2 className="text-base font-bold text-gray-800 mb-2 lg:text-2xl">라이브 찾기</h2>
+            <p className="text-sm text-gray-400 leading-relaxed lg:text-base lg:leading-7">
               뷰티 전문가에게 받은 라이브 코드나<br />
               뷰티 전문가 이름으로 라이브를 검색하세요.
             </p>
@@ -150,7 +162,7 @@ function LiveSearchInner() {
             <p className="text-xs text-gray-400 mt-1">다른 코드나 키워드로 검색해보세요.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:space-y-0">
             <p className="text-xs text-gray-400 mb-3">뷰티 전문가 {results.length}명을 찾았어요</p>
             {results.map(s => (
               <SellerCardItem key={s.slug} s={s} onNoLink={() => setNoLinkPopup(true)} />
@@ -164,7 +176,7 @@ function LiveSearchInner() {
 
 function SellerCardItem({ s, onNoLink }: { s: SellerCard; onNoLink: () => void }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-4">
+    <div className="bg-white rounded-xl border border-gray-100 p-4 lg:rounded-[1.5rem] lg:p-6 lg:shadow-sm lg:transition lg:hover:-translate-y-1 lg:hover:shadow-xl">
       {s.isLive && s.liveShareCode ? (
         <Link
           href={`/live/${s.liveShareCode}`}

@@ -21,7 +21,8 @@ export default function Header() {
 
   // 뷰티샵 안에서는 글로벌 헤더를 숨기고 뷰티샵 전용 헤더(SellerShopHeader)만 노출한다.
   const isSellerShop = /^\/shop\/[^/]+/.test(pathname);
-  const isHome = pathname === "/";
+  const desktopPublicRoots = ["/", "/sellers", "/experts", "/live", "/about", "/guide", "/become-seller"];
+  const showDesktopHeader = desktopPublicRoots.some((root) => root === "/" ? pathname === "/" : pathname === root || pathname.startsWith(`${root}/`));
   // 뷰티 전문가 서브페이지(장바구니/내정보 등)에서는 공통 헤더 대신 뷰티 전문가 전용 헤더가 노출된다.
   const { subpageActive } = useShopChrome();
 
@@ -29,7 +30,7 @@ export default function Header() {
 
   return (
     <>
-    <header className={`sticky top-0 z-[60] ${isHome ? "lg:hidden" : ""}`}>
+    <header className={`sticky top-0 z-[60] ${showDesktopHeader ? "lg:hidden" : ""}`}>
       <div className="bg-white border-b border-gray-100">
         <div className="flex items-center justify-between px-4 h-14">
           <Link href="/" prefetch={true} className="flex items-center gap-1.5">
@@ -77,19 +78,19 @@ export default function Header() {
         </div>
       </div>
     </header>
-    {isHome && (
+    {showDesktopHeader && (
       <header className="sticky top-0 z-[60] hidden border-b border-rose-100/80 bg-white/95 backdrop-blur-xl lg:block">
         <div className="mx-auto flex h-[76px] max-w-[1320px] items-center justify-between px-8">
           <Link href="/" prefetch className="flex items-center">
             <BrandWordmark size="lg" />
           </Link>
-          <nav className="flex items-center gap-9 text-sm font-bold text-gray-700" aria-label="PC 메인 메뉴">
-            {flags.seller && <Link href="/sellers" className="transition hover:text-[#b44b68]">뷰티 전문가</Link>}
-            <Link href="/#experts" className="transition hover:text-[#b44b68]">추천 전문가</Link>
-            {flags.liveCommerce && <Link href="/live" className="flex items-center gap-1.5 transition hover:text-[#b44b68]"><span className="h-2 w-2 rounded-full bg-red-500" /> 라이브</Link>}
-            <Link href="/#about" className="transition hover:text-[#b44b68]">뷰티메이트 소개</Link>
-            <Link href="/#how" className="transition hover:text-[#b44b68]">이용방법</Link>
-            <Link href="/become-seller" className="transition hover:text-[#b44b68]">전문가 입점</Link>
+          <nav className="flex items-center gap-8 text-sm font-bold text-gray-700" aria-label="PC 공개 메뉴">
+            {flags.seller && <DesktopMenuLink href="/sellers" pathname={pathname}>뷰티 전문가</DesktopMenuLink>}
+            <DesktopMenuLink href="/experts" pathname={pathname}>추천 전문가</DesktopMenuLink>
+            {flags.liveCommerce && <DesktopMenuLink href="/live" pathname={pathname} live>라이브</DesktopMenuLink>}
+            <DesktopMenuLink href="/about" pathname={pathname}>뷰티메이트 소개</DesktopMenuLink>
+            <DesktopMenuLink href="/guide" pathname={pathname}>이용방법</DesktopMenuLink>
+            <DesktopMenuLink href="/become-seller" pathname={pathname}>전문가 입점</DesktopMenuLink>
           </nav>
           <div className="flex items-center gap-2">
             {flags.seller && <Link href="/sellers" aria-label="검색" className="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 transition hover:bg-rose-50 hover:text-[#b44b68]"><Icon name="Search" size={20} /></Link>}
@@ -110,5 +111,16 @@ export default function Header() {
       </header>
     )}
     </>
+  );
+}
+
+function DesktopMenuLink({ href, pathname, children, live = false }: { href: string; pathname: string; children: React.ReactNode; live?: boolean }) {
+  const active = pathname === href || pathname.startsWith(`${href}/`);
+  return (
+    <Link href={href} className={`relative flex h-[76px] items-center gap-1.5 transition hover:text-[#b44b68] ${active ? "text-[#9a3656]" : ""}`}>
+      {live && <span className="h-2 w-2 rounded-full bg-red-500" />}
+      {children}
+      {active && <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-[#b44b68]" />}
+    </Link>
   );
 }

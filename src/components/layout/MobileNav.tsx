@@ -37,6 +37,8 @@ const DASHBOARD_PATHS = [
 
 export default function MobileNav() {
   const pathname = usePathname() ?? "";
+  const desktopPublicRoots = ["/", "/sellers", "/experts", "/live", "/about", "/guide", "/become-seller"];
+  const hasDesktopPublicNav = desktopPublicRoots.some((root) => root === "/" ? pathname === "/" : pathname === root || pathname.startsWith(`${root}/`));
   const searchParams = useSearchParams();
   // 라이브 팝업(iframe, ?embedded=true) 또는 라이브 진입/예약(?from=live) 시 하단 네비 숨김
   const embedded = searchParams?.get("embedded") === "true" || searchParams?.get("from") === "live";
@@ -146,7 +148,7 @@ export default function MobileNav() {
 
       {/* PC(lg+): 앱 컨테이너 바로 오른쪽 세로 사이드바 */}
       {/* 앱 컨테이너는 max-w-[480px] mx-auto → 오른쪽 끝: calc(50% + 240px). 사이드바는 그 바로 우측에 배치 */}
-      {pathname !== "/" && <nav
+      {!hasDesktopPublicNav && <nav
         className="hidden lg:flex fixed top-1/2 -translate-y-1/2 z-[60] flex-col items-center gap-1 py-4 px-2 bg-white/90 backdrop-blur-sm border border-gray-100 rounded-2xl shadow-md"
         style={{ left: "calc(50% + 248px)" }}
       >
