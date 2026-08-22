@@ -1,4 +1,4 @@
-export default function Loading() {
+export default function RootLoading() {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
       <div className="text-center">
