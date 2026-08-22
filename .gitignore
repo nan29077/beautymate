@@ -84,3 +84,7 @@ __pycache__/
 .pytest_cache/
 htmlcov/
 .coverage
+
+# 로컬 개발 서버 로그
+/dev-server.out.log
+/dev-server.err.log
