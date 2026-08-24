@@ -1,6 +1,7 @@
 "use client";
 
 import { Icon } from '@/components/shared/Icon';
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { useState, useEffect } from "react";
 import { Scale, Sparkles } from 'lucide-react';
 
@@ -244,7 +245,7 @@ export default function ProductDetailTabs({
               <div className="px-4 pb-2">
                 <div
                   className="product-detail-content prose prose-sm max-w-none text-gray-700"
-                  dangerouslySetInnerHTML={{ __html: detailContent }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(detailContent) }}
                 />
               </div>
             )}

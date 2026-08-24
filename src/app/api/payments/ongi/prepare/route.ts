@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { buildOngiCallbackToken, buildOngiCheckoutUrl, ensureOngiConfigured } from "@/lib/ongi";
+import {
+  buildOngiCallbackToken,
+  buildOngiCheckoutUrl,
+  ensureOngiConfigured,
+  isOngiCallbackSigningConfigured,
+} from "@/lib/ongi";
 import { logPayment } from "@/lib/paymentLog";
 
 export const dynamic = "force-dynamic";
@@ -77,11 +82,25 @@ export async function POST(request: Request) {
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.AUTH_URL ||
     new URL(request.url).origin;
-  // 콜백 위조 방지 — orderId 에 대한 HMAC 토큰을 함께 심는다 (callback 에서 검증)
+  // 콜백 위조 방지 — orderId 에 대한 HMAC 토큰을 함께 심는다 (callback 에서 검증).
+  // 시크릿이 없으면 콜백 검증이 불가능(= 통지 거부)하므로 결제창을 아예 열지 않는다.
+  if (!isOngiCallbackSigningConfigured()) {
+    await logPayment({
+      orderId: order.id,
+      provider: "ongi",
+      stage: "prepare",
+      status: "fail",
+      message: "MISSING_CALLBACK_SECRET (ONGI_CALLBACK_SECRET/AUTH_SECRET 미설정)",
+    });
+    return NextResponse.json(
+      { error: "결제 설정이 완료되지 않았습니다. 관리자에게 문의해 주세요." },
+      { status: 503 },
+    );
+  }
   const callbackToken = buildOngiCallbackToken(order.id);
   const callbackUrl =
     `${baseUrl}/api/payments/ongi/callback?orderId=${encodeURIComponent(order.id)}` +
-    (callbackToken ? `&token=${encodeURIComponent(callbackToken)}` : "");
+    `&token=${encodeURIComponent(callbackToken)}`;
   const returnUrl = `${baseUrl}/checkout/complete?orderId=${encodeURIComponent(order.id)}`;
 
   const name = order.customerName || order.user.name || "고객";

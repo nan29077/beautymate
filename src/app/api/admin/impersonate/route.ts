@@ -26,5 +26,12 @@ export async function POST(req: NextRequest) {
   }
 
   const token = signImpersonationToken(target.id);
+  if (!token) {
+    // AUTH_SECRET 미설정 — 서명 없이 토큰을 내보내면 위조가 가능하므로 기능을 막는다.
+    return NextResponse.json(
+      { error: "임시 로그인이 비활성화되어 있습니다. (서버 서명 키 미설정)" },
+      { status: 503 },
+    );
+  }
   return NextResponse.json({ token, role: target.role });
 }

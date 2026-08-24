@@ -15,7 +15,21 @@ interface Shop {
   shopLogo: string | null;
 }
 
-export default function ShopLoginClient({ shop }: { shop: Shop }) {
+// 서버에서 내려주는 소셜 로그인 사용 가능 여부.
+// OAuth 키가 설정된 provider 만 실제 로그인으로 연결하고, 미설정 provider 는
+// "준비 중"으로 비활성화한다. (예전에는 onClick 이 비어 있어 눌러도 아무 반응이 없었다)
+export interface ShopSocialProviders {
+  kakao: boolean;
+  naver: boolean;
+}
+
+export default function ShopLoginClient({
+  shop,
+  socialProviders = { kakao: false, naver: false },
+}: {
+  shop: Shop;
+  socialProviders?: ShopSocialProviders;
+}) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -49,47 +63,51 @@ export default function ShopLoginClient({ shop }: { shop: Shop }) {
       subtitle={`로그인 후 ${shop.shopName}으로 돌아갑니다`}
     >
       {/* 뷰티샵 전용 소셜 로그인 — 메인 /auth/login 과 완전히 분리된 컴포넌트 */}
-      <div className="space-y-2.5 mb-4">
-        {/* 카카오 간편 로그인 */}
-        <button
-          type="button"
-          onClick={() => {
-            // TODO: 카카오 OAuth 연동 예정
-          }}
-          className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl text-sm font-semibold text-gray-900 transition active:scale-[0.98]"
-          style={{ backgroundColor: "#FEE500" }}
-        >
-          {/* 카카오 로고 */}
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M9 1.5C4.86 1.5 1.5 4.136 1.5 7.38c0 2.088 1.326 3.918 3.33 4.986l-.846 3.132a.225.225 0 0 0 .336.252l3.684-2.43c.33.048.666.072 1.002.072 4.14 0 7.5-2.634 7.5-5.88C16.5 4.136 13.14 1.5 9 1.5z"
-              fill="#3C1E1E"
-            />
-          </svg>
-          카카오로 시작하기
-        </button>
+      {(socialProviders.kakao || socialProviders.naver) && (
+        <div className="space-y-2.5 mb-4">
+          {/* 카카오 간편 로그인 */}
+          {socialProviders.kakao && (
+            <button
+              type="button"
+              onClick={() => signIn("kakao", { callbackUrl: `/shop/${shop.slug}` })}
+              className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl text-sm font-semibold text-gray-900 transition active:scale-[0.98]"
+              style={{ backgroundColor: "#FEE500" }}
+            >
+              {/* 카카오 로고 */}
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M9 1.5C4.86 1.5 1.5 4.136 1.5 7.38c0 2.088 1.326 3.918 3.33 4.986l-.846 3.132a.225.225 0 0 0 .336.252l3.684-2.43c.33.048.666.072 1.002.072 4.14 0 7.5-2.634 7.5-5.88C16.5 4.136 13.14 1.5 9 1.5z"
+                  fill="#3C1E1E"
+                />
+              </svg>
+              카카오로 시작하기
+            </button>
+          )}
 
-        {/* 네이버 간편 로그인 */}
-        <button
-          type="button"
-          onClick={() => {
-            // TODO: 네이버 OAuth 연동 예정
-          }}
-          className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl text-sm font-semibold text-white transition active:scale-[0.98]"
-          style={{ backgroundColor: "#03C75A" }}
-        >
-          {/* 네이버 N 로고 */}
-          <span className="text-base font-extrabold leading-none">N</span>
-          네이버로 시작하기
-        </button>
-      </div>
+          {/* 네이버 간편 로그인 */}
+          {socialProviders.naver && (
+            <button
+              type="button"
+              onClick={() => signIn("naver", { callbackUrl: `/shop/${shop.slug}` })}
+              className="w-full flex items-center justify-center gap-2.5 py-3 rounded-xl text-sm font-semibold text-white transition active:scale-[0.98]"
+              style={{ backgroundColor: "#03C75A" }}
+            >
+              {/* 네이버 N 로고 */}
+              <span className="text-base font-extrabold leading-none">N</span>
+              네이버로 시작하기
+            </button>
+          )}
+        </div>
+      )}
 
-      {/* 구분선 */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="flex-1 h-px bg-gray-100" />
-        <span className="text-[11px] text-gray-400 font-medium">또는 이메일로 로그인</span>
-        <div className="flex-1 h-px bg-gray-100" />
-      </div>
+      {/* 구분선 — 소셜 버튼이 있을 때만 "또는" 문구를 보여준다 */}
+      {(socialProviders.kakao || socialProviders.naver) && (
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex-1 h-px bg-gray-100" />
+          <span className="text-[11px] text-gray-400 font-medium">또는 이메일로 로그인</span>
+          <div className="flex-1 h-px bg-gray-100" />
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3.5">
         <div>

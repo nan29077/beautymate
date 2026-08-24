@@ -55,22 +55,11 @@ export async function cleanupStalePendingOrders(): Promise<number> {
   for (const order of stale) {
     try {
       await prisma.$transaction(async (tx) => {
-        // 일반 뷰티 서비스(DirectProduct) 재고 복원 — 예약 생성 시 차감했던 재고를 되돌린다.
-        // abort 라우트(api/orders/[id]/abort)와 동일한 로직. 이 복원이 없으면 결제 없이
-        // 이탈한 예약의 차감 재고가 영구히 묶여 재고 1개짜리 뷰티 서비스가 "품절"로 굳는다.
-        // (아래 조건부 deleteMany 가 0건이면 throw 되어 트랜잭션 전체가 롤백되므로,
-        //  '그새 결제 완료된' 예약의 재고를 잘못 되돌리는 일은 없다.)
-        for (const it of order.items) {
-          if (it.itemType !== "DIRECT") continue;
-          await tx.directProduct
-            .updateMany({
-              where: { id: it.productId },
-              data: { stock: { increment: it.quantity } },
-            })
-            .catch(() => {
-              /* 뷰티 서비스가 이미 삭제된 경우 무시 */
-            });
-        }
+        // ※ DirectProduct.stock 은 복원하지 않는다.
+        //   상담 예약 서비스로 전환되면서 예약 생성(api/orders)에서 재고를 차감하지
+        //   않게 됐는데, 여기서만 increment 가 남아 있어 이탈 예약이 정리될 때마다
+        //   차감된 적 없는 재고가 계속 부풀어 올랐다. 차감이 없으므로 복원도 없다.
+        //   (재고 차감을 되살릴 경우 이 자리에 복원 로직을 함께 추가할 것)
 
         // 캠페인 카운터 롤백
         if (order.campaignId) {

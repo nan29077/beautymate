@@ -52,6 +52,22 @@ export async function GET(
       return NextResponse.json({ error: "뷰티 서비스를 찾을 수 없습니다" }, { status: 404 });
     }
 
+    // 소유권 검증 — 이 응답에는 공급가·관리자 마진 등 원가 정보가 담긴다.
+    // PUT 과 달리 GET 에 검사가 없어, 뷰티 전문가가 id 만 알면 다른 뷰티 전문가의
+    // 뷰티 서비스 공급가를 그대로 열람할 수 있었다. PUT 과 동일한 기준으로 막는다.
+    if (role === "CONSULTANT") {
+      const sellerProfile = await prisma.sellerProfile.findUnique({
+        where: { userId: session.user!.id },
+        select: { id: true },
+      });
+      if (!sellerProfile || product.sellerId !== sellerProfile.id) {
+        return NextResponse.json(
+          { error: "본인이 등록한 뷰티 서비스만 조회할 수 있습니다" },
+          { status: 403 },
+        );
+      }
+    }
+
     // Fetch categories for the form
     const categories = await prisma.category.findMany({
       where: { isActive: true },

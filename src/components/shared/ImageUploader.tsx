@@ -30,7 +30,7 @@ export default function ImageUploader({
   const imagesRef = useRef(images);
   imagesRef.current = images;
 
-  // 파일 크기 제한 없음 - 모든 파일 허용
+  // 서버(/api/upload) 정책: 이미지 전용 · 파일당 최대 10MB · SVG 차단
 
   // 단일 파일 업로드 (재시도 포함)
   const uploadSingleFile = async (file: File, retries = 2): Promise<string | null> => {
@@ -239,7 +239,7 @@ export default function ImageUploader({
             <input
               ref={fileRef}
               type="file"
-              accept="image/*,video/*,.heic,.heif,.raw,.cr2,.nef,.arw,.dng,.webp,.avif,.svg,.bmp,.tiff,.gif"
+              accept="image/*,.heic,.heif,.raw,.cr2,.nef,.arw,.dng,.webp,.avif,.bmp,.tiff,.gif"
               multiple
               capture={undefined}
               onChange={handleFileUpload}

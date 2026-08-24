@@ -24,7 +24,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "orderId가 필요합니다." }, { status: 400 });
   }
 
-  const order = await prisma.reservation.findUnique({ where: { id: orderId } });
+  const order = await prisma.reservation.findUnique({
+    where: { id: orderId },
+    include: { consultingSession: { select: { status: true, startedAt: true } } },
+  });
   if (!order) {
     return NextResponse.json({ error: "예약을 찾을 수 없습니다." }, { status: 404 });
   }
@@ -38,6 +41,36 @@ export async function POST(request: Request) {
 
   if (order.paymentStatus !== "COMPLETED" || !order.pgTid) {
     return NextResponse.json({ error: "취소 가능한 결제가 아닙니다." }, { status: 400 });
+  }
+
+  // ── 고객 직접 취소 제한 ────────────────────────────────────────────
+  // 이 라우트는 금액을 그대로 전액(또는 임의 부분) 환불한다. 뷰티 전문가가 이미 예약을
+  // 확정했거나 상담이 끝난 뒤에도 고객이 마음대로 호출하면 서비스를 제공한 뷰티 전문가가
+  // 대금을 잃는다. 확정 이후 취소는 뷰티 전문가 요청 → 관리자 승인 경로
+  // (/api/orders/[id]/cancel-request → cancel-approve)로만 처리하고,
+  // 여기서는 관리자만 직접 취소할 수 있게 한다.
+  if (!isAdmin) {
+    if (order.status === "CONFIRMED" || order.status === "COMPLETED") {
+      return NextResponse.json(
+        {
+          error:
+            "예약이 확정된 뒤에는 직접 취소할 수 없습니다. 뷰티샵 또는 고객센터로 취소를 요청해 주세요.",
+        },
+        { status: 403 },
+      );
+    }
+    // 상담(영상 세션)이 시작됐거나 끝난 예약도 고객 임의 환불 대상이 아니다.
+    const cs = order.consultingSession;
+    if (cs && (cs.status === "ACTIVE" || cs.status === "COMPLETED" || cs.startedAt)) {
+      return NextResponse.json(
+        { error: "이미 진행된 상담은 직접 취소할 수 없습니다. 고객센터로 문의해 주세요." },
+        { status: 403 },
+      );
+    }
+    // 부분 취소는 정산 금액을 임의로 깎을 수 있어 관리자 전용이다.
+    if (partialAmount && partialAmount > 0) {
+      return NextResponse.json({ error: "부분 취소는 관리자만 요청할 수 있습니다." }, { status: 403 });
+    }
   }
 
   const finalAmount = Math.round(Number(order.finalAmount));

@@ -30,14 +30,22 @@ export function ensureOngiConfigured() {
 // ONGI 통지에는 자체 서명이 없어, 예약 id 만 알면 가짜 성공 통지를 보낼 수 있다.
 // prepare 단계에서 callback_url 에 HMAC(orderId) 토큰을 심어 보내고,
 // callback 단계에서 동일 토큰인지 검증한다. 시크릿은 서버에만 존재한다.
-function ongiCallbackSecret(): string {
-  return (
+// ⚠️ 하드코딩 폴백 금지. 폴백 시크릿은 소스에 남아 위조 토큰을 만들 수 있게 되고,
+//    시크릿이 없다고 검증을 건너뛰면(fail-open) 예약 id 만 알면 가짜 입금 통지로
+//    미결제 예약을 결제완료로 바꿀 수 있다. 시크릿이 없으면 검증을 실패시킨다(fail-closed).
+function ongiCallbackSecret(): string | null {
+  const secret =
     process.env.ONGI_CALLBACK_SECRET ||
     process.env.ONGI_API_KEY ||
     process.env.AUTH_SECRET ||
     process.env.NEXTAUTH_SECRET ||
-    ""
-  );
+    "";
+  return secret ? secret : null;
+}
+
+/** 콜백 서명 검증 가능 여부 (시크릿 설정 여부) */
+export function isOngiCallbackSigningConfigured(): boolean {
+  return ongiCallbackSecret() !== null;
 }
 
 export function buildOngiCallbackToken(orderId: string): string {
@@ -49,9 +57,9 @@ export function buildOngiCallbackToken(orderId: string): string {
 export function verifyOngiCallbackToken(orderId: string, token: string | null): boolean {
   const expected = buildOngiCallbackToken(orderId);
   if (!expected) {
-    // 시크릿 미설정 환경 — 검증 불가. 경고만 남기고 통과 (기존 동작 유지)
-    console.warn("[ongi] 콜백 토큰 시크릿 미설정 — 서명 검증 생략");
-    return true;
+    // 시크릿 미설정 환경 — 검증이 불가능하므로 통지를 거부한다.
+    console.error("[ongi] 콜백 토큰 시크릿 미설정 — 서명 검증 불가로 통지를 거부합니다.");
+    return false;
   }
   if (!token || token.length !== expected.length) return false;
   try {

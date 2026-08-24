@@ -52,6 +52,37 @@ export async function GET() {
   }
 }
 
+// PATCH: 문의 답변 저장 (관리자 전용)
+// 관리자 화면의 "답변 전송"이 화면 상태만 바꾸고 저장되지 않아, 새로고침하면
+// 답변이 사라지고 문의가 계속 미답변으로 남던 문제를 해결한다.
+export async function PATCH(req: NextRequest) {
+  try {
+    const session = await auth();
+    if (!session || (session.user as any).role !== "SUPER_ADMIN") {
+      return NextResponse.json({ error: "권한이 없습니다" }, { status: 403 });
+    }
+    const body = await req.json().catch(() => ({}));
+    const id = String(body.id ?? "").trim();
+    const reply = String(body.reply ?? "").trim();
+    if (!id || !reply) {
+      return NextResponse.json({ error: "문의 ID와 답변 내용이 필요합니다" }, { status: 400 });
+    }
+
+    const list = await getInquiries();
+    const target = list.find((i) => i.id === id);
+    if (!target) {
+      return NextResponse.json({ error: "문의를 찾을 수 없습니다" }, { status: 404 });
+    }
+    target.reply = reply;
+    target.status = "replied";
+    await saveInquiries(list);
+
+    return NextResponse.json({ ok: true, inquiry: target });
+  } catch {
+    return NextResponse.json({ error: "답변 저장에 실패했습니다" }, { status: 500 });
+  }
+}
+
 // POST: 1:1 문의 접수 (인증 불필요 — 비회원도 문의 가능)
 export async function POST(req: NextRequest) {
   try {

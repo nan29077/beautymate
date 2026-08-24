@@ -233,7 +233,7 @@ export default function AddressesClient({ initialAddresses }: { initialAddresses
           <div className="text-center py-20 text-gray-400">
             <Icon name="Location" size={48} strokeWidth={1.5} className="mx-auto mb-3 opacity-30" />
             <p className="text-sm">등록된 배송지가 없습니다.</p>
-            <p className="text-xs text-gray-300 mt-1">위의 '배송지 추가' 버튼을 눌러 추가해보세요.</p>
+            <p className="text-xs text-gray-300 mt-1">위의 &apos;배송지 추가&apos; 버튼을 눌러 추가해보세요.</p>
           </div>
         ) : (
           <div className="space-y-3">

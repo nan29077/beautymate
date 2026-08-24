@@ -67,7 +67,6 @@ export async function POST(
         cancelType: null,
         cancelAmount: null,
         cancelFromSettlement: false,
-        deliveryStatus: "PAYMENT_COMPLETED",
       },
     });
 

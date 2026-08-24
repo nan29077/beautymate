@@ -1,6 +1,7 @@
 "use client";
 
 import { Icon } from '@/components/shared/Icon';
+import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import { useRouter } from "next/navigation";
 import { Hexagon } from 'lucide-react';
 import { useState } from "react";
@@ -167,11 +168,11 @@ const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = 
       <div className="space-y-3">
         <Card>
           <SectionHeading>제1조 (목적)</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">이 약관은 뷰티메이트(이하 "회사")가 운영하는 마켓플레이스 서비스(이하 "서비스")의 이용 조건 및 절차, 회사와 회원 간의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+          <p className="text-[13px] text-gray-600 leading-relaxed">이 약관은 뷰티메이트(이하 &quot;회사&quot;)가 운영하는 마켓플레이스 서비스(이하 &quot;서비스&quot;)의 이용 조건 및 절차, 회사와 회원 간의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.</p>
         </Card>
         <Card>
           <SectionHeading>제2조 (정의)</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">"회원"이란 회사의 서비스에 접속하여 이 약관에 따라 회사와 이용계약을 체결하고 회사가 제공하는 서비스를 이용하는 고객을 말합니다.</p>
+          <p className="text-[13px] text-gray-600 leading-relaxed">&quot;회원&quot;이란 회사의 서비스에 접속하여 이 약관에 따라 회사와 이용계약을 체결하고 회사가 제공하는 서비스를 이용하는 고객을 말합니다.</p>
         </Card>
         <Card>
           <SectionHeading>제3조 (서비스 이용)</SectionHeading>
@@ -223,7 +224,7 @@ const CONTENT: Record<string, { title: string; body: () => React.ReactNode }> = 
         </Card>
         <Card>
           <SectionHeading>신청 방법</SectionHeading>
-          <p className="text-[13px] text-gray-600 leading-relaxed">회원가입 시 '뷰티 전문가'를 선택하거나, 일반 회원으로 가입 후 마이페이지에서 뷰티 전문가 신청을 할 수 있습니다. 관리자 검토 후 1~3 영업일 내 결과가 안내됩니다.</p>
+          <p className="text-[13px] text-gray-600 leading-relaxed">회원가입 시 &apos;뷰티 전문가&apos;를 선택하거나, 일반 회원으로 가입 후 마이페이지에서 뷰티 전문가 신청을 할 수 있습니다. 관리자 검토 후 1~3 영업일 내 결과가 안내됩니다.</p>
         </Card>
         <Card>
           <SectionHeading>상담료 수익</SectionHeading>
@@ -271,7 +272,7 @@ function DbContentBody({ content }: { content: string }) {
     <Card>
       <div
         className="text-[13px] text-gray-700 leading-relaxed whitespace-pre-line prose-sm"
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }}
       />
     </Card>
   );

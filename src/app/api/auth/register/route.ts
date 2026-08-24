@@ -9,6 +9,11 @@ import { randomAvatar, randomBeautyMateAvatar, pickRoleAvatar } from "@/lib/defa
 import { getRegisterFieldSettings } from "@/lib/settings";
 import { notifySignupWelcome } from "@/lib/alimtalkTriggers";
 
+// 이메일 형식 검증 — 형식 확인 없이 저장하면 알림 메일/계정 복구가 불가능한
+// 계정이 그대로 만들어지고, 로그인 시에만 뒤늦게 문제가 드러난다.
+// (문의 접수 API /api/public/inquiry 와 동일한 패턴)
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function POST(request: NextRequest) {
   try {
     const {
@@ -32,6 +37,9 @@ export async function POST(request: NextRequest) {
     const address1Trimmed = typeof address1 === "string" ? address1.trim() : "";
     if (!nameTrimmed) return NextResponse.json({ error: "이름을 입력해주세요." }, { status: 400 });
     if (!emailTrimmed) return NextResponse.json({ error: "이메일을 입력해주세요." }, { status: 400 });
+    if (!EMAIL_RE.test(emailTrimmed) || emailTrimmed.length > 254) {
+      return NextResponse.json({ error: "올바른 이메일 형식이 아닙니다." }, { status: 400 });
+    }
     if (typeof password !== "string" || !password) return NextResponse.json({ error: "비밀번호를 입력해주세요." }, { status: 400 });
     if (password.length < 8) return NextResponse.json({ error: "비밀번호는 8자 이상이어야 합니다" }, { status: 400 });
     if (fieldSettings.phone === "required" && !phoneDigits) return NextResponse.json({ error: "휴대전화번호를 입력해주세요." }, { status: 400 });
@@ -39,8 +47,14 @@ export async function POST(request: NextRequest) {
     if (fieldSettings.birthday === "required" && (typeof birthday !== "string" || !birthday.trim())) return NextResponse.json({ error: "생년월일을 입력해주세요." }, { status: 400 });
     if (fieldSettings.address === "required" && !address1Trimmed) return NextResponse.json({ error: "주소를 입력해주세요." }, { status: 400 });
 
+    // 중복 이메일은 클라이언트가 구분할 수 있도록 409 Conflict 로 응답한다.
     const existing = await prisma.user.findUnique({ where: { email: emailTrimmed } });
-    if (existing) return NextResponse.json({ error: "이미 사용 중인 이메일입니다." }, { status: 400 });
+    if (existing) {
+      return NextResponse.json(
+        { error: "이미 사용 중인 이메일입니다.", code: "EMAIL_TAKEN" },
+        { status: 409 },
+      );
+    }
 
     const hashedPassword = await bcrypt.hash(password, 12);
     const userRole = role === "CONSULTANT" ? "CONSULTANT" : "CUSTOMER";
@@ -56,9 +70,11 @@ export async function POST(request: NextRequest) {
       consultantSlug = slugTaken ? `${baseSlug}-${Date.now().toString(36)}` : baseSlug;
     }
 
-    const genderPick = gender === "male" || gender === "female"
-      ? gender
-      : Math.random() < 0.5 ? "male" : "female";
+    // 성별은 입력값이 있을 때만 저장한다. 예전에는 미입력 시 남/녀를 무작위로
+    // 채워 넣어, 실제로 받은 적 없는 성별 정보가 회원 데이터·통계·아바타에
+    // 그대로 반영됐다. 미입력은 null 로 남긴다.
+    const genderPick: "male" | "female" | null =
+      gender === "male" || gender === "female" ? gender : null;
     const phoneNormalized = typeof phone === "string" && phone.trim() ? phone.replace(/[^0-9]/g, "") : null;
     const birthdayValue = typeof birthday === "string" && birthday.trim() ? birthday.trim() : null;
     const zipCodeValue = typeof zipCode === "string" && zipCode.trim() ? zipCode.trim() : null;
@@ -118,7 +134,20 @@ export async function POST(request: NextRequest) {
         : "회원가입이 완료되었습니다. 바로 로그인하실 수 있습니다.",
       needsApproval: userRole === "CONSULTANT",
     });
-  } catch (error) {
+  } catch (error: any) {
+    // 동시 가입 요청으로 중복 검사와 INSERT 사이에서 유니크 제약이 깨지는 경우
+    // (P2002) 도 500 이 아니라 409 로 돌려준다.
+    if (error?.code === "P2002") {
+      const target = Array.isArray(error?.meta?.target)
+        ? (error.meta.target as string[]).join(",")
+        : String(error?.meta?.target ?? "");
+      if (target.includes("email")) {
+        return NextResponse.json(
+          { error: "이미 사용 중인 이메일입니다.", code: "EMAIL_TAKEN" },
+          { status: 409 },
+        );
+      }
+    }
     console.error("Registration error:", error);
     return NextResponse.json({ error: "서버 오류가 발생했습니다" }, { status: 500 });
   }

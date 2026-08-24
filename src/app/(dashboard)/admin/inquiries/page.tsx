@@ -11,30 +11,24 @@ interface Inquiry {
   createdAt: string;
 }
 
-// Dummy data for inquiries
-const DUMMY_INQUIRIES: Inquiry[] = [
-  { id: "1", name: "김민지", email: "minji@example.com", category: "진행 방식", message: "예약한 뷰티 서비스가 아직 진행되지 않았습니다. 예약번호 ORD-2024-001입니다.", reply: "안녕하세요, 김민지님. 해당 예약은 현재 진행 방식 준비 중이며, 내일 출고 예정입니다.", status: "replied", createdAt: "2024-03-25T10:30:00Z" },
-  { id: "2", name: "이수호", email: "suho@example.com", category: "뷰티 서비스", message: "뷰티 서비스 사이즈가 맞지 않아 교환하고 싶습니다.", reply: null, status: "pending", createdAt: "2024-03-26T14:20:00Z" },
-  { id: "3", name: "박서연", email: "seoyeon@example.com", category: "결제", message: "결제가 두 번 되었습니다. 확인 부탁드립니다.", reply: null, status: "pending", createdAt: "2024-03-26T16:45:00Z" },
-  { id: "4", name: "정우진", email: "woojin@example.com", category: "기타", message: "뷰티 전문가 등록 절차에 대해 알고 싶습니다.", reply: "안녕하세요! 뷰티 전문가 등록은 회원가입 후 뷰티 전문가 신청을 통해 진행됩니다. 사업자등록증과 기본 정보를 입력하시면 됩니다.", status: "replied", createdAt: "2024-03-24T09:00:00Z" },
-  { id: "5", name: "최하은", email: "haeun@example.com", category: "환불", message: "구매한 뷰티 서비스의 환불을 요청합니다. 뷰티 서비스에 하자가 있습니다.", reply: null, status: "pending", createdAt: "2024-03-27T08:15:00Z" },
-];
-
 export default function AdminInquiriesPage() {
-  const [inquiries, setInquiries] = useState<Inquiry[]>(DUMMY_INQUIRIES);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // 실제 접수된 1:1 문의를 불러와 앞쪽(최신순)에 병합. 실패 시 더미 유지.
-  useEffect(() => {
+  // 실제 접수된 1:1 문의만 표시한다. (예전에는 샘플 더미 5건이 항상 섞여 나와
+  //  관리자가 실제 문의 건수·미답변 수를 신뢰할 수 없었다)
+  const loadInquiries = () => {
+    setLoading(true);
     fetch("/api/public/inquiry")
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((data: Inquiry[]) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setInquiries([...data, ...DUMMY_INQUIRIES]);
-        }
+        setInquiries(Array.isArray(data) ? data : []);
       })
-      .catch(() => {});
-  }, []);
+      .catch(() => setInquiries([]))
+      .finally(() => setLoading(false));
+  };
+  useEffect(loadInquiries, []);
   const [replyText, setReplyText] = useState<Record<string, string>>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "pending" | "replied">("all");
@@ -51,11 +45,30 @@ export default function AdminInquiriesPage() {
 
   const { pageItems, page, setPage, totalPages } = usePagination(filtered, 20);
 
-  const handleReply = (id: string) => {
+  const [savingId, setSavingId] = useState<string | null>(null);
+
+  // 답변은 서버에 저장한 뒤에만 화면에 반영한다 (저장 실패 시 답변이 사라지지 않도록).
+  const handleReply = async (id: string) => {
     const text = replyText[id]?.trim();
     if (!text) return;
-    setInquiries(prev => prev.map(i => i.id === id ? { ...i, reply: text, status: "replied" as const } : i));
-    setReplyText(prev => ({ ...prev, [id]: "" }));
+    setSavingId(id);
+    try {
+      const res = await fetch("/api/public/inquiry", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, reply: text }),
+      });
+      if (!res.ok) {
+        alert("답변 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+        return;
+      }
+      setInquiries(prev => prev.map(i => i.id === id ? { ...i, reply: text, status: "replied" as const } : i));
+      setReplyText(prev => ({ ...prev, [id]: "" }));
+    } catch {
+      alert("답변 저장 중 오류가 발생했습니다.");
+    } finally {
+      setSavingId(null);
+    }
   };
 
   const pendingCount = inquiries.filter(i => i.status === "pending").length;
@@ -95,7 +108,7 @@ export default function AdminInquiriesPage() {
         {filtered.length === 0 ? (
           <div className="text-center py-20 text-gray-400 bg-white rounded-xl border border-gray-100">
             <Icon name="Message" size={48} strokeWidth={1.5} className="mx-auto mb-3 opacity-30" />
-            <p className="text-sm">{searchQuery ? "검색 결과가 없습니다." : "문의 내역이 없습니다."}</p>
+            <p className="text-sm">{loading ? "문의를 불러오는 중입니다..." : searchQuery ? "검색 결과가 없습니다." : "문의 내역이 없습니다."}</p>
           </div>
         ) : pageItems.map((inquiry) => (
           <div key={inquiry.id} className="bg-white rounded-xl border border-gray-100 overflow-hidden">
@@ -137,9 +150,9 @@ export default function AdminInquiriesPage() {
                     <textarea value={replyText[inquiry.id] || ""} onChange={(e) => setReplyText(prev => ({ ...prev, [inquiry.id]: e.target.value }))}
                       placeholder="답변을 입력하세요..." className="flex-1 text-sm border border-gray-200 rounded-lg p-2.5 h-20 resize-none focus:outline-none focus:ring-2 focus:ring-brand-500" />
                   </div>
-                  <button onClick={() => handleReply(inquiry.id)} disabled={!replyText[inquiry.id]?.trim()}
+                  <button onClick={() => handleReply(inquiry.id)} disabled={!replyText[inquiry.id]?.trim() || savingId === inquiry.id}
                     className="mt-2 flex items-center gap-1.5 px-4 py-2 bg-brand-600 text-white text-xs font-medium rounded-lg hover:bg-brand-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-                    <Icon name="Share" size={12} /> 답변 전송
+                    <Icon name="Share" size={12} /> {savingId === inquiry.id ? "저장 중..." : "답변 전송"}
                   </button>
                 </div>
               </div>

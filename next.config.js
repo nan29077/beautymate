@@ -25,11 +25,14 @@ const nextConfig = {
     unoptimized: true,
     minimumCacheTTL: 86400,
   },
+  // 빌드 안전망 — 타입 오류·ESLint 오류가 있으면 빌드를 실패시킨다.
+  // (예전에는 둘 다 무시하도록 켜 두어, 스키마에 없는 컬럼 참조 같은 오류가
+  //  빌드를 통과해 운영에서야 500 으로 드러났다. ESLint 설정은 .eslintrc.json 참고)
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   allowedDevOrigins: [
     "*.sandbox.novita.ai",

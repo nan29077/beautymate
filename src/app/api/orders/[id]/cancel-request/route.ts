@@ -116,7 +116,6 @@ export async function POST(
         cancelStatus,
         cancelAmount,
         cancelFromSettlement,
-        deliveryStatus: "CANCEL_REQUESTED",
       },
     });
 

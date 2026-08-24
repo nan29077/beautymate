@@ -166,7 +166,6 @@ export async function POST(request: Request) {
         pgTid: approval.Tid ?? Tid,
         pgAuthData: JSON.stringify(approval),
         paidAt: new Date(),
-        ...(({ deliveryStatus: "PAYMENT_COMPLETED" }) as any),
       },
     });
     // 결제 완료 → 해당 뷰티샵 뷰티 전문가에게 예약접수 알림톡 (실패해도 결제 처리에 영향 없음)

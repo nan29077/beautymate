@@ -6,6 +6,8 @@ import { parseJsonArray } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 interface Participant {
+  id: string;
+  userId: string | null;
   name: string;
   entry: string | null;
   createdAt: Date;
@@ -38,31 +40,31 @@ function randomCode(len = 8) {
 }
 
 // 당첨자(로그인 참여자)에게 게임 쿠폰 자동 발급.
-// result.winners 의 이름과 참여자(userId 보유)를 대조해 승자를 식별한다.
+// 승자 판정은 result.winnerUserIds(참여자 userId) 를 기준으로 한다.
+// 예전에는 result.winners(표시 이름)를 참여자 이름과 문자열 비교했는데, 이름은
+// 중복·위장이 가능해 동명이인이 함께 당첨되거나 남의 이름을 그대로 적어 넣은
+// 참여자가 쿠폰을 받아갈 수 있었다. 이름은 표시용으로만 남긴다.
 // 실패해도 결과 처리를 막지 않도록 호출부에서 try/catch 로 감싼다.
 async function issueGameCoupons(
   gameId: string,
   sellerId: string,
   result: Record<string, unknown>,
 ) {
-  const winnerNames: string[] = Array.isArray(result.winners) ? (result.winners as unknown[]).map(String) : [];
-  if (winnerNames.length === 0) return;
-
   const coupons = await prisma.gameCoupon.findMany({ where: { gameId } });
   if (coupons.length === 0) return;
 
+  // 이 게임의 로그인 참여자만 쿠폰 대상 — 외부에서 넘어온 id 는 반드시 대조한다.
   const members = await prisma.gameParticipant.findMany({
     where: { gameId, userId: { not: null } },
-    select: { userId: true, name: true },
+    select: { userId: true },
   });
   if (members.length === 0) return;
+  const memberUserIds = new Set(members.map((m) => m.userId as string));
 
-  // 승자 이름 매칭 (NUMBER_GUESS 는 "이름 (숫자)" 형태 → 접두 매칭 허용)
-  const isWinner = (name: string) =>
-    winnerNames.some((w) => w === name || w.startsWith(`${name} (`));
-  const winnerUserIds = Array.from(
-    new Set(members.filter((m) => isWinner(m.name)).map((m) => m.userId as string)),
-  );
+  const declared: string[] = Array.isArray(result.winnerUserIds)
+    ? (result.winnerUserIds as unknown[]).map(String)
+    : [];
+  const winnerUserIds = Array.from(new Set(declared.filter((id) => memberUserIds.has(id))));
   if (winnerUserIds.length === 0) return;
 
   const now = new Date();
@@ -104,13 +106,27 @@ function computeSequential(
   participants: Participant[],
   items: string[],
 ) {
-  const pool = participants.length > 0 ? participants.map((p) => p.name) : items;
+  // 참여자가 있으면 참여자 풀, 없으면 뷰티 전문가가 입력한 항목 풀.
+  // 참여자 풀일 때는 userId 를 함께 들고 다녀야 쿠폰 발급 대상을 이름이 아닌
+  // 계정 기준으로 특정할 수 있다.
+  const pool: { name: string; userId: string | null }[] =
+    participants.length > 0
+      ? participants.map((p) => ({ name: p.name, userId: p.userId }))
+      : items.map((name) => ({ name, userId: null }));
   const rewards = Array.isArray(cfg.rewards) ? (cfg.rewards as unknown[]).map(String) : [];
   const rankCount = Math.max(1, Math.min(Number(cfg.rankCount) || pool.length, pool.length));
-  const ranks = shuffle(pool)
-    .slice(0, rankCount)
-    .map((name, i) => ({ rank: i + 1, name, reward: rewards[i] || "" }));
-  return { ranks, winners: ranks.map((r) => r.name) };
+  const picked = shuffle(pool).slice(0, rankCount);
+  const ranks = picked.map((p, i) => ({ rank: i + 1, name: p.name, reward: rewards[i] || "" }));
+  return {
+    ranks,
+    winners: ranks.map((r) => r.name),
+    winnerUserIds: pickUserIds(picked),
+  };
+}
+
+/** 당첨 참여자 목록에서 로그인 계정 id 만 중복 없이 추출 */
+function pickUserIds(list: { userId: string | null }[]): string[] {
+  return Array.from(new Set(list.map((x) => x.userId).filter((v): v is string => !!v)));
 }
 
 function computeWinners(type: string, cfg: Record<string, unknown>, participants: Participant[]) {
@@ -121,7 +137,11 @@ function computeWinners(type: string, cfg: Record<string, unknown>, participants
       const matched = participants
         .filter((p) => (p.entry ?? "").trim().toLowerCase() === keyword && keyword !== "")
         .slice(0, winnerCount);
-      return { winners: matched.map((p) => p.name), keyword: cfg.keyword ?? "" };
+      return {
+        winners: matched.map((p) => p.name),
+        winnerUserIds: pickUserIds(matched),
+        keyword: cfg.keyword ?? "",
+      };
     }
     case "NUMBER_GUESS": {
       const answer = Number(cfg.answer) || 0;
@@ -139,13 +159,19 @@ function computeWinners(type: string, cfg: Record<string, unknown>, participants
           .sort((a, b) => a.diff - b.diff || a.p.createdAt.getTime() - b.p.createdAt.getTime())
           .slice(0, winnerCount);
       }
-      return { winners: picked.map((x) => `${x.p.name} (${x.num})`), answer, mode };
+      return {
+        winners: picked.map((x) => `${x.p.name} (${x.num})`),
+        winnerUserIds: pickUserIds(picked.map((x) => x.p)),
+        answer,
+        mode,
+      };
     }
     case "QUIZ": {
       const answerIndex = Number(cfg.answerIndex) || 0;
       const correct = participants.filter((p) => Number((p.entry ?? "").trim()) === answerIndex);
       return {
         winners: correct.map((p) => p.name),
+        winnerUserIds: pickUserIds(correct),
         correctCount: correct.length,
         answerIndex,
       };
@@ -191,7 +217,7 @@ function computeWinners(type: string, cfg: Record<string, unknown>, participants
       return { box: { label: String(box.label ?? ""), kind: String(box.kind ?? "MISS") }, boxIndex: pickIdx };
     }
     default:
-      return { winners: [] };
+      return { winners: [], winnerUserIds: [] };
   }
 }
 
@@ -220,13 +246,20 @@ export async function POST(
 
     let result: Record<string, unknown>;
     if (Array.isArray(body.winners) && body.winners.length > 0) {
-      // 뷰티 전문가가 직접 당첨자 지정
-      result = { winners: body.winners.map((w: unknown) => String(w)) };
+      // 뷰티 전문가가 직접 당첨자 지정.
+      // 쿠폰은 계정(userId) 기준으로만 발급되므로, 이름만 넘어온 경우에는
+      // 표시용 당첨자 목록만 저장하고 쿠폰은 발급하지 않는다.
+      result = {
+        winners: body.winners.map((w: unknown) => String(w)),
+        winnerUserIds: Array.isArray(body.winnerUserIds)
+          ? (body.winnerUserIds as unknown[]).map(String)
+          : [],
+      };
     } else {
       const participants = await prisma.gameParticipant.findMany({
         where: { gameId: id },
         orderBy: { createdAt: "asc" },
-        select: { name: true, entry: true, createdAt: true },
+        select: { id: true, userId: true, name: true, entry: true, createdAt: true },
       });
       if (game.type === "SEQUENTIAL") {
         // 참여자 풀에서 순위 추첨 (참여자 없으면 items 폴백)

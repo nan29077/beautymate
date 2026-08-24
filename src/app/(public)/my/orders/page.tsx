@@ -15,6 +15,8 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
   CONFIRMED: { label: "확인됨", color: "bg-indigo-50 text-indigo-600" },
   SHIPPING: { label: "상담 진행중", color: "bg-cyan-50 text-cyan-600" },
   DELIVERED: { label: "서비스 완료", color: "bg-green-50 text-green-600" },
+  COMPLETED: { label: "서비스 완료", color: "bg-green-50 text-green-600" },
+  NO_SHOW: { label: "노쇼", color: "bg-red-50 text-red-500" },
   CANCELLED: { label: "취소됨", color: "bg-red-50 text-red-600" },
   REFUND_REQUESTED: {
     label: "환불요청",
@@ -23,20 +25,16 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
   REFUNDED: { label: "환불완료", color: "bg-gray-100 text-gray-500" },
 };
 
-const DELIVERY_STATUS_MAP: Record<string, { label: string; color: string }> = {
-  PAYMENT_COMPLETED: { label: "결제 완료", color: "bg-blue-50 text-blue-600" },
-  PREPARING: { label: "진행 방식 준비 중", color: "bg-yellow-50 text-yellow-600" },
-  SHIPPED: { label: "발송 완료", color: "bg-orange-50 text-orange-600" },
-  DELIVERING: { label: "진행 방식 중", color: "bg-purple-50 text-purple-600" },
-  DELIVERED: { label: "진행 방식 완료", color: "bg-green-50 text-green-700" },
-  CANCEL_REQUESTED: {
-    label: "결제취소 요청중",
+// 결제취소 진행 단계(reservations.cancelStatus) → 배지.
+// 뷰티 전문가가 취소를 요청하고 관리자가 승인하기까지의 중간 상태를 고객에게 보여준다.
+const CANCEL_STAGE_MAP: Record<string, { label: string; color: string }> = {
+  REQUESTED: { label: "결제취소 요청중", color: "bg-amber-50 text-amber-700" },
+  DEPOSIT_CONFIRMED: {
+    label: "결제취소 확인중",
     color: "bg-amber-50 text-amber-700",
   },
-  CANCEL_COMPLETED: {
-    label: "결제취소 완료",
-    color: "bg-gray-100 text-gray-500",
-  },
+  APPROVED: { label: "결제취소 승인", color: "bg-gray-100 text-gray-500" },
+  COMPLETED: { label: "결제취소 완료", color: "bg-gray-100 text-gray-500" },
 };
 
 // 예약내역은 역할과 무관하게 모든 로그인 사용자가 본인 구매 내역을 볼 수 있어야 함
@@ -101,21 +99,21 @@ export default async function MyOrdersPage() {
                 label: order.status,
                 color: "bg-gray-100 text-gray-600",
               };
-              // 미결제 예약은 deliveryStatus 를 신뢰하지 않는다.
-              // (기본값이 PAYMENT_COMPLETED 였던 과거 예약이 남아 있어, 결제 안 한 예약이
-              //  "결제 완료"로 표시되던 버그가 있었다. 실제 결제된 예약만 진행 방식 상태를 배지로 쓴다.)
-              const isPaid = order.paymentStatus === "COMPLETED";
-              const ds = isPaid
-                ? ((order as any).deliveryStatus as string | null | undefined)
-                : null;
-              // CANCEL_REQUESTED / CANCEL_COMPLETED는 취소 상태에서도 표시
-              const isCancelDelivery =
-                ds === "CANCEL_REQUESTED" || ds === "CANCEL_COMPLETED";
+              // 진행 상태 배지는 reservations 에 실제로 존재하는 컬럼에서만 도출한다.
+              // (예전에는 스키마에 없는 deliveryStatus 를 읽어 항상 undefined 였고,
+              //  이를 기록하려던 결제/취소 API 는 Unknown column 으로 실패했다.)
+              // 우선순위: 결제취소 진행 상태(cancelStatus) > 예약 상태(status)
+              // 결제가 실제로 이루어진 예약(결제완료 또는 환불완료)만 취소 단계를 배지로 쓴다.
+              // 미결제 예약에는 애초에 cancelStatus 가 붙지 않는다.
+              const isSettled =
+                order.paymentStatus === "COMPLETED" || order.paymentStatus === "REFUNDED";
+              const cancelStage = isSettled
+                ? CANCEL_STAGE_MAP[order.cancelStatus ?? ""]
+                : undefined;
+              // 취소 요청 배지는 아직 취소가 확정되지 않은 예약에서만 status 를 덮어쓴다.
               const badge =
-                (isCancelDelivery || !isCancelledOrRefunded) &&
-                ds &&
-                DELIVERY_STATUS_MAP[ds]
-                  ? DELIVERY_STATUS_MAP[ds]
+                cancelStage && (!isCancelledOrRefunded || order.cancelStatus === "COMPLETED")
+                  ? cancelStage
                   : status;
               return (
                 <Link

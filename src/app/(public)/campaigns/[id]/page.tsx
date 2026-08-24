@@ -1,3 +1,4 @@
+import { escapeHtml } from "@/lib/escapeHtml";
 import { Icon } from '@/components/shared/Icon';
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -64,6 +65,7 @@ export default async function CampaignDetailPage({
         : [];
 
   // Build reviews HTML for tabs
+  // 후기 작성자명·본문은 사용자 입력이므로 반드시 이스케이프한다 (저장형 XSS 방지)
   const reviewsHtml = campaign.product.reviews.map(r => `
     <div class="pb-3 border-b border-gray-100 last:border-0 mb-3">
       <div class="flex items-center gap-2 mb-1.5">
@@ -72,10 +74,10 @@ export default async function CampaignDetailPage({
             `<svg width="10" height="10" viewBox="0 0 24 24" fill="${i < r.rating ? 'black' : 'none'}" stroke="${i < r.rating ? 'black' : '#e5e7eb'}" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
           ).join('')}
         </div>
-        <span class="text-[11px] text-gray-500 font-medium">${r.user.name || '익명'}</span>
+        <span class="text-[11px] text-gray-500 font-medium">${escapeHtml(r.user.name) || '익명'}</span>
         <span class="text-[10px] text-gray-300">${new Date(r.createdAt).toLocaleDateString('ko-KR')}</span>
       </div>
-      <p class="text-sm text-gray-700 leading-relaxed">${r.content}</p>
+      <p class="text-sm text-gray-700 leading-relaxed">${escapeHtml(r.content)}</p>
     </div>
   `).join('');
 

@@ -162,7 +162,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="InviteFriend" size={10} className="text-blue-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>1단계:</b> 뷰티 전문가 "하늘"이 추천 코드 <span className="font-mono bg-white px-1 py-0.5 rounded text-brand-600 text-[10px]">HANEUL2024</span>를 팬에게 공유
+                    <b>1단계:</b> 뷰티 전문가 &quot;하늘&quot;이 추천 코드 <span className="font-mono bg-white px-1 py-0.5 rounded text-brand-600 text-[10px]">HANEUL2024</span>를 팬에게 공유
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -170,7 +170,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="InviteFriend" size={10} className="text-green-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>2단계:</b> 팬 "김민수"가 추천 코드를 입력하여 뷰티메이트에 회원가입 (회원가입 시 <b className="text-purple-600">추천인 할인 5%</b> 즉시 적용)
+                    <b>2단계:</b> 팬 &quot;김민수&quot;가 추천 코드를 입력하여 뷰티메이트에 회원가입 (회원가입 시 <b className="text-purple-600">추천인 할인 5%</b> 즉시 적용)
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -178,7 +178,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="Cart" size={10} className="text-emerald-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>3단계:</b> 김민수가 "실크 블라우스" 100,000원 뷰티 서비스 구매 → 추천인 할인 5% 적용 = <b>95,000원</b> 결제
+                    <b>3단계:</b> 김민수가 &quot;실크 블라우스&quot; 100,000원 뷰티 서비스 구매 → 추천인 할인 5% 적용 = <b>95,000원</b> 결제
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -186,7 +186,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="Wallet" size={10} className="text-brand-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>4단계:</b> 예약 완료 시 "하늘"에게 100,000원 × 3% = <b className="text-brand-600">3,000원 추천인 커미션</b> 자동 적립
+                    <b>4단계:</b> 예약 완료 시 &quot;하늘&quot;에게 100,000원 × 3% = <b className="text-brand-600">3,000원 추천인 커미션</b> 자동 적립
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -194,7 +194,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="Gift" size={10} className="text-orange-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>5단계:</b> 추후 김민수가 다시 구매할 때마다 "하늘"에게 3%의 추천인 커미션이 계속 적립 (영구 연결)
+                    <b>5단계:</b> 추후 김민수가 다시 구매할 때마다 &quot;하늘&quot;에게 3%의 추천인 커미션이 계속 적립 (영구 연결)
                   </div>
                 </div>
               </div>
@@ -250,7 +250,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
             </div>
             <div className="bg-pink-50 rounded-xl p-4 mb-3">
               <p className="text-xs text-gray-700 leading-relaxed">
-                <b>정의:</b> 고객이 특정 뷰티 전문가를 "단골"(팔로우)로 등록하고, SNS 채널 구독 인증을 완료한 경우 적용되는 추가 할인율입니다.
+                <b>정의:</b> 고객이 특정 뷰티 전문가를 &quot;단골&quot;(팔로우)로 등록하고, SNS 채널 구독 인증을 완료한 경우 적용되는 추가 할인율입니다.
               </p>
               <p className="text-xs text-gray-600 leading-relaxed mt-2">
                 <b>조건:</b> ① 뷰티 전문가 단골 설정(팔로우) 완료 <b>+</b> ② 해당 뷰티 전문가의 유튜브/인스타 등 SNS 채널 구독 인증 완료 → 두 조건 모두 충족 시 할인 적용
@@ -264,7 +264,7 @@ const [sellers, setSellers] = useState<SellerRate[]>([]);
                     <Icon name="Wishlist" size={10} className="text-pink-600" />
                   </div>
                   <div className="text-[11px] text-gray-600">
-                    <b>1단계:</b> 고객 "김민수"가 뷰티 전문가 "수아 뷰티랩"을 <b>단골</b>(팔로우)로 등록 → SellerFollower 레코드 생성
+                    <b>1단계:</b> 고객 &quot;김민수&quot;가 뷰티 전문가 &quot;수아 뷰티랩&quot;을 <b>단골</b>(팔로우)로 등록 → SellerFollower 레코드 생성
                   </div>
                 </div>
                 <div className="flex items-start gap-2">

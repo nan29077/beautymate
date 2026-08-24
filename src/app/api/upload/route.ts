@@ -31,6 +31,52 @@ export const dynamic = "force-dynamic";
 // Explicitly increase body parser size for this API route
 export const maxDuration = 60; // seconds
 
+// ── 업로드 보안 정책 ─────────────────────────────────────────────
+// 업로드된 파일은 그대로 공개 URL(S3/CloudFront 또는 /uploads)로 서빙되므로,
+// 스크립트를 실행할 수 있는 형식(SVG/HTML)을 받으면 저장형 XSS 가 된다.
+// 따라서 (1) 매직바이트로 판별된 실제 형식이 화이트리스트에 있어야 하고,
+// (2) SVG 는 판별 결과·확장자·MIME 어느 경로로도 통과시키지 않으며,
+// (3) 파일당 최대 크기를 강제한다.
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
+const ALLOWED_EXTS = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "webp",
+  "bmp",
+  "tiff",
+  "tif",
+  "avif",
+  "heic",
+  "heif",
+  "ico", // 파비콘 업로드
+]);
+// 명시적으로 거부하는 형식 (실행 가능 마크업 / 실행 파일)
+const BLOCKED_EXTS = new Set([
+  "svg",
+  "svgz",
+  "html",
+  "htm",
+  "xhtml",
+  "xml",
+  "js",
+  "mjs",
+  "php",
+  "exe",
+  "sh",
+  "bat",
+]);
+// 업로드가 허용된 역할 — 업로더 UI 는 관리자/뷰티 전문가 화면에만 존재한다.
+// (레거시 역할 계정도 기존 대시보드를 쓰고 있으므로 함께 허용)
+const UPLOAD_ALLOWED_ROLES = new Set([
+  "SUPER_ADMIN",
+  "CONSULTANT",
+  "SELLER",
+  "BRAND_ADMIN",
+  "MIDDLE_ADMIN",
+]);
+
 // Detect image type from file header (magic bytes)
 function detectImageFromBytes(buffer: Buffer): string | null {
   if (buffer.length < 4) return null;
@@ -66,19 +112,19 @@ function detectImageFromBytes(buffer: Buffer): string | null {
   return null;
 }
 
-// Fallback: guess extension from file name or MIME type
-function guessExtension(fileName: string, mimeType: string): string {
+// Fallback: guess extension from file name or MIME type.
+// 화이트리스트에 없는 확장자는 채택하지 않는다 (null → 업로드 거부).
+function guessExtension(fileName: string, mimeType: string): string | null {
   const nameExt = (fileName || "").split(".").pop()?.toLowerCase() || "";
-  const allExts = new Set(["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "ico", "tiff", "tif", "avif", "heic", "heif", "raw", "cr2", "nef", "arw", "dng", "raf", "orf", "rw2", "pef", "sr2", "jfif", "psd", "ai", "eps", "pdf"]);
-  if (allExts.has(nameExt)) return nameExt === "jpeg" ? "jpg" : nameExt;
-  // Accept any extension from filename
-  if (nameExt && nameExt.length <= 10) return nameExt;
+  if (BLOCKED_EXTS.has(nameExt)) return null;
+  if (ALLOWED_EXTS.has(nameExt)) return nameExt === "jpeg" ? "jpg" : nameExt;
   if (mimeType) {
     const mimeExt = mimeType.split("/").pop()?.toLowerCase() || "";
+    if (BLOCKED_EXTS.has(mimeExt) || mimeExt.includes("svg")) return null;
     if (mimeExt === "jpeg") return "jpg";
-    if (mimeExt && mimeExt.length <= 10) return mimeExt;
+    if (ALLOWED_EXTS.has(mimeExt)) return mimeExt;
   }
-  return "jpg"; // safe default
+  return null;
 }
 
 // S3 설정 (환경변수가 있을 때만 활성화)
@@ -120,6 +166,11 @@ export async function POST(req: NextRequest) {
     const session = await auth();
     if (!session) {
       return NextResponse.json({ error: "로그인 필요" }, { status: 401 });
+    }
+    // 고객(CUSTOMER/BUYER)은 업로드 UI 가 없다 — 공개 저장소에 임의 파일을 올리지 못하게 막는다.
+    const role = (session.user as any)?.role as string | undefined;
+    if (!role || !UPLOAD_ALLOWED_ROLES.has(role)) {
+      return NextResponse.json({ error: "업로드 권한이 없습니다." }, { status: 403 });
     }
 
     let files: File[] = [];
@@ -180,6 +231,12 @@ export async function POST(req: NextRequest) {
       if (processedNames.has(fileKey)) continue;
       processedNames.add(fileKey);
 
+      // 크기 상한 — 버퍼로 읽기 전에 선차단한다.
+      if (file.size > MAX_IMAGE_BYTES) {
+        errors.push(`${file.name}: 파일이 너무 큽니다 (최대 10MB)`);
+        continue;
+      }
+
       try {
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
@@ -189,10 +246,23 @@ export async function POST(req: NextRequest) {
           errors.push(`${file.name}: 빈 파일`);
           continue;
         }
+        if (actualSize > MAX_IMAGE_BYTES) {
+          errors.push(`${file.name}: 파일이 너무 큽니다 (최대 10MB)`);
+          continue;
+        }
 
         // Detect image type from magic bytes (primary method)
-        let ext = detectImageFromBytes(buffer);
-        if (!ext) ext = guessExtension(file.name, file.type);
+        const detected = detectImageFromBytes(buffer);
+        // SVG 는 스크립트 실행이 가능한 마크업이라 저장형 XSS 벡터다 — 무조건 거부.
+        if (detected === "svg") {
+          errors.push(`${file.name}: SVG 파일은 업로드할 수 없습니다`);
+          continue;
+        }
+        const ext = detected ?? guessExtension(file.name, file.type);
+        if (!ext || !ALLOWED_EXTS.has(ext)) {
+          errors.push(`${file.name}: 지원하지 않는 형식입니다 (이미지 파일만 업로드 가능)`);
+          continue;
+        }
 
         const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
 
@@ -200,10 +270,14 @@ export async function POST(req: NextRequest) {
           // ✅ S3 업로드 (영구 저장 — 배포 재시작 시 소실 없음)
           const mimeMap: Record<string, string> = {
             jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png",
-            gif: "image/gif", webp: "image/webp", svg: "image/svg+xml",
-            avif: "image/avif", heic: "image/heic",
+            gif: "image/gif", webp: "image/webp", bmp: "image/bmp",
+            tiff: "image/tiff", tif: "image/tiff",
+            avif: "image/avif", heic: "image/heic", heif: "image/heif",
+            ico: "image/x-icon",
           };
-          const contentType = mimeMap[ext] || file.type || "application/octet-stream";
+          // Content-Type 도 화이트리스트에서만 고른다 (file.type 을 그대로 신뢰하면
+          // image/svg+xml 같은 값이 그대로 응답 헤더에 실린다).
+          const contentType = mimeMap[ext] || "application/octet-stream";
           const url = await uploadToS3(buffer, uniqueName, contentType);
           urls.push(url);
         } else {

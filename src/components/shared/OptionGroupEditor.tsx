@@ -377,7 +377,7 @@ export default function OptionGroupEditor({
             <div className="border border-dashed border-gray-200 rounded-xl p-4 text-center">
               <p className="text-xs text-gray-400">
                 그룹을 추가해 옵션을 구성하세요.
-                <br />예: "색상" → 빨강/파랑, "사이즈" → S/M/L
+                <br />예: &quot;색상&quot; → 빨강/파랑, &quot;사이즈&quot; → S/M/L
               </p>
             </div>
           )}

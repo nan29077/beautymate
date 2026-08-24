@@ -164,7 +164,6 @@ export async function POST(request: Request) {
       pgTid: paymentCode,
       pgAuthData: JSON.stringify(payload),
       paidAt: new Date(),
-      ...(({ deliveryStatus: "PAYMENT_COMPLETED" }) as any),
     },
   });
   // 영상 상담 예약이면 세션 자동 생성 (실패해도 결제 처리에 영향 없음)
