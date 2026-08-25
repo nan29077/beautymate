@@ -10,6 +10,7 @@ import { signIn, getSession, getProviders } from "next-auth/react";
 import { useAppDialog } from "@/components/shared/AppDialog";
 import BusinessInfoFooter from "@/components/shared/BusinessInfoFooter";
 import { parseShopCookie, SB_SHOP_COOKIE } from "@/lib/shopContext";
+import { COMPANY } from "@/lib/companyInfo";
 
 export default function LoginPage() {
   return (
@@ -565,9 +566,9 @@ function SellerSupportNotice() {
         가능합니다.
       </p>
       <p className="text-xs text-amber-700">
-        고객센터: 카카오톡 채널 <b>@뷰티메이트</b>
+        고객센터 <b>{COMPANY.phone}</b>
         <br />
-        또는 <b>support@beautymate.co.kr</b>
+        메일 <b>{COMPANY.email}</b>
       </p>
     </div>
   );

@@ -104,29 +104,34 @@ export default function Footer({
 
         <div className="border-t border-gray-800 pt-4">
           <div className="space-y-2 text-[10px] text-gray-500 leading-relaxed">
+            {/* 노출 항목은 법인명·사업자등록·대표자·메일·고객센터 5가지로 고정 */}
             <div className="space-y-0.5">
               <p>
-                <span className="text-gray-400">상호</span> {footer.companyName}
-                <span className="mx-1.5 text-gray-700">|</span>
-                <span className="text-gray-400">대표</span> {footer.ceoName}
+                <span className="text-gray-400">법인명</span> {footer.companyName}
               </p>
               <p>
-                <span className="text-gray-400">사업자등록번호</span> {footer.bizNum}
-                <span className="mx-1.5 text-gray-700">|</span>
-                <span className="text-gray-400">통신판매신고번호</span> {footer.mailOrderNum}
+                <span className="text-gray-400">사업자등록</span> {footer.bizNum}
               </p>
               <p>
-                <span className="text-gray-400">대표번호</span> {footer.phone}
+                <span className="text-gray-400">대표자</span> {footer.ceoName}
               </p>
               <p>
-                <span className="text-gray-400">주소</span> {footer.address}
+                <span className="text-gray-400">메일</span>{" "}
+                <a href={`mailto:${footer.email}`} className="hover:text-gray-300">
+                  {footer.email}
+                </a>
+              </p>
+              <p>
+                <span className="text-gray-400">고객센터</span>{" "}
+                <a href={`tel:${footer.phone.replace(/[^0-9+]/g, "")}`} className="hover:text-gray-300">
+                  {footer.phone}
+                </a>
               </p>
             </div>
             <div className="flex flex-col items-start gap-2 pt-2 border-t border-gray-900">
               <div className="flex gap-3">
                 <Link href="/support/terms" className="hover:text-gray-300">이용약관</Link>
                 <Link href="/support/privacy" className="hover:text-gray-300">개인정보처리방침</Link>
-                <a href="#" className="hover:text-gray-300">사업자정보확인</a>
               </div>
               <p>&copy; {footer.copyright}</p>
             </div>

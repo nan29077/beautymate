@@ -2,6 +2,7 @@
 
 import { Icon } from '@/components/shared/Icon';
 import { useState, useEffect } from "react";
+import { COMPANY } from "@/lib/companyInfo";
 ;
 
 interface SellerShopFooterProps {
@@ -92,11 +93,11 @@ export default function SellerShopFooter({ sellerInfo }: SellerShopFooterProps) 
               </p>
               <div className="mt-3 pt-3 border-t border-gray-50 space-y-0.5 text-[10px] text-gray-400 leading-relaxed">
                 <p className="font-semibold text-gray-500 mb-1">통신판매중개자 정보</p>
-                <p><span className="text-gray-400">상호</span> 테스트 주식회사 · <span className="text-gray-400">대표</span> 홍길동</p>
-                <p><span className="text-gray-400">사업자등록번호</span> 000-00-00000</p>
-                <p><span className="text-gray-400">통신판매신고번호</span> 0000-테스트-0000</p>
-                <p><span className="text-gray-400">대표번호</span> 000-0000-0000</p>
-                <p><span className="text-gray-400">주소</span> 서울특별시 테스트구 테스트로 000, 0층</p>
+                <p><span className="text-gray-400">법인명</span> {COMPANY.name}</p>
+                <p><span className="text-gray-400">사업자등록</span> {COMPANY.bizNum}</p>
+                <p><span className="text-gray-400">대표자</span> {COMPANY.ceo}</p>
+                <p><span className="text-gray-400">메일</span> {COMPANY.email}</p>
+                <p><span className="text-gray-400">고객센터</span> {COMPANY.phone}</p>
               </div>
             </div>
           )}

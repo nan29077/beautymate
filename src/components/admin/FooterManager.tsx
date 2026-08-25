@@ -4,6 +4,7 @@ import { Icon } from '@/components/shared/Icon';
 import { useState } from "react";
 import { Save, Loader2, Building2 } from 'lucide-react';
 import type { FooterSettings } from "@/lib/settings";
+import { COMPANY } from "@/lib/companyInfo";
 import SavedPopup from "@/components/shared/SavedPopup";
 
 export default function FooterManager({ initialSettings }: { initialSettings: FooterSettings }) {
@@ -38,14 +39,14 @@ export default function FooterManager({ initialSettings }: { initialSettings: Fo
     }
   };
 
+  // 푸터 노출 항목과 1:1로 맞춘다. 통신판매신고번호·주소는 푸터에 표시하지 않으므로 편집 항목에서 제외.
   const fields: { key: keyof FooterSettings; label: string; placeholder: string }[] = [
-    { key: "companyName", label: "상호", placeholder: "테스트 주식회사" },
-    { key: "ceoName", label: "대표자명", placeholder: "홍길동" },
-    { key: "bizNum", label: "사업자등록번호", placeholder: "000-00-00000" },
-    { key: "mailOrderNum", label: "통신판매신고번호", placeholder: "0000-테스트-0000" },
-    { key: "phone", label: "대표번호", placeholder: "000-0000-0000" },
-    { key: "address", label: "주소", placeholder: "서울특별시 테스트구 테스트로 000, 0층" },
-    { key: "copyright", label: "저작권 문구", placeholder: "2026 뷰티메이트. All rights reserved." },
+    { key: "companyName", label: "법인명", placeholder: COMPANY.name },
+    { key: "bizNum", label: "사업자등록", placeholder: COMPANY.bizNum },
+    { key: "ceoName", label: "대표자", placeholder: COMPANY.ceo },
+    { key: "email", label: "메일", placeholder: COMPANY.email },
+    { key: "phone", label: "고객센터", placeholder: COMPANY.phone },
+    { key: "copyright", label: "저작권 문구", placeholder: `2026 ${COMPANY.serviceName}. All rights reserved.` },
   ];
 
   return (
@@ -55,7 +56,7 @@ export default function FooterManager({ initialSettings }: { initialSettings: Fo
         <Building2 size={16} className="text-gray-500" />
         <h2 className="text-sm font-bold text-gray-900">푸터 회사정보 관리</h2>
       </div>
-      <p className="text-[11px] text-gray-400 mb-4">메인페이지 푸터에 표시되는 회사 정보를 수정합니다. 저장 후 즉시 적용됩니다.</p>
+      <p className="text-[11px] text-gray-400 mb-4">푸터에 표시되는 사업자 정보를 수정합니다. 비워두면 코드 기본값이 표시됩니다. 저장 후 즉시 적용됩니다.</p>
 
       <div className="bg-white rounded-xl border border-gray-100 p-4 space-y-3">
         {fields.map(({ key, label, placeholder }) => (

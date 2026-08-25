@@ -9,6 +9,7 @@ import Pagination, { usePagination } from "@/components/shared/Pagination";
 import { isKoreanHoliday } from "@/lib/businessDays";
 import { calcPayoutBreakdown } from "@/lib/payout";
 import type { SellerSettlementSummary, SettlementOrder, PayoutSummary } from "@/lib/settlement";
+import { COMPANY } from "@/lib/companyInfo";
 
 const formatPrice = (n: number) => n.toLocaleString("ko-KR") + "원";
 
@@ -1029,7 +1030,7 @@ export default function SellerSettlementClient({
                   <Building2 size={14} className="text-blue-500 flex-shrink-0 mt-0.5" />
                   <p className="text-[11px] text-blue-700">
                     사업자 뷰티 전문가에게는 원천징수 없이 정산액 전액이 지급되며,
-                    <b> 뷰티메이트(테스트 주식회사)가 매입 세금계산서를 발행</b>합니다.
+                    <b> 뷰티메이트({COMPANY.name})가 매입 세금계산서를 발행</b>합니다.
                     입력하신 상호명·사업자등록번호 기준으로 발행됩니다.
                   </p>
                 </div>

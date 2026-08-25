@@ -6,6 +6,7 @@
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { safeQuery } from "@/lib/safeDb";
+import { COMPANY } from "@/lib/companyInfo";
 import {
   FEATURE_DEFAULTS,
   FEATURE_SETTING_KEYS,
@@ -30,32 +31,43 @@ export const SOCIAL_EMAIL_ENABLED_KEY = "social.emailEnabled";
 export const SOCIAL_EMAIL_URL_KEY = "social.emailUrl";
 
 // 푸터 회사 정보 설정 키
-export const FOOTER_COMPANY_NAME_KEY = "footer.companyName";
-export const FOOTER_CEO_NAME_KEY = "footer.ceoName";
-export const FOOTER_BIZ_NUM_KEY = "footer.bizNum";
-export const FOOTER_MAIL_ORDER_NUM_KEY = "footer.mailOrderNum";
-export const FOOTER_PHONE_KEY = "footer.phone";
-export const FOOTER_ADDRESS_KEY = "footer.address";
-export const FOOTER_COPYRIGHT_KEY = "footer.copyright";
+// ⚠️ 키를 v2 로 올린 이유 (2026-08-22)
+// 운영/로컬 DB Setting 테이블에 이전 브랜드 시절의 사업자 정보가 남아 있어 코드 기본값을
+// 덮어쓰는 사고가 반복됐다. 키를 새로 파서 (주)제이투핀 정보가 항상 먼저 보이게 한다.
+// 관리자 화면에서 저장하면 v2 키에 기록되므로 이후 수정은 정상 동작한다.
+export const FOOTER_COMPANY_NAME_KEY = "footer.v2.companyName";
+export const FOOTER_CEO_NAME_KEY = "footer.v2.ceoName";
+export const FOOTER_BIZ_NUM_KEY = "footer.v2.bizNum";
+export const FOOTER_MAIL_ORDER_NUM_KEY = "footer.v2.mailOrderNum";
+export const FOOTER_PHONE_KEY = "footer.v2.phone";
+export const FOOTER_EMAIL_KEY = "footer.v2.email";
+export const FOOTER_ADDRESS_KEY = "footer.v2.address";
+export const FOOTER_COPYRIGHT_KEY = "footer.v2.copyright";
 
 export type FooterSettings = {
   companyName: string;
   ceoName: string;
   bizNum: string;
+  /** 미노출 항목 (푸터에는 표시하지 않음, 값 보존용) */
   mailOrderNum: string;
   phone: string;
+  email: string;
+  /** 미노출 항목 (푸터에는 표시하지 않음, 값 보존용) */
   address: string;
   copyright: string;
 };
 
+// 푸터에 실제로 노출하는 항목은 법인명·사업자등록·대표자·메일·고객센터 5가지뿐이다.
+// (mailOrderNum / address 는 관리자 설정값 호환을 위해 타입만 남겨두고 화면에는 쓰지 않는다)
 export const FOOTER_DEFAULTS: FooterSettings = {
-  companyName: "테스트 주식회사",
-  ceoName: "홍길동",
-  bizNum: "000-00-00000",
-  mailOrderNum: "0000-테스트-0000",
-  phone: "000-0000-0000",
-  address: "서울특별시 테스트구 테스트로 000, 0층",
-  copyright: "2026 뷰티메이트. All rights reserved.",
+  companyName: COMPANY.name,
+  ceoName: COMPANY.ceo,
+  bizNum: COMPANY.bizNum,
+  mailOrderNum: "",
+  phone: COMPANY.phone,
+  email: COMPANY.email,
+  address: "",
+  copyright: `2026 ${COMPANY.serviceName}. All rights reserved.`,
 };
 
 
@@ -164,17 +176,25 @@ export async function getSocialLinks(): Promise<import("@/lib/featureFlags").Soc
 
 
 // 푸터 회사정보 조회
+// DB 에 빈 문자열이 저장돼 있으면 코드 기본값을 쓴다 (빈 푸터 방지).
+function pick(value: string | undefined, fallback: string): string {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : fallback;
+}
+
 export async function getFooterSettings(): Promise<FooterSettings> {
   const map = await getSettingsMap();
-  const copyright = (map[FOOTER_COPYRIGHT_KEY] ?? FOOTER_DEFAULTS.copyright)
-    .replace(/BeautyMate/gi, "뷰티메이트")
-    .replace(/뷰티메이트|뷰티메이트/g, "뷰티메이트");
+  const copyright = (pick(map[FOOTER_COPYRIGHT_KEY], FOOTER_DEFAULTS.copyright)).replace(
+    /BeautyMate/gi,
+    "뷰티메이트",
+  );
   return {
-    companyName: map[FOOTER_COMPANY_NAME_KEY] ?? FOOTER_DEFAULTS.companyName,
-    ceoName: map[FOOTER_CEO_NAME_KEY] ?? FOOTER_DEFAULTS.ceoName,
-    bizNum: map[FOOTER_BIZ_NUM_KEY] ?? FOOTER_DEFAULTS.bizNum,
+    companyName: pick(map[FOOTER_COMPANY_NAME_KEY], FOOTER_DEFAULTS.companyName),
+    ceoName: pick(map[FOOTER_CEO_NAME_KEY], FOOTER_DEFAULTS.ceoName),
+    bizNum: pick(map[FOOTER_BIZ_NUM_KEY], FOOTER_DEFAULTS.bizNum),
     mailOrderNum: map[FOOTER_MAIL_ORDER_NUM_KEY] ?? FOOTER_DEFAULTS.mailOrderNum,
-    phone: map[FOOTER_PHONE_KEY] ?? FOOTER_DEFAULTS.phone,
+    phone: pick(map[FOOTER_PHONE_KEY], FOOTER_DEFAULTS.phone),
+    email: pick(map[FOOTER_EMAIL_KEY], FOOTER_DEFAULTS.email),
     address: map[FOOTER_ADDRESS_KEY] ?? FOOTER_DEFAULTS.address,
     copyright,
   };

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { writeFile, readFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
+import { COMPANY } from "@/lib/companyInfo";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,7 +23,7 @@ interface ContactSettings {
 
 const DEFAULT_SETTINGS: ContactSettings = {
   phone: "02-1234-5678",
-  email: "support@beautymate.co.kr",
+  email: COMPANY.email,
   operatingHours: "평일 09:00 ~ 18:00",
   lunchBreak: "점심시간 12:00 ~ 13:00",
   offHoursNotice: "현재 상담 가능 시간이 아닙니다. 영업시간에 다시 문의해 주세요.",

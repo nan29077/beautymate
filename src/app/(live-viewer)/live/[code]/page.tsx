@@ -816,10 +816,11 @@ export default function LiveChannelPage() {
                 </p>
                 <div className="mt-3 pt-3 border-t border-amber-100 space-y-0.5 text-[10px] text-gray-400 leading-relaxed">
                   <p className="font-semibold text-gray-500 mb-1">통신판매중개자 정보</p>
-                  <p><span className="text-gray-400">상호</span> 뷰티메이트</p>
-                  <p><span className="text-gray-400">사업자등록번호</span> 사업자 등록 준비중</p>
-                  <p><span className="text-gray-400">통신판매신고번호</span> 신고 준비중</p>
-                  <p><span className="text-gray-400">이메일</span> support@beautymate.co.kr</p>
+                  <p><span className="text-gray-400">법인명</span> (주)제이투핀</p>
+                  <p><span className="text-gray-400">사업자등록</span> 819-86-04059</p>
+                  <p><span className="text-gray-400">대표자</span> 조재천</p>
+                  <p><span className="text-gray-400">메일</span> chuni1977@naver.com</p>
+                  <p><span className="text-gray-400">고객센터</span> 070-8064-5653</p>
                 </div>
               </div>
             )}
