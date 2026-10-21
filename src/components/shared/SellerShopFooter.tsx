@@ -98,6 +98,7 @@ export default function SellerShopFooter({ sellerInfo }: SellerShopFooterProps) 
                 <p><span className="text-gray-400">대표자</span> {COMPANY.ceo}</p>
                 <p><span className="text-gray-400">메일</span> {COMPANY.email}</p>
                 <p><span className="text-gray-400">고객센터</span> {COMPANY.phone}</p>
+                <p><span className="text-gray-400">주소</span> {COMPANY.address}</p>
               </div>
             </div>
           )}

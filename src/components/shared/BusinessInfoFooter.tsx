@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FOOTER_DEFAULTS, type FooterSettings } from "@/lib/settings";
 
 // 서비스 초기 화면(로그인/회원가입 등 (public) 레이아웃 밖 화면) 하단의 사업자 정보 푸터.
-// 노출 항목은 법인명·사업자등록·대표자·메일·고객센터 5가지 + 이용약관/개인정보처리방침 링크.
+// 노출 항목은 법인명·사업자등록·대표자·메일·고객센터·주소 6가지 + 이용약관/개인정보처리방침 링크.
 export default function BusinessInfoFooter({ settings }: { settings?: FooterSettings }) {
   const f = settings ?? FOOTER_DEFAULTS;
   return (
@@ -31,6 +31,11 @@ export default function BusinessInfoFooter({ settings }: { settings?: FooterSett
             {f.phone}
           </a>
         </p>
+        {f.address && (
+          <p>
+            <span className="text-gray-500">주소</span> {f.address}
+          </p>
+        )}
         <div className="flex gap-3 pt-1.5">
           <Link href="/support/terms" className="hover:text-gray-600">이용약관</Link>
           <Link href="/support/privacy" className="hover:text-gray-600">개인정보처리방침</Link>

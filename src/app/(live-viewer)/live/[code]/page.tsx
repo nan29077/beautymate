@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Bell, User, BookOpen, Heart, Gift, Share2, X, Play, Clock, ChevronRight, ChevronDown, ChevronUp, Eye, Loader2, Star, ExternalLink, Copy, CheckCircle, Video, BellRing, Pin, Info, Calendar, CalendarClock, Radio, Store, Users, Building2, Sparkles } from "lucide-react";
+import { COMPANY } from "@/lib/companyInfo";
 
 // ─── YouTube 미리보기 URL 파싱 (음소거 자동재생) ───
 function getYoutubePreviewUrl(url: string): string | null {
@@ -816,11 +817,12 @@ export default function LiveChannelPage() {
                 </p>
                 <div className="mt-3 pt-3 border-t border-amber-100 space-y-0.5 text-[10px] text-gray-400 leading-relaxed">
                   <p className="font-semibold text-gray-500 mb-1">통신판매중개자 정보</p>
-                  <p><span className="text-gray-400">법인명</span> (주)제이투핀</p>
-                  <p><span className="text-gray-400">사업자등록</span> 819-86-04059</p>
-                  <p><span className="text-gray-400">대표자</span> 조재천</p>
-                  <p><span className="text-gray-400">메일</span> chuni1977@naver.com</p>
-                  <p><span className="text-gray-400">고객센터</span> 070-8064-5653</p>
+                  <p><span className="text-gray-400">법인명</span> {COMPANY.name}</p>
+                  <p><span className="text-gray-400">사업자등록</span> {COMPANY.bizNum}</p>
+                  <p><span className="text-gray-400">대표자</span> {COMPANY.ceo}</p>
+                  <p><span className="text-gray-400">메일</span> {COMPANY.email}</p>
+                  <p><span className="text-gray-400">고객센터</span> {COMPANY.phone}</p>
+                  <p><span className="text-gray-400">주소</span> {COMPANY.address}</p>
                 </div>
               </div>
             )}

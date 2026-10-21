@@ -277,7 +277,8 @@ const TERMS_SECTIONS: LegalSection[] = [
 사업자등록 ${COMPANY.bizNum}
 대표자 ${COMPANY.ceo}
 메일 ${COMPANY.email}
-고객센터 ${COMPANY.phone}`,
+고객센터 ${COMPANY.phone}
+주소 ${COMPANY.address}`,
   },
 ];
 

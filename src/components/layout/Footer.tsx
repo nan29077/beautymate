@@ -104,7 +104,7 @@ export default function Footer({
 
         <div className="border-t border-gray-800 pt-4">
           <div className="space-y-2 text-[10px] text-gray-500 leading-relaxed">
-            {/* 노출 항목은 법인명·사업자등록·대표자·메일·고객센터 5가지로 고정 */}
+            {/* 노출 항목은 법인명·사업자등록·대표자·메일·고객센터·주소 6가지로 고정 */}
             <div className="space-y-0.5">
               <p>
                 <span className="text-gray-400">법인명</span> {footer.companyName}
@@ -127,6 +127,11 @@ export default function Footer({
                   {footer.phone}
                 </a>
               </p>
+              {footer.address && (
+                <p>
+                  <span className="text-gray-400">주소</span> {footer.address}
+                </p>
+              )}
             </div>
             <div className="flex flex-col items-start gap-2 pt-2 border-t border-gray-900">
               <div className="flex gap-3">

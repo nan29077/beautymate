@@ -33,7 +33,7 @@ export const SOCIAL_EMAIL_URL_KEY = "social.emailUrl";
 // 푸터 회사 정보 설정 키
 // ⚠️ 키를 v2 로 올린 이유 (2026-08-22)
 // 운영/로컬 DB Setting 테이블에 이전 브랜드 시절의 사업자 정보가 남아 있어 코드 기본값을
-// 덮어쓰는 사고가 반복됐다. 키를 새로 파서 (주)제이투핀 정보가 항상 먼저 보이게 한다.
+// 덮어쓰는 사고가 반복됐다. 키를 새로 파서 companyInfo.ts 의 사업자 정보가 항상 먼저 보이게 한다.
 // 관리자 화면에서 저장하면 v2 키에 기록되므로 이후 수정은 정상 동작한다.
 export const FOOTER_COMPANY_NAME_KEY = "footer.v2.companyName";
 export const FOOTER_CEO_NAME_KEY = "footer.v2.ceoName";
@@ -52,13 +52,12 @@ export type FooterSettings = {
   mailOrderNum: string;
   phone: string;
   email: string;
-  /** 미노출 항목 (푸터에는 표시하지 않음, 값 보존용) */
   address: string;
   copyright: string;
 };
 
-// 푸터에 실제로 노출하는 항목은 법인명·사업자등록·대표자·메일·고객센터 5가지뿐이다.
-// (mailOrderNum / address 는 관리자 설정값 호환을 위해 타입만 남겨두고 화면에는 쓰지 않는다)
+// 푸터에 노출하는 항목은 법인명·사업자등록·대표자·메일·고객센터·주소 6가지다.
+// (mailOrderNum 은 관리자 설정값 호환을 위해 타입만 남겨두고 화면에는 쓰지 않는다)
 export const FOOTER_DEFAULTS: FooterSettings = {
   companyName: COMPANY.name,
   ceoName: COMPANY.ceo,
@@ -66,7 +65,7 @@ export const FOOTER_DEFAULTS: FooterSettings = {
   mailOrderNum: "",
   phone: COMPANY.phone,
   email: COMPANY.email,
-  address: "",
+  address: COMPANY.address,
   copyright: `2026 ${COMPANY.serviceName}. All rights reserved.`,
 };
 
@@ -195,7 +194,7 @@ export async function getFooterSettings(): Promise<FooterSettings> {
     mailOrderNum: map[FOOTER_MAIL_ORDER_NUM_KEY] ?? FOOTER_DEFAULTS.mailOrderNum,
     phone: pick(map[FOOTER_PHONE_KEY], FOOTER_DEFAULTS.phone),
     email: pick(map[FOOTER_EMAIL_KEY], FOOTER_DEFAULTS.email),
-    address: map[FOOTER_ADDRESS_KEY] ?? FOOTER_DEFAULTS.address,
+    address: pick(map[FOOTER_ADDRESS_KEY], FOOTER_DEFAULTS.address),
     copyright,
   };
 }

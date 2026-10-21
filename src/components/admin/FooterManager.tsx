@@ -39,13 +39,14 @@ export default function FooterManager({ initialSettings }: { initialSettings: Fo
     }
   };
 
-  // 푸터 노출 항목과 1:1로 맞춘다. 통신판매신고번호·주소는 푸터에 표시하지 않으므로 편집 항목에서 제외.
+  // 푸터 노출 항목과 1:1로 맞춘다. 통신판매신고번호는 푸터에 표시하지 않으므로 편집 항목에서 제외.
   const fields: { key: keyof FooterSettings; label: string; placeholder: string }[] = [
     { key: "companyName", label: "법인명", placeholder: COMPANY.name },
     { key: "bizNum", label: "사업자등록", placeholder: COMPANY.bizNum },
     { key: "ceoName", label: "대표자", placeholder: COMPANY.ceo },
     { key: "email", label: "메일", placeholder: COMPANY.email },
     { key: "phone", label: "고객센터", placeholder: COMPANY.phone },
+    { key: "address", label: "주소", placeholder: COMPANY.address },
     { key: "copyright", label: "저작권 문구", placeholder: `2026 ${COMPANY.serviceName}. All rights reserved.` },
   ];
 
