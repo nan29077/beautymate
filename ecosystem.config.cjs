@@ -4,7 +4,7 @@ module.exports = {
       name: 'beautymate',
       script: 'node_modules/.bin/next',
       args: 'start -p 3000 -H 0.0.0.0',
-      cwd: '/home/user/webapp/app',
+      cwd: '/home/ubuntu/beautymate',
       env: {
         NODE_ENV: 'production',
         PORT: 3000,

@@ -770,7 +770,8 @@ model CartItem {
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
 
-  @@unique([userId, productId, variantId, sellerId, campaignId])
+  // utf8mb4에서 varchar(191)×5는 MySQL 인덱스 한계(3072바이트) 초과 → cuid(≤30자)이므로 prefix 100자면 유니크성 동일
+  @@unique([userId(length: 100), productId(length: 100), variantId(length: 100), sellerId(length: 100), campaignId(length: 100)])
   @@map("cart_items")
 }
 
