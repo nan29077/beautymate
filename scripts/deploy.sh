@@ -20,12 +20,21 @@ set -euo pipefail
 REPO_DIR="${1:-${REPO_DIR:-/home/ubuntu/beautymate}}"
 BRANCH="${2:-${BRANCH:-main}}"
 PM2_APP_NAME="${3:-${PM2_APP_NAME:-beautymate}}"
-APP_DIR="$REPO_DIR/app"
+# 저장소 루트가 곧 Next.js 앱 루트다(로컬 E:\프로젝트\뷰티메이트\app 이 git 루트).
+# 과거 사주메이트 구조(REPO_DIR/app)로 체크아웃된 서버도 있을 수 있어 둘 다 지원한다.
+if [ -f "$REPO_DIR/package.json" ]; then
+  APP_DIR="$REPO_DIR"
+elif [ -f "$REPO_DIR/app/package.json" ]; then
+  APP_DIR="$REPO_DIR/app"
+else
+  printf '[deploy] ERROR: package.json 을 찾을 수 없음 (%s, %s/app)\n' "$REPO_DIR" "$REPO_DIR" >&2
+  exit 1
+fi
 
 log() { printf '[deploy] %s\n' "$*"; }
 
 log "시작: $(date -Iseconds)"
-log "REPO_DIR=$REPO_DIR  BRANCH=$BRANCH  PM2=$PM2_APP_NAME"
+log "REPO_DIR=$REPO_DIR  APP_DIR=$APP_DIR  BRANCH=$BRANCH  PM2=$PM2_APP_NAME"
 
 if [ ! -d "$REPO_DIR/.git" ]; then
   log "ERROR: $REPO_DIR 가 git 저장소가 아님" >&2

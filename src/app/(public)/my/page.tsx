@@ -11,6 +11,7 @@ import { safeQuery } from "@/lib/safeDb";
 import { pickBuyerAvatar, pickBeautyMateAvatar } from "@/lib/defaults";
 import { isSellerLive, sellerProfileImage } from "@/lib/sellerLive";
 import { LIVE_RING_CLASS, OnAirBadge } from "@/components/shared/LiveBadge";
+import { MOCK_WALLET_BALANCE, formatWon } from "@/lib/paymentMock";
 
 export const dynamic = "force-dynamic";
 
@@ -94,13 +95,22 @@ export default async function MyPage() {
               referrerPolicy="no-referrer"
             />
           </div>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold text-gray-900">{user.name}</h1>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg font-bold text-gray-900 truncate">{user.name}</h1>
             {/* OAuth 이메일 미동의 시 placeholder(@no-email.local)는 숨김 */}
             {user.email && !user.email.endsWith("@no-email.local") && (
-              <p className="text-xs text-gray-800/70">{user.email}</p>
+              <p className="text-xs text-gray-800/70 truncate">{user.email}</p>
             )}
           </div>
+          {/* 잔액 — 결제(목업) 화면으로 연결. 잔액 기능 연동 전까지는 0원 고정(MOCK_WALLET_BALANCE) */}
+          <Link
+            href="/payment"
+            className="flex-shrink-0 text-right rounded-xl bg-white/25 px-3 py-1.5 hover:bg-white/40 transition-colors"
+            aria-label={`잔액 ${formatWon(MOCK_WALLET_BALANCE)}, 결제 화면으로 이동`}
+          >
+            <span className="block text-[10px] font-medium text-gray-800/70">잔액</span>
+            <span className="block text-base font-extrabold text-gray-900 leading-tight">{formatWon(MOCK_WALLET_BALANCE)}</span>
+          </Link>
           <Link href="/my/settings" className="p-2 text-gray-700 hover:text-gray-900">
             <Icon name="Settings" size={20} strokeWidth={1.5} />
           </Link>

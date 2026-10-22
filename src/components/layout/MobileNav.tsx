@@ -50,7 +50,12 @@ export default function MobileNav() {
   // "마이페이지"는 역할에 따라 본인 대시보드 또는 /my 로 연결 (비고객 /my 리다이렉트 플래시 방지)
   const myHref = myPageHref(session?.user?.role);
 
-  // 메인(고객) 하단 메뉴: 홈 · 라이브 · 예약 · 뷰티 전문가 · 마이페이지
+  // '결제'(/payment)는 고객 전용 화면이다. 관리자·뷰티 전문가는 접근 시 본인 대시보드로
+  // 리다이렉트되므로 메뉴에서 숨긴다. (비로그인은 노출 → 클릭 시 로그인 후 /payment 로 복귀)
+  const role = session?.user?.role;
+  const showPayment = role !== "SUPER_ADMIN" && role !== "CONSULTANT";
+
+  // 메인(고객) 하단 메뉴: 홈 · 라이브 · 예약 · 뷰티 전문가 · 결제 · 마이페이지
   // ('뷰티 전문가 탐색'이 꺼져 있으면 /sellers 가 404이므로 대신 내 단골 뷰티 전문가(/my/seller)를 연결한다)
   const navItems: { href: string; icon: string; label: string; matchExact?: boolean }[] = [
     { href: "/", icon: "Home", label: "홈", matchExact: true },
@@ -59,6 +64,7 @@ export default function MobileNav() {
     flags.seller
       ? { href: "/sellers", icon: "Users", label: "뷰티 전문가" }
       : { href: "/my/seller", icon: "Users", label: "뷰티 전문가" },
+    ...(showPayment ? [{ href: "/payment", icon: "Wallet", label: "결제" }] : []),
     { href: myHref, icon: "MyPage", label: "마이페이지", matchExact: true },
   ];
 
@@ -132,7 +138,7 @@ export default function MobileNav() {
                 <div className="relative">
                   <Icon name={item.icon} size={22} className={isActive ? "" : "opacity-60"} />
                 </div>
-                <span className={cn("text-[10px] leading-tight", isActive ? "font-semibold text-black" : "font-normal")}>
+                <span className={cn("text-[10px] leading-tight whitespace-nowrap", isActive ? "font-semibold text-black" : "font-normal")}>
                   {item.label}
                 </span>
               </Link>

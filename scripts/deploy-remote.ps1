@@ -1,12 +1,12 @@
-# Windows -> beautymate 실서버 (15.165.111.176) SSH 배포 + 재시작.
+# Windows -> beautymate 실서버 (3.35.107.134) SSH 배포 + 재시작.
 #
 # 사용:
 #   .\scripts\deploy-remote.ps1
 #
 # 환경변수로 오버라이드 가능:
-#   DEPLOY_SSH_KEY    기본 C:\Users\yunse\keys\vanillaform_key.pem
+#   DEPLOY_SSH_KEY    기본 C:\Users\Jeon\Desktop\작업물 AWS 키\ssh_keys\vanillaform_key.pem
 #   DEPLOY_SSH_USER   기본 ubuntu
-#   DEPLOY_SSH_HOST   기본 15.165.111.176
+#   DEPLOY_SSH_HOST   기본 3.35.107.134
 #   DEPLOY_REPO_DIR   기본 /home/ubuntu/beautymate
 #   DEPLOY_BRANCH     기본 main
 #   DEPLOY_PM2_NAME   기본 beautymate
@@ -18,9 +18,9 @@ function Get-EnvOrDefault($name, $default) {
   if ([string]::IsNullOrWhiteSpace($v)) { return $default } else { return $v }
 }
 
-$SshKey  = Get-EnvOrDefault 'DEPLOY_SSH_KEY'  'C:\Users\yunse\keys\vanillaform_key.pem'
+$SshKey  = Get-EnvOrDefault 'DEPLOY_SSH_KEY'  'C:\Users\Jeon\Desktop\작업물 AWS 키\ssh_keys\vanillaform_key.pem'
 $SshUser = Get-EnvOrDefault 'DEPLOY_SSH_USER' 'ubuntu'
-$SshHost = Get-EnvOrDefault 'DEPLOY_SSH_HOST' '15.165.111.176'
+$SshHost = Get-EnvOrDefault 'DEPLOY_SSH_HOST' '3.35.107.134'
 $RepoDir = Get-EnvOrDefault 'DEPLOY_REPO_DIR' '/home/ubuntu/beautymate'
 $Branch  = Get-EnvOrDefault 'DEPLOY_BRANCH'   'main'
 $PmName  = Get-EnvOrDefault 'DEPLOY_PM2_NAME' 'beautymate'
